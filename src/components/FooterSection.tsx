@@ -1,5 +1,5 @@
 
-import { Instagram, Telegram } from "lucide-react";
+import { Instagram, MessageCircle } from "lucide-react";
 
 const FooterSection = () => {
   return (
@@ -43,7 +43,7 @@ const FooterSection = () => {
                     <Instagram size={22} />
                   </a>
                   <a href="#" className="text-white/70 hover:text-gold-400 transition-colors">
-                    <Telegram size={22} />
+                    <MessageCircle size={22} />
                   </a>
                 </div>
               </li>
