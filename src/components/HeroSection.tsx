@@ -71,7 +71,7 @@ const HeroSection = () => {
               <div className="bg-gradient-to-br from-gray-800 to-black p-3 rounded-[32px] glass-morphism border border-white/10 shadow-[0_0_25px_rgba(255,215,0,0.15)]">
                 <div className="aspect-[9/19.5] overflow-hidden rounded-[24px] border-[8px] border-black">
                   <img 
-                    src="src\components\images\home page.jpeg" 
+                    src="/images/home page.jpeg" 
                     alt="LiftLegends App Preview" 
                     className="w-full h-full object-cover"
                   />
