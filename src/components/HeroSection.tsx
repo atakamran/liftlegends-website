@@ -7,8 +7,12 @@ const HeroSection = () => {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    // Trigger animation after component mounts
-    setIsVisible(true);
+    // Trigger animation after component mounts with a small delay to improve FCP
+    const timer = setTimeout(() => {
+      setIsVisible(true);
+    }, 100);
+    
+    return () => clearTimeout(timer);
   }, []);
 
   return (
@@ -132,6 +136,8 @@ const HeroSection = () => {
                         alt="LiftLegends Logo" 
                         className="w-32 h-auto"
                         loading="eager"
+                        width="128"
+                        height="128"
                       />
                     </div>
                     

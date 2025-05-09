@@ -115,14 +115,8 @@ const FooterSection = () => {
             
             {/* Social media links */}
             <div className="flex items-center gap-4 mt-6">
-              <a href="#" className="bg-gray-800 hover:bg-gold-500 text-white hover:text-black p-2 rounded-full transition-all hover:scale-110 hover:shadow-[0_0_10px_rgba(255,215,0,0.3)]">
+              <a href="https://www.instagram.com/liftlegends.ir" target="_blank" rel="noopener noreferrer" className="bg-gray-800 hover:bg-gold-500 text-white hover:text-black p-2 rounded-full transition-all hover:scale-110 hover:shadow-[0_0_10px_rgba(255,215,0,0.3)]">
                 <Instagram size={18} />
-              </a>
-              <a href="#" className="bg-gray-800 hover:bg-gold-500 text-white hover:text-black p-2 rounded-full transition-all hover:scale-110 hover:shadow-[0_0_10px_rgba(255,215,0,0.3)]">
-                <Twitter size={18} />
-              </a>
-              <a href="#" className="bg-gray-800 hover:bg-gold-500 text-white hover:text-black p-2 rounded-full transition-all hover:scale-110 hover:shadow-[0_0_10px_rgba(255,215,0,0.3)]">
-                <Linkedin size={18} />
               </a>
             </div>
           </div>
