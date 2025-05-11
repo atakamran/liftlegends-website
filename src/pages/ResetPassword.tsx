@@ -33,11 +33,16 @@ const ResetPassword = () => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsSubmitting(true);
     try {
+      // استفاده از آدرس کامل برای بازگشت
+      const redirectUrl = `${window.location.origin}/update-password`;
+      console.log("Redirect URL:", redirectUrl);
+      
       const { error } = await supabase.auth.resetPasswordForEmail(values.email, {
-        redirectTo: window.location.origin + '/update-password',
+        redirectTo: redirectUrl,
       });
       
       if (error) {
+        console.error("Supabase error:", error);
         toast.error(error.message);
       } else {
         setIsSuccess(true);

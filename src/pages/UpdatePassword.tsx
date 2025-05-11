@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -10,7 +10,7 @@ import { z } from "zod";
 import { toast } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowLeft, Check } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const formSchema = z.object({
   password: z.string().min(6, {
@@ -27,7 +27,25 @@ const formSchema = z.object({
 const UpdatePassword = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isError, setIsError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  // استخراج پارامترهای URL
+  useEffect(() => {
+    // بررسی اعتبار توکن بازیابی رمز عبور
+    const checkSession = async () => {
+      const { data, error } = await supabase.auth.getSession();
+      
+      if (error || !data.session) {
+        setIsError(true);
+        setErrorMessage("لینک بازیابی رمز عبور نامعتبر یا منقضی شده است. لطفاً دوباره درخواست بازیابی رمز عبور کنید.");
+      }
+    };
+    
+    checkSession();
+  }, []);
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -46,6 +64,8 @@ const UpdatePassword = () => {
       
       if (error) {
         toast.error(error.message);
+        setIsError(true);
+        setErrorMessage(error.message);
       } else {
         setIsSuccess(true);
         toast.success("رمز عبور با موفقیت تغییر یافت");
@@ -56,6 +76,8 @@ const UpdatePassword = () => {
     } catch (error) {
       console.error("Error updating password:", error);
       toast.error("خطا در تغییر رمز عبور");
+      setIsError(true);
+      setErrorMessage("خطا در تغییر رمز عبور. لطفاً دوباره تلاش کنید.");
     } finally {
       setIsSubmitting(false);
     }
@@ -90,6 +112,23 @@ const UpdatePassword = () => {
               <p className="text-muted-foreground">
                 رمز عبور شما با موفقیت تغییر یافت. تا چند لحظه دیگر به صفحه اصلی هدایت می‌شوید.
               </p>
+            </div>
+          ) : isError ? (
+            <div className="text-center space-y-4">
+              <div className="flex justify-center">
+                <div className="bg-red-500/20 p-3 rounded-full">
+                  <ArrowLeft className="h-6 w-6 text-red-500" />
+                </div>
+              </div>
+              <p className="text-muted-foreground">
+                {errorMessage}
+              </p>
+              <Button 
+                className="w-full bg-gold-500 hover:bg-gold-600 text-primary-foreground mt-4"
+                onClick={() => navigate("/reset-password")}
+              >
+                بازگشت به صفحه بازیابی رمز عبور
+              </Button>
             </div>
           ) : (
             <Form {...form}>
