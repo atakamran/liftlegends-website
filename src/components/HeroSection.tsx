@@ -79,17 +79,18 @@ const HeroSection = () => {
                 دانلود برای اندروید
               </Button>
               <div className="absolute -top-3 -right-3 bg-red-500 text-white text-xs px-2 py-1 rounded-full animate-pulse">
-                بزودی
+                دانلود از لینک مستقیم
               </div>
             </div>
-            {/* <div className="relative">
-              <Button variant="outline" className="border-gold-500 text-gold-500 hover:bg-gold-500/10 px-8 py-6 text-lg font-medium rounded-xl transition-all">
-                دانلود مستقیم APK
+            <div className="relative">
+              <Button 
+                variant="outline" 
+                className="border-gold-500 text-gold-500 hover:bg-gold-500/10 px-8 py-6 text-lg font-medium rounded-xl transition-all"
+                onClick={() => window.open("https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends//lift%20legends.apk", "_blank")}
+              >
+                دانلود از لینک مستقیم
               </Button>
-              <div className="absolute -top-3 -right-3 bg-red-500 text-white text-xs px-2 py-1 rounded-full animate-pulse">
-                بزودی
-              </div>
-            </div> */}
+            </div>
           </div>
           
           <div className="flex items-center justify-center md:justify-start gap-6 mt-6">
