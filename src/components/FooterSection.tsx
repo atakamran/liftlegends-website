@@ -147,6 +147,12 @@ const FooterSection = () => {
                 </a>
               </li>
               <li>
+                <a href="/blog" className="text-white/70 hover:text-gold-400 transition-colors flex items-center gap-2 group">
+                  <span className="w-1.5 h-1.5 bg-gold-500 rounded-full group-hover:scale-150 transition-transform"></span>
+                  <span className="group-hover:translate-x-1 transition-transform">بلاگ</span>
+                </a>
+              </li>
+              <li>
                 <a href="#" className="text-white/70 hover:text-gold-400 transition-colors flex items-center gap-2 group">
                   <span className="w-1.5 h-1.5 bg-gold-500 rounded-full group-hover:scale-150 transition-transform"></span>
                   <span className="group-hover:translate-x-1 transition-transform">دانلود</span>

@@ -11,6 +11,8 @@ import TermsOfUse from "./pages/TermsOfUse";
 import WorkWithUs from "./pages/WorkWithUs";
 import ResetPassword from "./pages/ResetPassword";
 import UpdatePassword from "./pages/UpdatePassword";
+import Blog from "./pages/Blog";
+import BlogPost from "./pages/BlogPost";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +29,8 @@ const App = () => (
           <Route path="/work-with-us" element={<WorkWithUs />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/update-password" element={<UpdatePassword />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/:postId" element={<BlogPost />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
