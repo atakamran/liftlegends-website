@@ -166,6 +166,19 @@ const WorkWithUs = () => {
                   </li>
                 </ul>
               </div>
+              
+              <div className="bg-gray-900 p-6 rounded-xl border border-white/5 mt-6">
+                <h3 className="text-xl font-semibold mb-3 text-gold-500">همکاری به عنوان مربی</h3>
+                <p className="text-white/80 mb-4">
+                  آیا مربی بدنسازی، متخصص تغذیه یا کارشناس مکمل‌های ورزشی هستید؟
+                </p>
+                <a 
+                  href="/coach-application" 
+                  className="inline-block bg-gold-500 hover:bg-gold-600 text-black px-6 py-3 rounded-xl transition-all hover:scale-105 font-medium"
+                >
+                  درخواست همکاری به عنوان مربی
+                </a>
+              </div>
             </div>
           </div>
           

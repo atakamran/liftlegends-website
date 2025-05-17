@@ -55,6 +55,7 @@ export type Database = {
         Row: {
           author_id: string
           category: string | null
+          coach_id: string | null
           content: string
           cover_image: string | null
           created_at: string
@@ -68,6 +69,7 @@ export type Database = {
         Insert: {
           author_id: string
           category?: string | null
+          coach_id?: string | null
           content: string
           cover_image?: string | null
           created_at?: string
@@ -81,6 +83,7 @@ export type Database = {
         Update: {
           author_id?: string
           category?: string | null
+          coach_id?: string | null
           content?: string
           cover_image?: string | null
           created_at?: string
@@ -91,7 +94,148 @@ export type Database = {
           title?: string
           updated_at?: string
         }
+        Relationships: [
+          {
+            foreignKeyName: "blog_posts_coach_id_fkey"
+            columns: ["coach_id"]
+            isOneToOne: false
+            referencedRelation: "coaches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      coach_applications: {
+        Row: {
+          created_at: string | null
+          email: string
+          experience_years: number
+          expertise: string
+          full_name: string
+          id: string
+          message: string | null
+          phone: string | null
+          resume_url: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          experience_years: number
+          expertise: string
+          full_name: string
+          id?: string
+          message?: string | null
+          phone?: string | null
+          resume_url?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          experience_years?: number
+          expertise?: string
+          full_name?: string
+          id?: string
+          message?: string | null
+          phone?: string | null
+          resume_url?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
         Relationships: []
+      }
+      coaches: {
+        Row: {
+          bio: string | null
+          created_at: string | null
+          experience_years: number | null
+          expertise: string
+          full_name: string
+          id: string
+          profile_id: string | null
+          profile_image: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          bio?: string | null
+          created_at?: string | null
+          experience_years?: number | null
+          expertise: string
+          full_name: string
+          id: string
+          profile_id?: string | null
+          profile_image?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          bio?: string | null
+          created_at?: string | null
+          experience_years?: number | null
+          expertise?: string
+          full_name?: string
+          id?: string
+          profile_id?: string | null
+          profile_image?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coaches_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fitness_plans: {
+        Row: {
+          coach_id: string
+          created_at: string | null
+          description: string
+          duration_weeks: number
+          id: string
+          image_url: string | null
+          price: number
+          title: string
+          type: string
+          updated_at: string | null
+        }
+        Insert: {
+          coach_id: string
+          created_at?: string | null
+          description: string
+          duration_weeks: number
+          id?: string
+          image_url?: string | null
+          price: number
+          title: string
+          type: string
+          updated_at?: string | null
+        }
+        Update: {
+          coach_id?: string
+          created_at?: string | null
+          description?: string
+          duration_weeks?: number
+          id?: string
+          image_url?: string | null
+          price?: number
+          title?: string
+          type?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fitness_plans_coach_id_fkey"
+            columns: ["coach_id"]
+            isOneToOne: false
+            referencedRelation: "coaches"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_profiles: {
         Row: {
@@ -103,6 +247,8 @@ export type Database = {
           goal: string | null
           height: number | null
           id: string
+          is_admin: boolean | null
+          is_coach: boolean | null
           name: string | null
           permissions: string | null
           phoneNumber: string | null
@@ -122,6 +268,8 @@ export type Database = {
           goal?: string | null
           height?: number | null
           id?: string
+          is_admin?: boolean | null
+          is_coach?: boolean | null
           name?: string | null
           permissions?: string | null
           phoneNumber?: string | null
@@ -141,6 +289,8 @@ export type Database = {
           goal?: string | null
           height?: number | null
           id?: string
+          is_admin?: boolean | null
+          is_coach?: boolean | null
           name?: string | null
           permissions?: string | null
           phoneNumber?: string | null
@@ -153,12 +303,61 @@ export type Database = {
         }
         Relationships: []
       }
+      user_purchases: {
+        Row: {
+          amount: number
+          expires_at: string | null
+          id: string
+          payment_id: string | null
+          payment_status: string | null
+          plan_id: string
+          purchase_date: string | null
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          expires_at?: string | null
+          id?: string
+          payment_id?: string | null
+          payment_status?: string | null
+          plan_id: string
+          purchase_date?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          expires_at?: string | null
+          id?: string
+          payment_id?: string | null
+          payment_status?: string | null
+          plan_id?: string
+          purchase_date?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_purchases_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "fitness_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      is_admin: {
+        Args: { _user_id: string }
+        Returns: boolean
+      }
       is_blog_admin: {
+        Args: { _user_id: string }
+        Returns: boolean
+      }
+      is_coach: {
         Args: { _user_id: string }
         Returns: boolean
       }
