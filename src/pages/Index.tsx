@@ -10,13 +10,13 @@ const Index = () => {
   // Structured data is now added directly in the HTML head for better performance
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <>
       <HeroSection />
       <FeaturesSection />
       {/* <TestimonialsSection />
       <FaqSection /> */}
       <FooterSection />
-    </div>
+    </>
   );
 };
 
