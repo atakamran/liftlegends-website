@@ -74,21 +74,12 @@ const HeroSection = () => {
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start mt-8">
             <div className="relative">
-              <Button className="bg-gold-500 hover:bg-gold-600 text-black px-8 py-6 text-lg font-medium rounded-xl transition-all hover:scale-105 shadow-[0_0_15px_rgba(255,215,0,0.3)] animate-pulse-gold">
+              <Button 
+                className="bg-gold-500 hover:bg-gold-600 text-black px-8 py-6 text-lg font-medium rounded-xl transition-all hover:scale-105 shadow-[0_0_15px_rgba(255,215,0,0.3)] animate-pulse-gold"
+                onClick={() => window.location.href = "/download"}
+              >
                 <Download size={20} className="ml-2" />
                 دانلود برای اندروید
-              </Button>
-              <div className="absolute -top-3 -right-3 bg-red-500 text-white text-xs px-2 py-1 rounded-full animate-pulse">
-                دانلود از لینک مستقیم
-              </div>
-            </div>
-            <div className="relative">
-              <Button 
-                variant="outline" 
-                className="border-gold-500 text-gold-500 hover:bg-gold-500/10 px-8 py-6 text-lg font-medium rounded-xl transition-all"
-                onClick={() => window.open("https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends//lift%20legends.apk", "_blank")}
-              >
-                دانلود از لینک مستقیم
               </Button>
             </div>
           </div>

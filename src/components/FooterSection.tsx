@@ -89,14 +89,11 @@ const FooterSection = () => {
               <div className="relative">
                 <Button 
                   className="bg-gold-500 hover:bg-gold-600 text-black px-6 py-3 rounded-xl transition-all hover:scale-105 font-medium shadow-[0_0_15px_rgba(255,215,0,0.2)] hover:shadow-[0_0_20px_rgba(255,215,0,0.4)]"
-                  onClick={() => window.open("https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends//lift%20legends.apk", "_blank")}
+                  onClick={() => window.location.href = "/download"}
                 >
                   <Download size={18} className="ml-2" />
                   دانلود اپلیکیشن
                 </Button>
-                <div className="absolute -top-3 -right-3 bg-red-500 text-white text-xs px-2 py-1 rounded-full animate-pulse">
-                  دانلود از لینک مستقیم
-                </div>
               </div>
             </div>
           </div>
@@ -153,7 +150,7 @@ const FooterSection = () => {
                 </a>
               </li>
               <li>
-                <a href="#" className="text-white/70 hover:text-gold-400 transition-colors flex items-center gap-2 group">
+                <a href="/download" className="text-white/70 hover:text-gold-400 transition-colors flex items-center gap-2 group">
                   <span className="w-1.5 h-1.5 bg-gold-500 rounded-full group-hover:scale-150 transition-transform"></span>
                   <span className="group-hover:translate-x-1 transition-transform">دانلود</span>
                 </a>

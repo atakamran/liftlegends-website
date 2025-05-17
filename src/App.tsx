@@ -14,6 +14,7 @@ import UpdatePassword from "./pages/UpdatePassword";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
 import CoachApplication from "./pages/CoachApplication";
+import Download from "./pages/Download";
 
 const queryClient = new QueryClient();
 
@@ -33,6 +34,7 @@ const App = () => (
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:postId" element={<BlogPost />} />
           <Route path="/coach-application" element={<CoachApplication />} />
+          <Route path="/download" element={<Download />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
