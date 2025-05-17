@@ -181,34 +181,7 @@ const FeaturesSection = () => {
           </div>
         </div>
         
-        {/* CTA Banner */}
-        <div className="mt-24 bg-gradient-to-r from-gray-900 to-black p-8 md:p-12 rounded-2xl border border-gold-500/20 relative overflow-hidden group hover:border-gold-500/40 transition-all duration-500">
-          <div className="absolute -z-10 top-0 right-0 w-64 h-64 bg-gold-500 rounded-full blur-[100px] opacity-10 group-hover:opacity-20 transition-opacity"></div>
-          <div className="absolute -z-10 bottom-0 left-0 w-32 h-32 bg-gold-400 rounded-full blur-[80px] opacity-5 group-hover:opacity-10 transition-opacity"></div>
-          
-          <div className="flex flex-col md:flex-row items-center justify-between gap-8">
-            <div>
-              <h3 className="text-2xl md:text-3xl font-bold mb-4 text-gradient">آماده شروع هستید؟</h3>
-              <p className="text-white/70 max-w-xl">
-                همین امروز LiftLegends را دانلود کنید و سفر خود را به سمت بدنی قوی‌تر و سالم‌تر با <span className="text-gold-400">برنامه هوشمند تمرینی</span> و <span className="text-gold-400">برنامه مکمل و استرویید</span> آغاز کنید.
-              </p>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <div className="relative">
-                <button 
-                  className="bg-gold-500 hover:bg-gold-600 text-black px-6 py-3 rounded-xl transition-all hover:scale-105 font-medium shadow-[0_0_15px_rgba(255,215,0,0.2)] hover:shadow-[0_0_20px_rgba(255,215,0,0.4)]"
-                  onClick={() => window.open("https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends//lift%20legends.apk", "_blank")}
-                >
-                  <Download size={18} className="inline ml-2" />
-                  دانلود اپلیکیشن
-                </button>
-                <div className="absolute -top-3 -right-3 bg-red-500 text-white text-xs px-2 py-1 rounded-full animate-pulse">
-                  دانلود از لینک مستقیم
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        
       </div>
     </section>
   );

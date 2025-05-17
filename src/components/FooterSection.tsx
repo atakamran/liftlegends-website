@@ -276,7 +276,23 @@ const FooterSection = () => {
         
         {/* Copyright and legal */}
         <div className={`mt-16 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 transform transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`} style={{ transitionDelay: "600ms" }}>
-          <p className="text-white/60 text-sm">© ۱۴۰۴ LiftLegends. تمامی حقوق محفوظ است.</p>
+          <div className="flex flex-col md:flex-row items-center gap-4">
+            <p className="text-white/60 text-sm">© ۱۴۰۴ LiftLegends. تمامی حقوق محفوظ است.</p>
+            <a 
+              referrerPolicy="origin" 
+              target="_blank" 
+              href="https://trustseal.enamad.ir/?id=610487&Code=biPgIL29KpupPGTfmx6ATaHLhmIS9EnB"
+              className="hover:opacity-90 transition-opacity"
+            >
+              <img 
+                referrerPolicy="origin" 
+                src="https://trustseal.enamad.ir/logo.aspx?id=610487&Code=biPgIL29KpupPGTfmx6ATaHLhmIS9EnB" 
+                alt="نماد اعتماد الکترونیکی" 
+                style={{cursor: 'pointer'}} 
+                data-code="biPgIL29KpupPGTfmx6ATaHLhmIS9EnB"
+              />
+            </a>
+          </div>
           <div className="flex gap-4 text-sm">
             <a href="/privacy-policy" className="text-white/60 hover:text-gold-400 transition-colors">حریم خصوصی</a>
             <span className="text-white/40">|</span>
