@@ -16,6 +16,7 @@ import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
 import CoachApplication from "./pages/CoachApplication";
 import Download from "./pages/Download";
+import Profile from "./pages/Profile";
 
 const queryClient = new QueryClient();
 
@@ -23,22 +24,6 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <BrowserRouter>
-<<<<<<< Updated upstream
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-          <Route path="/terms-of-use" element={<TermsOfUse />} />
-          {/* <Route path="/work-with-us" element={<WorkWithUs />} /> */}
-          <Route path="/reset-password" element={<ResetPassword />} />
-          <Route path="/update-password" element={<UpdatePassword />} />
-          <Route path="/blog" element={<Blog />} />
-          <Route path="/blog/:postId" element={<BlogPost />} />
-          <Route path="/coach-application" element={<CoachApplication />} />
-          <Route path="/download" element={<Download />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-=======
         <Layout>
           <Routes>
             <Route path="/" element={<Index />} />
@@ -50,13 +35,14 @@ const App = () => (
             <Route path="/blog" element={<Blog />} />
             <Route path="/blog/:postId" element={<BlogPost />} />
             <Route path="/coach-application" element={<CoachApplication />} />
+            <Route path="/download" element={<Download />} />
+            <Route path="/profile" element={<Profile />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
           <Toaster />
           <Sonner />
         </Layout>
->>>>>>> Stashed changes
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
