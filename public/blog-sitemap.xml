@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
+        xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
+
+  <!-- صفحه اصلی بلاگ -->
+  <url>
+    <loc>https://liftlegends.ir/blog</loc>
+    <lastmod>2024-08-15</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://uploadkon.ir/uploads/4b3815_25بهترین-برنامه‌های-تمرینی-برای-افزایش-حجم-عضلات.jpg</image:loc>
+      <image:title>بلاگ لیفت لجندز</image:title>
+      <image:caption>مقالات تخصصی بدنسازی و تناسب اندام</image:caption>
+    </image:image>
+  </url>
+
+  <!-- دسته‌بندی‌های بلاگ -->
+  <url>
+    <loc>https://liftlegends.ir/blog/category/workout</loc>
+    <lastmod>2024-08-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <news:news>
+      <news:publication>
+        <news:name>LiftLegends</news:name>
+        <news:language>fa</news:language>
+      </news:publication>
+      <news:publication_date>2024-08-15</news:publication_date>
+      <news:title>مقالات تمرین و برنامه‌ریزی بدنسازی</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://liftlegends.ir/blog/category/nutrition</loc>
+    <lastmod>2024-08-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <news:news>
+      <news:publication>
+        <news:name>LiftLegends</news:name>
+        <news:language>fa</news:language>
+      </news:publication>
+      <news:publication_date>2024-08-15</news:publication_date>
+      <news:title>مقالات تغذیه و رژیم غذایی</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://liftlegends.ir/blog/category/supplements</loc>
+    <lastmod>2024-08-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <news:news>
+      <news:publication>
+        <news:name>LiftLegends</news:name>
+        <news:language>fa</news:language>
+      </news:publication>
+      <news:publication_date>2024-08-15</news:publication_date>
+      <news:title>مقالات مکمل‌ها و استروئیدها</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://liftlegends.ir/blog/category/motivation</loc>
+    <lastmod>2024-08-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <news:news>
+      <news:publication>
+        <news:name>LiftLegends</news:name>
+        <news:language>fa</news:language>
+      </news:publication>
+      <news:publication_date>2024-08-15</news:publication_date>
+      <news:title>مقالات انگیزش و روانشناسی ورزشی</news:title>
+    </news:news>
+  </url>
+
+  <!-- مقالات بلاگ -->
+  <url>
+    <loc>https://liftlegends.ir/blog/workout-plans-for-muscle-growth</loc>
+    <lastmod>2024-08-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://uploadkon.ir/uploads/4b3815_25بهترین-برنامه‌های-تمرینی-برای-افزایش-حجم-عضلات.jpg</image:loc>
+      <image:title>برنامه‌های تمرینی برای افزایش حجم عضلات</image:title>
+    </image:image>
+    <news:news>
+      <news:publication>
+        <news:name>LiftLegends</news:name>
+        <news:language>fa</news:language>
+      </news:publication>
+      <news:publication_date>2024-08-15</news:publication_date>
+      <news:title>بهترین برنامه‌های تمرینی برای افزایش حجم عضلات</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://liftlegends.ir/blog/nutrition-for-muscle-gain</loc>
+    <lastmod>2024-08-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://uploadkon.ir/uploads/4b3815_25بهترین-برنامه‌های-تمرینی-برای-افزایش-حجم-عضلات.jpg</image:loc>
+      <image:title>تغذیه برای افزایش حجم عضلات</image:title>
+    </image:image>
+    <news:news>
+      <news:publication>
+        <news:name>LiftLegends</news:name>
+        <news:language>fa</news:language>
+      </news:publication>
+      <news:publication_date>2024-08-10</news:publication_date>
+      <news:title>اصول تغذیه برای افزایش حجم عضلات</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://liftlegends.ir/blog/supplements-guide</loc>
+    <lastmod>2024-08-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <news:news>
+      <news:publication>
+        <news:name>LiftLegends</news:name>
+        <news:language>fa</news:language>
+      </news:publication>
+      <news:publication_date>2024-08-05</news:publication_date>
+      <news:title>راهنمای جامع مکمل‌های بدنسازی</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://liftlegends.ir/blog/motivation-tips</loc>
+    <lastmod>2024-08-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <news:news>
+      <news:publication>
+        <news:name>LiftLegends</news:name>
+        <news:language>fa</news:language>
+      </news:publication>
+      <news:publication_date>2024-08-01</news:publication_date>
+      <news:title>نکات انگیزشی برای حفظ تداوم در تمرینات</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://liftlegends.ir/blog/training-frequency</loc>
+    <lastmod>2024-07-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <news:news>
+      <news:publication>
+        <news:name>LiftLegends</news:name>
+        <news:language>fa</news:language>
+      </news:publication>
+      <news:publication_date>2024-07-25</news:publication_date>
+      <news:title>تعداد جلسات تمرینی مناسب در هفته</news:title>
+    </news:news>
+  </url>
+</urlset>

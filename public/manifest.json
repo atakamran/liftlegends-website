@@ -1,0 +1,58 @@
+{
+  "name": "LiftLegends - مربی بدنسازی هوشمند",
+  "short_name": "LiftLegends",
+  "description": "برنامه تمرینی هوشمند و رژیم غذایی شخصی‌سازی شده با هوش مصنوعی برای بدنسازی و تناسب اندام",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#FFD700",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64",
+      "type": "image/x-icon"
+    }
+  ],
+  "related_applications": [
+    {
+      "platform": "play",
+      "url": "https://play.google.com/store/apps/details?id=ir.liftlegends.app"
+    }
+  ],
+  "prefer_related_applications": true,
+  "categories": ["fitness", "health", "lifestyle"],
+  "screenshots": [
+    {
+      "src": "/screenshots/home.jpg",
+      "sizes": "1080x1920",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "/screenshots/workout.jpg",
+      "sizes": "1080x1920",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "/screenshots/nutrition.jpg",
+      "sizes": "1080x1920",
+      "type": "image/jpeg"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "بلاگ",
+      "short_name": "بلاگ",
+      "description": "مشاهده مقالات بدنسازی و تناسب اندام",
+      "url": "/blog"
+    },
+    {
+      "name": "ورود",
+      "short_name": "ورود",
+      "description": "ورود به حساب کاربری",
+      "url": "/login"
+    }
+  ],
+  "lang": "fa-IR",
+  "dir": "rtl"
+}

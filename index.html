@@ -2,6 +2,15 @@
 <!DOCTYPE html>
 <html lang="fa">
   <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-E87QWJ7KY1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-E87QWJ7KY1');
+    </script>
+    
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>LiftLegends - مربی بدنسازی هوشمند با هوش مصنوعی | برنامه تمرینی و رژیم غذایی</title>
@@ -13,12 +22,19 @@
     <meta name="robots" content="index, follow" />
     <meta name="language" content="Persian" />
     <meta name="revisit-after" content="7 days" />
+    
+    <!-- PWA Support -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="application-name" content="LiftLegends" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="LiftLegends" />
+    <meta name="mobile-web-app-capable" content="yes" />
 
     <!-- Favicon -->
     <link rel="icon" href="/favicon.ico" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <link rel="shortcut icon" href="/favicon.ico" />
-    <link rel="apple-touch-icon" href="/favicon/apple-touch-icon.png" />
     <meta name="msapplication-TileColor" content="#FFD700" />
 
     <!-- Open Graph / Facebook -->
@@ -100,5 +116,20 @@
     <div id="root"></div>
     <!-- External scripts removed for performance optimization -->
     <script type="module" src="/src/main.tsx"></script>
+    
+    <!-- Service Worker Registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/service-worker.js')
+            .then(registration => {
+              console.log('ServiceWorker registration successful with scope: ', registration.scope);
+            })
+            .catch(error => {
+              console.log('ServiceWorker registration failed: ', error);
+            });
+        });
+      }
+    </script>
   </body>
 </html>

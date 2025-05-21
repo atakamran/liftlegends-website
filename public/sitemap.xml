@@ -1,44 +1,136 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
+        xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
+  <!-- صفحه اصلی -->
   <url>
     <loc>https://liftlegends.ir/</loc>
     <lastmod>2024-08-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends//white%20logo.png</image:loc>
+      <image:title>LiftLegends Logo</image:title>
+      <image:caption>لوگوی رسمی لیفت لجندز - مربی هوشمند بدنسازی</image:caption>
+    </image:image>
   </url>
+
+  <!-- صفحات اصلی -->
   <url>
     <loc>https://liftlegends.ir/privacy-policy</loc>
-    <lastmod>2024-07-01</lastmod>
+    <lastmod>2024-08-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://liftlegends.ir/terms-of-use</loc>
-    <lastmod>2024-07-01</lastmod>
+    <lastmod>2024-08-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://liftlegends.ir/coach-application</loc>
-    <lastmod>2024-07-01</lastmod>
+    <lastmod>2024-08-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
+
+  <!-- صفحات کاربری -->
+  <url>
+    <loc>https://liftlegends.ir/login</loc>
+    <lastmod>2024-08-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://liftlegends.ir/register</loc>
+    <lastmod>2024-08-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://liftlegends.ir/reset-password</loc>
+    <lastmod>2024-08-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.4</priority>
+  </url>
+
+  <!-- صفحات بلاگ -->
   <url>
     <loc>https://liftlegends.ir/blog</loc>
     <lastmod>2024-08-15</lastmod>
-    <changefreq>weekly</changefreq>
+    <changefreq>daily</changefreq>
     <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://uploadkon.ir/uploads/4b3815_25بهترین-برنامه‌های-تمرینی-برای-افزایش-حجم-عضلات.jpg</image:loc>
+      <image:title>بلاگ لیفت لجندز</image:title>
+      <image:caption>مقالات تخصصی بدنسازی و تناسب اندام</image:caption>
+    </image:image>
   </url>
+
+  <!-- دسته‌بندی‌های بلاگ -->
+  <url>
+    <loc>https://liftlegends.ir/blog/category/workout</loc>
+    <lastmod>2024-08-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://liftlegends.ir/blog/category/nutrition</loc>
+    <lastmod>2024-08-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://liftlegends.ir/blog/category/supplements</loc>
+    <lastmod>2024-08-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://liftlegends.ir/blog/category/motivation</loc>
+    <lastmod>2024-08-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- مقالات بلاگ -->
   <url>
     <loc>https://liftlegends.ir/blog/workout-plans-for-muscle-growth</loc>
     <lastmod>2024-08-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://uploadkon.ir/uploads/4b3815_25بهترین-برنامه‌های-تمرینی-برای-افزایش-حجم-عضلات.jpg</image:loc>
+      <image:title>برنامه‌های تمرینی برای افزایش حجم عضلات</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://liftlegends.ir/blog/nutrition-for-muscle-gain</loc>
     <lastmod>2024-08-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://uploadkon.ir/uploads/4b3815_25بهترین-برنامه‌های-تمرینی-برای-افزایش-حجم-عضلات.jpg</image:loc>
+      <image:title>تغذیه برای افزایش حجم عضلات</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://liftlegends.ir/blog/supplements-guide</loc>
+    <lastmod>2024-08-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://liftlegends.ir/blog/motivation-tips</loc>
+    <lastmod>2024-08-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://liftlegends.ir/blog/training-frequency</loc>
+    <lastmod>2024-07-25</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>

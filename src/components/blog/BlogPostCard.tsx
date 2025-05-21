@@ -11,13 +11,21 @@ interface BlogPostCardProps {
 
 const BlogPostCard = ({ post }: BlogPostCardProps) => {
   return (
-    <Link to={`/blog/${post.id}`}>
+    <Link 
+      to={`/blog/${post.slug || post.id}`}
+      title={post.title}
+      aria-label={`مشاهده مقاله: ${post.title}`}
+    >
       <Card className="bg-zinc-900 border-zinc-800 hover:border-yellow-500 hover:shadow-[0_0_30px_rgba(234,179,8,0.1)] transition-all duration-300 h-full overflow-hidden">
         <div className="aspect-video w-full overflow-hidden relative">
           <img 
             src={post.image} 
             alt={post.title} 
             className="w-full h-full object-cover transition-transform duration-700 hover:scale-110"
+            width="400"
+            height="225"
+            loading="lazy"
+            decoding="async"
           />
           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-t from-black/60 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
         </div>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>اتصال به اینترنت قطع شده است | LiftLegends</title>
+  <link rel="icon" href="/favicon.ico" />
+  <style>
+    body {
+      font-family: 'Vazirmatn', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: #000;
+      color: #fff;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      text-align: center;
+    }
+    .container {
+      max-width: 600px;
+      padding: 2rem;
+      background-color: #111;
+      border-radius: 1rem;
+      border: 1px solid #333;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+    .logo {
+      width: 120px;
+      height: auto;
+      margin-bottom: 2rem;
+    }
+    h1 {
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+      color: #FFD700;
+    }
+    p {
+      font-size: 1.1rem;
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+      color: #ccc;
+    }
+    .button {
+      display: inline-block;
+      background-color: #FFD700;
+      color: #000;
+      font-weight: bold;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.5rem;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      border: none;
+      font-size: 1rem;
+    }
+    .button:hover {
+      background-color: #f0c800;
+      transform: translateY(-2px);
+    }
+    .icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      color: #FFD700;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <img src="https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends//white%20logo.png" alt="LiftLegends Logo" class="logo">
+    <div class="icon">📶</div>
+    <h1>اتصال به اینترنت قطع شده است</h1>
+    <p>متأسفانه اتصال شما به اینترنت قطع شده است. لطفاً اتصال خود را بررسی کرده و دوباره تلاش کنید.</p>
+    <p>برای استفاده از تمام امکانات لیفت لجندز، به اینترنت نیاز دارید.</p>
+    <button class="button" onclick="window.location.reload()">تلاش مجدد</button>
+  </div>
+
+  <script>
+    // Check if the user comes back online
+    window.addEventListener('online', () => {
+      window.location.reload();
+    });
+  </script>
+</body>
+</html>

@@ -1,29 +1,103 @@
 # LiftLegends Robots.txt
 # Website: https://liftlegends.ir
+# Last Updated: 2024-08-15
 
+# Google
 User-agent: Googlebot
 Allow: /
 Disallow: /admin/
+Disallow: /api/
+Disallow: /private/
+Disallow: /dashboard
+Disallow: /profile
 
+# Google Image
+User-agent: Googlebot-Image
+Allow: /images/
+Allow: /*.jpg$
+Allow: /*.jpeg$
+Allow: /*.png$
+Allow: /*.webp$
+Allow: /*.svg$
+
+# Bing
 User-agent: Bingbot
 Allow: /
 Disallow: /admin/
+Disallow: /api/
+Disallow: /private/
+Disallow: /dashboard
+Disallow: /profile
 
+# Yandex
 User-agent: Yandex
 Allow: /
 Disallow: /admin/
+Disallow: /api/
+Disallow: /private/
+Disallow: /dashboard
+Disallow: /profile
 
+# Yooz (موتور جستجوی ایرانی)
+User-agent: YoozBot
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /private/
+Disallow: /dashboard
+Disallow: /profile
+
+# Social Media Bots
 User-agent: Twitterbot
 Allow: /
+Allow: /blog/
+Allow: /images/
 
 User-agent: facebookexternalhit
 Allow: /
+Allow: /blog/
+Allow: /images/
 
+User-agent: LinkedInBot
+Allow: /
+Allow: /blog/
+Allow: /images/
+
+User-agent: Pinterestbot
+Allow: /
+Allow: /blog/
+Allow: /images/
+
+User-agent: TelegramBot
+Allow: /
+Allow: /blog/
+Allow: /images/
+
+# Default for all other bots
 User-agent: *
 Allow: /
 Disallow: /admin/
 Disallow: /api/
 Disallow: /private/
+Disallow: /dashboard
+Disallow: /profile
+Disallow: /login
+Disallow: /register
+Disallow: /reset-password
+Disallow: /update-password
+Disallow: /*.json$
+Disallow: /*.xml$
+Disallow: /*.txt$
+Disallow: /*.md$
+Disallow: /*.log$
+Disallow: /*.sql$
+Disallow: /*.env$
+Disallow: /*.config$
+
+# Crawl delay for all bots
+Crawl-delay: 10
 
 # Sitemaps
+Sitemap: https://liftlegends.ir/sitemap-index.xml
 Sitemap: https://liftlegends.ir/sitemap.xml
+Sitemap: https://liftlegends.ir/blog-sitemap.xml

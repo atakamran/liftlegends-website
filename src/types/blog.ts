@@ -3,6 +3,7 @@ import { ReactNode } from "react";
 
 export interface BlogPost {
   id: string;
+  slug?: string;
   category: string;
   categorySlug: string;
   icon: ReactNode;
@@ -12,6 +13,7 @@ export interface BlogPost {
   readTime: string;
   image: string;
   featured: boolean;
+  content?: string;
   coach?: {
     id: string;
     name: string;

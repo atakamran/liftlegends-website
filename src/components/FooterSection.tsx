@@ -126,33 +126,33 @@ const FooterSection = () => {
             <h4 className="font-semibold mb-6 text-lg text-white">لینک‌های سریع</h4>
             <ul className="space-y-3">
               <li>
-                <a href="#features" className="text-white/70 hover:text-gold-400 transition-colors flex items-center gap-2 group">
-                  <span className="w-1.5 h-1.5 bg-gold-500 rounded-full group-hover:scale-150 transition-transform"></span>
-                  <span className="group-hover:translate-x-1 transition-transform">ویژگی‌ها</span>
-                </a>
-              </li>
-              <li>
-                <a href="#testimonials" className="text-white/70 hover:text-gold-400 transition-colors flex items-center gap-2 group">
-                  <span className="w-1.5 h-1.5 bg-gold-500 rounded-full group-hover:scale-150 transition-transform"></span>
-                  <span className="group-hover:translate-x-1 transition-transform">نظرات کاربران</span>
-                </a>
-              </li>
-              <li>
-                <a href="#faq" className="text-white/70 hover:text-gold-400 transition-colors flex items-center gap-2 group">
-                  <span className="w-1.5 h-1.5 bg-gold-500 rounded-full group-hover:scale-150 transition-transform"></span>
-                  <span className="group-hover:translate-x-1 transition-transform">سوالات متداول</span>
+                <a href="/" className="text-white/70 hover:text-gold-400 transition-colors flex items-center gap-2 group">
+                  <ChevronRight size={16} className="text-gold-500 group-hover:translate-x-1 transition-transform" />
+                  <span className="group-hover:translate-x-1 transition-transform">صفحه اصلی</span>
                 </a>
               </li>
               <li>
                 <a href="/blog" className="text-white/70 hover:text-gold-400 transition-colors flex items-center gap-2 group">
-                  <span className="w-1.5 h-1.5 bg-gold-500 rounded-full group-hover:scale-150 transition-transform"></span>
+                  <ChevronRight size={16} className="text-gold-500 group-hover:translate-x-1 transition-transform" />
                   <span className="group-hover:translate-x-1 transition-transform">بلاگ</span>
                 </a>
               </li>
               <li>
                 <a href="/download" className="text-white/70 hover:text-gold-400 transition-colors flex items-center gap-2 group">
-                  <span className="w-1.5 h-1.5 bg-gold-500 rounded-full group-hover:scale-150 transition-transform"></span>
-                  <span className="group-hover:translate-x-1 transition-transform">دانلود</span>
+                  <ChevronRight size={16} className="text-gold-500 group-hover:translate-x-1 transition-transform" />
+                  <span className="group-hover:translate-x-1 transition-transform">دانلود اپلیکیشن</span>
+                </a>
+              </li>
+              <li>
+                <a href="#features" className="text-white/70 hover:text-gold-400 transition-colors flex items-center gap-2 group">
+                  <ChevronRight size={16} className="text-gold-500 group-hover:translate-x-1 transition-transform" />
+                  <span className="group-hover:translate-x-1 transition-transform">ویژگی‌ها</span>
+                </a>
+              </li>
+              <li>
+                <a href="#testimonials" className="text-white/70 hover:text-gold-400 transition-colors flex items-center gap-2 group">
+                  <ChevronRight size={16} className="text-gold-500 group-hover:translate-x-1 transition-transform" />
+                  <span className="group-hover:translate-x-1 transition-transform">نظرات کاربران</span>
                 </a>
               </li>
             </ul>
@@ -163,26 +163,26 @@ const FooterSection = () => {
             <h4 className="font-semibold mb-6 text-lg text-white">شرکت</h4>
             <ul className="space-y-3">
               <li>
-                <a href="#" className="text-white/70 hover:text-gold-400 transition-colors flex items-center gap-2 group">
-                  <span className="w-1.5 h-1.5 bg-gold-500 rounded-full group-hover:scale-150 transition-transform"></span>
+                <a href="/about" className="text-white/70 hover:text-gold-400 transition-colors flex items-center gap-2 group">
+                  <ChevronRight size={16} className="text-gold-500 group-hover:translate-x-1 transition-transform" />
                   <span className="group-hover:translate-x-1 transition-transform">درباره ما</span>
                 </a>
               </li>
               <li>
                 <a href="/privacy-policy" className="text-white/70 hover:text-gold-400 transition-colors flex items-center gap-2 group">
-                  <span className="w-1.5 h-1.5 bg-gold-500 rounded-full group-hover:scale-150 transition-transform"></span>
+                  <ChevronRight size={16} className="text-gold-500 group-hover:translate-x-1 transition-transform" />
                   <span className="group-hover:translate-x-1 transition-transform">حریم خصوصی</span>
                 </a>
               </li>
               <li>
                 <a href="/terms-of-use" className="text-white/70 hover:text-gold-400 transition-colors flex items-center gap-2 group">
-                  <span className="w-1.5 h-1.5 bg-gold-500 rounded-full group-hover:scale-150 transition-transform"></span>
+                  <ChevronRight size={16} className="text-gold-500 group-hover:translate-x-1 transition-transform" />
                   <span className="group-hover:translate-x-1 transition-transform">شرایط استفاده</span>
                 </a>
               </li>
               <li>
                 <a href="/coach-application" className="text-white/70 hover:text-gold-400 transition-colors flex items-center gap-2 group">
-                  <span className="w-1.5 h-1.5 bg-gold-500 rounded-full group-hover:scale-150 transition-transform"></span>
+                  <ChevronRight size={16} className="text-gold-500 group-hover:translate-x-1 transition-transform" />
                   <span className="group-hover:translate-x-1 transition-transform">فرم درخواست مربی</span>
                 </a>
               </li>
@@ -194,20 +194,26 @@ const FooterSection = () => {
             <h4 className="font-semibold mb-6 text-lg text-white">تماس با ما</h4>
             <ul className="space-y-4">
               <li>
-                <a href="mailto:info@liftlegends.ir" className="text-white/70 hover:text-gold-400 transition-colors flex items-start gap-3 group">
-                  <Mail size={18} className="mt-1 text-gold-500 group-hover:scale-110 transition-transform" />
+                <a href="mailto:info@liftlegends.ir" className="text-white/70 hover:text-gold-400 transition-colors flex items-center gap-3 group">
+                  <div className="bg-gray-800/80 p-2 rounded-full group-hover:bg-gold-500/10 transition-colors">
+                    <Mail size={18} className="text-gold-500 group-hover:scale-110 transition-transform" />
+                  </div>
                   <span className="group-hover:translate-x-1 transition-transform">info@liftlegends.ir</span>
                 </a>
               </li>
               <li>
-                <a href="tel:+989148866040" className="text-white/70 hover:text-gold-400 transition-colors flex items-start gap-3 group">
-                  <Phone size={18} className="mt-1 text-gold-500 group-hover:scale-110 transition-transform" />
+                <a href="tel:+989148866040" className="text-white/70 hover:text-gold-400 transition-colors flex items-center gap-3 group">
+                  <div className="bg-gray-800/80 p-2 rounded-full group-hover:bg-gold-500/10 transition-colors">
+                    <Phone size={18} className="text-gold-500 group-hover:scale-110 transition-transform" />
+                  </div>
                   <span className="group-hover:translate-x-1 transition-transform">09148866040</span>
                 </a>
               </li>
               <li>
-                <div className="flex items-start gap-3">
-                  <MapPin size={18} className="mt-1 text-gold-500" />
+                <div className="flex items-center gap-3">
+                  <div className="bg-gray-800/80 p-2 rounded-full">
+                    <MapPin size={18} className="text-gold-500" />
+                  </div>
                   <p className="text-white/70">تبریز</p>
                 </div>
               </li>
@@ -280,6 +286,7 @@ const FooterSection = () => {
               target="_blank" 
               href="https://trustseal.enamad.ir/?id=610487&Code=biPgIL29KpupPGTfmx6ATaHLhmIS9EnB"
               className="hover:opacity-90 transition-opacity"
+              rel="noopener noreferrer"
             >
               <img 
                 referrerPolicy="origin" 
@@ -287,6 +294,8 @@ const FooterSection = () => {
                 alt="نماد اعتماد الکترونیکی" 
                 style={{cursor: 'pointer'}} 
                 data-code="biPgIL29KpupPGTfmx6ATaHLhmIS9EnB"
+                width="70"
+                height="70"
               />
             </a>
           </div>

@@ -18,13 +18,21 @@ const FeaturedPost = ({ post, isVisible }: FeaturedPostProps) => {
           <span className="w-2 h-8 bg-yellow-500 rounded-full ml-3"></span>
           مقاله ویژه
         </h2>
-        <Link to={`/blog/${post.id}`}>
+        <Link 
+          to={`/blog/${post.slug || post.id}`}
+          title={post.title}
+          aria-label={`مشاهده مقاله: ${post.title}`}
+        >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-gradient-to-br from-zinc-900 to-zinc-800 rounded-2xl overflow-hidden border border-zinc-700 hover:border-yellow-500 transition-all duration-300 p-0 md:p-0">
             <div className="h-64 md:h-auto overflow-hidden">
               <img 
                 src={post.image} 
                 alt={post.title} 
                 className="w-full h-full object-cover transition-transform duration-700 hover:scale-110"
+                width="600"
+                height="400"
+                loading="lazy"
+                decoding="async"
               />
             </div>
             <div className="p-6 md:p-8 flex flex-col justify-between">

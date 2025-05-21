@@ -15,10 +15,15 @@ const DIST_DIR = join(__dirname, 'dist');
 const MIME_TYPES = {
   '.html': 'text/html',
   '.js': 'application/javascript',
+  '.mjs': 'application/javascript',
+  '.jsx': 'application/javascript',
+  '.ts': 'application/javascript',
+  '.tsx': 'application/javascript',
   '.css': 'text/css',
   '.json': 'application/json',
   '.png': 'image/png',
   '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
   '.gif': 'image/gif',
   '.svg': 'image/svg+xml',
   '.ico': 'image/x-icon',
@@ -26,7 +31,8 @@ const MIME_TYPES = {
   '.woff2': 'font/woff2',
   '.ttf': 'font/ttf',
   '.eot': 'application/vnd.ms-fontobject',
-  '.otf': 'font/otf'
+  '.otf': 'font/otf',
+  '.webp': 'image/webp'
 };
 
 const server = createServer((req, res) => {
@@ -62,7 +68,12 @@ const server = createServer((req, res) => {
     
     // Determine the file's MIME type
     const ext = extname(filePath);
-    const contentType = MIME_TYPES[ext] || 'application/octet-stream';
+    let contentType = MIME_TYPES[ext] || 'application/octet-stream';
+    
+    // Special handling for JavaScript modules
+    if (ext === '.js' && req.url.includes('type=module')) {
+      contentType = 'application/javascript';
+    }
     
     // Set CORS headers to allow local testing
     res.writeHead(200, {

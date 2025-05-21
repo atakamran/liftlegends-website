@@ -409,7 +409,12 @@ const AuthHeader = () => {
       <div className="container mx-auto px-4 py-2">
         <div className="flex items-center justify-between flex-row-reverse h-14">
           {/* Logo */}
-          <Link to="/" className="flex items-center">
+          <Link 
+            to="/" 
+            className="flex items-center"
+            aria-label="صفحه اصلی LiftLegends"
+            title="بازگشت به صفحه اصلی"
+          >
             <img 
               src="https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends//white%20logo.png" 
               alt="LiftLegends Logo" 
@@ -422,18 +427,7 @@ const AuthHeader = () => {
 
           {/* Desktop Navigation - Simplified */}
           <nav className="hidden md:flex items-center space-x-6 mr-6">
-            <Link to="/" className="text-white/90 hover:text-gold-500 transition-colors px-2 py-1 text-sm font-medium relative group">
-              صفحه اصلی
-              <span className="absolute inset-x-0 bottom-0 h-0.5 bg-gold-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-200 ease-out"></span>
-            </Link>
-            <Link to="/services" className="text-white/90 hover:text-gold-500 transition-colors px-2 py-1 text-sm font-medium relative group">
-              خدمات
-              <span className="absolute inset-x-0 bottom-0 h-0.5 bg-gold-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-200 ease-out"></span>
-            </Link>
-            <Link to="/coaches" className="text-white/90 hover:text-gold-500 transition-colors px-2 py-1 text-sm font-medium relative group">
-              مربیان
-              <span className="absolute inset-x-0 bottom-0 h-0.5 bg-gold-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-200 ease-out"></span>
-            </Link>
+            {/* Navigation links removed temporarily as requested */}
           </nav>
 
           {/* Auth Buttons */}
@@ -462,14 +456,24 @@ const AuthHeader = () => {
                     </div>
                     
                     <div className="py-1">
-                      <Link to="/profile" className="flex items-center px-4 py-2 text-sm text-white/90 hover:text-gold-500 hover:bg-gray-700/30 text-right transition-all duration-150 mx-1 rounded-md group">
+                      <Link 
+                        to="/profile" 
+                        className="flex items-center px-4 py-2 text-sm text-white/90 hover:text-gold-500 hover:bg-gray-700/30 text-right transition-all duration-150 mx-1 rounded-md group"
+                        title="مشاهده و ویرایش پروفایل"
+                        aria-label="پروفایل کاربری"
+                      >
                         <div className="flex items-center">
                           <User className="h-4 w-4 ml-2 text-gold-500/70 group-hover:text-gold-500 transition-colors" />
                           <span className="group-hover:translate-x-0.5 transition-transform duration-150">پروفایل</span>
                         </div>
                       </Link>
                       
-                      <Link to="/dashboard" className="flex items-center px-4 py-2 text-sm text-white/90 hover:text-gold-500 hover:bg-gray-700/30 text-right transition-all duration-150 mx-1 rounded-md group">
+                      <Link 
+                        to="/dashboard" 
+                        className="flex items-center px-4 py-2 text-sm text-white/90 hover:text-gold-500 hover:bg-gray-700/30 text-right transition-all duration-150 mx-1 rounded-md group"
+                        title="مشاهده داشبورد کاربری"
+                        aria-label="داشبورد کاربری"
+                      >
                         <div className="flex items-center">
                           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-2 text-gold-500/70 group-hover:text-gold-500 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
@@ -619,38 +623,7 @@ const AuthHeader = () => {
             )}
             
             <nav className="flex flex-col space-y-1.5">
-              <Link to="/" className="text-white/90 hover:text-gold-500 transition-all duration-200 py-2 px-3 rounded-lg hover:bg-gray-700/30 flex items-center group">
-                <div className="w-8 h-8 rounded-lg bg-gray-700/50 flex items-center justify-center ml-3 group-hover:bg-gray-700 transition-colors">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gold-500/80 group-hover:text-gold-500 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                  </svg>
-                </div>
-                <span className="text-sm font-medium group-hover:translate-x-0.5 transition-transform duration-200">صفحه اصلی</span>
-              </Link>
-              
-              <Link to="/services" className="text-white/90 hover:text-gold-500 transition-all duration-200 py-2 px-3 rounded-lg hover:bg-gray-700/30 flex items-center group">
-                <div className="w-8 h-8 rounded-lg bg-gray-700/50 flex items-center justify-center ml-3 group-hover:bg-gray-700 transition-colors">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gold-500/80 group-hover:text-gold-500 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                  </svg>
-                </div>
-                <span className="text-sm font-medium group-hover:translate-x-0.5 transition-transform duration-200">خدمات</span>
-              </Link>
-              
-              <Link to="/coaches" className="text-white/90 hover:text-gold-500 transition-all duration-200 py-2 px-3 rounded-lg hover:bg-gray-700/30 flex items-center group">
-                <div className="w-8 h-8 rounded-lg bg-gray-700/50 flex items-center justify-center ml-3 group-hover:bg-gray-700 transition-colors">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gold-500/80 group-hover:text-gold-500 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                    <circle cx="9" cy="7" r="4"></circle>
-                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                  </svg>
-                </div>
-                <span className="text-sm font-medium group-hover:translate-x-0.5 transition-transform duration-200">مربیان</span>
-              </Link>
+              {/* Mobile navigation links removed temporarily as requested */}
 
               
               {user ? (

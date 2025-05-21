@@ -17,6 +17,7 @@ import BlogPost from "./pages/BlogPost";
 import CoachApplication from "./pages/CoachApplication";
 import Download from "./pages/Download";
 import Profile from "./pages/Profile";
+import Dashboard from "./pages/Dashboard";
 
 const queryClient = new QueryClient();
 
@@ -37,6 +38,7 @@ const App = () => (
             <Route path="/coach-application" element={<CoachApplication />} />
             <Route path="/download" element={<Download />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/dashboard" element={<Dashboard />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
