@@ -4,12 +4,20 @@ import { readFile } from 'fs';
 import { join, extname } from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import express from 'express';
+import cors from 'cors';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const PORT = 3000;
 const DIST_DIR = join(__dirname, 'dist');
+
+// Create Express app
+const app = express();
+
+// Enable CORS for all routes
+app.use(cors());
 
 // MIME types for different file extensions
 const MIME_TYPES = {
@@ -35,34 +43,35 @@ const MIME_TYPES = {
   '.webp': 'image/webp'
 };
 
-const server = createServer((req, res) => {
-  console.log(`${req.method} ${req.url}`);
+// Serve static files from the dist directory
+app.use(express.static(DIST_DIR));
+
+// Handle SPA routing - serve index.html for all non-file requests
+app.get('*', (req, res) => {
+  console.log(`GET ${req.url}`);
   
-  // Handle SPA routing - serve index.html for all non-file requests
-  let filePath = join(DIST_DIR, req.url === '/' ? 'index.html' : req.url);
+  // Try to serve the requested file
+  const filePath = join(DIST_DIR, req.url === '/' ? 'index.html' : req.url);
   
-  // Check if the requested path is a file
   readFile(filePath, (err, data) => {
     if (err) {
       // If file not found, serve index.html for SPA routing
       if (err.code === 'ENOENT') {
-        filePath = join(DIST_DIR, 'index.html');
-        readFile(filePath, (err, data) => {
+        const indexPath = join(DIST_DIR, 'index.html');
+        readFile(indexPath, (err, data) => {
           if (err) {
-            res.writeHead(500);
-            res.end('Error loading index.html');
+            res.status(500).send('Error loading index.html');
             return;
           }
           
-          res.writeHead(200, { 'Content-Type': 'text/html' });
-          res.end(data);
+          res.setHeader('Content-Type', 'text/html');
+          res.send(data);
         });
         return;
       }
       
       // For other errors
-      res.writeHead(500);
-      res.end(`Server Error: ${err.code}`);
+      res.status(500).send(`Server Error: ${err.code}`);
       return;
     }
     
@@ -75,19 +84,13 @@ const server = createServer((req, res) => {
       contentType = 'application/javascript';
     }
     
-    // Set CORS headers to allow local testing
-    res.writeHead(200, {
-      'Content-Type': contentType,
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
-    });
-    
-    res.end(data);
+    res.setHeader('Content-Type', contentType);
+    res.send(data);
   });
 });
 
-server.listen(PORT, () => {
+// Start the server
+app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}/`);
   console.log(`Serving files from ${DIST_DIR}`);
 });
