@@ -239,7 +239,9 @@ export type Database = {
       }
       user_profiles: {
         Row: {
+          admin: boolean | null
           age: number | null
+          coach: boolean | null
           created_at: string | null
           currentWeight: number | null
           email: string | null
@@ -260,7 +262,9 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          admin?: boolean | null
           age?: number | null
+          coach?: boolean | null
           created_at?: string | null
           currentWeight?: number | null
           email?: string | null
@@ -281,7 +285,9 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          admin?: boolean | null
           age?: number | null
+          coach?: boolean | null
           created_at?: string | null
           currentWeight?: number | null
           email?: string | null
