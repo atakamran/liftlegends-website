@@ -110,14 +110,7 @@ interface BlogCategory {
   created_at: string;
 }
 
-interface SubscriptionPlan {
-  id: string;
-  name: string;
-  description: string;
-  price_monthly: number;
-  price_yearly: number;
-  features: string[];
-}
+
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -125,13 +118,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
   const [blogCategories, setBlogCategories] = useState<BlogCategory[]>([]);
-  const [activeTab, setActiveTab] = useState("overview");
-  const [subscriptionStatus, setSubscriptionStatus] = useState({
-    isActive: false,
-    plan: null as string | null,
-    endDate: null as string | null,
-    daysRemaining: 0
-  });
+  const [activeTab, setActiveTab] = useState("blog");
   
   // Blog form state
   const [blogFormData, setBlogFormData] = useState<Partial<BlogPost>>({
@@ -157,36 +144,7 @@ const Dashboard = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [currentBlogId, setCurrentBlogId] = useState<string | null>(null);
   
-  // Subscription plans
-  const subscriptionPlans: SubscriptionPlan[] = [
-    {
-      id: "pro",
-      name: "پرو",
-      description: "مناسب برای افراد مبتدی و متوسط",
-      price_monthly: 99000,
-      price_yearly: 990000,
-      features: [
-        "دسترسی به تمام برنامه‌های تمرینی",
-        "مشاوره آنلاین هفتگی",
-        "برنامه غذایی شخصی‌سازی شده",
-        "پشتیبانی ۲۴/۷"
-      ]
-    },
-    {
-      id: "ultimate",
-      name: "آلتیمیت",
-      description: "مناسب برای ورزشکاران حرفه‌ای",
-      price_monthly: 199000,
-      price_yearly: 1990000,
-      features: [
-        "تمام امکانات پلن پرو",
-        "مشاوره آنلاین روزانه",
-        "برنامه تمرینی اختصاصی",
-        "آنالیز پیشرفت هفتگی",
-        "جلسات مشاوره تصویری با مربیان حرفه‌ای"
-      ]
-    }
-  ];
+
   
   // Function to fetch user data
   const fetchUserData = async () => {
@@ -220,33 +178,9 @@ const Dashboard = () => {
         profile: profileData || undefined
       } as User);
       
-      // Check subscription status
+      // Check if user is admin
       if (profileData) {
-        const { subscription_plan, subscription_end_date, is_admin } = profileData;
-        
-        // Check if subscription is active
-        const isActive = subscription_plan && subscription_end_date && 
-                        new Date(subscription_end_date) > new Date();
-        
-        // Calculate days remaining if subscription is active
-        let daysRemaining = 0;
-        if (isActive && subscription_end_date) {
-          const endDate = new Date(subscription_end_date);
-          const today = new Date();
-          daysRemaining = Math.ceil((endDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-        }
-        
-        setSubscriptionStatus({
-          isActive: !!isActive,
-          plan: subscription_plan,
-          endDate: subscription_end_date,
-          daysRemaining
-        });
-        
-        // If user is admin, set active tab to blog
-        if (is_admin) {
-          setActiveTab("blog");
-        }
+        const { is_admin } = profileData;
       }
       
     } catch (error) {
@@ -687,15 +621,7 @@ const Dashboard = () => {
     }).format(date);
   };
   
-  // Function to handle subscription purchase
-  const handleSubscriptionPurchase = (planId: string, isYearly: boolean) => {
-    // This would typically redirect to a payment gateway
-    // For now, we'll just show a toast message
-    toast({
-      title: "درخواست خرید اشتراک",
-      description: `درخواست خرید اشتراک ${planId} ${isYearly ? 'سالانه' : 'ماهانه'} ثبت شد. بزودی به درگاه پرداخت منتقل خواهید شد.`,
-    });
-  };
+
   
   // Load user data on component mount
   useEffect(() => {
@@ -738,232 +664,25 @@ const Dashboard = () => {
       <div className="max-w-7xl mx-auto">
         <h1 className="text-3xl font-bold text-center mb-8">داشبورد کاربری</h1>
         
-        <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className={`grid ${user?.profile?.is_admin ? 'grid-cols-3' : 'grid-cols-2'} mb-8 bg-gray-800/50 p-1 rounded-lg`}>
-            {!user?.profile?.is_admin && (
-              <>
-                <TabsTrigger value="overview" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-gold-500 data-[state=active]:to-amber-400 data-[state=active]:text-black data-[state=active]:font-medium rounded-md transition-all duration-300">
-                  خلاصه وضعیت
-                </TabsTrigger>
-                <TabsTrigger value="subscription" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-gold-500 data-[state=active]:to-amber-400 data-[state=active]:text-black data-[state=active]:font-medium rounded-md transition-all duration-300">
-                  اشتراک
-                </TabsTrigger>
-              </>
-            )}
-            {user?.profile?.is_admin && (
-              <>
-                <TabsTrigger value="overview" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-gold-500 data-[state=active]:to-amber-400 data-[state=active]:text-black data-[state=active]:font-medium rounded-md transition-all duration-300">
-                  خلاصه وضعیت
-                </TabsTrigger>
-                <TabsTrigger value="subscription" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-gold-500 data-[state=active]:to-amber-400 data-[state=active]:text-black data-[state=active]:font-medium rounded-md transition-all duration-300">
-                  اشتراک
-                </TabsTrigger>
-                <TabsTrigger value="blog" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-gold-500 data-[state=active]:to-amber-400 data-[state=active]:text-black data-[state=active]:font-medium rounded-md transition-all duration-300">
-                  مدیریت بلاگ
-                </TabsTrigger>
-              </>
-            )}
-          </TabsList>
+        <Tabs defaultValue="blog" value={activeTab} onValueChange={setActiveTab} className="w-full">
+          {user?.profile?.is_admin ? (
+            <TabsList className="grid grid-cols-1 mb-8 bg-gray-800/50 p-1 rounded-lg">
+              <TabsTrigger value="blog" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-gold-500 data-[state=active]:to-amber-400 data-[state=active]:text-black data-[state=active]:font-medium rounded-md transition-all duration-300">
+                مدیریت بلاگ
+              </TabsTrigger>
+            </TabsList>
+          ) : (
+            <div className="text-center p-8 bg-gray-800/50 rounded-lg mb-8">
+              <h2 className="text-xl font-bold mb-4">داشبورد در حال بروزرسانی است</h2>
+              <p className="text-gray-400">لطفاً بعداً مراجعه کنید.</p>
+            </div>
+          )}
           
-          {/* Overview Tab */}
-          <TabsContent value="overview" className="space-y-6">
-            <Card className="bg-gray-800/50 border-gray-700">
-              <CardHeader>
-                <CardTitle className="text-xl text-gold-500">خوش آمدید، {user?.profile?.name || user?.email}</CardTitle>
-                <CardDescription className="text-gray-400">
-                  خلاصه وضعیت حساب کاربری شما
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {/* Subscription Status */}
-                <div className="bg-gray-700/30 rounded-lg p-4 border border-gray-700">
-                  <h3 className="text-lg font-medium mb-2 flex items-center">
-                    <Calendar className="h-5 w-5 ml-2 text-gold-500" />
-                    وضعیت اشتراک
-                  </h3>
-                  {subscriptionStatus.isActive ? (
-                    <div className="space-y-2">
-                      <p className="text-green-400 flex items-center">
-                        <Check className="h-4 w-4 ml-1" />
-                        اشتراک فعال: {subscriptionStatus.plan}
-                      </p>
-                      <p className="text-sm text-gray-400">
-                        تاریخ پایان: {subscriptionStatus.endDate ? formatDate(subscriptionStatus.endDate) : 'نامشخص'}
-                      </p>
-                      <p className="text-sm text-gray-400">
-                        {subscriptionStatus.daysRemaining} روز باقی‌مانده
-                      </p>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="mt-2 bg-gray-700 hover:bg-gray-600 text-white border-gray-600"
-                        onClick={() => setActiveTab("subscription")}
-                      >
-                        مدیریت اشتراک
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="space-y-2">
-                      <p className="text-amber-400 flex items-center">
-                        <X className="h-4 w-4 ml-1" />
-                        بدون اشتراک فعال
-                      </p>
-                      <Button 
-                        variant="default" 
-                        size="sm" 
-                        className="mt-2 bg-gradient-to-r from-gold-500 to-amber-400 hover:from-gold-600 hover:to-amber-500 text-black"
-                        onClick={() => setActiveTab("subscription")}
-                      >
-                        خرید اشتراک
-                      </Button>
-                    </div>
-                  )}
-                </div>
-                
-                {/* Quick Stats */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="bg-gray-700/30 rounded-lg p-4 border border-gray-700">
-                    <h3 className="text-lg font-medium mb-2">وضعیت پروفایل</h3>
-                    <p className="text-sm text-gray-400">
-                      {user?.profile?.name ? 'تکمیل شده' : 'ناقص - لطفاً پروفایل خود را تکمیل کنید'}
-                    </p>
-                    {!user?.profile?.name && (
-                      <Button 
-                        variant="link" 
-                        size="sm" 
-                        className="mt-2 text-gold-500 p-0"
-                        onClick={() => navigate("/profile")}
-                      >
-                        تکمیل پروفایل
-                      </Button>
-                    )}
-                  </div>
-                  
-                  <div className="bg-gray-700/30 rounded-lg p-4 border border-gray-700">
-                    <h3 className="text-lg font-medium mb-2">هدف تناسب اندام</h3>
-                    <p className="text-sm text-gray-400">
-                      {user?.profile?.goal || 'تعیین نشده'}
-                    </p>
-                    {!user?.profile?.goal && (
-                      <Button 
-                        variant="link" 
-                        size="sm" 
-                        className="mt-2 text-gold-500 p-0"
-                        onClick={() => navigate("/profile")}
-                      >
-                        تعیین هدف
-                      </Button>
-                    )}
-                  </div>
-                  
-                  <div className="bg-gray-700/30 rounded-lg p-4 border border-gray-700">
-                    <h3 className="text-lg font-medium mb-2">تاریخ عضویت</h3>
-                    <p className="text-sm text-gray-400">
-                      {user?.created_at ? formatDate(user.created_at) : 'نامشخص'}
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          {/* Subscription Tab */}
-          <TabsContent value="subscription" className="space-y-6">
-            <Card className="bg-gray-800/50 border-gray-700">
-              <CardHeader>
-                <CardTitle className="text-xl text-gold-500">مدیریت اشتراک</CardTitle>
-                <CardDescription className="text-gray-400">
-                  اشتراک خود را مدیریت کنید یا اشتراک جدید خریداری کنید
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {/* Current Subscription */}
-                <div className="bg-gray-700/30 rounded-lg p-4 border border-gray-700 mb-6">
-                  <h3 className="text-lg font-medium mb-2 flex items-center">
-                    <CreditCard className="h-5 w-5 ml-2 text-gold-500" />
-                    اشتراک فعلی
-                  </h3>
-                  {subscriptionStatus.isActive ? (
-                    <div className="space-y-2">
-                      <p className="text-green-400 flex items-center">
-                        <Check className="h-4 w-4 ml-1" />
-                        اشتراک فعال: {subscriptionStatus.plan}
-                      </p>
-                      <p className="text-sm text-gray-400">
-                        تاریخ پایان: {subscriptionStatus.endDate ? formatDate(subscriptionStatus.endDate) : 'نامشخص'}
-                      </p>
-                      <p className="text-sm text-gray-400">
-                        {subscriptionStatus.daysRemaining} روز باقی‌مانده
-                      </p>
-                    </div>
-                  ) : (
-                    <p className="text-amber-400 flex items-center">
-                      <X className="h-4 w-4 ml-1" />
-                      بدون اشتراک فعال
-                    </p>
-                  )}
-                </div>
-                
-                {/* Subscription Plans */}
-                <h3 className="text-lg font-medium mb-4">پلن‌های اشتراک</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {subscriptionPlans.map((plan) => (
-                    <Card key={plan.id} className="bg-gray-800 border-gray-700 overflow-hidden">
-                      <div className="bg-gradient-to-r from-gold-500/20 to-amber-400/20 p-1"></div>
-                      <CardHeader>
-                        <CardTitle className="text-xl text-gold-500">{plan.name}</CardTitle>
-                        <CardDescription className="text-gray-400">
-                          {plan.description}
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        <div className="space-y-2">
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm text-gray-400">ماهانه:</span>
-                            <span className="text-lg font-bold text-white">{plan.price_monthly.toLocaleString()} تومان</span>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm text-gray-400">سالانه:</span>
-                            <span className="text-lg font-bold text-white">{plan.price_yearly.toLocaleString()} تومان</span>
-                          </div>
-                        </div>
-                        
-                        <div className="pt-4 border-t border-gray-700">
-                          <h4 className="text-sm font-medium mb-2">ویژگی‌ها:</h4>
-                          <ul className="space-y-2">
-                            {plan.features.map((feature, index) => (
-                              <li key={index} className="flex items-start">
-                                <Check className="h-4 w-4 ml-2 text-green-500 mt-0.5" />
-                                <span className="text-sm text-gray-300">{feature}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      </CardContent>
-                      <CardFooter className="flex flex-col space-y-2">
-                        <Button 
-                          className="w-full bg-gradient-to-r from-gold-500 to-amber-400 hover:from-gold-600 hover:to-amber-500 text-black"
-                          onClick={() => handleSubscriptionPurchase(plan.id, false)}
-                        >
-                          خرید اشتراک ماهانه
-                        </Button>
-                        <Button 
-                          variant="outline"
-                          className="w-full border-gold-500/30 text-gold-500 hover:bg-gold-500/10"
-                          onClick={() => handleSubscriptionPurchase(plan.id, true)}
-                        >
-                          خرید اشتراک سالانه (۱۰٪ تخفیف)
-                        </Button>
-                      </CardFooter>
-                    </Card>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
+
           
           {/* Blog Management Tab - Only visible to admins */}
-          <TabsContent value="blog" className="space-y-6">
+          {user?.profile?.is_admin && (
+            <TabsContent value="blog" className="space-y-6">
               <Card className="bg-gray-800/50 border-gray-700">
                 <CardHeader>
                   <CardTitle className="text-xl text-gold-500">مدیریت بلاگ</CardTitle>
@@ -1300,6 +1019,7 @@ const Dashboard = () => {
                 </CardContent>
               </Card>
             </TabsContent>
+          )}
           
         </Tabs>
       </div>
