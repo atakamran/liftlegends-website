@@ -18,8 +18,6 @@ import CoachApplication from "./pages/CoachApplication";
 import Download from "./pages/Download";
 import Profile from "./pages/Profile";
 import Dashboard from "./pages/Dashboard";
-import Payment from "./pages/Payment";
-import PaymentCallback from "./pages/PaymentCallback";
 
 const queryClient = new QueryClient();
 
@@ -41,8 +39,6 @@ const App = () => (
             <Route path="/download" element={<Download />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/payment" element={<Payment />} />
-            <Route path="/payment/callback" element={<PaymentCallback />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

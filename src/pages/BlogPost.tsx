@@ -1,4 +1,3 @@
-
 import { useParams, Link } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import FooterSection from "@/components/FooterSection";
@@ -216,7 +215,7 @@ const BlogPostPage = () => {
             "dateModified": post.updated_at || post.created_at,
             "author": {
               "@type": "Person",
-              "name": "تیم لیفت لجندز"
+              "name": post.author || "تیم لیفت لجندز"
             },
             "publisher": {
               "@type": "Organization",
