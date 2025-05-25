@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, CreditCard, Shield } from "lucide-react";
+import { Loader2, CreditCard, Shield, AlertTriangle } from "lucide-react";
 import PaymentSummary from "./PaymentSummary";
 
 interface PaymentFormData {
@@ -34,48 +34,28 @@ const PaymentForm = () => {
     setIsLoading(true);
     
     try {
-      // ZarinPal payment request
-      const myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-
-      const raw = JSON.stringify({
-        "merchant_id": "89999bca-a25d-4ada-9846-62ec13a250b1",
-        "amount": data.amount,
-        "description": data.description,
-        "metadata": {
-          "mobile": data.mobile,
-          "email": data.email
-        },
-        "callback_url": `${window.location.origin}/payment/callback`
+      // Simulate payment processing for demo purposes
+      // Note: In production, this should be handled through a backend API to avoid CORS issues
+      toast({
+        title: "توجه",
+        description: "این یک نسخه نمایشی است. پرداخت واقعی نیازمند پیاده‌سازی بک‌اند است.",
+        variant: "default",
       });
 
-      const requestOptions = {
-        method: "POST",
-        headers: myHeaders,
-        body: raw,
-      };
+      // Simulate a delay
+      await new Promise(resolve => setTimeout(resolve, 2000));
 
-      const response = await fetch("https://staging.zarinpal.com/pg/v4/payment/request.json", requestOptions);
-      const result = await response.json();
+      // Simulate successful payment for demo
+      const demoAuthority = "A" + Math.random().toString(36).substr(2, 9).toUpperCase();
+      
+      // Redirect to callback page with demo data
+      window.location.href = `/payment/callback?Authority=${demoAuthority}&Status=OK`;
 
-      console.log("Payment request result:", result);
-
-      if (result.data?.code === 100) {
-        // Redirect to ZarinPal payment gateway
-        const paymentUrl = `https://staging.zarinpal.com/pg/StartPay/${result.data.authority}`;
-        window.location.href = paymentUrl;
-      } else {
-        toast({
-          title: "خطا در پرداخت",
-          description: "مشکلی در ایجاد درخواست پرداخت رخ داده است.",
-          variant: "destructive",
-        });
-      }
     } catch (error) {
       console.error("Payment error:", error);
       toast({
-        title: "خطا در اتصال",
-        description: "مشکلی در اتصال به درگاه پرداخت رخ داده است.",
+        title: "خطا در پرداخت",
+        description: "مشکلی در پردازش پرداخت رخ داده است.",
         variant: "destructive",
       });
     } finally {
@@ -96,6 +76,19 @@ const PaymentForm = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {/* Demo Notice */}
+          <div className="bg-orange-900/20 border border-orange-700 rounded-lg p-4 mb-6">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="h-5 w-5 text-orange-400 mt-0.5" />
+              <div>
+                <h4 className="text-orange-400 font-semibold text-sm">نسخه نمایشی</h4>
+                <p className="text-orange-200 text-sm mt-1">
+                  این یک نسخه نمایشی است. برای پیاده‌سازی واقعی، نیاز به راه‌اندازی بک‌اند و API درگاه پرداخت دارید.
+                </p>
+              </div>
+            </div>
+          </div>
+
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div className="space-y-2">
               <Label htmlFor="amount" className="text-white">مبلغ (تومان)</Label>
@@ -177,7 +170,7 @@ const PaymentForm = () => {
               ) : (
                 <>
                   <Shield className="mr-2 h-4 w-4" />
-                  پرداخت امن
+                  پرداخت نمایشی
                 </>
               )}
             </Button>
