@@ -62,24 +62,88 @@ const PaymentCallback = () => {
           amount: paymentInfo.amount.toString(),
         };
 
-        const response = await axios.post("/api/zarinpal/verify", verifyData);
+        console.log("Verifying payment with data:", verifyData);
+        
+        // Try to use the proxy endpoint first
+        let response;
+        try {
+          response = await axios.post("http://localhost:3000/api/zarinpal/verify", verifyData);
+        } catch (proxyError) {
+          console.error("Error with proxy verification:", proxyError);
+          console.log("Trying direct verification with Zarinpal...");
+          
+          // If proxy fails, try direct request as fallback
+          response = await axios.post(
+            "https://staging.zarinpal.com/pg/v4/payment/verify.json", 
+            verifyData,
+            {
+              headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+              }
+            }
+          );
+        }
+        
+        console.log("Verification response:", response.data);
 
+        // Check the response structure and status codes
+        console.log("Processing verification response:", response.data);
+        
+        // Zarinpal returns code 100 for successful payment and 101 for verified payment
         if (
           response.data.data &&
           (response.data.data.code === 100 || response.data.data.code === 101)
         ) {
           // Payment was successful
           setSuccess(true);
-          setMessage(`پرداخت با موفقیت انجام شد. کد پیگیری: ${response.data.data.ref_id}`);
+          const refId = response.data.data.ref_id;
+          setMessage(`پرداخت با موفقیت انجام شد. کد پیگیری: ${refId}`);
+          
+          console.log(`Payment successful! Reference ID: ${refId}`);
 
-          // Update user subscription in database
-          await updateUserSubscription(paymentInfo.plan_id, paymentInfo.user_id, paymentInfo.plan_period);
+          try {
+            // Update user subscription in database
+            await updateUserSubscription(paymentInfo.plan_id, paymentInfo.user_id, paymentInfo.plan_period);
+            
+            // Show success toast
+            toast({
+              title: "اشتراک فعال شد",
+              description: "اشتراک شما با موفقیت فعال شد و از هم‌اکنون قابل استفاده است.",
+            });
+          } catch (subscriptionError) {
+            console.error("Error activating subscription:", subscriptionError);
+            
+            // Still show success for payment but note the subscription issue
+            setMessage(`پرداخت با موفقیت انجام شد اما در فعال‌سازی اشتراک مشکلی پیش آمد. لطفاً با پشتیبانی تماس بگیرید. کد پیگیری: ${refId}`);
+            
+            toast({
+              variant: "destructive",
+              title: "خطا در فعال‌سازی اشتراک",
+              description: "پرداخت موفق بود اما در فعال‌سازی اشتراک مشکلی پیش آمد. لطفاً با پشتیبانی تماس بگیرید.",
+            });
+          }
         } else {
           // Payment failed
           setSuccess(false);
-          setMessage(
-            response.data.errors?.message || "خطا در تایید پرداخت. لطفاً با پشتیبانی تماس بگیرید"
-          );
+          
+          // Get error message from response
+          let errorMessage = "خطا در تایید پرداخت. لطفاً با پشتیبانی تماس بگیرید";
+          
+          if (response.data.errors && response.data.errors.message) {
+            errorMessage = response.data.errors.message;
+          } else if (response.data.data && response.data.data.message) {
+            errorMessage = response.data.data.message;
+          }
+          
+          setMessage(errorMessage);
+          console.error("Payment verification failed:", errorMessage);
+          
+          toast({
+            variant: "destructive",
+            title: "خطا در تایید پرداخت",
+            description: errorMessage,
+          });
         }
       } catch (error) {
         console.error("Payment verification error:", error);
@@ -100,6 +164,8 @@ const PaymentCallback = () => {
   // Function to update user subscription
   const updateUserSubscription = async (planId: SubscriptionPlan, userId: string, period: 'monthly' | 'yearly') => {
     try {
+      console.log(`Activating subscription: Plan=${planId}, User=${userId}, Period=${period}`);
+      
       // Calculate subscription end date based on plan and period
       const startDate = new Date();
       const endDate = new Date(startDate);
@@ -111,18 +177,62 @@ const PaymentCallback = () => {
         endDate.setFullYear(endDate.getFullYear() + 1);
       }
       
+      console.log(`Subscription period: ${startDate.toISOString()} to ${endDate.toISOString()}`);
+      
+      // First, check if the user exists
+      const { data: userData, error: userError } = await supabase
+        .from("user_profiles")
+        .select("*")
+        .eq("user_id", userId)
+        .single();
+        
+      if (userError) {
+        console.error("Error fetching user profile:", userError);
+        throw new Error("User profile not found");
+      }
+      
+      console.log("Current user profile:", userData);
+      
       // Update user profile with new subscription details
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from("user_profiles")
         .update({
           subscription_plan: planId,
           subscription_start_date: startDate.toISOString(),
           subscription_end_date: endDate.toISOString(),
+          is_subscription_active: true,
           updated_at: new Date().toISOString()
         })
-        .eq("user_id", userId);
+        .eq("user_id", userId)
+        .select();
         
-      if (error) throw error;
+      if (error) {
+        console.error("Error updating subscription in database:", error);
+        throw error;
+      }
+      
+      console.log("Subscription activated successfully:", data);
+      
+      // Also log the subscription transaction to subscription_logs table
+      const { error: logError } = await supabase
+        .from('subscription_logs')
+        .insert({
+          user_id: userId,
+          plan_id: planId,
+          period: period,
+          amount: JSON.parse(localStorage.getItem("payment_info") || "{}").amount || 0,
+          start_date: startDate.toISOString(),
+          end_date: endDate.toISOString(),
+          created_at: new Date().toISOString()
+        });
+        
+      if (logError) {
+        console.error("Error logging subscription transaction:", logError);
+        // Don't throw here, as the subscription is already activated
+      }
+      
+      // Clear payment info from localStorage
+      localStorage.removeItem("payment_info");
       
       return true;
     } catch (error) {

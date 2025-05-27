@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
+import axios from "axios";
 import { 
   Loader2, 
   CreditCard, 
@@ -113,7 +114,7 @@ const Payment = () => {
   }, [planParam, cycleParam]);
 
   // Function to proceed to payment
-  const proceedToPayment = () => {
+  const proceedToPayment = async () => {
     if (!planParam || !user) {
       toast({
         variant: "destructive",
@@ -126,12 +127,13 @@ const Payment = () => {
     try {
       setLoading(true);
       
-      // Create payment data
+      // Calculate amount based on subscription plan and cycle
       const amount = cycleParam === 'monthly' 
         ? SUBSCRIPTION_PLANS[planParam].price.monthly 
         : SUBSCRIPTION_PLANS[planParam].price.yearly;
         
-      const data: PaymentData = {
+      // Create payment data for our records
+      const paymentData: PaymentData = {
         plan_id: planParam,
         amount: amount,
         period: cycleParam,
@@ -141,28 +143,80 @@ const Payment = () => {
       };
       
       // Store payment info in localStorage for verification after callback
-      localStorage.setItem('payment_info', JSON.stringify(data));
+      localStorage.setItem('payment_info', JSON.stringify(paymentData));
       
       toast({
         title: "انتقال به درگاه پرداخت",
-        description: "در حال انتقال به درگاه پرداخت زرین‌پال...",
+        description: "در حال اتصال به درگاه پرداخت زرین‌پال...",
       });
       
-      // Simulate redirect to payment gateway
-      // In a real implementation, you would redirect to Zarinpal here
-      // window.location.href = "https://www.zarinpal.com/pg/StartPay/" + authority;
+      // Prepare data for Zarinpal API
+      const zarinpalData = JSON.stringify({
+        "merchant_id": "89999bca-a25d-4ada-9846-62ec13a250b1",
+        "amount": amount.toString(),
+        "description": `اشتراک ${planParam} - ${cycleParam === 'monthly' ? 'ماهانه' : 'سالانه'}`,
+        "metadata": {
+          "user_id": user.id,
+          "plan": planParam,
+          "cycle": cycleParam
+        },
+        "callback_url": "https://liftlegends.ir/payment-callback"
+      });
       
-      // For demo purposes, we'll just show a success message
-      setTimeout(() => {
-        setLoading(false);
-      }, 2000);
+      // Prepare data for Zarinpal API
+      const planName = planParam === 'pro' 
+        ? 'پرو' 
+        : planParam === 'ultimate' 
+          ? 'آلتیمیت' 
+          : 'رایگان';
+      
+      const periodName = cycleParam === 'monthly' ? 'ماهانه' : 'سالانه';
+      const planDuration = cycleParam === 'monthly' ? "1" : "12";
+      
+      const data = {
+        merchant_id: "89999bca-a25d-4ada-9846-62ec13a250b1",
+        amount: amount.toString(),
+        description: `اشتراک ${periodName} ${planName} - LiftLegends`,
+        metadata: {
+          user_id: user.id,
+          email: user.email || "",
+          plan_id: planParam,
+          plan_period: cycleParam,
+          plan_duration: planDuration
+        },
+        callback_url: window.location.origin + "/payment-callback"
+      };
+      
+      try {
+        // Use relative URL to work on any domain
+        const response = await axios.post('/api/zarinpal/payment-request', data);
+        
+        if (response.data.data && response.data.data.authority) {
+          // Store payment info in localStorage for verification after callback
+          localStorage.setItem('payment_info', JSON.stringify({
+            authority: response.data.data.authority,
+            amount: amount,
+            plan_id: planParam,
+            user_id: user.id,
+            timestamp: new Date().toISOString()
+          }));
+          
+          // Redirect to Zarinpal payment page
+          window.location.href = `https://staging.zarinpal.com/pg/StartPay/${response.data.data.authority}`;
+        } else {
+          throw new Error(response.data.errors?.message || 'خطا در اتصال به درگاه پرداخت');
+        }
+      } catch (error) {
+        console.error("Payment error:", error);
+        throw new Error(error instanceof Error ? error.message : "مشکلی در پردازش پرداخت رخ داد");
+      }
       
     } catch (error) {
-      console.error("Error creating payment data:", error);
+      console.error("Error processing payment:", error);
       toast({
         variant: "destructive",
-        title: "خطا در ایجاد اطلاعات پرداخت",
-        description: "مشکلی در ایجاد اطلاعات پرداخت رخ داد. لطفاً دوباره تلاش کنید.",
+        title: "خطا در پرداخت",
+        description: error instanceof Error ? error.message : "مشکلی در پردازش پرداخت رخ داد. لطفاً دوباره تلاش کنید.",
       });
       setLoading(false);
     }
@@ -388,7 +442,7 @@ const Payment = () => {
                   ) : (
                     <span className="flex items-center justify-center">
                       <CreditCard size={18} className="ml-2" />
-                      پرداخت با زرین‌پال
+                      پرداخت از طریق درگاه زرین‌پال
                     </span>
                   )}
                 </Button>

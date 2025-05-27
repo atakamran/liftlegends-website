@@ -344,6 +344,39 @@ export type Database = {
           },
         ]
       }
+      subscription_logs: {
+        Row: {
+          id: string
+          user_id: string
+          plan_id: string
+          period: 'monthly' | 'yearly'
+          amount: number
+          start_date: string
+          end_date: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          plan_id: string
+          period: 'monthly' | 'yearly'
+          amount: number
+          start_date: string
+          end_date: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          plan_id?: string
+          period?: 'monthly' | 'yearly'
+          amount?: number
+          start_date?: string
+          end_date?: string
+          created_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
