@@ -19,6 +19,7 @@ import Download from "./pages/Download";
 import Profile from "./pages/Profile";
 import Dashboard from "./pages/Dashboard";
 import PaymentCallback from "./pages/PaymentCallback";
+import Payment from "./pages/Payment";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +42,7 @@ const App = () => (
             <Route path="/profile" element={<Profile />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/payment-callback" element={<PaymentCallback />} />
+            <Route path="/payment" element={<Payment />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
