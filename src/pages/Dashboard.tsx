@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
+import axios from "axios";
+import { SubscriptionPlan, SUBSCRIPTION_PLANS } from "@/types/user";
 import {
   Card,
   CardContent,
@@ -47,7 +49,7 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
-import { Loader2, Plus, Edit, Trash2, Check, X, Calendar, CreditCard } from "lucide-react";
+import { Loader2, Plus, Edit, Trash2, Check, X, Calendar, CreditCard, Shield, Zap } from "lucide-react";
 
 // Define interfaces
 interface UserProfile {
@@ -115,7 +117,7 @@ interface BlogCategory {
 const Dashboard = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [pageLoading, setPageLoading] = useState(true);
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
   const [blogCategories, setBlogCategories] = useState<BlogCategory[]>([]);
   const [activeTab, setActiveTab] = useState("blog");
@@ -149,7 +151,7 @@ const Dashboard = () => {
   // Function to fetch user data
   const fetchUserData = async () => {
     try {
-      setLoading(true);
+      setPageLoading(true);
       
       // Check if user is logged in
       const { data: sessionData } = await supabase.auth.getSession();
@@ -191,7 +193,7 @@ const Dashboard = () => {
         description: "مشکلی در دریافت اطلاعات کاربری رخ داد. لطفاً دوباره تلاش کنید.",
       });
     } finally {
-      setLoading(false);
+      setPageLoading(false);
     }
   };
   
@@ -259,7 +261,7 @@ const Dashboard = () => {
         return;
       }
       
-      setLoading(true);
+      setPageLoading(true);
       
       // Create new blog post
       const { data, error } = await supabase
@@ -305,7 +307,7 @@ const Dashboard = () => {
         description: "مشکلی در ایجاد مقاله جدید رخ داد. لطفاً دوباره تلاش کنید.",
       });
     } finally {
-      setLoading(false);
+      setPageLoading(false);
     }
   };
   
@@ -324,7 +326,7 @@ const Dashboard = () => {
         return;
       }
       
-      setLoading(true);
+      setPageLoading(true);
       
       // Update blog post
       const { data, error } = await supabase
@@ -372,14 +374,14 @@ const Dashboard = () => {
         description: "مشکلی در بروزرسانی مقاله رخ داد. لطفاً دوباره تلاش کنید.",
       });
     } finally {
-      setLoading(false);
+      setPageLoading(false);
     }
   };
   
   // Function to delete a blog post
   const deleteBlogPost = async (id: string) => {
     try {
-      setLoading(true);
+      setPageLoading(true);
       
       // Delete blog post
       const { error } = await supabase
@@ -404,7 +406,7 @@ const Dashboard = () => {
         description: "مشکلی در حذف مقاله رخ داد. لطفاً دوباره تلاش کنید.",
       });
     } finally {
-      setLoading(false);
+      setPageLoading(false);
     }
   };
   
@@ -421,7 +423,7 @@ const Dashboard = () => {
         return;
       }
       
-      setLoading(true);
+      setPageLoading(true);
       console.log("Creating new category:", categoryFormData);
       
       // Create new category
@@ -459,18 +461,144 @@ const Dashboard = () => {
         description: "مشکلی در ایجاد دسته‌بندی جدید رخ داد. لطفاً دوباره تلاش کنید.",
       });
     } finally {
-      setLoading(false);
+      setPageLoading(false);
     }
   };
   
   // State for dialog open/close
   const [deletingCategoryId, setDeletingCategoryId] = useState<string | null>(null);
   
+  // State for subscription loading
+  const [loading, setLoading] = useState<string | null>(null);
+  
+  // Function to handle subscription payment
+  const handleSubscription = async (planId: SubscriptionPlan, amount: number, period: 'monthly' | 'semiannual' | 'yearly') => {
+    try {
+      const loadingKey = `${planId}-${period}`;
+      setLoading(loadingKey);
+      
+      if (!user) {
+        toast({
+          variant: "destructive",
+          title: "خطا در پرداخت",
+          description: "لطفاً ابتدا وارد حساب کاربری خود شوید.",
+        });
+        return;
+      }
+      
+      const data = {
+        merchant_id: "89999bca-a25d-4ada-9846-62ec13a250b1",
+        amount: amount.toString(),
+        description: `اشتراک ${planId === "basic" ? "رایگان" : `${period === 'monthly' ? 'ماهانه' : 'سالانه'} ${planId === "pro" ? "پرو" : "آلتیمیت"}`} - LiftLegends`,
+        metadata: {
+          user_id: user.id,
+          email: user.email || "",
+          plan_id: planId,
+          plan_period: period,
+          plan_duration: period === 'monthly' ? "1" : "12"
+        },
+        callback_url: window.location.origin + "/payment-callback"
+      };
+      
+      const response = await axios.post('/api/zarinpal/payment-request', data);
+      
+      if (response.data.data && response.data.data.authority) {
+        // Store payment info in localStorage for verification after callback
+        localStorage.setItem('payment_info', JSON.stringify({
+          authority: response.data.data.authority,
+          amount: amount,
+          plan_id: planId,
+          user_id: user.id,
+          timestamp: new Date().toISOString()
+        }));
+        
+        // Redirect to Zarinpal payment page
+        window.location.href = `https://staging.zarinpal.com/pg/StartPay/${response.data.data.authority}`;
+      } else {
+        throw new Error(response.data.errors?.message || 'خطا در اتصال به درگاه پرداخت');
+      }
+    } catch (error) {
+      console.error("Payment error:", error);
+      toast({
+        variant: "destructive",
+        title: "خطا در پرداخت",
+        description: error instanceof Error ? error.message : "مشکلی در پردازش پرداخت رخ داد. لطفاً دوباره تلاش کنید.",
+      });
+    } finally {
+      setLoading(null);
+    }
+  };
+  
+  // Function to update user subscription
+  const updateUserSubscription = async (planId: SubscriptionPlan, userId: string, period: 'monthly' | 'yearly') => {
+    try {
+      setPageLoading(true);
+      
+      // Calculate subscription end date based on plan and period
+      const startDate = new Date();
+      const endDate = new Date(startDate);
+      
+      // Set end date based on subscription period
+      if (period === 'monthly') {
+        endDate.setMonth(endDate.getMonth() + 1);
+      } else if (period === 'yearly') {
+        endDate.setFullYear(endDate.getFullYear() + 1);
+      }
+      
+      // Update user profile with new subscription details
+      const { data, error } = await supabase
+        .from("user_profiles")
+        .update({
+          subscription_plan: planId,
+          subscription_start_date: startDate.toISOString(),
+          subscription_end_date: endDate.toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .eq("user_id", userId)
+        .select()
+        .single();
+        
+      if (error) throw error;
+      
+      // Update local user state
+      if (user && user.profile) {
+        setUser({
+          ...user,
+          profile: {
+            ...user.profile,
+            subscription_plan: planId,
+            subscription_start_date: startDate.toISOString(),
+            subscription_end_date: endDate.toISOString(),
+            updated_at: new Date().toISOString()
+          }
+        });
+      }
+      
+      // Show success message
+      toast({
+        title: "اشتراک با موفقیت فعال شد",
+        description: `اشتراک ${period === 'monthly' ? 'ماهانه' : 'سالانه'} ${planId === 'pro' ? 'پرو' : 'آلتیمیت'} با موفقیت فعال شد.`,
+      });
+      
+      return data;
+    } catch (error) {
+      console.error("Error updating subscription:", error);
+      toast({
+        variant: "destructive",
+        title: "خطا در بروزرسانی اشتراک",
+        description: "مشکلی در بروزرسانی اشتراک رخ داد. لطفاً با پشتیبانی تماس بگیرید.",
+      });
+      return null;
+    } finally {
+      setPageLoading(false);
+    }
+  };
+
   // Function to delete category
   const deleteCategory = async (id: string) => {
     try {
       console.log("Deleting category with ID:", id);
-      setLoading(true);
+      setPageLoading(true);
       setDeletingCategoryId(id);
       
       // Delete category directly
@@ -503,7 +631,7 @@ const Dashboard = () => {
         description: "مشکلی در حذف دسته‌بندی رخ داد. لطفاً دوباره تلاش کنید.",
       });
     } finally {
-      setLoading(false);
+      setLoading(null);
       setDeletingCategoryId(null);
     }
   };
@@ -644,7 +772,7 @@ const Dashboard = () => {
   }, [user?.profile?.is_admin]);
   
   // If loading, show loading spinner
-  if (loading && !user) {
+  if (pageLoading && !user) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-900">
         <Loader2 className="h-8 w-8 animate-spin text-gold-500" />
@@ -654,7 +782,7 @@ const Dashboard = () => {
   }
   
   // If user is not logged in, redirect to home
-  if (!user && !loading) {
+  if (!user && !pageLoading) {
     navigate('/');
     return null;
   }
@@ -664,21 +792,298 @@ const Dashboard = () => {
       <div className="max-w-7xl mx-auto">
         <h1 className="text-3xl font-bold text-center mb-8">داشبورد کاربری</h1>
         
-        <Tabs defaultValue="blog" value={activeTab} onValueChange={setActiveTab} className="w-full">
-          {user?.profile?.is_admin ? (
-            <TabsList className="grid grid-cols-1 mb-8 bg-gray-800/50 p-1 rounded-lg">
+        <Tabs defaultValue="subscription" value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid grid-cols-2 mb-8 bg-gray-800/50 p-1 rounded-lg">
+            <TabsTrigger value="subscription" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-gold-500 data-[state=active]:to-amber-400 data-[state=active]:text-black data-[state=active]:font-medium rounded-md transition-all duration-300">
+              <CreditCard size={16} className="ml-2" />
+              اشتراک
+            </TabsTrigger>
+            {user?.profile?.is_admin && (
               <TabsTrigger value="blog" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-gold-500 data-[state=active]:to-amber-400 data-[state=active]:text-black data-[state=active]:font-medium rounded-md transition-all duration-300">
+                <Edit size={16} className="ml-2" />
                 مدیریت بلاگ
               </TabsTrigger>
-            </TabsList>
-          ) : (
-            <div className="text-center p-8 bg-gray-800/50 rounded-lg mb-8">
-              <h2 className="text-xl font-bold mb-4">داشبورد در حال بروزرسانی است</h2>
-              <p className="text-gray-400">لطفاً بعداً مراجعه کنید.</p>
-            </div>
-          )}
+            )}
+          </TabsList>
           
-
+          {/* Subscription Tab - Visible to all users */}
+          <TabsContent value="subscription" className="space-y-6">
+            <Card className="bg-gray-800/50 border-gray-700">
+              <CardHeader>
+                <CardTitle className="text-xl text-gold-500">اشتراک‌های LiftLegends</CardTitle>
+                <CardDescription className="text-gray-400">
+                  با خرید اشتراک به تمامی امکانات پیشرفته دسترسی پیدا کنید
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {/* Basic Plan */}
+                  <div className="relative bg-gray-800/70 rounded-xl overflow-hidden border border-white/10 hover:border-gold-500/30 transition-all duration-300 hover:shadow-[0_0_25px_rgba(255,215,0,0.15)] group">
+                    <div className="h-2 w-full bg-gradient-to-r from-blue-500 to-blue-600"></div>
+                    <div className="p-6">
+                      <h3 className="text-xl font-bold text-white mb-2">اشتراک یک ماهه</h3>
+                      <div className="flex items-baseline mb-4">
+                        <span className="text-3xl font-bold text-white">{SUBSCRIPTION_PLANS.ultimate.price.monthly.toLocaleString('fa-IR')}</span>
+                        <span className="text-gray-400 mr-2">تومان</span>
+                      </div>
+                      <div className="flex items-center text-gray-400 mb-6">
+                        <Calendar size={16} className="ml-2" />
+                        <span>مدت اشتراک: ۱ ماه</span>
+                      </div>
+                      <ul className="space-y-3 mb-6">
+                        <li className="flex items-start">
+                          <div className="bg-gradient-to-r from-gold-400 to-gold-600 p-1 rounded-full ml-2 mt-1">
+                            <Check size={12} className="text-black" />
+                          </div>
+                          <span className="text-gray-300">برنامه تمرینی شخصی‌سازی شده</span>
+                        </li>
+                        <li className="flex items-start">
+                          <div className="bg-gradient-to-r from-gold-400 to-gold-600 p-1 rounded-full ml-2 mt-1">
+                            <Check size={12} className="text-black" />
+                          </div>
+                          <span className="text-gray-300">برنامه غذایی پایه</span>
+                        </li>
+                        <li className="flex items-start">
+                          <div className="bg-gradient-to-r from-gold-400 to-gold-600 p-1 rounded-full ml-2 mt-1">
+                            <Check size={12} className="text-black" />
+                          </div>
+                          <span className="text-gray-300">پشتیبانی ۲۴/۷ با هوش مصنوعی</span>
+                        </li>
+                        <li className="flex items-start">
+                          <div className="bg-gradient-to-r from-gold-400 to-gold-600 p-1 rounded-full ml-2 mt-1">
+                            <Check size={12} className="text-black" />
+                          </div>
+                          <span className="text-gray-300">ثبت پیشرفت تمرینی</span>
+                        </li>
+                      </ul>
+                      <Button
+                        onClick={() => handleSubscription("basic", 0, 'monthly')}
+                        disabled={loading === "basic-monthly" || user?.profile?.subscription_plan === "basic"}
+                        className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:opacity-90 text-white py-6 rounded-lg transition-all group-hover:scale-105"
+                      >
+                        {loading === "basic" ? (
+                          <span className="flex items-center justify-center">
+                            <Zap size={18} className="animate-pulse ml-2" />
+                            در حال پردازش...
+                          </span>
+                        ) : user?.profile?.subscription_plan === "basic" ? (
+                          <span className="flex items-center justify-center">
+                            <Shield size={18} className="ml-2" />
+                            اشتراک فعال
+                          </span>
+                        ) : (
+                          <span className="flex items-center justify-center">
+                            <CreditCard size={18} className="ml-2" />
+                            خرید اشتراک
+                          </span>
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                  
+                  {/* Pro Plan */}
+                  <div className="relative bg-gray-800/70 rounded-xl overflow-hidden border border-white/10 hover:border-gold-500/30 transition-all duration-300 hover:shadow-[0_0_25px_rgba(255,215,0,0.15)] group">
+                    <div className="absolute top-0 right-0 bg-gold-500 text-black text-xs font-bold px-3 py-1 rounded-bl-lg">
+                      پیشنهاد ویژه
+                    </div>
+                    <div className="h-2 w-full bg-gradient-to-r from-gold-500 to-amber-500"></div>
+                    <div className="p-6">
+                      <ul className="space-y-3 mb-6">
+                        <li className="flex items-start">
+                          <div className="bg-gradient-to-r from-gold-400 to-gold-600 p-1 rounded-full ml-2 mt-1">
+                            <Check size={12} className="text-black" />
+                          </div>
+                          <span className="text-gray-300">تمام امکانات اشتراک یک ماهه</span>
+                        </li>
+                        <li className="flex items-start">
+                          <div className="bg-gradient-to-r from-gold-400 to-gold-600 p-1 rounded-full ml-2 mt-1">
+                            <Check size={12} className="text-black" />
+                          </div>
+                          <span className="text-gray-300">برنامه غذایی پیشرفته</span>
+                        </li>
+                        <li className="flex items-start">
+                          <div className="bg-gradient-to-r from-gold-400 to-gold-600 p-1 rounded-full ml-2 mt-1">
+                            <Check size={12} className="text-black" />
+                          </div>
+                          <span className="text-gray-300">مشاوره مکمل</span>
+                        </li>
+                        <li className="flex items-start">
+                          <div className="bg-gradient-to-r from-gold-400 to-gold-600 p-1 rounded-full ml-2 mt-1">
+                            <Check size={12} className="text-black" />
+                          </div>
+                          <span className="text-gray-300">برنامه‌ریزی هفتگی پیشرفته</span>
+                        </li>
+                        <li className="flex items-start">
+                          <div className="bg-gradient-to-r from-gold-400 to-gold-600 p-1 rounded-full ml-2 mt-1">
+                            <Check size={12} className="text-black" />
+                          </div>
+                          <span className="text-gray-300">۱۵٪ تخفیف نسبت به اشتراک ماهانه</span>
+                        </li>
+                      </ul>
+                      <div className="flex flex-col space-y-2">
+                        <Button
+                          onClick={() => handleSubscription("pro", SUBSCRIPTION_PLANS.pro.price.monthly, 'monthly')}
+                          disabled={loading === "pro-monthly" || user?.profile?.subscription_plan === "pro"}
+                          className="w-full bg-gradient-to-r from-gold-500 to-amber-500 hover:opacity-90 text-white py-3 rounded-lg transition-all group-hover:scale-105"
+                        >
+                          {loading === "pro-monthly" ? (
+                            <span className="flex items-center justify-center">
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              در حال پردازش...
+                            </span>
+                          ) : (
+                            <span className="flex items-center justify-center">
+                              <CreditCard size={18} className="ml-2" />
+                              اشتراک ماهانه ({SUBSCRIPTION_PLANS.pro.price.monthly.toLocaleString('fa-IR')} تومان)
+                            </span>
+                          )}
+                        </Button>
+                        <Button
+                          onClick={() => handleSubscription("pro", SUBSCRIPTION_PLANS.pro.price.yearly, 'yearly')}
+                          disabled={loading === "pro-yearly" || user?.profile?.subscription_plan === "pro"}
+                          className="w-full bg-gradient-to-r from-gold-500 to-amber-500 hover:opacity-90 text-white py-3 rounded-lg transition-all group-hover:scale-105"
+                        >
+                          {loading === "pro-yearly" ? (
+                            <span className="flex items-center justify-center">
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              در حال پردازش...
+                            </span>
+                          ) : (
+                            <span className="flex items-center justify-center">
+                              <CreditCard size={18} className="ml-2" />
+                              اشتراک سالانه ({SUBSCRIPTION_PLANS.pro.price.yearly.toLocaleString('fa-IR')} تومان)
+                            </span>
+                          )}
+                        </Button>
+                      </div>
+                        <Button
+                          onClick={() => handleSubscription("pro", SUBSCRIPTION_PLANS.pro.price.yearly, 'yearly')}
+                          disabled={loading === "pro" || user?.profile?.subscription_plan === "pro"}
+                          className="w-full bg-gradient-to-r from-gold-500 to-amber-400 text-black font-medium hover:from-gold-600 hover:to-amber-500 transition-all duration-300"
+                        >
+                          {loading === "pro" ? (
+                            <span className="flex items-center justify-center">
+                              <Zap size={18} className="animate-pulse ml-2" />
+                              در حال پردازش...
+                            </span>
+                          ) : user?.profile?.subscription_plan === "pro" ? (
+                            <span className="flex items-center justify-center">
+                              <Shield size={18} className="ml-2" />
+                              اشتراک فعال
+                            </span>
+                          ) : (
+                            <span className="flex items-center justify-center">
+                              <CreditCard size={18} className="ml-2" />
+                              خرید اشتراک
+                            </span>
+                          )}
+                        </Button>
+                    </div>
+                  </div>
+                  
+                  {/* Premium Plan */}
+                  <div className="relative bg-gray-800/70 rounded-xl overflow-hidden border border-white/10 hover:border-gold-500/30 transition-all duration-300 hover:shadow-[0_0_25px_rgba(255,215,0,0.15)] group">
+                    <div className="h-2 w-full bg-gradient-to-r from-purple-500 to-purple-600"></div>
+                    <div className="p-6">
+                      <h3 className="text-xl font-bold text-white mb-2">اشتراک شش ماهه</h3>
+                      <div className="flex items-baseline mb-4">
+                        <span className="text-3xl font-bold text-white">{SUBSCRIPTION_PLANS.pro.price.monthly.toLocaleString('fa-IR')}</span>
+                        <span className="text-gray-400 mr-2">تومان</span>
+                      </div>
+                      <div className="flex items-center text-gray-400 mb-6">
+                        <Calendar size={16} className="ml-2" />
+                        <span>مدت اشتراک: ۶ ماه</span>
+                      </div>
+                      <ul className="space-y-3 mb-6">
+                        <li className="flex items-start">
+                          <div className="bg-gradient-to-r from-gold-400 to-gold-600 p-1 rounded-full ml-2 mt-1">
+                            <Check size={12} className="text-black" />
+                          </div>
+                          <span className="text-gray-300">تمام امکانات اشتراک ماهانه</span>
+                        </li>
+                        <li className="flex items-start">
+                          <div className="bg-gradient-to-r from-gold-400 to-gold-600 p-1 rounded-full ml-2 mt-1">
+                            <Check size={12} className="text-black" />
+                          </div>
+                          <span className="text-gray-300">برنامه استرویید شخصی‌سازی شده</span>
+                        </li>
+                        <li className="flex items-start">
+                          <div className="bg-gradient-to-r from-gold-400 to-gold-600 p-1 rounded-full ml-2 mt-1">
+                            <Check size={12} className="text-black" />
+                          </div>
+                          <span className="text-gray-300">مشاوره تخصصی تغذیه</span>
+                        </li>
+                        <li className="flex items-start">
+                          <div className="bg-gradient-to-r from-gold-400 to-gold-600 p-1 rounded-full ml-2 mt-1">
+                            <Check size={12} className="text-black" />
+                          </div>
+                          <span className="text-gray-300">برنامه‌های تمرینی ویژه</span>
+                        </li>
+                        <li className="flex items-start">
+                          <div className="bg-gradient-to-r from-gold-400 to-gold-600 p-1 rounded-full ml-2 mt-1">
+                            <Check size={12} className="text-black" />
+                          </div>
+                          <span className="text-gray-300">۲۵٪ تخفیف نسبت به اشتراک ماهانه</span>
+                        </li>
+                      </ul>
+                      <div className="space-y-3">
+                        <Button
+                          onClick={() => handleSubscription("pro", SUBSCRIPTION_PLANS.pro.price.monthly, 'semiannual')}
+                          disabled={loading === "pro-semiannual" || user?.profile?.subscription_plan === "pro"}
+                          className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:opacity-90 text-white py-3 rounded-lg transition-all group-hover:scale-105"
+                        >
+                          {loading === "pro-semiannual" ? (
+                            <span className="flex items-center justify-center">
+                              <Zap size={18} className="animate-pulse ml-2" />
+                              در حال پردازش...
+                            </span>
+                          ) : user?.profile?.subscription_plan === "pro" ? (
+                            <span className="flex items-center justify-center">
+                              <Shield size={18} className="ml-2" />
+                              اشتراک فعال
+                            </span>
+                          ) : (
+                            <span className="flex items-center justify-center">
+                              <CreditCard size={18} className="ml-2" />
+                              خرید اشتراک
+                            </span>
+                          )}
+                        </Button>
+                        <Button
+                          onClick={() => handleSubscription("ultimate", SUBSCRIPTION_PLANS.ultimate.price.yearly, 'yearly')}
+                          disabled={loading === "ultimate-yearly" || user?.profile?.subscription_plan === "ultimate"}
+                          className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:opacity-90 text-white py-3 rounded-lg transition-all group-hover:scale-105"
+                        >
+                          {loading === "ultimate-yearly" ? (
+                            <span className="flex items-center justify-center">
+                              <Zap size={18} className="animate-pulse ml-2" />
+                              در حال پردازش...
+                            </span>
+                          ) : user?.profile?.subscription_plan === "ultimate" ? (
+                            <span className="flex items-center justify-center">
+                              <Shield size={18} className="ml-2" />
+                              اشتراک فعال
+                            </span>
+                          ) : (
+                            <span className="flex items-center justify-center">
+                              <CreditCard size={18} className="ml-2" />
+                              اشتراک سالانه ({SUBSCRIPTION_PLANS.ultimate.price.yearly.toLocaleString('fa-IR')} تومان)
+                            </span>
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="mt-8 p-4 bg-gray-800/50 rounded-lg border border-white/10">
+                  <p className="text-gray-400 text-sm text-center">
+                    پرداخت از طریق درگاه امن زرین‌پال انجام می‌شود. پس از تکمیل پرداخت، اشتراک شما بلافاصله فعال خواهد شد.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
           
           {/* Blog Management Tab - Only visible to admins */}
           {user?.profile?.is_admin && (
@@ -802,7 +1207,7 @@ const Dashboard = () => {
                         )}
                         <Button
                           onClick={isEditing ? updateBlogPost : createBlogPost}
-                          disabled={loading}
+                          disabled={!!loading}
                           className="bg-gradient-to-r from-gold-500 to-amber-400 hover:from-gold-600 hover:to-amber-500 text-black"
                         >
                           {loading ? (
@@ -851,7 +1256,7 @@ const Dashboard = () => {
                     
                     <Button
                       onClick={createCategory}
-                      disabled={loading}
+                      disabled={!!loading}
                       className="bg-gradient-to-r from-gold-500 to-amber-400 hover:from-gold-600 hover:to-amber-500 text-black"
                     >
                       {loading ? (
@@ -903,7 +1308,7 @@ const Dashboard = () => {
                                   deleteCategory(category.id);
                                 }
                               }}
-                              disabled={loading}
+                              disabled={!!loading}
                             >
                               {loading && deletingCategoryId === category.id ? (
                                 <Loader2 className="h-3 w-3 animate-spin" />
@@ -1020,7 +1425,6 @@ const Dashboard = () => {
               </Card>
             </TabsContent>
           )}
-          
         </Tabs>
       </div>
     </div>

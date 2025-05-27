@@ -6,8 +6,9 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import express from 'express';
 
-// Import cors using require syntax
-const cors = require("cors");
+// Import cors using ES module syntax
+import cors from 'cors';
+import axios from 'axios';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -20,6 +21,9 @@ const app = express();
 
 // Enable CORS for all routes
 app.use(cors());
+
+// Add JSON body parser middleware
+app.use(express.json());
 
 // MIME types for different file extensions
 const MIME_TYPES = {
@@ -44,6 +48,29 @@ const MIME_TYPES = {
   '.otf': 'font/otf',
   '.webp': 'image/webp'
 };
+
+// Proxy endpoint for Zarinpal API
+app.post('/api/zarinpal/payment-request', async (req, res) => {
+  try {
+    const response = await axios.post(
+      'https://staging.zarinpal.com/pg/v4/payment/request.json',
+      req.body,
+      {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+    res.json(response.data);
+  } catch (error) {
+    console.error('Zarinpal API error:', error.message);
+    res.status(500).json({
+      error: true,
+      message: error.message,
+      data: error.response?.data || null
+    });
+  }
+});
 
 // Serve static files from the dist directory
 app.use(express.static(DIST_DIR));
