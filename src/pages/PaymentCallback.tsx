@@ -46,6 +46,12 @@ const PaymentCallback = () => {
         }
 
         const paymentInfo: PaymentInfo = JSON.parse(paymentInfoStr);
+        
+        // Add plan_period if it doesn't exist (for backward compatibility)
+        if (!paymentInfo.plan_period) {
+          console.log("Adding missing plan_period to payment info");
+          paymentInfo.plan_period = 'monthly'; // Default to monthly if not specified
+        }
 
         // Check if payment was successful
         if (status !== "OK" || !authority) {
@@ -64,26 +70,8 @@ const PaymentCallback = () => {
 
         console.log("Verifying payment with data:", verifyData);
         
-        // Try to use the proxy endpoint first
-        let response;
-        try {
-          response = await axios.post("http://localhost:3000/api/zarinpal/verify", verifyData);
-        } catch (proxyError) {
-          console.error("Error with proxy verification:", proxyError);
-          console.log("Trying direct verification with Zarinpal...");
-          
-          // If proxy fails, try direct request as fallback
-          response = await axios.post(
-            "https://staging.zarinpal.com/pg/v4/payment/verify.json", 
-            verifyData,
-            {
-              headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-              }
-            }
-          );
-        }
+        // Use relative URL to work on any domain
+        const response = await axios.post("/api/zarinpal/verify", verifyData);
         
         console.log("Verification response:", response.data);
 

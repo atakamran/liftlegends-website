@@ -39,9 +39,9 @@ export const SUBSCRIPTION_PLANS: Record<SubscriptionPlan, SubscriptionPlanDetail
       yearly: 0
     },
     features: [
-      'Basic workout plans',
-      'Limited exercise library',
-      'Basic progress tracking'
+      'برنامه‌های تمرینی پایه',
+      'کتابخانه محدود تمرینات',
+      'پیگیری پیشرفت ابتدایی'
     ]
   },
   pro: {
@@ -51,24 +51,24 @@ export const SUBSCRIPTION_PLANS: Record<SubscriptionPlan, SubscriptionPlanDetail
       yearly: 990000
     },
     features: [
-      'Advanced workout plans',
-      'Full exercise library',
-      'Detailed progress tracking',
-      'Nutrition guidance'
+      'برنامه‌های تمرینی پیشرفته',
+      'کتابخانه کامل تمرینات',
+      'پیگیری دقیق پیشرفت',
+      'برنامه غذایی اختصاصی'
     ]
   },
   ultimate: {
     name: 'ultimate',
     price: {
-      monthly: 199000,
+      monthly: 15000,
       yearly: 1990000
     },
     features: [
-      'Premium workout plans',
-      'Complete exercise library',
-      'Advanced progress analytics',
-      'Personalized nutrition plans',
-      'Priority support'
+      'تمام ویژگی‌های اشتراک پرو',
+      'مربی هوش مصنوعی اختصاصی',
+      'مشاوره تخصصی مکمل‌ها',
+      'برنامه‌ریزی پیشرفته تمرینات',
+      'پشتیبانی ویژه ۲۴ ساعته'
     ]
   }
 };
