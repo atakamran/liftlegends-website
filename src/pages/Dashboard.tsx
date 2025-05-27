@@ -180,6 +180,53 @@ const Dashboard = () => {
         profile: profileData || undefined
       } as User);
       
+      // Check if subscription has expired and update it directly in the database
+      if (profileData && 
+          (profileData.subscription_plan === "pro" || profileData.subscription_plan === "ultimate") && 
+          profileData.subscription_end_date) {
+        
+        const endDate = new Date(profileData.subscription_end_date);
+        const today = new Date();
+        
+        // Reset time part to compare only dates
+        endDate.setHours(0, 0, 0, 0);
+        today.setHours(0, 0, 0, 0);
+        
+        // If subscription has expired, update it to basic directly in the database
+        if (today > endDate) {
+          console.log("Expired subscription detected during data fetch, updating to basic plan...");
+          
+          // Update user profile with basic subscription
+          const { data: updatedProfile, error: updateError } = await supabase
+            .from("user_profiles")
+            .update({
+              subscription_plan: "basic",
+              subscription_end_date: null, // Basic plan doesn't expire
+              updated_at: new Date().toISOString()
+            })
+            .eq("user_id", userData.id)
+            .select();
+            
+          if (updateError) {
+            console.error("Error updating expired subscription:", updateError);
+          } else {
+            console.log("Subscription successfully updated to basic plan:", updatedProfile);
+            
+            // Update the local user state with the updated profile
+            setUser({
+              ...userData,
+              profile: updatedProfile[0] || undefined
+            } as User);
+            
+            toast({
+              title: "اشتراک منقضی شده",
+              description: "اشتراک شما به پایان رسیده و به پلن پایه تغییر یافت.",
+              variant: "default"
+            });
+          }
+        }
+      }
+      
       // Check if user is admin
       if (profileData) {
         const { is_admin } = profileData;
@@ -471,6 +518,149 @@ const Dashboard = () => {
   // State for subscription loading
   const [loading, setLoading] = useState<string | null>(null);
   
+  // Function to calculate remaining days of subscription
+  const calculateRemainingDays = (endDateStr: string | null): number | null => {
+    if (!endDateStr) return null;
+    
+    try {
+      const endDate = new Date(endDateStr);
+      const today = new Date();
+      
+      // Reset time part to compare only dates
+      endDate.setHours(0, 0, 0, 0);
+      today.setHours(0, 0, 0, 0);
+      
+      // Calculate difference in milliseconds and convert to days
+      const diffTime = endDate.getTime() - today.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      
+      return diffDays > 0 ? diffDays : 0;
+    } catch (error) {
+      console.error("Error calculating remaining days:", error);
+      return null;
+    }
+  };
+  
+  // Function to check and handle expired subscriptions
+  const checkExpiredSubscription = async () => {
+    if (!user?.profile) return;
+    
+    // Only check for paid plans (pro or ultimate)
+    if (user.profile.subscription_plan !== "pro" && user.profile.subscription_plan !== "ultimate") return;
+    
+    // Check if subscription has an end date
+    if (!user.profile.subscription_end_date) return;
+    
+    // Calculate remaining days
+    const remainingDays = calculateRemainingDays(user.profile.subscription_end_date);
+    
+    // If subscription has expired (0 days remaining), revert to basic plan
+    if (remainingDays !== null && remainingDays <= 0) {
+      try {
+        console.log("Subscription expired, reverting to basic plan");
+        console.log("Current subscription plan:", user.profile.subscription_plan);
+        console.log("Subscription end date:", user.profile.subscription_end_date);
+        
+        // Update user profile with basic subscription
+        const { data, error } = await supabase
+          .from("user_profiles")
+          .update({
+            subscription_plan: "basic",
+            subscription_end_date: null, // Basic plan doesn't expire
+            updated_at: new Date().toISOString()
+            // Keep the original subscription_start_date for record
+          })
+          .eq("user_id", user.id)
+          .select();
+          
+        if (error) {
+          console.error("Supabase error when reverting to basic plan:", error);
+          throw error;
+        }
+        
+        console.log("Database update successful:", data);
+        
+        // Update local user state
+        if (user && user.profile) {
+          setUser({
+            ...user,
+            profile: {
+              ...user.profile,
+              subscription_plan: "basic",
+              subscription_end_date: null,
+              updated_at: new Date().toISOString()
+            }
+          });
+          
+          console.log("Local user state updated to basic plan");
+        }
+        
+        toast({
+          title: "اشتراک منقضی شده",
+          description: "اشتراک شما به پایان رسیده و به پلن پایه تغییر یافت.",
+          variant: "default"
+        });
+        
+      } catch (error) {
+        console.error("Error reverting to basic plan:", error);
+        
+        toast({
+          title: "خطا در بروزرسانی اشتراک",
+          description: "مشکلی در تغییر اشتراک به پلن پایه رخ داد. لطفاً با پشتیبانی تماس بگیرید.",
+          variant: "destructive"
+        });
+      }
+    }
+  };
+  
+  // Function to format date to Persian format
+  const formatDateToPersian = (dateStr: string | null): string => {
+    if (!dateStr) return "تعیین نشده";
+    
+    try {
+      const date = new Date(dateStr);
+      // Format: YYYY/MM/DD
+      return date.toLocaleDateString('fa-IR');
+    } catch (error) {
+      console.error("Error formatting date:", error);
+      return "تاریخ نامعتبر";
+    }
+  };
+  
+  // Function to render subscription status with remaining days
+  const renderSubscriptionStatus = (plan: string | null, endDate: string | null): JSX.Element => {
+    if (!plan || plan === "basic") {
+      return (
+        <span className="flex items-center justify-center">
+          <Shield size={18} className="ml-2" />
+          اشتراک فعال
+        </span>
+      );
+    }
+    
+    const remainingDays = calculateRemainingDays(endDate);
+    
+    // Determine color based on plan type
+    const colorClass = plan === "pro" 
+      ? "from-amber-500/20 to-gold-500/20 text-amber-400" 
+      : "from-purple-500/20 to-indigo-500/20 text-purple-400";
+    
+    const dotColor = plan === "pro" ? "bg-amber-400" : "bg-purple-400";
+    
+    return (
+      <span className="flex items-center justify-center">
+        <Shield size={18} className="ml-2" />
+        اشتراک فعال
+        {remainingDays !== null && (
+          <span className={`mr-2 text-xs bg-gradient-to-r ${colorClass} px-2 py-1 rounded-full flex items-center`}>
+            <span className={`w-1.5 h-1.5 rounded-full ${dotColor} mr-1`}></span>
+            {remainingDays} روز
+          </span>
+        )}
+      </span>
+    );
+  };
+  
   // Function to handle subscription payment
   const handleSubscription = async (planId: SubscriptionPlan, amount: number, period: 'monthly' | 'semiannual' | 'yearly') => {
     try {
@@ -486,16 +676,69 @@ const Dashboard = () => {
         return;
       }
       
+      // Handle basic plan activation without payment
+      if (planId === "basic") {
+        try {
+          setPageLoading(true);
+          
+          // Update user profile with basic subscription
+          const { error } = await supabase
+            .from("user_profiles")
+            .update({
+              subscription_plan: "basic",
+              subscription_start_date: new Date().toISOString(),
+              subscription_end_date: null, // Basic plan doesn't expire
+              updated_at: new Date().toISOString()
+            })
+            .eq("user_id", user.id);
+            
+          if (error) throw error;
+          
+          // Refresh user data
+          await fetchUserData();
+          
+          toast({
+            title: "اشتراک رایگان فعال شد",
+            description: "اشتراک رایگان با موفقیت فعال شد.",
+          });
+          
+          setLoading(null);
+          return;
+        } catch (error) {
+          console.error("Error activating basic plan:", error);
+          toast({
+            variant: "destructive",
+            title: "خطا در فعال‌سازی اشتراک رایگان",
+            description: "مشکلی در فعال‌سازی اشتراک رایگان رخ داد. لطفاً دوباره تلاش کنید.",
+          });
+          setLoading(null);
+          return;
+        } finally {
+          setPageLoading(false);
+        }
+      }
+      
+      // For paid plans, proceed with payment
+      let planDuration = "1";
+      if (period === 'yearly') {
+        planDuration = "12";
+      } else if (period === 'semiannual') {
+        planDuration = "6";
+      }
+      
+      const planName = planId === "pro" ? "پرو" : "آلتیمیت";
+      const periodName = period === 'monthly' ? 'ماهانه' : (period === 'yearly' ? 'سالانه' : 'شش ماهه');
+      
       const data = {
         merchant_id: "89999bca-a25d-4ada-9846-62ec13a250b1",
         amount: amount.toString(),
-        description: `اشتراک ${planId === "basic" ? "رایگان" : `${period === 'monthly' ? 'ماهانه' : 'سالانه'} ${planId === "pro" ? "پرو" : "آلتیمیت"}`} - LiftLegends`,
+        description: `اشتراک ${periodName} ${planName} - LiftLegends`,
         metadata: {
           user_id: user.id,
           email: user.email || "",
           plan_id: planId,
           plan_period: period,
-          plan_duration: period === 'monthly' ? "1" : "12"
+          plan_duration: planDuration
         },
         callback_url: window.location.origin + "/payment-callback"
       };
@@ -756,6 +999,23 @@ const Dashboard = () => {
     fetchUserData();
   }, []);
   
+  // Check for expired subscriptions when user data is loaded
+  useEffect(() => {
+    if (user?.profile) {
+      console.log("Checking subscription status...");
+      checkExpiredSubscription();
+      
+      // Also set up an interval to check every minute while the user is on the page
+      const intervalId = setInterval(() => {
+        console.log("Periodic subscription check...");
+        checkExpiredSubscription();
+      }, 60000); // Check every minute
+      
+      // Clean up the interval when the component unmounts
+      return () => clearInterval(intervalId);
+    }
+  }, [user?.profile]);
+  
   // Load blog data when blog tab is active and user is admin
   useEffect(() => {
     if (activeTab === "blog" && user?.profile?.is_admin) {
@@ -808,278 +1068,476 @@ const Dashboard = () => {
           
           {/* Subscription Tab - Visible to all users */}
           <TabsContent value="subscription" className="space-y-6">
-            <Card className="bg-gray-800/50 border-gray-700">
-              <CardHeader>
-                <CardTitle className="text-xl text-gold-500">اشتراک‌های LiftLegends</CardTitle>
-                <CardDescription className="text-gray-400">
+            {/* Current Subscription Info Card */}
+            {user?.profile?.subscription_plan && (
+              <Card className={`bg-gradient-to-b ${user?.profile?.subscription_plan === "pro" ? "from-amber-900/20 to-gold-900/20 border-amber-700/30" : user?.profile?.subscription_plan === "ultimate" ? "from-purple-900/20 to-indigo-900/20 border-purple-700/30" : "from-blue-900/20 to-blue-900/20 border-blue-700/30"} shadow-xl`}>
+                <CardHeader className="pb-4">
+                  <CardTitle className={`text-xl font-bold bg-clip-text text-transparent ${user?.profile?.subscription_plan === "pro" ? "bg-gradient-to-r from-gold-400 to-amber-300" : user?.profile?.subscription_plan === "ultimate" ? "bg-gradient-to-r from-purple-400 to-indigo-300" : "bg-gradient-to-r from-blue-400 to-blue-300"}`}>
+                    اطلاعات اشتراک {user?.profile?.subscription_plan === "pro" ? "پرو" : user?.profile?.subscription_plan === "ultimate" ? "آلتیمیت" : "پایه"}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="bg-gray-800/50 p-4 rounded-lg">
+                        <div className="flex items-center mb-2">
+                          <Calendar size={18} className={`ml-2 ${user?.profile?.subscription_plan === "pro" ? "text-amber-400" : user?.profile?.subscription_plan === "ultimate" ? "text-purple-400" : "text-blue-400"}`} />
+                          <span className="text-gray-300">تاریخ شروع اشتراک:</span>
+                        </div>
+                        <p className="text-white font-medium text-lg">{formatDateToPersian(user.profile.subscription_start_date)}</p>
+                      </div>
+                      
+                      {user.profile.subscription_end_date ? (
+                        <div className="bg-gray-800/50 p-4 rounded-lg">
+                          <div className="flex items-center mb-2">
+                            <Calendar size={18} className={`ml-2 ${user?.profile?.subscription_plan === "pro" ? "text-amber-400" : user?.profile?.subscription_plan === "ultimate" ? "text-purple-400" : "text-blue-400"}`} />
+                            <span className="text-gray-300">تاریخ پایان اشتراک:</span>
+                          </div>
+                          <p className="text-white font-medium text-lg">{formatDateToPersian(user.profile.subscription_end_date)}</p>
+                        </div>
+                      ) : (
+                        <div className="bg-gray-800/50 p-4 rounded-lg">
+                          <div className="flex items-center mb-2">
+                            <Calendar size={18} className="ml-2 text-blue-400" />
+                            <span className="text-gray-300">تاریخ پایان اشتراک:</span>
+                          </div>
+                          <p className="text-white font-medium text-lg">بدون محدودیت زمانی</p>
+                        </div>
+                      )}
+                    </div>
+                    
+                    {user.profile.subscription_end_date && user.profile.subscription_start_date && (
+                      <div className="p-4 rounded-lg bg-gray-800/50">
+                        <div className="flex items-center mb-2">
+                          <Shield size={18} className={`ml-2 ${calculateRemainingDays(user.profile.subscription_end_date) && calculateRemainingDays(user.profile.subscription_end_date)! > 0 ? "text-green-400" : "text-red-400"}`} />
+                          <span className="text-gray-300">وضعیت اشتراک:</span>
+                        </div>
+                        
+                        {calculateRemainingDays(user.profile.subscription_end_date) !== null && (
+                          <>
+                            <div className="flex items-center justify-between mb-1">
+                              <p className="text-white font-medium">
+                                {calculateRemainingDays(user.profile.subscription_end_date)! > 0 ? (
+                                  <span className="text-green-400">
+                                    {calculateRemainingDays(user.profile.subscription_end_date)} روز باقی‌مانده
+                                  </span>
+                                ) : (
+                                  <div className="flex flex-col space-y-2">
+                                    <span className="text-red-400">
+                                      اشتراک منقضی شده - لطفا تمدید کنید
+                                    </span>
+                                    <Button 
+                                      variant="outline" 
+                                      size="sm" 
+                                      className="bg-gray-800 border-red-500/30 hover:bg-gray-700 text-red-400"
+                                      onClick={checkExpiredSubscription}
+                                    >
+                                      بازگشت به اشتراک پایه
+                                    </Button>
+                                  </div>
+                                )}
+                              </p>
+                              
+                              {calculateRemainingDays(user.profile.subscription_end_date)! > 0 && (
+                                <span className="text-xs text-gray-400">
+                                  {formatDateToPersian(user.profile.subscription_start_date)} تا {formatDateToPersian(user.profile.subscription_end_date)}
+                                </span>
+                              )}
+                            </div>
+                            
+                            {/* Modern Progress Bar */}
+                            {calculateRemainingDays(user.profile.subscription_end_date)! > 0 && (
+                              <div className="w-full h-2 bg-gray-700 rounded-full overflow-hidden mt-2">
+                                {(() => {
+                                  try {
+                                    const startDate = new Date(user.profile.subscription_start_date!);
+                                    const endDate = new Date(user.profile.subscription_end_date!);
+                                    const today = new Date();
+                                    
+                                    // Calculate total duration and elapsed time
+                                    const totalDuration = endDate.getTime() - startDate.getTime();
+                                    const elapsedTime = today.getTime() - startDate.getTime();
+                                    
+                                    // Calculate percentage (capped between 0-100)
+                                    const percentage = Math.max(0, Math.min(100, (elapsedTime / totalDuration) * 100));
+                                    
+                                    // Determine color based on remaining percentage
+                                    const colorClass = 
+                                      percentage > 80 ? "bg-red-500" : 
+                                      percentage > 60 ? "bg-orange-500" : 
+                                      percentage > 40 ? "bg-amber-500" : 
+                                      percentage > 20 ? "bg-green-500" : 
+                                      "bg-emerald-500";
+                                    
+                                    return (
+                                      <div 
+                                        className={`h-full ${colorClass}`} 
+                                        style={{ width: `${percentage}%` }}
+                                      ></div>
+                                    );
+                                  } catch (error) {
+                                    console.error("Error rendering progress bar:", error);
+                                    return null;
+                                  }
+                                })()}
+                              </div>
+                            )}
+                          </>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+            
+            <Card className="bg-gradient-to-b from-gray-800/80 to-gray-900/90 border-gray-700 shadow-xl">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gold-400 to-amber-300">اشتراک‌های LiftLegends</CardTitle>
+                <CardDescription className="text-gray-300">
                   با خرید اشتراک به تمامی امکانات پیشرفته دسترسی پیدا کنید
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                   {/* Basic Plan */}
-                  <div className="relative bg-gray-800/70 rounded-xl overflow-hidden border border-white/10 hover:border-gold-500/30 transition-all duration-300 hover:shadow-[0_0_25px_rgba(255,215,0,0.15)] group">
-                    <div className="h-2 w-full bg-gradient-to-r from-blue-500 to-blue-600"></div>
-                    <div className="p-6">
-                      <h3 className="text-xl font-bold text-white mb-2">اشتراک یک ماهه</h3>
-                      <div className="flex items-baseline mb-4">
-                        <span className="text-3xl font-bold text-white">{SUBSCRIPTION_PLANS.ultimate.price.monthly.toLocaleString('fa-IR')}</span>
-                        <span className="text-gray-400 mr-2">تومان</span>
+                  <div className="relative group">
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-blue-600/20 rounded-2xl blur-xl opacity-70 group-hover:opacity-100 transition-all duration-500"></div>
+                    <div className="relative bg-gray-900 rounded-2xl overflow-hidden border border-blue-500/30 transition-all duration-300 group-hover:border-blue-400/50 group-hover:translate-y-[-5px] group-hover:shadow-[0_10px_40px_rgba(59,130,246,0.3)]">
+                      <div className="h-1.5 w-full bg-gradient-to-r from-blue-500 to-blue-600"></div>
+                      <div className="p-6">
+                        <div className="flex justify-between items-start mb-4">
+                          <div>
+                            <h3 className="text-xl font-bold text-white mb-1">Basic</h3>
+                            <p className="text-blue-400 text-sm font-medium">رایگان</p>
+                          </div>
+                          <div className="bg-blue-500/10 p-2 rounded-full">
+                            <Shield className="h-6 w-6 text-blue-400" />
+                          </div>
+                        </div>
+                        
+                        
+                        <div className="flex items-center text-gray-400 mb-6">
+                          <span className="text-3xl font-bold text-white">0</span>
+                          <Calendar size={16} className="ml-2" />
+                          <span>دسترسی محدود</span>
+                        </div>
+                        
+                        <ul className="space-y-3 mb-8">
+                          <li className="flex items-start">
+                            <div className="bg-blue-500/20 p-1 rounded-full ml-2 mt-1">
+                              <Check size={12} className="text-blue-400" />
+                            </div>
+                            <span className="text-gray-300">برنامه تمرینی پایه</span>
+                          </li>
+                          <li className="flex items-start">
+                            <div className="bg-blue-500/20 p-1 rounded-full ml-2 mt-1">
+                              <Check size={12} className="text-blue-400" />
+                            </div>
+                            <span className="text-gray-300">دسترسی به کتابخانه تمرین‌های محدود</span>
+                          </li>
+                          <li className="flex items-start">
+                            <div className="bg-blue-500/20 p-1 rounded-full ml-2 mt-1">
+                              <Check size={12} className="text-blue-400" />
+                            </div>
+                            <span className="text-gray-300">ثبت پیشرفت تمرینی پایه</span>
+                          </li>
+                        </ul>
+                        
+                        <Button
+                          onClick={() => handleSubscription("basic", 0, 'monthly')}
+                          disabled={loading === "basic-monthly" || user?.profile?.subscription_plan === "basic" || user?.profile?.subscription_plan === "pro" || user?.profile?.subscription_plan === "ultimate"}
+                          className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white py-3 rounded-xl transition-all duration-300 shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40"
+                        >
+                          {loading === "basic-monthly" ? (
+                            <span className="flex items-center justify-center">
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              در حال پردازش...
+                            </span>
+                          ) : user?.profile?.subscription_plan === "basic" ? (
+                            <span className="flex items-center justify-center">
+                              <Shield size={18} className="ml-2" />
+                              اشتراک فعال
+                            </span>
+                          ) : user?.profile?.subscription_plan === "pro" || user?.profile?.subscription_plan === "ultimate" ? (
+                            <span className="flex items-center justify-center">
+                              <Shield size={18} className="ml-2" />
+                              اشتراک بالاتر فعال است
+                            </span>
+                          ) : (
+                            <span className="flex items-center justify-center">
+                              <CreditCard size={18} className="ml-2" />
+                              فعال‌سازی رایگان
+                            </span>
+                          )}
+                        </Button>
                       </div>
-                      <div className="flex items-center text-gray-400 mb-6">
-                        <Calendar size={16} className="ml-2" />
-                        <span>مدت اشتراک: ۱ ماه</span>
-                      </div>
-                      <ul className="space-y-3 mb-6">
-                        <li className="flex items-start">
-                          <div className="bg-gradient-to-r from-gold-400 to-gold-600 p-1 rounded-full ml-2 mt-1">
-                            <Check size={12} className="text-black" />
-                          </div>
-                          <span className="text-gray-300">برنامه تمرینی شخصی‌سازی شده</span>
-                        </li>
-                        <li className="flex items-start">
-                          <div className="bg-gradient-to-r from-gold-400 to-gold-600 p-1 rounded-full ml-2 mt-1">
-                            <Check size={12} className="text-black" />
-                          </div>
-                          <span className="text-gray-300">برنامه غذایی پایه</span>
-                        </li>
-                        <li className="flex items-start">
-                          <div className="bg-gradient-to-r from-gold-400 to-gold-600 p-1 rounded-full ml-2 mt-1">
-                            <Check size={12} className="text-black" />
-                          </div>
-                          <span className="text-gray-300">پشتیبانی ۲۴/۷ با هوش مصنوعی</span>
-                        </li>
-                        <li className="flex items-start">
-                          <div className="bg-gradient-to-r from-gold-400 to-gold-600 p-1 rounded-full ml-2 mt-1">
-                            <Check size={12} className="text-black" />
-                          </div>
-                          <span className="text-gray-300">ثبت پیشرفت تمرینی</span>
-                        </li>
-                      </ul>
-                      <Button
-                        onClick={() => handleSubscription("basic", 0, 'monthly')}
-                        disabled={loading === "basic-monthly" || user?.profile?.subscription_plan === "basic"}
-                        className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:opacity-90 text-white py-6 rounded-lg transition-all group-hover:scale-105"
-                      >
-                        {loading === "basic" ? (
-                          <span className="flex items-center justify-center">
-                            <Zap size={18} className="animate-pulse ml-2" />
-                            در حال پردازش...
-                          </span>
-                        ) : user?.profile?.subscription_plan === "basic" ? (
-                          <span className="flex items-center justify-center">
-                            <Shield size={18} className="ml-2" />
-                            اشتراک فعال
-                          </span>
-                        ) : (
-                          <span className="flex items-center justify-center">
-                            <CreditCard size={18} className="ml-2" />
-                            خرید اشتراک
-                          </span>
-                        )}
-                      </Button>
                     </div>
                   </div>
                   
                   {/* Pro Plan */}
-                  <div className="relative bg-gray-800/70 rounded-xl overflow-hidden border border-white/10 hover:border-gold-500/30 transition-all duration-300 hover:shadow-[0_0_25px_rgba(255,215,0,0.15)] group">
-                    <div className="absolute top-0 right-0 bg-gold-500 text-black text-xs font-bold px-3 py-1 rounded-bl-lg">
-                      پیشنهاد ویژه
-                    </div>
-                    <div className="h-2 w-full bg-gradient-to-r from-gold-500 to-amber-500"></div>
-                    <div className="p-6">
-                      <ul className="space-y-3 mb-6">
-                        <li className="flex items-start">
-                          <div className="bg-gradient-to-r from-gold-400 to-gold-600 p-1 rounded-full ml-2 mt-1">
-                            <Check size={12} className="text-black" />
-                          </div>
-                          <span className="text-gray-300">تمام امکانات اشتراک یک ماهه</span>
-                        </li>
-                        <li className="flex items-start">
-                          <div className="bg-gradient-to-r from-gold-400 to-gold-600 p-1 rounded-full ml-2 mt-1">
-                            <Check size={12} className="text-black" />
-                          </div>
-                          <span className="text-gray-300">برنامه غذایی پیشرفته</span>
-                        </li>
-                        <li className="flex items-start">
-                          <div className="bg-gradient-to-r from-gold-400 to-gold-600 p-1 rounded-full ml-2 mt-1">
-                            <Check size={12} className="text-black" />
-                          </div>
-                          <span className="text-gray-300">مشاوره مکمل</span>
-                        </li>
-                        <li className="flex items-start">
-                          <div className="bg-gradient-to-r from-gold-400 to-gold-600 p-1 rounded-full ml-2 mt-1">
-                            <Check size={12} className="text-black" />
-                          </div>
-                          <span className="text-gray-300">برنامه‌ریزی هفتگی پیشرفته</span>
-                        </li>
-                        <li className="flex items-start">
-                          <div className="bg-gradient-to-r from-gold-400 to-gold-600 p-1 rounded-full ml-2 mt-1">
-                            <Check size={12} className="text-black" />
-                          </div>
-                          <span className="text-gray-300">۱۵٪ تخفیف نسبت به اشتراک ماهانه</span>
-                        </li>
-                      </ul>
-                      <div className="flex flex-col space-y-2">
-                        <Button
-                          onClick={() => handleSubscription("pro", SUBSCRIPTION_PLANS.pro.price.monthly, 'monthly')}
-                          disabled={loading === "pro-monthly" || user?.profile?.subscription_plan === "pro"}
-                          className="w-full bg-gradient-to-r from-gold-500 to-amber-500 hover:opacity-90 text-white py-3 rounded-lg transition-all group-hover:scale-105"
-                        >
-                          {loading === "pro-monthly" ? (
-                            <span className="flex items-center justify-center">
-                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                              در حال پردازش...
-                            </span>
-                          ) : (
-                            <span className="flex items-center justify-center">
-                              <CreditCard size={18} className="ml-2" />
-                              اشتراک ماهانه ({SUBSCRIPTION_PLANS.pro.price.monthly.toLocaleString('fa-IR')} تومان)
-                            </span>
-                          )}
-                        </Button>
-                        <Button
-                          onClick={() => handleSubscription("pro", SUBSCRIPTION_PLANS.pro.price.yearly, 'yearly')}
-                          disabled={loading === "pro-yearly" || user?.profile?.subscription_plan === "pro"}
-                          className="w-full bg-gradient-to-r from-gold-500 to-amber-500 hover:opacity-90 text-white py-3 rounded-lg transition-all group-hover:scale-105"
-                        >
-                          {loading === "pro-yearly" ? (
-                            <span className="flex items-center justify-center">
-                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                              در حال پردازش...
-                            </span>
-                          ) : (
-                            <span className="flex items-center justify-center">
-                              <CreditCard size={18} className="ml-2" />
-                              اشتراک سالانه ({SUBSCRIPTION_PLANS.pro.price.yearly.toLocaleString('fa-IR')} تومان)
-                            </span>
-                          )}
-                        </Button>
+                  <div className="relative group">
+                    <div className="absolute inset-0 bg-gradient-to-r from-gold-500/20 to-amber-500/20 rounded-2xl blur-xl opacity-70 group-hover:opacity-100 transition-all duration-500"></div>
+                    <div className="relative bg-gray-900 rounded-2xl overflow-hidden border border-gold-500/30 transition-all duration-300 group-hover:border-gold-400/50 group-hover:translate-y-[-5px] group-hover:shadow-[0_10px_40px_rgba(234,179,8,0.3)]">
+                      <div className="absolute top-0 right-0 bg-gradient-to-r from-gold-500 to-amber-500 text-black text-xs font-bold px-3 py-1 rounded-bl-lg z-10">
+                        پیشنهاد ویژه
                       </div>
-                        <Button
-                          onClick={() => handleSubscription("pro", SUBSCRIPTION_PLANS.pro.price.yearly, 'yearly')}
-                          disabled={loading === "pro" || user?.profile?.subscription_plan === "pro"}
-                          className="w-full bg-gradient-to-r from-gold-500 to-amber-400 text-black font-medium hover:from-gold-600 hover:to-amber-500 transition-all duration-300"
-                        >
-                          {loading === "pro" ? (
-                            <span className="flex items-center justify-center">
-                              <Zap size={18} className="animate-pulse ml-2" />
-                              در حال پردازش...
-                            </span>
-                          ) : user?.profile?.subscription_plan === "pro" ? (
-                            <span className="flex items-center justify-center">
-                              <Shield size={18} className="ml-2" />
-                              اشتراک فعال
-                            </span>
-                          ) : (
-                            <span className="flex items-center justify-center">
-                              <CreditCard size={18} className="ml-2" />
-                              خرید اشتراک
-                            </span>
-                          )}
-                        </Button>
+                      <div className="h-1.5 w-full bg-gradient-to-r from-gold-500 to-amber-500"></div>
+                      <div className="p-6">
+                        <div className="flex justify-between items-start mb-4">
+                          <div>
+                            <h3 className="text-xl font-bold text-white mb-1">Pro</h3>
+                            <p className="text-amber-400 text-sm font-medium">پیشنهاد محبوب</p>
+                          </div>
+                          <div className="bg-amber-500/10 p-2 rounded-full">
+                            <Zap className="h-6 w-6 text-amber-400" />
+                          </div>
+                        </div>
+                        
+                        <div className="flex flex-col space-y-6 mb-6">
+                          <div>
+                            <div className="flex items-center mb-1">
+                              <span className="text-sm text-gray-400">اشتراک ماهانه</span>
+                            </div>
+                            <div className="flex items-baseline">
+                              <span className="text-3xl font-bold text-white">{SUBSCRIPTION_PLANS.pro.price.monthly.toLocaleString('fa-IR')}</span>
+                              <span className="text-gray-400 mr-2">تومان</span>
+                            </div>
+                          </div>
+                          
+                          <div>
+                            <div className="flex items-center mb-1">
+                              <span className="text-sm text-gray-400">اشتراک سالانه</span>
+                              <span className="mr-2 text-xs bg-gradient-to-r from-gold-500 to-amber-500 text-black px-2 py-0.5 rounded-full">20% تخفیف</span>
+                            </div>
+                            <div className="flex items-baseline">
+                              <span className="text-3xl font-bold text-white">{SUBSCRIPTION_PLANS.pro.price.yearly.toLocaleString('fa-IR')}</span>
+                              <span className="text-gray-400 mr-2">تومان</span>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <ul className="space-y-3 mb-8">
+                          <li className="flex items-start">
+                            <div className="bg-amber-500/20 p-1 rounded-full ml-2 mt-1">
+                              <Check size={12} className="text-amber-400" />
+                            </div>
+                            <span className="text-gray-300">تمام امکانات اشتراک پایه</span>
+                          </li>
+                          <li className="flex items-start">
+                            <div className="bg-amber-500/20 p-1 rounded-full ml-2 mt-1">
+                              <Check size={12} className="text-amber-400" />
+                            </div>
+                            <span className="text-gray-300">برنامه غذایی پیشرفته</span>
+                          </li>
+                          <li className="flex items-start">
+                            <div className="bg-amber-500/20 p-1 rounded-full ml-2 mt-1">
+                              <Check size={12} className="text-amber-400" />
+                            </div>
+                            <span className="text-gray-300">مشاوره مکمل</span>
+                          </li>
+                          <li className="flex items-start">
+                            <div className="bg-amber-500/20 p-1 rounded-full ml-2 mt-1">
+                              <Check size={12} className="text-amber-400" />
+                            </div>
+                            <span className="text-gray-300">برنامه‌ریزی هفتگی پیشرفته</span>
+                          </li>
+                        </ul>
+                        
+                        <div className="flex flex-col space-y-3">
+                          <Button
+                            onClick={() => handleSubscription("pro", SUBSCRIPTION_PLANS.pro.price.monthly, 'monthly')}
+                            disabled={loading === "pro-monthly" || user?.profile?.subscription_plan === "pro" || user?.profile?.subscription_plan === "ultimate"}
+                            className="w-full bg-gradient-to-r from-gold-500 to-amber-500 hover:from-gold-600 hover:to-amber-600 text-black font-medium py-3 rounded-xl transition-all duration-300 shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40"
+                          >
+                            {loading === "pro-monthly" ? (
+                              <span className="flex items-center justify-center">
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                در حال پردازش...
+                              </span>
+                            ) : user?.profile?.subscription_plan === "pro" ? (
+                              renderSubscriptionStatus("pro", user?.profile?.subscription_end_date)
+                            ) : user?.profile?.subscription_plan === "ultimate" ? (
+                              <span className="flex items-center justify-center">
+                                <Shield size={18} className="ml-2" />
+                                اشتراک بالاتر فعال است
+                              </span>
+                            ) : (
+                              <span className="flex items-center justify-center">
+                                <CreditCard size={18} className="ml-2" />
+                                اشتراک ماهانه
+                              </span>
+                            )}
+                          </Button>
+                          
+                          <Button
+                            onClick={() => handleSubscription("pro", SUBSCRIPTION_PLANS.pro.price.yearly, 'yearly')}
+                            disabled={loading === "pro-yearly" || user?.profile?.subscription_plan === "pro" || user?.profile?.subscription_plan === "ultimate"}
+                            className="w-full bg-gradient-to-r from-amber-400 to-gold-500 hover:from-amber-500 hover:to-gold-600 text-black font-medium py-3 rounded-xl transition-all duration-300 shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40"
+                          >
+                            {loading === "pro-yearly" ? (
+                              <span className="flex items-center justify-center">
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                در حال پردازش...
+                              </span>
+                            ) : user?.profile?.subscription_plan === "pro" ? (
+                              <span className="flex items-center justify-center">
+                                <Shield size={18} className="ml-2" />
+                                اشتراک فعال
+                              </span>
+                            ) : user?.profile?.subscription_plan === "ultimate" ? (
+                              <span className="flex items-center justify-center">
+                                <Shield size={18} className="ml-2" />
+                                اشتراک بالاتر فعال است
+                              </span>
+                            ) : (
+                              <span className="flex items-center justify-center">
+                                <CreditCard size={18} className="ml-2" />
+                                اشتراک سالانه (با تخفیف)
+                              </span>
+                            )}
+                          </Button>
+                        </div>
+                      </div>
                     </div>
                   </div>
                   
-                  {/* Premium Plan */}
-                  <div className="relative bg-gray-800/70 rounded-xl overflow-hidden border border-white/10 hover:border-gold-500/30 transition-all duration-300 hover:shadow-[0_0_25px_rgba(255,215,0,0.15)] group">
-                    <div className="h-2 w-full bg-gradient-to-r from-purple-500 to-purple-600"></div>
-                    <div className="p-6">
-                      <h3 className="text-xl font-bold text-white mb-2">اشتراک شش ماهه</h3>
-                      <div className="flex items-baseline mb-4">
-                        <span className="text-3xl font-bold text-white">{SUBSCRIPTION_PLANS.pro.price.monthly.toLocaleString('fa-IR')}</span>
-                        <span className="text-gray-400 mr-2">تومان</span>
-                      </div>
-                      <div className="flex items-center text-gray-400 mb-6">
-                        <Calendar size={16} className="ml-2" />
-                        <span>مدت اشتراک: ۶ ماه</span>
-                      </div>
-                      <ul className="space-y-3 mb-6">
-                        <li className="flex items-start">
-                          <div className="bg-gradient-to-r from-gold-400 to-gold-600 p-1 rounded-full ml-2 mt-1">
-                            <Check size={12} className="text-black" />
+                  {/* Ultimate Plan */}
+                  <div className="relative group">
+                    <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-indigo-500/20 rounded-2xl blur-xl opacity-70 group-hover:opacity-100 transition-all duration-500"></div>
+                    <div className="relative bg-gray-900 rounded-2xl overflow-hidden border border-purple-500/30 transition-all duration-300 group-hover:border-purple-400/50 group-hover:translate-y-[-5px] group-hover:shadow-[0_10px_40px_rgba(168,85,247,0.3)]">
+                      <div className="h-1.5 w-full bg-gradient-to-r from-purple-500 to-indigo-500"></div>
+                      <div className="p-6">
+                        <div className="flex justify-between items-start mb-4">
+                          <div>
+                            <h3 className="text-xl font-bold text-white mb-1">Ultimate</h3>
+                            <p className="text-purple-400 text-sm font-medium">تجربه حرفه‌ای</p>
                           </div>
-                          <span className="text-gray-300">تمام امکانات اشتراک ماهانه</span>
-                        </li>
-                        <li className="flex items-start">
-                          <div className="bg-gradient-to-r from-gold-400 to-gold-600 p-1 rounded-full ml-2 mt-1">
-                            <Check size={12} className="text-black" />
+                          <div className="bg-purple-500/10 p-2 rounded-full">
+                            <CreditCard className="h-6 w-6 text-purple-400" />
                           </div>
-                          <span className="text-gray-300">برنامه استرویید شخصی‌سازی شده</span>
-                        </li>
-                        <li className="flex items-start">
-                          <div className="bg-gradient-to-r from-gold-400 to-gold-600 p-1 rounded-full ml-2 mt-1">
-                            <Check size={12} className="text-black" />
+                        </div>
+                        
+                        <div className="flex flex-col space-y-6 mb-6">
+                          <div>
+                            <div className="flex items-center mb-1">
+                              <span className="text-sm text-gray-400">اشتراک ماهانه</span>
+                            </div>
+                            <div className="flex items-baseline">
+                              <span className="text-3xl font-bold text-white">{SUBSCRIPTION_PLANS.ultimate.price.monthly.toLocaleString('fa-IR')}</span>
+                              <span className="text-gray-400 mr-2">تومان</span>
+                            </div>
                           </div>
-                          <span className="text-gray-300">مشاوره تخصصی تغذیه</span>
-                        </li>
-                        <li className="flex items-start">
-                          <div className="bg-gradient-to-r from-gold-400 to-gold-600 p-1 rounded-full ml-2 mt-1">
-                            <Check size={12} className="text-black" />
+                          
+                          <div>
+                            <div className="flex items-center mb-1">
+                              <span className="text-sm text-gray-400">اشتراک سالانه</span>
+                              <span className="mr-2 text-xs bg-gradient-to-r from-purple-500 to-indigo-500 text-white px-2 py-0.5 rounded-full">20% تخفیف</span>
+                            </div>
+                            <div className="flex items-baseline">
+                              <span className="text-3xl font-bold text-white">{SUBSCRIPTION_PLANS.ultimate.price.yearly.toLocaleString('fa-IR')}</span>
+                              <span className="text-gray-400 mr-2">تومان</span>
+                            </div>
                           </div>
-                          <span className="text-gray-300">برنامه‌های تمرینی ویژه</span>
-                        </li>
-                        <li className="flex items-start">
-                          <div className="bg-gradient-to-r from-gold-400 to-gold-600 p-1 rounded-full ml-2 mt-1">
-                            <Check size={12} className="text-black" />
-                          </div>
-                          <span className="text-gray-300">۲۵٪ تخفیف نسبت به اشتراک ماهانه</span>
-                        </li>
-                      </ul>
-                      <div className="space-y-3">
-                        <Button
-                          onClick={() => handleSubscription("pro", SUBSCRIPTION_PLANS.pro.price.monthly, 'semiannual')}
-                          disabled={loading === "pro-semiannual" || user?.profile?.subscription_plan === "pro"}
-                          className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:opacity-90 text-white py-3 rounded-lg transition-all group-hover:scale-105"
-                        >
-                          {loading === "pro-semiannual" ? (
-                            <span className="flex items-center justify-center">
-                              <Zap size={18} className="animate-pulse ml-2" />
-                              در حال پردازش...
-                            </span>
-                          ) : user?.profile?.subscription_plan === "pro" ? (
-                            <span className="flex items-center justify-center">
-                              <Shield size={18} className="ml-2" />
-                              اشتراک فعال
-                            </span>
-                          ) : (
-                            <span className="flex items-center justify-center">
-                              <CreditCard size={18} className="ml-2" />
-                              خرید اشتراک
-                            </span>
-                          )}
-                        </Button>
-                        <Button
-                          onClick={() => handleSubscription("ultimate", SUBSCRIPTION_PLANS.ultimate.price.yearly, 'yearly')}
-                          disabled={loading === "ultimate-yearly" || user?.profile?.subscription_plan === "ultimate"}
-                          className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:opacity-90 text-white py-3 rounded-lg transition-all group-hover:scale-105"
-                        >
-                          {loading === "ultimate-yearly" ? (
-                            <span className="flex items-center justify-center">
-                              <Zap size={18} className="animate-pulse ml-2" />
-                              در حال پردازش...
-                            </span>
-                          ) : user?.profile?.subscription_plan === "ultimate" ? (
-                            <span className="flex items-center justify-center">
-                              <Shield size={18} className="ml-2" />
-                              اشتراک فعال
-                            </span>
-                          ) : (
-                            <span className="flex items-center justify-center">
-                              <CreditCard size={18} className="ml-2" />
-                              اشتراک سالانه ({SUBSCRIPTION_PLANS.ultimate.price.yearly.toLocaleString('fa-IR')} تومان)
-                            </span>
-                          )}
-                        </Button>
+                        </div>
+                        
+                        <ul className="space-y-3 mb-8">
+                          <li className="flex items-start">
+                            <div className="bg-purple-500/20 p-1 rounded-full ml-2 mt-1">
+                              <Check size={12} className="text-purple-400" />
+                            </div>
+                            <span className="text-gray-300">تمام امکانات اشتراک Pro</span>
+                          </li>
+                          <li className="flex items-start">
+                            <div className="bg-purple-500/20 p-1 rounded-full ml-2 mt-1">
+                              <Check size={12} className="text-purple-400" />
+                            </div>
+                            <span className="text-gray-300">برنامه استرویید شخصی‌سازی شده</span>
+                          </li>
+                          <li className="flex items-start">
+                            <div className="bg-purple-500/20 p-1 rounded-full ml-2 mt-1">
+                              <Check size={12} className="text-purple-400" />
+                            </div>
+                            <span className="text-gray-300">مشاوره تخصصی تغذیه</span>
+                          </li>
+                          <li className="flex items-start">
+                            <div className="bg-purple-500/20 p-1 rounded-full ml-2 mt-1">
+                              <Check size={12} className="text-purple-400" />
+                            </div>
+                            <span className="text-gray-300">برنامه‌های تمرینی ویژه</span>
+                          </li>
+                        </ul>
+                        
+                        <div className="flex flex-col space-y-3">
+                          <Button
+                            onClick={() => handleSubscription("ultimate", SUBSCRIPTION_PLANS.ultimate.price.monthly, 'monthly')}
+                            disabled={loading === "ultimate-monthly" || user?.profile?.subscription_plan === "ultimate"}
+                            className="w-full bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white py-3 rounded-xl transition-all duration-300 shadow-lg shadow-purple-500/20 hover:shadow-purple-500/40"
+                          >
+                            {loading === "ultimate-monthly" ? (
+                              <span className="flex items-center justify-center">
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                در حال پردازش...
+                              </span>
+                            ) : user?.profile?.subscription_plan === "ultimate" ? (
+                              renderSubscriptionStatus("ultimate", user?.profile?.subscription_end_date)
+                            ) : (
+                              <span className="flex items-center justify-center">
+                                <CreditCard size={18} className="ml-2" />
+                                اشتراک ماهانه
+                              </span>
+                            )}
+                          </Button>
+                          
+                          <Button
+                            onClick={() => handleSubscription("ultimate", SUBSCRIPTION_PLANS.ultimate.price.yearly, 'yearly')}
+                            disabled={loading === "ultimate-yearly" || user?.profile?.subscription_plan === "ultimate"}
+                            className="w-full bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white py-3 rounded-xl transition-all duration-300 shadow-lg shadow-purple-500/20 hover:shadow-purple-500/40"
+                          >
+                            {loading === "ultimate-yearly" ? (
+                              <span className="flex items-center justify-center">
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                در حال پردازش...
+                              </span>
+                            ) : user?.profile?.subscription_plan === "ultimate" ? (
+                              <span className="flex items-center justify-center">
+                                <Shield size={18} className="ml-2" />
+                                اشتراک فعال
+                              </span>
+                            ) : (
+                              <span className="flex items-center justify-center">
+                                <CreditCard size={18} className="ml-2" />
+                                اشتراک سالانه (با تخفیف)
+                              </span>
+                            )}
+                          </Button>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
                 
-                <div className="mt-8 p-4 bg-gray-800/50 rounded-lg border border-white/10">
-                  <p className="text-gray-400 text-sm text-center">
-                    پرداخت از طریق درگاه امن زرین‌پال انجام می‌شود. پس از تکمیل پرداخت، اشتراک شما بلافاصله فعال خواهد شد.
-                  </p>
+                <div className="mt-10 p-6 bg-gradient-to-r from-gray-800/50 to-gray-900/50 rounded-xl border border-white/10 shadow-lg">
+                  <div className="flex flex-col md:flex-row items-center justify-between">
+                    <div className="flex items-center mb-4 md:mb-0">
+                      <div className="bg-gradient-to-r from-gold-500 to-amber-500 p-2 rounded-full mr-4">
+                        <Shield className="h-6 w-6 text-black" />
+                      </div>
+                      <div>
+                        <h4 className="text-white font-medium">پرداخت امن و مطمئن</h4>
+                        <p className="text-gray-400 text-sm">پرداخت از طریق درگاه امن زرین‌پال انجام می‌شود</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center">
+                      <div className="bg-gradient-to-r from-gold-500 to-amber-500 p-2 rounded-full mr-4">
+                        <Zap className="h-6 w-6 text-black" />
+                      </div>
+                      <div>
+                        <h4 className="text-white font-medium">فعال‌سازی آنی</h4>
+                        <p className="text-gray-400 text-sm">پس از تکمیل پرداخت، اشتراک شما بلافاصله فعال خواهد شد</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
