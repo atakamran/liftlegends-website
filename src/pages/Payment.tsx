@@ -3,16 +3,25 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
-import { Loader2, CreditCard, ArrowRight, Shield } from "lucide-react";
-import SubscriptionPlans from "@/components/SubscriptionPlans";
-import { SubscriptionPlan } from "@/types/user";
+import { 
+  Loader2, 
+  CreditCard, 
+  ArrowRight, 
+  CheckCircle, 
+  Calendar, 
+  Check
+} from "lucide-react";
+import { SubscriptionPlan, SUBSCRIPTION_PLANS } from "@/types/user";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 
 interface User {
   id: string;
@@ -26,7 +35,7 @@ interface User {
 interface PaymentData {
   plan_id: SubscriptionPlan;
   amount: number;
-  period: 'monthly' | 'semiannual' | 'yearly';
+  period: 'monthly' | 'yearly';
   payment_method: string;
   user_id: string;
   timestamp: string;
@@ -37,8 +46,11 @@ const Payment = () => {
   const [searchParams] = useSearchParams();
   const [user, setUser] = useState<User | null>(null);
   const [pageLoading, setPageLoading] = useState(true);
-  const [loading, setLoading] = useState<string | null>(null);
-  const [paymentData, setPaymentData] = useState<PaymentData | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  // Get plan and cycle from URL parameters
+  const planParam = searchParams.get('plan') as SubscriptionPlan | null;
+  const cycleParam = searchParams.get('cycle') as 'monthly' | 'yearly' | null;
 
   // Function to fetch user data
   const fetchUserData = async () => {
@@ -84,52 +96,45 @@ const Payment = () => {
     }
   };
 
-  // Parse payment data from URL if available
+  // Initialize component
   useEffect(() => {
-    const dataParam = searchParams.get('data');
-    if (dataParam) {
-      try {
-        const parsedData = JSON.parse(dataParam) as PaymentData;
-        
-        // Validate that the parsed data has the required fields
-        if (!parsedData.amount || !parsedData.user_id) {
-          throw new Error("Invalid payment data structure");
-        }
-        
-        setPaymentData(parsedData);
-      } catch (error) {
-        console.error("Error parsing payment data:", error);
-        toast({
-          variant: "destructive",
-          title: "خطا در پردازش اطلاعات پرداخت",
-          description: "داده‌های پرداخت نامعتبر است.",
-        });
-      }
+    // Validate URL parameters
+    if (!planParam || !cycleParam) {
+      toast({
+        variant: "destructive",
+        title: "خطا در پارامترهای صفحه",
+        description: "اطلاعات پرداخت ناقص است. لطفاً دوباره از صفحه اشتراک‌ها اقدام کنید.",
+      });
+      navigate('/subscription');
+      return;
     }
     
     fetchUserData();
-  }, [searchParams]);
+  }, [planParam, cycleParam]);
 
-  // Function to handle subscription
-  const handleSubscription = async (planId: SubscriptionPlan, amount: number, period: 'monthly' | 'semiannual' | 'yearly', paymentMethod: string) => {
+  // Function to proceed to payment
+  const proceedToPayment = () => {
+    if (!planParam || !user) {
+      toast({
+        variant: "destructive",
+        title: "خطا در پرداخت",
+        description: "اطلاعات پرداخت ناقص است. لطفاً دوباره تلاش کنید.",
+      });
+      return;
+    }
+    
     try {
-      const loadingKey = `${planId}-${period}`;
-      setLoading(loadingKey);
-      
-      if (!user) {
-        toast({
-          variant: "destructive",
-          title: "خطا در پرداخت",
-          description: "لطفاً ابتدا وارد حساب کاربری خود شوید.",
-        });
-        return;
-      }
+      setLoading(true);
       
       // Create payment data
+      const amount = cycleParam === 'monthly' 
+        ? SUBSCRIPTION_PLANS[planParam].price.monthly 
+        : SUBSCRIPTION_PLANS[planParam].price.yearly;
+        
       const data: PaymentData = {
-        plan_id: planId,
+        plan_id: planParam,
         amount: amount,
-        period: period,
+        period: cycleParam,
         payment_method: 'zarinpal',
         user_id: user.id,
         timestamp: new Date().toISOString()
@@ -138,13 +143,19 @@ const Payment = () => {
       // Store payment info in localStorage for verification after callback
       localStorage.setItem('payment_info', JSON.stringify(data));
       
-      // Update payment data
-      setPaymentData(data);
-      
       toast({
-        title: "اطلاعات پرداخت ایجاد شد",
-        description: "اطلاعات پرداخت با موفقیت ایجاد شد.",
+        title: "انتقال به درگاه پرداخت",
+        description: "در حال انتقال به درگاه پرداخت زرین‌پال...",
       });
+      
+      // Simulate redirect to payment gateway
+      // In a real implementation, you would redirect to Zarinpal here
+      // window.location.href = "https://www.zarinpal.com/pg/StartPay/" + authority;
+      
+      // For demo purposes, we'll just show a success message
+      setTimeout(() => {
+        setLoading(false);
+      }, 2000);
       
     } catch (error) {
       console.error("Error creating payment data:", error);
@@ -153,19 +164,48 @@ const Payment = () => {
         title: "خطا در ایجاد اطلاعات پرداخت",
         description: "مشکلی در ایجاد اطلاعات پرداخت رخ داد. لطفاً دوباره تلاش کنید.",
       });
-    } finally {
-      setLoading(null);
+      setLoading(false);
     }
   };
 
-  // Function to render subscription status
-  const renderSubscriptionStatus = (plan: string, endDate: string | null) => {
-    return (
-      <span className="flex items-center justify-center">
-        <Shield size={18} className="ml-2" />
-        اشتراک فعال
-      </span>
-    );
+  // Calculate subscription dates
+  const getSubscriptionDates = () => {
+    const startDate = new Date();
+    const endDate = new Date(startDate);
+    
+    if (cycleParam === 'monthly') {
+      endDate.setMonth(endDate.getMonth() + 1);
+    } else {
+      endDate.setFullYear(endDate.getFullYear() + 1);
+    }
+    
+    // Format dates in Persian format
+    const formatPersianDate = (date: Date) => {
+      return `۱۴۰۴/${date.getMonth() + 1}/${date.getDate()}`;
+    };
+    
+    return {
+      start: formatPersianDate(startDate),
+      end: formatPersianDate(endDate)
+    };
+  };
+
+  // Get plan details
+  const getPlanDetails = () => {
+    if (!planParam) return null;
+    
+    const planTitle = planParam === 'pro' 
+      ? 'حرفه‌ای (Pro)' 
+      : planParam === 'ultimate' 
+        ? 'نامحدود (Ultimate)' 
+        : 'پایه (Basic)';
+        
+    const planFeatures = SUBSCRIPTION_PLANS[planParam].features;
+    
+    return {
+      title: planTitle,
+      features: planFeatures
+    };
   };
 
   // If loading, show loading spinner
@@ -178,69 +218,184 @@ const Payment = () => {
     );
   }
 
+  // If plan parameters are missing, show error
+  if (!planParam || !cycleParam) {
+    return (
+      <div className="min-h-screen bg-gray-900 text-white py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
+        <Card className="bg-gradient-to-b from-gray-800/80 to-gray-900/90 border-gray-700 shadow-xl max-w-md w-full">
+          <CardHeader>
+            <CardTitle className="text-2xl font-bold text-center">خطا در بارگذاری</CardTitle>
+            <CardDescription className="text-center">
+              اطلاعات پرداخت ناقص است
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="text-center">
+            <p className="mb-6">لطفاً دوباره از صفحه اشتراک‌ها اقدام کنید.</p>
+            <Button 
+              onClick={() => navigate('/subscription')}
+              className="w-full"
+            >
+              بازگشت به صفحه اشتراک‌ها
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  const planDetails = getPlanDetails();
+  const subscriptionDates = getSubscriptionDates();
+  const amount = cycleParam === 'monthly' 
+    ? SUBSCRIPTION_PLANS[planParam].price.monthly 
+    : SUBSCRIPTION_PLANS[planParam].price.yearly;
+
   return (
-    <div className="min-h-screen bg-gray-900 text-white py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-950 text-white py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold text-center mb-8">صفحه پرداخت</h1>
-        
-        {paymentData ? (
-          <Card className="bg-gradient-to-b from-gray-800/80 to-gray-900/90 border-gray-700 shadow-xl mb-8">
-            <CardHeader className="pb-4">
-              <CardTitle className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gold-400 to-amber-300">اطلاعات پرداخت</CardTitle>
-              <CardDescription className="text-gray-300">
-                جزئیات پرداخت
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="bg-gray-800/50 p-4 rounded-lg">
-                    <div className="flex items-center mb-2">
-                      <CreditCard size={18} className="ml-2 text-gold-500" />
-                      <span className="text-gray-300">مبلغ قابل پرداخت:</span>
+        {/* Header Section */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-gold-400 via-amber-300 to-gold-500 mb-4">
+            پرداخت اشتراک
+          </h1>
+          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+            تکمیل فرآیند خرید اشتراک و پرداخت
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+          {/* Order Summary */}
+          <div className="lg:col-span-2">
+            <Card className="bg-gradient-to-b from-gray-800/80 to-gray-900/90 border-gray-700 shadow-xl overflow-hidden">
+              <div className="h-2 bg-gradient-to-r from-gold-500 to-amber-500"></div>
+              <CardHeader>
+                <CardTitle className="text-2xl font-bold">خلاصه سفارش</CardTitle>
+                <CardDescription>جزئیات اشتراک انتخابی شما</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="bg-gray-800/50 p-5 rounded-xl border border-gray-700">
+                    <div className="flex items-center mb-3">
+                      <h3 className="text-lg font-semibold mr-2">
+                        {planDetails?.title}
+                      </h3>
                     </div>
-                    <p className="text-white font-medium text-lg">{paymentData.amount.toLocaleString('fa-IR')} تومان</p>
+                    <div className="flex items-baseline mb-1">
+                      <span className="text-2xl font-bold">
+                        {amount.toLocaleString('fa-IR')}
+                      </span>
+                      <span className="text-gray-400 mr-2">تومان</span>
+                    </div>
+                    <div className="text-sm text-gray-400">
+                      دوره: {cycleParam === 'monthly' ? 'ماهانه' : 'سالانه'}
+                      {cycleParam === 'yearly' && (
+                        <Badge variant="outline" className="mr-2 bg-amber-500/10 text-amber-400 border-amber-500/30">
+                          20% تخفیف
+                        </Badge>
+                      )}
+                    </div>
                   </div>
                   
-                  <div className="bg-gray-800/50 p-4 rounded-lg">
-                    <div className="flex items-center mb-2">
-                      <CreditCard size={18} className="ml-2 text-gold-500" />
-                      <span className="text-gray-300">روش پرداخت:</span>
+                  <div className="bg-gray-800/50 p-5 rounded-xl border border-gray-700">
+                    <div className="flex items-center mb-3">
+                      <Calendar className="h-5 w-5 text-gold-500" />
+                      <h3 className="text-lg font-semibold mr-2">تاریخ اشتراک</h3>
                     </div>
-                    <p className="text-white font-medium text-lg">زرین‌پال</p>
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">تاریخ شروع:</span>
+                        <span className="font-medium">{subscriptionDates.start}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">تاریخ پایان:</span>
+                        <span className="font-medium">{subscriptionDates.end}</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
                 
-                <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4 sm:space-x-reverse">
-                  <Button 
-                    variant="outline" 
-                    className="w-full border-gray-700 hover:bg-gray-800 text-white py-6 rounded-xl"
-                    onClick={() => navigate('/dashboard')}
-                  >
-                    <ArrowRight size={18} className="ml-2" />
-                    بازگشت به داشبورد
-                  </Button>
+                <div className="bg-gray-800/50 p-5 rounded-xl border border-gray-700">
+                  <div className="flex items-center mb-4">
+                    <CheckCircle className="h-5 w-5 text-gold-500" />
+                    <h3 className="text-lg font-semibold mr-2">ویژگی‌های اشتراک</h3>
+                  </div>
+                  <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {planDetails?.features.map((feature, index) => (
+                      <li key={index} className="flex items-start">
+                        <div className="bg-gold-500/20 p-1 rounded-full ml-2 mt-1">
+                          <Check size={12} className="text-gold-400" />
+                        </div>
+                        <span className="text-gray-300">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="mb-8">
-            <p className="text-center text-gray-300 mb-6">
-              لطفاً یکی از اشتراک‌های زیر را انتخاب کنید.
-            </p>
+              </CardContent>
+              <CardFooter className="flex flex-col space-y-4">
+                <Button 
+                  onClick={() => navigate('/subscription')}
+                  variant="outline" 
+                  className="w-full border-gray-700 hover:bg-gray-800 text-white"
+                >
+                  <ArrowRight size={18} className="ml-2" />
+                  بازگشت به انتخاب اشتراک
+                </Button>
+              </CardFooter>
+            </Card>
           </div>
-        )}
-        
-        {/* Subscription Plans Component */}
-        <SubscriptionPlans 
-          currentPlan={user?.profile?.subscription_plan || null}
-          subscriptionEndDate={user?.profile?.subscription_end_date || null}
-          onSubscribe={handleSubscription}
-          loading={loading}
-          renderSubscriptionStatus={renderSubscriptionStatus}
-          redirectToExternalApp={true}
-        />
+          
+          {/* Payment Section */}
+          <div className="lg:col-span-1">
+            <Card className="bg-gradient-to-b from-gray-800/80 to-gray-900/90 border-gray-700 shadow-xl overflow-hidden sticky top-8">
+              <div className="h-2 bg-gradient-to-r from-green-500 to-emerald-500"></div>
+              <CardHeader>
+                <CardTitle className="text-2xl font-bold">پرداخت</CardTitle>
+                <CardDescription>تکمیل فرآیند خرید اشتراک</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="bg-gray-800/50 p-5 rounded-xl border border-gray-700">
+                  <div className="flex justify-between items-center mb-4">
+                    <span className="text-gray-300">مبلغ قابل پرداخت:</span>
+                    <span className="text-xl font-bold">
+                      {amount.toLocaleString('fa-IR')} تومان
+                    </span>
+                  </div>
+                  
+                  <Separator className="my-4 bg-gray-700" />
+                  
+                  <div className="text-center space-y-4">
+                    <div className="flex items-center justify-center mb-2">
+                      <CreditCard size={18} className="ml-2 text-green-500" />
+                      <span className="text-gray-300">پرداخت از طریق درگاه زرین‌پال</span>
+                    </div>
+                    <p className="text-sm text-gray-400">
+                      برای تکمیل خرید اشتراک، دکمه زیر را کلیک کنید.
+                      پس از کلیک بر روی دکمه پرداخت، به درگاه امن زرین‌پال منتقل خواهید شد.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+              <CardFooter>
+                <Button 
+                  onClick={proceedToPayment}
+                  disabled={loading}
+                  className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white py-6 rounded-xl transition-all duration-300 shadow-lg shadow-green-500/20 hover:shadow-green-500/40"
+                >
+                  {loading ? (
+                    <span className="flex items-center justify-center">
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      در حال پردازش...
+                    </span>
+                  ) : (
+                    <span className="flex items-center justify-center">
+                      <CreditCard size={18} className="ml-2" />
+                      پرداخت با زرین‌پال
+                    </span>
+                  )}
+                </Button>
+              </CardFooter>
+            </Card>
+          </div>
+        </div>
       </div>
     </div>
   );

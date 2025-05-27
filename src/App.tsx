@@ -19,7 +19,9 @@ import Download from "./pages/Download";
 import Profile from "./pages/Profile";
 import Dashboard from "./pages/Dashboard";
 import PaymentCallback from "./pages/PaymentCallback";
+import Subscription from "./pages/Subscription";
 import Payment from "./pages/Payment";
+import AboutUs from "./pages/AboutUs";
 
 const queryClient = new QueryClient();
 
@@ -32,6 +34,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/terms-of-use" element={<TermsOfUse />} />
+            <Route path="/about-us" element={<AboutUs />} />
             {/* <Route path="/work-with-us" element={<WorkWithUs />} /> */}
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/update-password" element={<UpdatePassword />} />
@@ -42,6 +45,7 @@ const App = () => (
             <Route path="/profile" element={<Profile />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/payment-callback" element={<PaymentCallback />} />
+            <Route path="/subscription" element={<Subscription />} />
             <Route path="/payment" element={<Payment />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

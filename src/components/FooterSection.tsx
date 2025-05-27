@@ -163,7 +163,7 @@ const FooterSection = () => {
             <h4 className="font-semibold mb-6 text-lg text-white">شرکت</h4>
             <ul className="space-y-3">
               <li>
-                <a href="/about" className="text-white/70 hover:text-gold-400 transition-colors flex items-center gap-2 group">
+                <a href="/about-us" className="text-white/70 hover:text-gold-400 transition-colors flex items-center gap-2 group">
                   <ChevronRight size={16} className="text-gold-500 group-hover:translate-x-1 transition-transform" />
                   <span className="group-hover:translate-x-1 transition-transform">درباره ما</span>
                 </a>

@@ -117,14 +117,37 @@ const ResetPassword = () => {
             </Form>
           )}
         </CardContent>
-        <CardFooter className="flex justify-center">
-          <Button 
-            variant="link" 
-            onClick={() => navigate("/")}
-            className="text-muted-foreground hover:text-white"
-          >
-            بازگشت به صفحه اصلی
-          </Button>
+        <CardFooter className="flex flex-col space-y-3">
+          <div className="text-center">
+            <Button 
+              variant="link" 
+              onClick={() => navigate("/")}
+              className="text-muted-foreground hover:text-white"
+            >
+              بازگشت به صفحه اصلی
+            </Button>
+          </div>
+          <div className="text-center text-sm text-muted-foreground">
+            به یاد آوردید؟{" "}
+            <Button 
+              variant="link" 
+              className="p-0 h-auto text-gold-500 hover:text-gold-400"
+              onClick={() => {
+                // Open the login dialog by simulating a click on the login button
+                const loginButton = document.querySelector('[data-auth-trigger="login"]') as HTMLElement;
+                if (loginButton) {
+                  loginButton.click();
+                } else {
+                  // Fallback to navigating to home page where login is available
+                  navigate('/');
+                  // Show a toast message to guide the user
+                  toast.info("برای ورود به حساب کاربری، از منوی بالای صفحه استفاده کنید");
+                }
+              }}
+            >
+              ورود به حساب کاربری
+            </Button>
+          </div>
         </CardFooter>
       </Card>
     </div>

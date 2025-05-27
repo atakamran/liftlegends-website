@@ -483,6 +483,21 @@ const AuthHeader = () => {
                           <span className="group-hover:translate-x-0.5 transition-transform duration-150">داشبورد</span>
                         </div>
                       </Link>
+                      
+                      <Link 
+                        to="/subscription" 
+                        className="flex items-center px-4 py-2 text-sm text-white/90 hover:text-gold-500 hover:bg-gray-700/30 text-right transition-all duration-150 mx-1 rounded-md group"
+                        title="اشتراک‌های LiftLegends"
+                        aria-label="اشتراک‌ها"
+                      >
+                        <div className="flex items-center">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-2 text-gold-500/70 group-hover:text-gold-500 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <rect x="2" y="4" width="20" height="16" rx="2" />
+                            <line x1="2" y1="10" x2="22" y2="10" />
+                          </svg>
+                          <span className="group-hover:translate-x-0.5 transition-transform duration-150">اشتراک‌ها</span>
+                        </div>
+                      </Link>
                     </div>
                     
                     <div className="px-3 pt-1 pb-2 border-t border-gray-700/30 mt-1">
@@ -502,7 +517,10 @@ const AuthHeader = () => {
             ) : (
               <Dialog>
                 <DialogTrigger asChild>
-                  <Button className="bg-gradient-to-r from-gold-500 to-amber-400 hover:from-gold-600 hover:to-amber-500 text-black font-medium text-sm px-4 py-1.5 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 border border-gold-400/30">
+                  <Button 
+                    className="bg-gradient-to-r from-gold-500 to-amber-400 hover:from-gold-600 hover:to-amber-500 text-black font-medium text-sm px-4 py-1.5 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 border border-gold-400/30"
+                    data-auth-trigger="login"
+                  >
                     ورود / ثبت‌نام
                   </Button>
                 </DialogTrigger>
@@ -547,13 +565,29 @@ const AuthHeader = () => {
                             onChange={handleInputChange}
                           />
                         </div>
-                        <Button
-                          className="w-full bg-gradient-to-r from-gold-500 to-amber-400 hover:from-gold-600 hover:to-amber-500 text-black font-medium rounded-lg py-5 shadow-md hover:shadow-lg transition-all duration-300"
-                          onClick={handleLogin}
-                          disabled={loading}
-                        >
-                          {loading ? "در حال ورود..." : "ورود"}
-                        </Button>
+                        <div className="space-y-2">
+                          <Button
+                            className="w-full bg-gradient-to-r from-gold-500 to-amber-400 hover:from-gold-600 hover:to-amber-500 text-black font-medium rounded-lg py-5 shadow-md hover:shadow-lg transition-all duration-300"
+                            onClick={handleLogin}
+                            disabled={loading}
+                          >
+                            {loading ? "در حال ورود..." : "ورود"}
+                          </Button>
+                          <div className="text-center">
+                            <Button 
+                              variant="link" 
+                              className="text-sm text-gray-400 hover:text-gold-500"
+                              onClick={() => {
+                                // Close the dialog
+                                (document.querySelector('[data-dialog-close]') as HTMLElement)?.click();
+                                // Navigate to reset password page
+                                navigate('/reset-password');
+                              }}
+                            >
+                              رمز عبور خود را فراموش کرده‌اید؟
+                            </Button>
+                          </div>
+                        </div>
                       </div>
                     </TabsContent>
                     
@@ -649,6 +683,16 @@ const AuthHeader = () => {
                     <span className="text-sm font-medium group-hover:translate-x-0.5 transition-transform duration-200">داشبورد</span>
                   </Link>
                   
+                  <Link to="/subscription" className="text-white/90 hover:text-gold-500 transition-all duration-200 py-2 px-3 rounded-lg hover:bg-gray-700/30 flex items-center group">
+                    <div className="w-8 h-8 rounded-lg bg-gray-700/50 flex items-center justify-center ml-3 group-hover:bg-gray-700 transition-colors">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gold-500/80 group-hover:text-gold-500 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="2" y="4" width="20" height="16" rx="2" />
+                        <line x1="2" y1="10" x2="22" y2="10" />
+                      </svg>
+                    </div>
+                    <span className="text-sm font-medium group-hover:translate-x-0.5 transition-transform duration-200">اشتراک‌ها</span>
+                  </Link>
+                  
                   <button 
                     onClick={handleLogout}
                     className="w-full text-right text-red-400 hover:text-red-300 transition-all duration-200 py-2 px-3 rounded-lg hover:bg-red-900/10 flex items-center mt-1 group"
@@ -662,7 +706,10 @@ const AuthHeader = () => {
               ) : (
                 <Dialog>
                   <DialogTrigger asChild>
-                    <Button className="mt-3 w-full bg-gradient-to-r from-gold-500 to-amber-400 hover:from-gold-600 hover:to-amber-500 text-black font-medium text-sm rounded-lg shadow-md">
+                    <Button 
+                      className="mt-3 w-full bg-gradient-to-r from-gold-500 to-amber-400 hover:from-gold-600 hover:to-amber-500 text-black font-medium text-sm rounded-lg shadow-md"
+                      data-auth-trigger="login"
+                    >
                       ورود / ثبت‌نام
                     </Button>
                   </DialogTrigger>
@@ -707,13 +754,29 @@ const AuthHeader = () => {
                               onChange={handleInputChange}
                             />
                           </div>
-                          <Button
-                            className="w-full bg-gold-500 hover:bg-gold-600 text-black font-medium"
-                            onClick={handleLogin}
-                            disabled={loading}
-                          >
-                            {loading ? "در حال ورود..." : "ورود"}
-                          </Button>
+                          <div className="space-y-2">
+                            <Button
+                              className="w-full bg-gold-500 hover:bg-gold-600 text-black font-medium"
+                              onClick={handleLogin}
+                              disabled={loading}
+                            >
+                              {loading ? "در حال ورود..." : "ورود"}
+                            </Button>
+                            <div className="text-center">
+                              <Button 
+                                variant="link" 
+                                className="text-sm text-gray-400 hover:text-gold-500"
+                                onClick={() => {
+                                  // Close the dialog
+                                  setIsMenuOpen(false);
+                                  // Navigate to reset password page
+                                  navigate('/reset-password');
+                                }}
+                              >
+                                رمز عبور خود را فراموش کرده‌اید؟
+                              </Button>
+                            </div>
+                          </div>
                         </div>
                       </TabsContent>
                       

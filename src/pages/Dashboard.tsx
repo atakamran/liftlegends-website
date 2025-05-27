@@ -121,7 +121,7 @@ const Dashboard = () => {
   const [pageLoading, setPageLoading] = useState(true);
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
   const [blogCategories, setBlogCategories] = useState<BlogCategory[]>([]);
-  const [activeTab, setActiveTab] = useState("blog");
+  const [activeTab, setActiveTab] = useState(user?.profile?.is_admin ? "blog" : "");
   
   // Blog form state
   const [blogFormData, setBlogFormData] = useState<Partial<BlogPost>>({
@@ -997,7 +997,12 @@ const Dashboard = () => {
   
   // Load user data on component mount
   useEffect(() => {
-    fetchUserData();
+    fetchUserData().then(() => {
+      // Set active tab based on user role
+      if (user?.profile?.is_admin) {
+        setActiveTab("blog");
+      }
+    });
   }, []);
   
   // Check for expired subscriptions when user data is loaded
@@ -1053,12 +1058,8 @@ const Dashboard = () => {
       <div className="max-w-7xl mx-auto">
         <h1 className="text-3xl font-bold text-center mb-8">داشبورد کاربری</h1>
         
-        <Tabs defaultValue="subscription" value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid grid-cols-2 mb-8 bg-gray-800/50 p-1 rounded-lg">
-            <TabsTrigger value="subscription" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-gold-500 data-[state=active]:to-amber-400 data-[state=active]:text-black data-[state=active]:font-medium rounded-md transition-all duration-300">
-              <CreditCard size={16} className="ml-2" />
-              اشتراک
-            </TabsTrigger>
+        <Tabs defaultValue="blog" value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid grid-cols-1 mb-8 bg-gray-800/50 p-1 rounded-lg">
             {user?.profile?.is_admin && (
               <TabsTrigger value="blog" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-gold-500 data-[state=active]:to-amber-400 data-[state=active]:text-black data-[state=active]:font-medium rounded-md transition-all duration-300">
                 <Edit size={16} className="ml-2" />
@@ -1066,156 +1067,6 @@ const Dashboard = () => {
               </TabsTrigger>
             )}
           </TabsList>
-          
-          {/* Subscription Tab - Visible to all users */}
-          <TabsContent value="subscription" className="space-y-6">
-            {/* Current Subscription Info Card */}
-            {user?.profile?.subscription_plan && (
-              <Card className={`bg-gradient-to-b ${user?.profile?.subscription_plan === "pro" ? "from-amber-900/20 to-gold-900/20 border-amber-700/30" : user?.profile?.subscription_plan === "ultimate" ? "from-purple-900/20 to-indigo-900/20 border-purple-700/30" : "from-blue-900/20 to-blue-900/20 border-blue-700/30"} shadow-xl`}>
-                <CardHeader className="pb-4">
-                  <CardTitle className={`text-xl font-bold bg-clip-text text-transparent ${user?.profile?.subscription_plan === "pro" ? "bg-gradient-to-r from-gold-400 to-amber-300" : user?.profile?.subscription_plan === "ultimate" ? "bg-gradient-to-r from-purple-400 to-indigo-300" : "bg-gradient-to-r from-blue-400 to-blue-300"}`}>
-                    اطلاعات اشتراک {user?.profile?.subscription_plan === "pro" ? "پرو" : user?.profile?.subscription_plan === "ultimate" ? "آلتیمیت" : "پایه"}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="bg-gray-800/50 p-4 rounded-lg">
-                        <div className="flex items-center mb-2">
-                          <Calendar size={18} className={`ml-2 ${user?.profile?.subscription_plan === "pro" ? "text-amber-400" : user?.profile?.subscription_plan === "ultimate" ? "text-purple-400" : "text-blue-400"}`} />
-                          <span className="text-gray-300">تاریخ شروع اشتراک:</span>
-                        </div>
-                        <p className="text-white font-medium text-lg">{formatDateToPersian(user.profile.subscription_start_date)}</p>
-                      </div>
-                      
-                      {user.profile.subscription_end_date ? (
-                        <div className="bg-gray-800/50 p-4 rounded-lg">
-                          <div className="flex items-center mb-2">
-                            <Calendar size={18} className={`ml-2 ${user?.profile?.subscription_plan === "pro" ? "text-amber-400" : user?.profile?.subscription_plan === "ultimate" ? "text-purple-400" : "text-blue-400"}`} />
-                            <span className="text-gray-300">تاریخ پایان اشتراک:</span>
-                          </div>
-                          <p className="text-white font-medium text-lg">{formatDateToPersian(user.profile.subscription_end_date)}</p>
-                        </div>
-                      ) : (
-                        <div className="bg-gray-800/50 p-4 rounded-lg">
-                          <div className="flex items-center mb-2">
-                            <Calendar size={18} className="ml-2 text-blue-400" />
-                            <span className="text-gray-300">تاریخ پایان اشتراک:</span>
-                          </div>
-                          <p className="text-white font-medium text-lg">بدون محدودیت زمانی</p>
-                        </div>
-                      )}
-                    </div>
-                    
-                    {user.profile.subscription_end_date && user.profile.subscription_start_date && (
-                      <div className="p-4 rounded-lg bg-gray-800/50">
-                        <div className="flex items-center mb-2">
-                          <Shield size={18} className={`ml-2 ${calculateRemainingDays(user.profile.subscription_end_date) && calculateRemainingDays(user.profile.subscription_end_date)! > 0 ? "text-green-400" : "text-red-400"}`} />
-                          <span className="text-gray-300">وضعیت اشتراک:</span>
-                        </div>
-                        
-                        {calculateRemainingDays(user.profile.subscription_end_date) !== null && (
-                          <>
-                            <div className="flex items-center justify-between mb-1">
-                              <p className="text-white font-medium">
-                                {calculateRemainingDays(user.profile.subscription_end_date)! > 0 ? (
-                                  <span className="text-green-400">
-                                    {calculateRemainingDays(user.profile.subscription_end_date)} روز باقی‌مانده
-                                  </span>
-                                ) : (
-                                  <div className="flex flex-col space-y-2">
-                                    <span className="text-red-400">
-                                      اشتراک منقضی شده - لطفا تمدید کنید
-                                    </span>
-                                    <Button 
-                                      variant="outline" 
-                                      size="sm" 
-                                      className="bg-gray-800 border-red-500/30 hover:bg-gray-700 text-red-400"
-                                      onClick={checkExpiredSubscription}
-                                    >
-                                      بازگشت به اشتراک پایه
-                                    </Button>
-                                  </div>
-                                )}
-                              </p>
-                              
-                              {calculateRemainingDays(user.profile.subscription_end_date)! > 0 && (
-                                <span className="text-xs text-gray-400">
-                                  {formatDateToPersian(user.profile.subscription_start_date)} تا {formatDateToPersian(user.profile.subscription_end_date)}
-                                </span>
-                              )}
-                            </div>
-                            
-                            {/* Modern Progress Bar */}
-                            {calculateRemainingDays(user.profile.subscription_end_date)! > 0 && (
-                              <div className="w-full h-2 bg-gray-700 rounded-full overflow-hidden mt-2">
-                                {(() => {
-                                  try {
-                                    const startDate = new Date(user.profile.subscription_start_date!);
-                                    const endDate = new Date(user.profile.subscription_end_date!);
-                                    const today = new Date();
-                                    
-                                    // Calculate total duration and elapsed time
-                                    const totalDuration = endDate.getTime() - startDate.getTime();
-                                    const elapsedTime = today.getTime() - startDate.getTime();
-                                    
-                                    // Calculate percentage (capped between 0-100)
-                                    const percentage = Math.max(0, Math.min(100, (elapsedTime / totalDuration) * 100));
-                                    
-                                    // Determine color based on remaining percentage
-                                    const colorClass = 
-                                      percentage > 80 ? "bg-red-500" : 
-                                      percentage > 60 ? "bg-orange-500" : 
-                                      percentage > 40 ? "bg-amber-500" : 
-                                      percentage > 20 ? "bg-green-500" : 
-                                      "bg-emerald-500";
-                                    
-                                    return (
-                                      <div 
-                                        className={`h-full ${colorClass}`} 
-                                        style={{ width: `${percentage}%` }}
-                                      ></div>
-                                    );
-                                  } catch (error) {
-                                    console.error("Error rendering progress bar:", error);
-                                    return null;
-                                  }
-                                })()}
-                              </div>
-                            )}
-                          </>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-            
-            {/* Import the SubscriptionPlans component */}
-            <div className="flex flex-col space-y-4">
-              <div className="flex justify-between items-center">
-                <h3 className="text-xl font-bold text-gold-500">اشتراک‌های LiftLegends</h3>
-                <Button 
-                  variant="outline" 
-                  className="bg-gray-800 border-gray-700 hover:bg-gray-700 text-gold-500"
-                  onClick={() => navigate('/payment')}
-                >
-                  <CreditCard size={16} className="ml-2" />
-                  دریافت لینک پرداخت
-                </Button>
-              </div>
-              
-              {/* Use the SubscriptionPlans component */}
-              <SubscriptionPlans 
-                currentPlan={user?.profile?.subscription_plan || null}
-                subscriptionEndDate={user?.profile?.subscription_end_date || null}
-                onSubscribe={handleSubscription}
-                loading={loading}
-                renderSubscriptionStatus={renderSubscriptionStatus}
-              />
-            </div>
-          </TabsContent>
           
           {/* Blog Management Tab - Only visible to admins */}
           {user?.profile?.is_admin && (
