@@ -515,118 +515,13 @@ const AuthHeader = () => {
                 </div>
               </div>
             ) : (
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button 
-                    className="bg-gradient-to-r from-gold-500 to-amber-400 hover:from-gold-600 hover:to-amber-500 text-black font-medium text-sm px-4 py-1.5 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 border border-gold-400/30"
-                    data-auth-trigger="login"
-                  >
-                    ورود / ثبت‌نام
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-md bg-gray-900/95 backdrop-blur-md border border-gray-700/50 rounded-lg shadow-2xl">
-                  <DialogClose className="hidden" />
-                  <DialogHeader>
-                    <DialogTitle className="text-lg text-center text-white font-bold">
-                      حساب کاربری
-                    </DialogTitle>
-                    <DialogDescription className="text-center text-gray-400 mt-1 text-sm">
-                      برای استفاده از امکانات ویژه وارد حساب کاربری خود شوید
-                    </DialogDescription>
-                  </DialogHeader>
-                  
-                  <Tabs defaultValue="login" className="w-full" onValueChange={(value) => setAuthMode(value as "login" | "register")}>
-                    <TabsList className="grid w-full grid-cols-2 mb-6 bg-gray-800/50 p-1 rounded-lg">
-                      <TabsTrigger value="login" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-gold-500 data-[state=active]:to-amber-400 data-[state=active]:text-black data-[state=active]:font-medium rounded-md transition-all duration-300">ورود</TabsTrigger>
-                      <TabsTrigger value="register" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-gold-500 data-[state=active]:to-amber-400 data-[state=active]:text-black data-[state=active]:font-medium rounded-md transition-all duration-300">ثبت‌نام</TabsTrigger>
-                    </TabsList>
-                    
-                    <TabsContent value="login" className="space-y-4">
-                      <div className="space-y-4">
-                        <div className="space-y-2">
-                          <label className="text-sm font-medium text-white">ایمیل</label>
-                          <Input
-                            type="email"
-                            name="email"
-                            placeholder="ایمیل خود را وارد کنید"
-                            className="bg-gray-800 border-gray-700 text-white"
-                            value={formData.email}
-                            onChange={handleInputChange}
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <label className="text-sm font-medium text-white">رمز عبور</label>
-                          <Input
-                            type="password"
-                            name="password"
-                            placeholder="رمز عبور خود را وارد کنید"
-                            className="bg-gray-800 border-gray-700 text-white"
-                            value={formData.password}
-                            onChange={handleInputChange}
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Button
-                            className="w-full bg-gradient-to-r from-gold-500 to-amber-400 hover:from-gold-600 hover:to-amber-500 text-black font-medium rounded-lg py-5 shadow-md hover:shadow-lg transition-all duration-300"
-                            onClick={handleLogin}
-                            disabled={loading}
-                          >
-                            {loading ? "در حال ورود..." : "ورود"}
-                          </Button>
-                          <div className="text-center">
-                            <Button 
-                              variant="link" 
-                              className="text-sm text-gray-400 hover:text-gold-500"
-                              onClick={() => {
-                                // Close the dialog
-                                (document.querySelector('[data-dialog-close]') as HTMLElement)?.click();
-                                // Navigate to reset password page
-                                navigate('/reset-password');
-                              }}
-                            >
-                              رمز عبور خود را فراموش کرده‌اید؟
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    </TabsContent>
-                    
-                    <TabsContent value="register" className="space-y-4">
-                      <div className="space-y-4">
-                        <div className="space-y-2">
-                          <label className="text-sm font-medium text-white">ایمیل</label>
-                          <Input
-                            type="email"
-                            name="email"
-                            placeholder="ایمیل خود را وارد کنید"
-                            className="bg-gray-800 border-gray-700 text-white"
-                            value={formData.email}
-                            onChange={handleInputChange}
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <label className="text-sm font-medium text-white">رمز عبور</label>
-                          <Input
-                            type="password"
-                            name="password"
-                            placeholder="رمز عبور خود را وارد کنید"
-                            className="bg-gray-800 border-gray-700 text-white"
-                            value={formData.password}
-                            onChange={handleInputChange}
-                          />
-                        </div>
-                        <Button
-                          className="w-full bg-gradient-to-r from-gold-500 to-amber-400 hover:from-gold-600 hover:to-amber-500 text-black font-medium rounded-lg py-5 shadow-md hover:shadow-lg transition-all duration-300"
-                          onClick={handleRegister}
-                          disabled={loading}
-                        >
-                          {loading ? "در حال ثبت‌نام..." : "ثبت‌نام"}
-                        </Button>
-                      </div>
-                    </TabsContent>
-                  </Tabs>
-                </DialogContent>
-              </Dialog>
+              <Link to="/login">
+                <Button 
+                  className="bg-gradient-to-r from-gold-500 to-amber-400 hover:from-gold-600 hover:to-amber-500 text-black font-medium text-sm px-4 py-1.5 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 border border-gold-400/30"
+                >
+                  ورود / ثبت‌نام
+                </Button>
+              </Link>
             )}
           </div>
 
@@ -704,118 +599,13 @@ const AuthHeader = () => {
                   </button>
                 </div>
               ) : (
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button 
-                      className="mt-3 w-full bg-gradient-to-r from-gold-500 to-amber-400 hover:from-gold-600 hover:to-amber-500 text-black font-medium text-sm rounded-lg shadow-md"
-                      data-auth-trigger="login"
-                    >
-                      ورود / ثبت‌نام
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-md bg-gray-900/95 backdrop-blur-md border border-gray-700/50 rounded-lg shadow-2xl">
-                    <DialogClose className="hidden" />
-                    <DialogHeader>
-                      <DialogTitle className="text-lg text-center text-white font-bold">
-                        حساب کاربری
-                      </DialogTitle>
-                      <DialogDescription className="text-center text-gray-400 text-sm mt-1">
-                        برای استفاده از امکانات ویژه وارد حساب کاربری خود شوید
-                      </DialogDescription>
-                    </DialogHeader>
-                    
-                    <Tabs defaultValue="login" className="w-full" onValueChange={(value) => setAuthMode(value as "login" | "register")}>
-                      <TabsList className="grid w-full grid-cols-2 mb-4 bg-gray-800/50 p-1 rounded-lg">
-                        <TabsTrigger value="login" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-gold-500 data-[state=active]:to-amber-400 data-[state=active]:text-black data-[state=active]:font-medium rounded-md transition-all duration-300">ورود</TabsTrigger>
-                        <TabsTrigger value="register" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-gold-500 data-[state=active]:to-amber-400 data-[state=active]:text-black data-[state=active]:font-medium rounded-md transition-all duration-300">ثبت‌نام</TabsTrigger>
-                      </TabsList>
-                      
-                      <TabsContent value="login" className="space-y-4">
-                        <div className="space-y-4">
-                          <div className="space-y-2">
-                            <label className="text-sm font-medium text-white">ایمیل</label>
-                            <Input
-                              type="email"
-                              name="email"
-                              placeholder="ایمیل خود را وارد کنید"
-                              className="bg-gray-800 border-gray-700 text-white"
-                              value={formData.email}
-                              onChange={handleInputChange}
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <label className="text-sm font-medium text-white">رمز عبور</label>
-                            <Input
-                              type="password"
-                              name="password"
-                              placeholder="رمز عبور خود را وارد کنید"
-                              className="bg-gray-800 border-gray-700 text-white"
-                              value={formData.password}
-                              onChange={handleInputChange}
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <Button
-                              className="w-full bg-gold-500 hover:bg-gold-600 text-black font-medium"
-                              onClick={handleLogin}
-                              disabled={loading}
-                            >
-                              {loading ? "در حال ورود..." : "ورود"}
-                            </Button>
-                            <div className="text-center">
-                              <Button 
-                                variant="link" 
-                                className="text-sm text-gray-400 hover:text-gold-500"
-                                onClick={() => {
-                                  // Close the dialog
-                                  setIsMenuOpen(false);
-                                  // Navigate to reset password page
-                                  navigate('/reset-password');
-                                }}
-                              >
-                                رمز عبور خود را فراموش کرده‌اید؟
-                              </Button>
-                            </div>
-                          </div>
-                        </div>
-                      </TabsContent>
-                      
-                      <TabsContent value="register" className="space-y-4">
-                        <div className="space-y-4">
-                          <div className="space-y-2">
-                            <label className="text-sm font-medium text-white">ایمیل</label>
-                            <Input
-                              type="email"
-                              name="email"
-                              placeholder="ایمیل خود را وارد کنید"
-                              className="bg-gray-800 border-gray-700 text-white"
-                              value={formData.email}
-                              onChange={handleInputChange}
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <label className="text-sm font-medium text-white">رمز عبور</label>
-                            <Input
-                              type="password"
-                              name="password"
-                              placeholder="رمز عبور خود را وارد کنید"
-                              className="bg-gray-800 border-gray-700 text-white"
-                              value={formData.password}
-                              onChange={handleInputChange}
-                            />
-                          </div>
-                          <Button
-                            className="w-full bg-gold-500 hover:bg-gold-600 text-black font-medium"
-                            onClick={handleRegister}
-                            disabled={loading}
-                          >
-                            {loading ? "در حال ثبت‌نام..." : "ثبت‌نام"}
-                          </Button>
-                        </div>
-                      </TabsContent>
-                    </Tabs>
-                  </DialogContent>
-                </Dialog>
+                <Link to="/login">
+                  <Button 
+                    className="mt-3 w-full bg-gradient-to-r from-gold-500 to-amber-400 hover:from-gold-600 hover:to-amber-500 text-black font-medium text-sm rounded-lg shadow-md"
+                  >
+                    ورود / ثبت‌نام
+                  </Button>
+                </Link>
               )}
             </nav>
           </div>
