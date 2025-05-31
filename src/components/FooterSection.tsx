@@ -1,5 +1,5 @@
 
-import { Instagram, MessageCircle, Twitter, Linkedin, Mail, MapPin, Phone, Download, ArrowUp, Dumbbell, Shield, Brain, Utensils, Star, ChevronRight } from "lucide-react";
+import { Instagram, MessageCircle, Twitter, Linkedin, Mail, MapPin, Phone, Download, ArrowUp, Dumbbell, Shield, Brain, Utensils, Star, ChevronRight, QrCode } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 
@@ -29,69 +29,74 @@ const FooterSection = () => {
   }, []);
 
   return (
-    <footer id="footer" className="bg-gradient-to-b from-gray-900 to-black pt-20 pb-10 px-4 border-t border-white/10 relative">
-      {/* Background effects */}
+    <footer id="footer" className="bg-gradient-to-b from-gray-900 via-black to-black pt-24 pb-10 px-4 border-t border-white/10 relative">
+      {/* Enhanced background effects */}
       <div className="absolute -z-10 bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-black to-transparent"></div>
-      <div className="absolute -z-10 top-20 right-20 w-64 h-64 bg-gold-500 rounded-full blur-[150px] opacity-5"></div>
-      <div className="absolute -z-10 bottom-40 left-20 w-48 h-48 bg-gold-400 rounded-full blur-[120px] opacity-5"></div>
+      <div className="absolute -z-10 top-20 right-20 w-80 h-80 bg-gradient-to-r from-gold-500 to-amber-400 rounded-full blur-[180px] opacity-5"></div>
+      <div className="absolute -z-10 bottom-40 left-20 w-64 h-64 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full blur-[150px] opacity-5"></div>
       
-      {/* Back to top button */}
+      {/* Enhanced back to top button */}
       <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
         <button 
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          className="bg-gold-500 hover:bg-gold-600 text-black p-3 rounded-full shadow-lg transition-all hover:scale-110 hover:shadow-[0_0_15px_rgba(255,215,0,0.4)]"
+          className="bg-gradient-to-r from-gold-500 to-amber-400 hover:from-gold-600 hover:to-amber-500 text-black p-4 rounded-full shadow-lg transition-all hover:scale-110 hover:shadow-[0_0_20px_rgba(255,215,0,0.4)]"
           aria-label="بازگشت به بالا"
         >
           <ArrowUp size={20} />
         </button>
       </div>
       
-      <div className="max-w-6xl mx-auto">
-        {/* App download banner */}
-        <div className={`bg-gradient-to-r from-gray-800 to-black p-8 md:p-10 rounded-2xl border border-gold-500/20 mb-16 relative overflow-hidden group hover:border-gold-500/30 transition-all duration-500 transform ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-          <div className="absolute -z-10 top-0 right-0 w-64 h-64 bg-gold-500 rounded-full blur-[100px] opacity-10 group-hover:opacity-15 transition-opacity"></div>
-          <div className="absolute -z-10 bottom-0 left-0 w-32 h-32 bg-gold-400 rounded-full blur-[80px] opacity-5 group-hover:opacity-10 transition-opacity"></div>
+      <div className="max-w-7xl mx-auto">
+        {/* Enhanced app download banner */}
+        <div className={`bg-gradient-to-br from-gray-900 to-black p-10 md:p-12 rounded-3xl border border-gold-500/20 mb-20 relative overflow-hidden group hover:border-gold-500/40 transition-all duration-500 transform ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+          <div className="absolute -z-10 top-0 right-0 w-96 h-96 bg-gradient-to-r from-gold-500 to-amber-400 rounded-full blur-[150px] opacity-10 group-hover:opacity-15 transition-opacity"></div>
+          <div className="absolute -z-10 bottom-0 left-0 w-48 h-48 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full blur-[100px] opacity-5 group-hover:opacity-10 transition-opacity"></div>
           
-          <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-10">
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <div className="flex">
                   {[1, 2, 3, 4, 5].map((i) => (
-                    <Star key={i} size={14} className="text-gold-500 fill-gold-500" />
+                    <Star key={i} size={16} className="text-gold-500 fill-gold-500" />
                   ))}
                 </div>
                 <span className="text-white/70 text-sm">+۱۰۰۰ کاربر راضی</span>
               </div>
-              <h3 className="text-2xl md:text-3xl font-bold mb-4">
-                <span className="text-gradient">LiftLegends</span> را همین امروز دانلود کنید
+              <h3 className="text-3xl md:text-4xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-gold-400 via-amber-300 to-gold-500 animate-gradient-x">
+                LiftLegends را همین امروز دانلود کنید
               </h3>
-              <p className="text-white/70 max-w-xl">
-                با LiftLegends، سفر خود را به سمت بدنی قوی‌تر و سالم‌تر آغاز کنید. <span className="text-gold-400">برنامه تمرینی هوشمند</span> و <span className="text-gold-400">برنامه مکمل و استرویید</span> شما همیشه همراهتان است.
+              <p className="text-white/70 max-w-xl text-lg leading-relaxed">
+                با LiftLegends، سفر خود را به سمت بدنی قوی‌تر و سالم‌تر آغاز کنید. <span className="text-gold-400 font-medium">برنامه تمرینی هوشمند</span> و <span className="text-gold-400 font-medium">برنامه مکمل و استرویید</span> شما همیشه همراهتان است.
               </p>
               
-              {/* Feature badges */}
-              <div className="flex flex-wrap gap-3 mt-4">
-                <div className="bg-gray-800/50 backdrop-blur-sm px-3 py-1.5 rounded-full border border-gold-500/30 flex items-center gap-1.5">
-                  <Dumbbell size={14} className="text-gold-500" />
-                  <span className="text-white/80 text-xs">برنامه تمرینی هوشمند</span>
+              {/* Enhanced feature badges */}
+              <div className="flex flex-wrap gap-3 mt-6">
+                <div className="bg-gray-800/50 backdrop-blur-sm px-4 py-2 rounded-full border border-gold-500/30 flex items-center gap-2 hover:border-gold-500/70 hover:bg-gray-800/80 transition-all duration-300 group">
+                  <Dumbbell size={16} className="text-gold-500 group-hover:scale-110 transition-transform" />
+                  <span className="text-white/80 text-sm group-hover:text-white transition-colors">برنامه تمرینی هوشمند</span>
                 </div>
-                <div className="bg-gray-800/50 backdrop-blur-sm px-3 py-1.5 rounded-full border border-gold-500/30 flex items-center gap-1.5">
-                  <Shield size={14} className="text-gold-500" />
-                  <span className="text-white/80 text-xs">برنامه مکمل و استرویید</span>
+                <div className="bg-gray-800/50 backdrop-blur-sm px-4 py-2 rounded-full border border-gold-500/30 flex items-center gap-2 hover:border-gold-500/70 hover:bg-gray-800/80 transition-all duration-300 group">
+                  <Shield size={16} className="text-gold-500 group-hover:scale-110 transition-transform" />
+                  <span className="text-white/80 text-sm group-hover:text-white transition-colors">برنامه مکمل و استرویید</span>
                 </div>
-                <div className="bg-gray-800/50 backdrop-blur-sm px-3 py-1.5 rounded-full border border-gold-500/30 flex items-center gap-1.5">
-                  <Brain size={14} className="text-gold-500" />
-                  <span className="text-white/80 text-xs">هوش مصنوعی</span>
+                <div className="bg-gray-800/50 backdrop-blur-sm px-4 py-2 rounded-full border border-gold-500/30 flex items-center gap-2 hover:border-gold-500/70 hover:bg-gray-800/80 transition-all duration-300 group">
+                  <Brain size={16} className="text-gold-500 group-hover:scale-110 transition-transform" />
+                  <span className="text-white/80 text-sm group-hover:text-white transition-colors">هوش مصنوعی</span>
                 </div>
               </div>
             </div>
-            <div className="flex flex-col sm:flex-row gap-4">
+            
+            {/* Enhanced download button and QR code */}
+            <div className="flex flex-col sm:flex-row gap-6 items-center">
+              <div className="bg-white p-3 rounded-xl shadow-lg hidden md:block">
+                <QrCode size={100} className="text-black" />
+              </div>
               <div className="relative">
                 <Button 
-                  className="bg-gold-500 hover:bg-gold-600 text-black px-6 py-3 rounded-xl transition-all hover:scale-105 font-medium shadow-[0_0_15px_rgba(255,215,0,0.2)] hover:shadow-[0_0_20px_rgba(255,215,0,0.4)]"
+                  className="bg-gradient-to-r from-gold-500 to-amber-400 hover:from-gold-600 hover:to-amber-500 text-black px-8 py-6 text-lg font-medium rounded-xl transition-all hover:scale-105 shadow-[0_0_20px_rgba(255,215,0,0.2)] hover:shadow-[0_0_30px_rgba(255,215,0,0.4)] group"
                   onClick={() => window.location.href = "/download"}
                 >
-                  <Download size={18} className="ml-2" />
+                  <Download size={20} className="ml-2 group-hover:animate-bounce" />
                   دانلود اپلیکیشن
                 </Button>
               </div>
@@ -149,12 +154,7 @@ const FooterSection = () => {
                   <span className="group-hover:translate-x-1 transition-transform">ویژگی‌ها</span>
                 </a>
               </li>
-              <li>
-                <a href="#testimonials" className="text-white/70 hover:text-gold-400 transition-colors flex items-center gap-2 group">
-                  <ChevronRight size={16} className="text-gold-500 group-hover:translate-x-1 transition-transform" />
-                  <span className="group-hover:translate-x-1 transition-transform">نظرات کاربران</span>
-                </a>
-              </li>
+
             </ul>
           </div>
           

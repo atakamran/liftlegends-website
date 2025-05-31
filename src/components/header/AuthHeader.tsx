@@ -425,13 +425,27 @@ const AuthHeader = () => {
             />
           </Link>
 
-          {/* Desktop Navigation - Simplified */}
-          <nav className="hidden md:flex items-center space-x-6 mr-6">
-            {/* Navigation links removed temporarily as requested */}
+          {/* Desktop Navigation - New Modern Design */}
+          <nav className="hidden md:flex items-center space-x-0 space-x-reverse space-x-8 mr-6">
+            <Link to="/" className="text-white/90 hover:text-gold-500 font-medium text-sm transition-colors duration-200 relative after:content-[''] after:absolute after:right-0 after:left-0 after:bottom-0 after:h-0.5 after:bg-gold-500 after:scale-x-0 after:origin-right hover:after:scale-x-100 after:transition-transform after:duration-300">
+              خانه
+            </Link>
+            <Link to="/download" className="text-white/90 hover:text-gold-500 font-medium text-sm transition-colors duration-200 relative after:content-[''] after:absolute after:right-0 after:left-0 after:bottom-0 after:h-0.5 after:bg-gold-500 after:scale-x-0 after:origin-right hover:after:scale-x-100 after:transition-transform after:duration-300">
+              دانلود اپلیکیشن
+            </Link>
+            <Link to="/subscription" className="text-white/90 hover:text-gold-500 font-medium text-sm transition-colors duration-200 relative after:content-[''] after:absolute after:right-0 after:left-0 after:bottom-0 after:h-0.5 after:bg-gold-500 after:scale-x-0 after:origin-right hover:after:scale-x-100 after:transition-transform after:duration-300">
+              برنامه تمرینی
+            </Link>
+            <Link to="/blog" className="text-white/90 hover:text-gold-500 font-medium text-sm transition-colors duration-200 relative after:content-[''] after:absolute after:right-0 after:left-0 after:bottom-0 after:h-0.5 after:bg-gold-500 after:scale-x-0 after:origin-right hover:after:scale-x-100 after:transition-transform after:duration-300">
+              بلاگ
+            </Link>
+            <Link to="/about-us" className="text-white/90 hover:text-gold-500 font-medium text-sm transition-colors duration-200 relative after:content-[''] after:absolute after:right-0 after:left-0 after:bottom-0 after:h-0.5 after:bg-gold-500 after:scale-x-0 after:origin-right hover:after:scale-x-100 after:transition-transform after:duration-300">
+              تماس با ما
+            </Link>
           </nav>
 
           {/* Auth Buttons */}
-          <div className="hidden md:flex items-center space-x-3">
+          <div className="hidden md:flex items-center space-x-0 space-x-reverse space-x-3">
             {user ? (
               <div className="flex items-center">
                 <div className="relative group">
@@ -552,8 +566,60 @@ const AuthHeader = () => {
             )}
             
             <nav className="flex flex-col space-y-1.5">
-              {/* Mobile navigation links removed temporarily as requested */}
-
+              <Link to="/" className="text-white/90 hover:text-gold-500 transition-all duration-200 py-2 px-3 rounded-lg hover:bg-gray-700/30 flex items-center group">
+                <div className="w-8 h-8 rounded-lg bg-gray-700/50 flex items-center justify-center ml-3 group-hover:bg-gray-700 transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gold-500/80 group-hover:text-gold-500 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                  </svg>
+                </div>
+                <span className="group-hover:translate-x-0.5 transition-transform duration-150">خانه</span>
+              </Link>
+              
+              <Link to="/download" className="text-white/90 hover:text-gold-500 transition-all duration-200 py-2 px-3 rounded-lg hover:bg-gray-700/30 flex items-center group">
+                <div className="w-8 h-8 rounded-lg bg-gray-700/50 flex items-center justify-center ml-3 group-hover:bg-gray-700 transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gold-500/80 group-hover:text-gold-500 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                </div>
+                <span className="group-hover:translate-x-0.5 transition-transform duration-150">دانلود اپلیکیشن</span>
+              </Link>
+              
+              <Link to="/subscription" className="text-white/90 hover:text-gold-500 transition-all duration-200 py-2 px-3 rounded-lg hover:bg-gray-700/30 flex items-center group">
+                <div className="w-8 h-8 rounded-lg bg-gray-700/50 flex items-center justify-center ml-3 group-hover:bg-gray-700 transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gold-500/80 group-hover:text-gold-500 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
+                    <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
+                    <line x1="6" y1="1" x2="6" y2="4"></line>
+                    <line x1="10" y1="1" x2="10" y2="4"></line>
+                    <line x1="14" y1="1" x2="14" y2="4"></line>
+                  </svg>
+                </div>
+                <span className="group-hover:translate-x-0.5 transition-transform duration-150">برنامه تمرینی</span>
+              </Link>
+              
+              <Link to="/blog" className="text-white/90 hover:text-gold-500 transition-all duration-200 py-2 px-3 rounded-lg hover:bg-gray-700/30 flex items-center group">
+                <div className="w-8 h-8 rounded-lg bg-gray-700/50 flex items-center justify-center ml-3 group-hover:bg-gray-700 transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gold-500/80 group-hover:text-gold-500 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                  </svg>
+                </div>
+                <span className="group-hover:translate-x-0.5 transition-transform duration-150">بلاگ</span>
+              </Link>
+              
+              <Link to="/about-us" className="text-white/90 hover:text-gold-500 transition-all duration-200 py-2 px-3 rounded-lg hover:bg-gray-700/30 flex items-center group">
+                <div className="w-8 h-8 rounded-lg bg-gray-700/50 flex items-center justify-center ml-3 group-hover:bg-gray-700 transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gold-500/80 group-hover:text-gold-500 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                  </svg>
+                </div>
+                <span className="group-hover:translate-x-0.5 transition-transform duration-150">تماس با ما</span>
+              </Link>
               
               {user ? (
                 <div className="mt-2 pt-2 border-t border-gray-700/30">

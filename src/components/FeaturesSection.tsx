@@ -1,6 +1,7 @@
 
 import { Activity, Dumbbell, Utensils, Brain, Calendar, BarChart3, Zap, Download, Shield, Pill, Award, Sparkles, Clock, ChevronRight } from "lucide-react";
 import { useEffect, useState, useRef, ReactNode } from "react";
+import { Button } from "@/components/ui/button";
 
 interface AdditionalFeature {
   icon: ReactNode;
@@ -105,24 +106,30 @@ const FeaturesSection = () => {
   }, [visibleFeatures]);
 
   return (
-    <section id="features" className="py-20 px-4 bg-gradient-to-b from-gray-900 to-black relative">
-      <div className="absolute top-0 left-0 w-full h-20 bg-gradient-to-b from-black to-transparent"></div>
-      <div className="absolute -z-10 top-1/3 right-0 w-72 h-72 bg-gold-500 rounded-full blur-[120px] opacity-5"></div>
-      <div className="absolute -z-10 bottom-1/4 left-1/4 w-64 h-64 bg-gold-400 rounded-full blur-[100px] opacity-5"></div>
+    <section id="features" className="py-24 px-4 bg-gradient-to-b from-gray-900 via-black to-gray-900 relative">
+      {/* Enhanced background effects */}
+      <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-b from-black to-transparent"></div>
+      <div className="absolute -z-10 top-1/3 right-0 w-96 h-96 bg-gradient-to-r from-gold-500 to-amber-400 rounded-full blur-[150px] opacity-5"></div>
+      <div className="absolute -z-10 bottom-1/4 left-1/4 w-80 h-80 bg-gradient-to-r from-gold-400 to-amber-300 rounded-full blur-[130px] opacity-5"></div>
+      <div className="absolute -z-10 top-2/3 right-1/4 w-64 h-64 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full blur-[120px] opacity-3"></div>
       
-      <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-16">
-          <span className="inline-block bg-gold-500/10 text-gold-400 text-sm px-4 py-1.5 rounded-full border border-gold-500/20 mb-4">
+      <div className="max-w-7xl mx-auto">
+        {/* Enhanced section header with better typography and animations */}
+        <div className="text-center mb-20">
+          <span className="inline-block bg-gradient-to-r from-gold-500/20 to-amber-500/10 text-gold-400 text-sm px-5 py-2 rounded-full border border-gold-500/20 mb-5 hover:border-gold-500/40 transition-colors">
             ویژگی‌های منحصر به فرد
           </span>
-          <h2 className="text-3xl md:text-5xl font-bold mb-6 text-gradient">ویژگی‌های برتر LiftLegends</h2>
-          <p className="text-white/70 max-w-2xl mx-auto text-lg">
-            با LiftLegends به قدرت خود دست یابید و اهداف بدنسازی خود را با <span className="text-gold-400">برنامه هوشمند تمرینی</span> محقق کنید
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-8 bg-clip-text text-transparent bg-gradient-to-r from-gold-400 via-amber-300 to-gold-500 animate-gradient-x">
+            ویژگی‌های برتر LiftLegends
+          </h2>
+          <p className="text-white/70 max-w-3xl mx-auto text-lg leading-relaxed">
+            با LiftLegends به قدرت خود دست یابید و اهداف بدنسازی خود را با <span className="text-gold-400 font-medium">برنامه هوشمند تمرینی</span> محقق کنید. 
+            اپلیکیشنی که با استفاده از <span className="text-gold-400 font-medium">هوش مصنوعی</span> به شما کمک می‌کند به بهترین فرم بدنی خود برسید.
           </p>
         </div>
 
-        {/* Main features grid */}
-        <div className="mb-20">
+        {/* Enhanced main features grid with better card design */}
+        <div className="mb-24">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {features.map((feature, index) => (
               <div 
@@ -131,23 +138,28 @@ const FeaturesSection = () => {
                 ref={el => featureRefs.current[index] = el}
               >
                 <div 
-                  className={`relative h-full bg-gradient-to-br from-gray-900 to-black p-6 rounded-xl glass-morphism border border-white/10 shadow-[0_0_25px_rgba(255,215,0,0.1)] overflow-hidden group hover:border-gold-500/30 transition-all duration-500 transform ${visibleFeatures.includes(index) ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+                  className={`relative h-full bg-gradient-to-br from-gray-900 to-black p-8 rounded-2xl glass-morphism border border-white/10 shadow-[0_0_25px_rgba(255,215,0,0.1)] overflow-hidden group hover:border-gold-500/30 hover:shadow-[0_0_35px_rgba(255,215,0,0.15)] transition-all duration-500 transform ${visibleFeatures.includes(index) ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
                   style={{ transitionDelay: `${index * 100}ms` }}
                 >
+                  {/* Enhanced hover effects */}
                   <div className="absolute inset-0 bg-gradient-to-br from-gold-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                  <div className="absolute top-4 right-4 bg-gold-500/10 text-gold-400 text-xs px-2 py-0.5 rounded-full border border-gold-500/20">
+                  <div className="absolute top-4 right-4 bg-gradient-to-r from-gold-500/20 to-amber-500/10 text-gold-400 text-xs px-3 py-1 rounded-full border border-gold-500/20 font-medium">
                     {feature.tag}
                   </div>
-                  <div className="space-y-4 flex flex-col items-center text-center pt-4">
-                    <div className="bg-gradient-to-br from-gold-400 to-gold-600 p-4 rounded-lg text-black inline-block group-hover:scale-110 transition-transform duration-500 shadow-lg">
+                  
+                  {/* Enhanced content layout */}
+                  <div className="space-y-5 flex flex-col items-center text-center pt-4">
+                    <div className="bg-gradient-to-br from-gold-400 to-amber-500 p-5 rounded-xl text-black inline-block group-hover:scale-110 transition-transform duration-500 shadow-lg">
                       {feature.icon}
                     </div>
-                    <h3 className="text-xl font-semibold text-white group-hover:text-gold-400 transition-colors">{feature.title}</h3>
+                    <h3 className="text-2xl font-semibold text-white group-hover:text-gold-400 transition-colors">{feature.title}</h3>
                     <p className="text-white/70 leading-relaxed">{feature.description}</p>
-                    {/* <a href="#" className="text-gold-400 hover:text-gold-300 flex items-center gap-1 text-sm mt-2 group-hover:translate-x-1 transition-transform">
+                    
+                    {/* Learn more link */}
+                    <a href="#" className="text-gold-400 hover:text-gold-300 flex items-center gap-1 text-sm mt-2 group-hover:translate-x-1 transition-transform">
                       اطلاعات بیشتر
                       <ChevronRight size={16} />
-                    </a> */}
+                    </a>
                   </div>
                 </div>
               </div>
@@ -155,24 +167,70 @@ const FeaturesSection = () => {
           </div>
         </div>
         
-        {/* Additional features */}
+        {/* App screenshot showcase */}
+        <div className="my-32 relative">
+          <div className="absolute -z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl h-80 bg-gradient-to-r from-gold-500/10 to-amber-500/5 rounded-full blur-[100px]"></div>
+          
+          <div className="text-center mb-16">
+            <span className="inline-block bg-gradient-to-r from-purple-500/20 to-blue-500/10 text-purple-400 text-sm px-5 py-2 rounded-full border border-purple-500/20 mb-5">
+              اسکرین‌شات‌های اپلیکیشن
+            </span>
+            <h2 className="text-3xl md:text-4xl font-bold mb-6 text-white">تجربه کاربری فوق‌العاده</h2>
+            <p className="text-white/70 max-w-2xl mx-auto">
+              طراحی مدرن و کاربرپسند اپلیکیشن LiftLegends برای تجربه‌ای لذت‌بخش
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            <div className="bg-gradient-to-br from-gray-900 to-black p-3 rounded-2xl border border-white/10 shadow-lg hover:shadow-[0_0_30px_rgba(255,215,0,0.1)] transition-all duration-500 hover:-translate-y-2 group">
+              <img 
+                src="https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends//homepage.jpg" 
+                alt="صفحه اصلی اپلیکیشن LiftLegends" 
+                className="w-full h-auto rounded-xl"
+                loading="lazy"
+              />
+              <p className="text-center text-white/70 mt-4 group-hover:text-gold-400 transition-colors">صفحه اصلی</p>
+            </div>
+            <div className="bg-gradient-to-br from-gray-900 to-black p-3 rounded-2xl border border-white/10 shadow-lg hover:shadow-[0_0_30px_rgba(255,215,0,0.1)] transition-all duration-500 hover:-translate-y-2 group md:transform md:translate-y-8">
+              <img 
+                src="https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends//training.jpg" 
+                alt="برنامه تمرینی در اپلیکیشن LiftLegends" 
+                className="w-full h-auto rounded-xl"
+                loading="lazy"
+              />
+              <p className="text-center text-white/70 mt-4 group-hover:text-gold-400 transition-colors">برنامه تمرینی</p>
+            </div>
+            <div className="bg-gradient-to-br from-gray-900 to-black p-3 rounded-2xl border border-white/10 shadow-lg hover:shadow-[0_0_30px_rgba(255,215,0,0.1)] transition-all duration-500 hover:-translate-y-2 group">
+              <img 
+                src="https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends//supplements.jpg" 
+                alt="برنامه مکمل و استرویید در اپلیکیشن LiftLegends" 
+                className="w-full h-auto rounded-xl"
+                loading="lazy"
+              />
+              <p className="text-center text-white/70 mt-4 group-hover:text-gold-400 transition-colors">برنامه مکمل و استرویید</p>
+            </div>
+          </div>
+        </div>
+        
+        {/* Enhanced additional features with better visual design */}
         <div className="mt-24">
-          <h3 className="text-2xl font-semibold text-center mb-4 text-white">امکانات بیشتر</h3>
-          <p className="text-white/70 text-center max-w-2xl mx-auto mb-12">
+          <h3 className="text-3xl font-bold text-center mb-6 text-white">امکانات بیشتر</h3>
+          <p className="text-white/70 text-center max-w-2xl mx-auto mb-16 leading-relaxed">
             علاوه بر ویژگی‌های اصلی، LiftLegends امکانات متنوع دیگری نیز برای کمک به شما در مسیر بدنسازی ارائه می‌دهد
           </p>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
             {additionalFeatures.map((feature, index) => (
               <div 
                 key={index} 
-                className="bg-gray-800/50 p-6 rounded-xl border border-white/5 hover:border-gold-500/30 transition-all duration-300 hover:shadow-[0_0_20px_rgba(255,215,0,0.1)] hover:-translate-y-1 group text-center relative"
+                className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 p-6 rounded-xl border border-white/5 hover:border-gold-500/30 transition-all duration-300 hover:shadow-[0_0_20px_rgba(255,215,0,0.1)] hover:-translate-y-1 group text-center relative"
               >
                 {feature.badge && (
-                  <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full animate-pulse">
+                  <div className="absolute -top-2 -right-2 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs px-2 py-1 rounded-full animate-pulse">
                     {feature.badge}
                   </div>
                 )}
-                <div className="bg-gradient-to-br from-gold-400 to-gold-600 p-3 rounded-lg text-black inline-block mb-4 group-hover:scale-110 transition-transform shadow-md">
+                <div className="bg-gradient-to-br from-gold-400 to-amber-500 p-3 rounded-lg text-black inline-block mb-4 group-hover:scale-110 transition-transform shadow-md">
                   {feature.icon}
                 </div>
                 <h4 className="text-lg font-medium text-white group-hover:text-gold-400 transition-colors">{feature.title}</h4>
@@ -181,7 +239,29 @@ const FeaturesSection = () => {
           </div>
         </div>
         
-        
+        {/* Call to action */}
+        <div className="mt-32 bg-gradient-to-r from-gray-900 to-black p-10 rounded-2xl border border-gold-500/20 relative overflow-hidden group hover:border-gold-500/40 transition-all duration-500">
+          <div className="absolute -z-10 top-0 right-0 w-80 h-80 bg-gradient-to-r from-gold-500 to-amber-400 rounded-full blur-[120px] opacity-10 group-hover:opacity-15 transition-opacity"></div>
+          
+          <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+            <div>
+              <h3 className="text-3xl font-bold mb-4 text-white">
+                آماده <span className="text-gradient">تغییر بدن</span> خود هستید؟
+              </h3>
+              <p className="text-white/70 max-w-xl leading-relaxed">
+                همین امروز اپلیکیشن LiftLegends را دانلود کنید و سفر خود را به سمت بدنی قوی‌تر و سالم‌تر آغاز کنید.
+              </p>
+            </div>
+            
+            <Button 
+              className="bg-gradient-to-r from-gold-500 to-amber-400 hover:from-gold-600 hover:to-amber-500 text-black px-8 py-6 text-lg font-medium rounded-xl transition-all hover:scale-105 shadow-[0_0_20px_rgba(255,215,0,0.2)] hover:shadow-[0_0_30px_rgba(255,215,0,0.4)]"
+              onClick={() => window.location.href = "/download"}
+            >
+              <Download size={20} className="ml-2" />
+              دانلود اپلیکیشن
+            </Button>
+          </div>
+        </div>
       </div>
     </section>
   );
