@@ -23,6 +23,7 @@ import Subscription from "./pages/Subscription";
 import Payment from "./pages/Payment";
 import AboutUs from "./pages/AboutUs";
 import Login from "./pages/Login";
+import Programs from "./pages/Programs";
 
 const queryClient = new QueryClient();
 
@@ -49,6 +50,7 @@ const App = () => (
             <Route path="/subscription" element={<Subscription />} />
             <Route path="/payment" element={<Payment />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/programs" element={<Programs />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

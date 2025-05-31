@@ -197,6 +197,7 @@ const Payment = () => {
             authority: response.data.data.authority,
             amount: amount,
             plan_id: planParam,
+            plan_period: cycleParam,
             user_id: user.id,
             timestamp: new Date().toISOString()
           }));

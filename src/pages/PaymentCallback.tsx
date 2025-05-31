@@ -91,6 +91,13 @@ const PaymentCallback = () => {
           console.log(`Payment successful! Reference ID: ${refId}`);
 
           try {
+            // Add reference ID to payment info for recording in database
+            const updatedPaymentInfo = {
+              ...paymentInfo,
+              ref_id: refId
+            };
+            localStorage.setItem('payment_info', JSON.stringify(updatedPaymentInfo));
+            
             // Update user subscription in database
             await updateUserSubscription(paymentInfo.plan_id, paymentInfo.user_id, paymentInfo.plan_period);
             
@@ -201,6 +208,67 @@ const PaymentCallback = () => {
       
       console.log("Subscription activated successfully:", data);
       
+      // Get payment info from localStorage
+      const paymentInfo = JSON.parse(localStorage.getItem("payment_info") || "{}");
+      const amount = paymentInfo.amount || 0;
+      const authority = paymentInfo.authority || null;
+      const refId = paymentInfo.ref_id || null;
+      
+      // Fetch the corresponding fitness plan UUID based on the plan type
+      let fitnessPlanId;
+      
+      try {
+        const { data: planData, error: planError } = await supabase
+          .from('fitness_plans')
+          .select('id')
+          .eq('type', planId)
+          .single();
+          
+        if (planError) {
+          console.error("Error fetching fitness plan ID:", planError);
+          throw new Error(`Could not find fitness plan with type: ${planId}`);
+        }
+        
+        fitnessPlanId = planData?.id;
+        console.log(`Found fitness plan ID: ${fitnessPlanId} for plan type: ${planId}`);
+        
+        if (!fitnessPlanId) {
+          throw new Error(`Fitness plan ID is null or undefined for plan type: ${planId}`);
+        }
+      } catch (planFetchError) {
+        console.error("Error in fitness plan lookup:", planFetchError);
+        // If we can't find the plan, log the error but continue with the subscription process
+        // We'll use a placeholder UUID that will need to be updated manually
+        console.warn("Using placeholder UUID for fitness plan");
+        fitnessPlanId = "00000000-0000-0000-0000-000000000000";
+      }
+      
+      // Insert purchase record into user_purchases table
+      try {
+        const { data: purchaseData, error: purchaseError } = await supabase
+          .from('user_purchases')
+          .insert({
+            user_id: userId,
+            plan_id: fitnessPlanId, // Use the UUID from the fitness_plans table
+            amount: amount,
+            payment_id: refId || authority, // Use reference ID if available, otherwise use authority
+            payment_status: 'completed',
+            expires_at: endDate.toISOString(),
+            purchase_date: startDate.toISOString()
+          })
+          .select();
+          
+        if (purchaseError) {
+          console.error("Error recording purchase in database:", purchaseError);
+          // Don't throw here, as the subscription is already activated
+        } else {
+          console.log("Purchase recorded successfully:", purchaseData);
+        }
+      } catch (purchaseInsertError) {
+        console.error("Exception when recording purchase:", purchaseInsertError);
+        // Don't throw here, as the subscription is already activated
+      }
+      
       // Also log the subscription transaction to subscription_logs table
       const { error: logError } = await supabase
         .from('subscription_logs')
@@ -208,7 +276,7 @@ const PaymentCallback = () => {
           user_id: userId,
           plan_id: planId,
           period: period,
-          amount: JSON.parse(localStorage.getItem("payment_info") || "{}").amount || 0,
+          amount: amount,
           start_date: startDate.toISOString(),
           end_date: endDate.toISOString(),
           created_at: new Date().toISOString()

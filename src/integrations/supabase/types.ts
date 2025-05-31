@@ -377,6 +377,39 @@ export type Database = {
         }
         Relationships: []
       }
+      programs_sale: {
+        Row: {
+          id: string
+          title: string
+          description: string
+          price: number
+          category: 'training' | 'diet' | 'supplement'
+          image_url: string | null
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          title: string
+          description: string
+          price: number
+          category: 'training' | 'diet' | 'supplement'
+          image_url?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          title?: string
+          description?: string
+          price?: number
+          category?: 'training' | 'diet' | 'supplement'
+          image_url?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

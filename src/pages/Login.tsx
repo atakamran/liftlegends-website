@@ -58,6 +58,11 @@ const Login = () => {
       // Set login state in localStorage
       localStorage.setItem('isLoggedIn', 'true');
       
+      // Dispatch a custom event to notify header component
+      window.dispatchEvent(new CustomEvent('userLoggedIn', { 
+        detail: { user: data.user }
+      }));
+      
       toast({
         title: "ورود موفقیت‌آمیز",
         description: "با موفقیت وارد شدید.",
@@ -125,6 +130,11 @@ const Login = () => {
       // Set login state in localStorage if auto-confirmed
       if (data.session) {
         localStorage.setItem('isLoggedIn', 'true');
+        
+        // Dispatch a custom event to notify header component
+        window.dispatchEvent(new CustomEvent('userLoggedIn', { 
+          detail: { user: data.user }
+        }));
         
         // Redirect to dashboard if auto-confirmed
         navigate('/');

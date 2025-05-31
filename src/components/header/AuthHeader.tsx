@@ -119,43 +119,9 @@ const AuthHeader = () => {
     }
   };
   
-  // Function to check user subscription status
-  const checkSubscriptionStatus = async (userId: string) => {
-    try {
-      // Fetch the user profile which contains subscription information
-      const profileData = await fetchUserProfile(userId);
-      
-      if (!profileData) {
-        return {
-          isActive: false,
-          plan: null,
-          endDate: null,
-          daysRemaining: 0
-        };
-      }
-      
-      const { subscription_plan, subscription_end_date } = profileData;
-      
-      // Check if subscription is active
-      const isActive = subscription_plan && subscription_end_date && 
-                      new Date(subscription_end_date) > new Date();
-      
-      // Calculate days remaining if subscription is active
-      let daysRemaining = 0;
-      if (isActive && subscription_end_date) {
-        const endDate = new Date(subscription_end_date);
-        const today = new Date();
-        daysRemaining = Math.ceil((endDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-      }
-      
-      return {
-        isActive: !!isActive,
-        plan: subscription_plan,
-        endDate: subscription_end_date,
-        daysRemaining
-      };
-    } catch (error) {
-      console.error("Error checking subscription status:", error);
+  // Function to check user subscription status from profile data
+  const checkSubscriptionStatus = (profileData: UserProfile | null) => {
+    if (!profileData) {
       return {
         isActive: false,
         plan: null,
@@ -163,33 +129,82 @@ const AuthHeader = () => {
         daysRemaining: 0
       };
     }
+    
+    const { subscription_plan, subscription_end_date } = profileData;
+    
+    // Check if subscription is active
+    const isActive = subscription_plan && subscription_end_date && 
+                    new Date(subscription_end_date) > new Date();
+    
+    // Calculate days remaining if subscription is active
+    let daysRemaining = 0;
+    if (isActive && subscription_end_date) {
+      const endDate = new Date(subscription_end_date);
+      const today = new Date();
+      daysRemaining = Math.ceil((endDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+    }
+    
+    return {
+      isActive: !!isActive,
+      plan: subscription_plan,
+      endDate: subscription_end_date,
+      daysRemaining
+    };
   };
   
-  // Function to fetch all user data (auth, profile, subscription) in one call
+  // Function to fetch all user data (auth, profile, subscription) in one call - optimized
   const fetchAllUserData = async () => {
     try {
       // First check if user is logged in according to localStorage
       const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
       if (!isLoggedIn) {
+        setUser(null); // Immediately set user to null if not logged in
         return null;
       }
       
-      // Get current session from Supabase
+      // Check if we have cached user data in localStorage
+      const cachedUserDataStr = localStorage.getItem('headauth');
+      if (cachedUserDataStr) {
+        try {
+          const cachedData = JSON.parse(cachedUserDataStr);
+          
+          // Check if the cached data is still valid (not expired)
+          if (cachedData.expiresAt && new Date(cachedData.expiresAt) > new Date()) {
+            // Use cached data
+            setUser(cachedData.userData);
+            return cachedData.userData;
+          }
+          // If expired, continue with fetching fresh data
+        } catch (e) {
+          console.error("Error parsing cached user data:", e);
+          // Continue with fetching fresh data
+        }
+      }
+      
+      // Get current session from Supabase - do this first and fast
       const { data } = await supabase.auth.getSession();
       if (!data.session) {
         // Session expired but localStorage still has logged in flag
         localStorage.setItem('isLoggedIn', 'false');
+        localStorage.removeItem('headauth'); // Clear cached auth data
+        setUser(null); // Immediately set user to null
         return null;
       }
       
       // Get basic user data
       const userData = data.session.user as User;
       
+      // Set basic user data immediately so UI can start rendering
+      setUser(prev => ({
+        ...prev,
+        ...userData
+      }));
+      
       // Fetch user profile data
       const profileData = await fetchUserProfile(userData.id);
       
-      // Fetch subscription status
-      const subscriptionStatus = await checkSubscriptionStatus(userData.id);
+      // Calculate subscription status from profile data (no extra API call)
+      const subscriptionStatus = checkSubscriptionStatus(profileData);
       
       // Combine all data
       const completeUserData = {
@@ -202,7 +217,17 @@ const AuthHeader = () => {
       setUser(prev => ({
         ...prev,
         ...userData,
-        profile: profileData
+        profile: profileData,
+        subscription: subscriptionStatus
+      }));
+      
+      // Store complete user data in localStorage with 1 month expiration
+      const expiresAt = new Date();
+      expiresAt.setMonth(expiresAt.getMonth() + 1); // Set expiration to 1 month from now
+      
+      localStorage.setItem('headauth', JSON.stringify({
+        userData: completeUserData,
+        expiresAt: expiresAt.toISOString()
       }));
       
       return completeUserData;
@@ -233,17 +258,83 @@ const AuthHeader = () => {
       return false;
     }
     
-    // If refresh is true, fetch fresh data from Supabase
-    if (refresh) {
-      await fetchAllUserData();
+    // Check if we have cached user data and it's not a forced refresh
+    if (!refresh) {
+      const cachedUserDataStr = localStorage.getItem('headauth');
+      if (cachedUserDataStr) {
+        try {
+          const cachedData = JSON.parse(cachedUserDataStr);
+          
+          // Check if the cached data is still valid (not expired)
+          if (cachedData.expiresAt && new Date(cachedData.expiresAt) > new Date()) {
+            // Use cached data
+            setUser(cachedData.userData);
+            return true;
+          }
+        } catch (e) {
+          console.error("Error parsing cached user data:", e);
+        }
+      }
     }
+    
+    // If refresh is true or no valid cached data, fetch fresh data from Supabase
+    await fetchAllUserData();
     
     return true;
   };
 
   useEffect(() => {
-    // Fetch all user data on component mount
-    fetchAllUserData();
+    // Check if user is logged in according to localStorage
+    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    
+    // If not logged in, immediately set user to null and don't fetch data
+    if (!isLoggedIn) {
+      setUser(null);
+    } else {
+      // Check if we have cached user data in localStorage
+      const cachedUserDataStr = localStorage.getItem('headauth');
+      if (cachedUserDataStr) {
+        try {
+          const cachedData = JSON.parse(cachedUserDataStr);
+          
+          // Check if the cached data is still valid (not expired)
+          if (cachedData.expiresAt && new Date(cachedData.expiresAt) > new Date()) {
+            // Use cached data
+            setUser(cachedData.userData);
+            return; // Skip further API calls if we have valid cached data
+          }
+        } catch (e) {
+          console.error("Error parsing cached user data:", e);
+          // Continue with fetching fresh data
+        }
+      }
+      
+      // User is logged in according to localStorage, fetch session first
+      const getInitialSession = async () => {
+        try {
+          const { data } = await supabase.auth.getSession();
+          
+          // If session exists, set basic user data immediately
+          if (data.session) {
+            const userData = data.session.user as User;
+            setUser(userData);
+            
+            // Then fetch complete data in background
+            fetchAllUserData();
+          } else {
+            // No valid session, update localStorage and set user to null
+            localStorage.setItem('isLoggedIn', 'false');
+            localStorage.removeItem('headauth'); // Clear cached auth data
+            setUser(null);
+          }
+        } catch (error) {
+          console.error("Error getting initial session:", error);
+          setUser(null);
+        }
+      };
+      
+      getInitialSession();
+    }
 
     // Set up auth state change listener
     const { data: authListener } = supabase.auth.onAuthStateChange(
@@ -252,10 +343,33 @@ const AuthHeader = () => {
         const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
         
         if (session && isLoggedIn) {
-          // User logged in and localStorage agrees - fetch all user data
+          // Check if we have valid cached user data
+          const cachedUserDataStr = localStorage.getItem('headauth');
+          if (cachedUserDataStr) {
+            try {
+              const cachedData = JSON.parse(cachedUserDataStr);
+              
+              // Check if the cached data is still valid (not expired)
+              if (cachedData.expiresAt && new Date(cachedData.expiresAt) > new Date()) {
+                // Use cached data
+                setUser(cachedData.userData);
+                return; // Skip further API calls if we have valid cached data
+              }
+            } catch (e) {
+              console.error("Error parsing cached user data:", e);
+              // Continue with fetching fresh data
+            }
+          }
+          
+          // User logged in and localStorage agrees - set basic user data immediately
+          const userData = session.user as User;
+          setUser(userData);
+          
+          // Then fetch complete data in background
           fetchAllUserData();
         } else {
           // Either no session or localStorage says we're logged out
+          localStorage.removeItem('headauth'); // Clear cached auth data
           setUser(null);
         }
       }
@@ -274,10 +388,31 @@ const AuthHeader = () => {
     
     window.addEventListener('storage', handleStorageChange);
 
+    // Listen for subscription update event (after payment)
+    const handleUserSubscriptionUpdate = () => {
+      checkLoginState(true); // Force refresh user data
+    };
+    window.addEventListener('userSubscriptionUpdated', handleUserSubscriptionUpdate);
+    
+    // Listen for login event from Login page
+    const handleUserLogin = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      if (customEvent.detail && customEvent.detail.user) {
+        // Set basic user data immediately
+        setUser(customEvent.detail.user as User);
+        // Then fetch complete data in background
+        fetchAllUserData();
+      }
+    };
+    window.addEventListener('userLoggedIn', handleUserLogin);
+
     return () => {
       authListener.subscription.unsubscribe();
       window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('userSubscriptionUpdated', handleUserSubscriptionUpdate);
+      window.removeEventListener('userLoggedIn', handleUserLogin);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -300,16 +435,27 @@ const AuthHeader = () => {
       // Set login state in localStorage
       localStorage.setItem('isLoggedIn', 'true');
       
-      // Fetch all user data from Supabase
-      await fetchAllUserData();
-
+      // Set basic user data immediately
+      if (data.user) {
+        setUser(data.user as User);
+      }
+      
+      // Dispatch a custom event to notify other components
+      window.dispatchEvent(new CustomEvent('userLoggedIn', { 
+        detail: { user: data.user }
+      }));
+      
+      // Close the dialog immediately for better UX
+      (document.querySelector('[data-dialog-close]') as HTMLElement)?.click();
+      
+      // Show success message
       toast({
         title: "ورود موفقیت‌آمیز",
         description: "با موفقیت وارد شدید.",
       });
       
-      // Close the dialog
-      (document.querySelector('[data-dialog-close]') as HTMLElement)?.click();
+      // Fetch complete user data in background
+      fetchAllUserData();
     } catch (error: unknown) {
       toast({
         variant: "destructive",
@@ -348,22 +494,30 @@ const AuthHeader = () => {
       if (data.session) {
         localStorage.setItem('isLoggedIn', 'true');
         
-        // Fetch all user data from Supabase
-        await fetchAllUserData();
+        // Set basic user data immediately
+        if (data.user) {
+          setUser(data.user as User);
+        }
+        
+        // Dispatch a custom event to notify other components
+        window.dispatchEvent(new CustomEvent('userLoggedIn', { 
+          detail: { user: data.user }
+        }));
+        
+        // Close the dialog immediately for better UX
+        (document.querySelector('[data-dialog-close]') as HTMLElement)?.click();
+        
+        // Fetch complete user data in background
+        fetchAllUserData();
+      } else {
+        // Switch to login tab after successful registration if not auto-confirmed
+        setAuthMode("login");
       }
 
       toast({
         title: "ثبت‌نام موفقیت‌آمیز",
         description: "حساب کاربری شما با موفقیت ایجاد شد. لطفاً ایمیل خود را برای تأیید حساب بررسی کنید.",
       });
-      
-      // If auto-confirmed, close the dialog
-      if (data.session) {
-        (document.querySelector('[data-dialog-close]') as HTMLElement)?.click();
-      } else {
-        // Switch to login tab after successful registration if not auto-confirmed
-        setAuthMode("login");
-      }
     } catch (error: unknown) {
       toast({
         variant: "destructive",
@@ -379,6 +533,9 @@ const AuthHeader = () => {
     try {
       // Set logout state in localStorage first to ensure it's updated
       localStorage.setItem('isLoggedIn', 'false');
+      
+      // Clear cached auth data
+      localStorage.removeItem('headauth');
       
       // Force user state to null immediately
       setUser(null);
@@ -426,12 +583,15 @@ const AuthHeader = () => {
           </Link>
 
           {/* Desktop Navigation - New Modern Design */}
-          <nav className="hidden md:flex items-center space-x-0 space-x-reverse space-x-8 mr-6">
+          <nav className="hidden md:flex items-center space-x-reverse space-x-8 mr-6">
             <Link to="/" className="text-white/90 hover:text-gold-500 font-medium text-sm transition-colors duration-200 relative after:content-[''] after:absolute after:right-0 after:left-0 after:bottom-0 after:h-0.5 after:bg-gold-500 after:scale-x-0 after:origin-right hover:after:scale-x-100 after:transition-transform after:duration-300">
               خانه
             </Link>
             <Link to="/download" className="text-white/90 hover:text-gold-500 font-medium text-sm transition-colors duration-200 relative after:content-[''] after:absolute after:right-0 after:left-0 after:bottom-0 after:h-0.5 after:bg-gold-500 after:scale-x-0 after:origin-right hover:after:scale-x-100 after:transition-transform after:duration-300">
               دانلود اپلیکیشن
+            </Link>
+            <Link to="/programs" className="text-white/90 hover:text-gold-500 font-medium text-sm transition-colors duration-200 relative after:content-[''] after:absolute after:right-0 after:left-0 after:bottom-0 after:h-0.5 after:bg-gold-500 after:scale-x-0 after:origin-right hover:after:scale-x-100 after:transition-transform after:duration-300">
+              برنامه‌ها
             </Link>
             <Link to="/subscription" className="text-white/90 hover:text-gold-500 font-medium text-sm transition-colors duration-200 relative after:content-[''] after:absolute after:right-0 after:left-0 after:bottom-0 after:h-0.5 after:bg-gold-500 after:scale-x-0 after:origin-right hover:after:scale-x-100 after:transition-transform after:duration-300">
               برنامه تمرینی
@@ -445,7 +605,7 @@ const AuthHeader = () => {
           </nav>
 
           {/* Auth Buttons */}
-          <div className="hidden md:flex items-center space-x-0 space-x-reverse space-x-3">
+          <div className="hidden md:flex items-center space-x-reverse space-x-3">
             {user ? (
               <div className="flex items-center">
                 <div className="relative group">
@@ -558,7 +718,7 @@ const AuthHeader = () => {
                     {getInitials(user.profile?.name || user.email || "")}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-white truncate">{user.profile?.name || "کاربر"}</p>
+                    <p className="text-sm font-medium text-white truncate">{user.profile?.name || user.email || "کاربر"}</p>
                     <p className="text-xs text-gray-400 truncate">{user.email}</p>
                   </div>
                 </div>
@@ -566,7 +726,11 @@ const AuthHeader = () => {
             )}
             
             <nav className="flex flex-col space-y-1.5">
-              <Link to="/" className="text-white/90 hover:text-gold-500 transition-all duration-200 py-2 px-3 rounded-lg hover:bg-gray-700/30 flex items-center group">
+              <Link 
+                to="/" 
+                className="text-white/90 hover:text-gold-500 transition-all duration-200 py-2 px-3 rounded-lg hover:bg-gray-700/30 flex items-center group"
+                onClick={() => setIsMenuOpen(false)}
+              >
                 <div className="w-8 h-8 rounded-lg bg-gray-700/50 flex items-center justify-center ml-3 group-hover:bg-gray-700 transition-colors">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gold-500/80 group-hover:text-gold-500 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
@@ -576,7 +740,11 @@ const AuthHeader = () => {
                 <span className="group-hover:translate-x-0.5 transition-transform duration-150">خانه</span>
               </Link>
               
-              <Link to="/download" className="text-white/90 hover:text-gold-500 transition-all duration-200 py-2 px-3 rounded-lg hover:bg-gray-700/30 flex items-center group">
+              <Link 
+                to="/download" 
+                className="text-white/90 hover:text-gold-500 transition-all duration-200 py-2 px-3 rounded-lg hover:bg-gray-700/30 flex items-center group"
+                onClick={() => setIsMenuOpen(false)}
+              >
                 <div className="w-8 h-8 rounded-lg bg-gray-700/50 flex items-center justify-center ml-3 group-hover:bg-gray-700 transition-colors">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gold-500/80 group-hover:text-gold-500 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -587,7 +755,25 @@ const AuthHeader = () => {
                 <span className="group-hover:translate-x-0.5 transition-transform duration-150">دانلود اپلیکیشن</span>
               </Link>
               
-              <Link to="/subscription" className="text-white/90 hover:text-gold-500 transition-all duration-200 py-2 px-3 rounded-lg hover:bg-gray-700/30 flex items-center group">
+              <Link 
+                to="/programs" 
+                className="text-white/90 hover:text-gold-500 transition-all duration-200 py-2 px-3 rounded-lg hover:bg-gray-700/30 flex items-center group"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <div className="w-8 h-8 rounded-lg bg-gray-700/50 flex items-center justify-center ml-3 group-hover:bg-gray-700 transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gold-500/80 group-hover:text-gold-500 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                  </svg>
+                </div>
+                <span className="group-hover:translate-x-0.5 transition-transform duration-150">برنامه‌ها</span>
+              </Link>
+              
+              <Link 
+                to="/subscription" 
+                className="text-white/90 hover:text-gold-500 transition-all duration-200 py-2 px-3 rounded-lg hover:bg-gray-700/30 flex items-center group"
+                onClick={() => setIsMenuOpen(false)}
+              >
                 <div className="w-8 h-8 rounded-lg bg-gray-700/50 flex items-center justify-center ml-3 group-hover:bg-gray-700 transition-colors">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gold-500/80 group-hover:text-gold-500 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
@@ -600,7 +786,11 @@ const AuthHeader = () => {
                 <span className="group-hover:translate-x-0.5 transition-transform duration-150">برنامه تمرینی</span>
               </Link>
               
-              <Link to="/blog" className="text-white/90 hover:text-gold-500 transition-all duration-200 py-2 px-3 rounded-lg hover:bg-gray-700/30 flex items-center group">
+              <Link 
+                to="/blog" 
+                className="text-white/90 hover:text-gold-500 transition-all duration-200 py-2 px-3 rounded-lg hover:bg-gray-700/30 flex items-center group"
+                onClick={() => setIsMenuOpen(false)}
+              >
                 <div className="w-8 h-8 rounded-lg bg-gray-700/50 flex items-center justify-center ml-3 group-hover:bg-gray-700 transition-colors">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gold-500/80 group-hover:text-gold-500 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
@@ -610,7 +800,11 @@ const AuthHeader = () => {
                 <span className="group-hover:translate-x-0.5 transition-transform duration-150">بلاگ</span>
               </Link>
               
-              <Link to="/about-us" className="text-white/90 hover:text-gold-500 transition-all duration-200 py-2 px-3 rounded-lg hover:bg-gray-700/30 flex items-center group">
+              <Link 
+                to="/about-us" 
+                className="text-white/90 hover:text-gold-500 transition-all duration-200 py-2 px-3 rounded-lg hover:bg-gray-700/30 flex items-center group"
+                onClick={() => setIsMenuOpen(false)}
+              >
                 <div className="w-8 h-8 rounded-lg bg-gray-700/50 flex items-center justify-center ml-3 group-hover:bg-gray-700 transition-colors">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gold-500/80 group-hover:text-gold-500 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <circle cx="12" cy="12" r="10"></circle>
@@ -623,7 +817,11 @@ const AuthHeader = () => {
               
               {user ? (
                 <div className="mt-2 pt-2 border-t border-gray-700/30">
-                  <Link to="/profile" className="text-white/90 hover:text-gold-500 transition-all duration-200 py-2 px-3 rounded-lg hover:bg-gray-700/30 flex items-center group">
+                  <Link 
+                    to="/profile" 
+                    className="text-white/90 hover:text-gold-500 transition-all duration-200 py-2 px-3 rounded-lg hover:bg-gray-700/30 flex items-center group"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
                     <div className="w-8 h-8 rounded-lg bg-gray-700/50 flex items-center justify-center ml-3 group-hover:bg-gray-700 transition-colors">
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gold-500/80 group-hover:text-gold-500 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
@@ -633,7 +831,11 @@ const AuthHeader = () => {
                     <span className="text-sm font-medium group-hover:translate-x-0.5 transition-transform duration-200">پروفایل</span>
                   </Link>
                   
-                  <Link to="/dashboard" className="text-white/90 hover:text-gold-500 transition-all duration-200 py-2 px-3 rounded-lg hover:bg-gray-700/30 flex items-center group">
+                  <Link 
+                    to="/dashboard" 
+                    className="text-white/90 hover:text-gold-500 transition-all duration-200 py-2 px-3 rounded-lg hover:bg-gray-700/30 flex items-center group"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
                     <div className="w-8 h-8 rounded-lg bg-gray-700/50 flex items-center justify-center ml-3 group-hover:bg-gray-700 transition-colors">
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gold-500/80 group-hover:text-gold-500 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
@@ -644,7 +846,11 @@ const AuthHeader = () => {
                     <span className="text-sm font-medium group-hover:translate-x-0.5 transition-transform duration-200">داشبورد</span>
                   </Link>
                   
-                  <Link to="/subscription" className="text-white/90 hover:text-gold-500 transition-all duration-200 py-2 px-3 rounded-lg hover:bg-gray-700/30 flex items-center group">
+                  <Link 
+                    to="/subscription" 
+                    className="text-white/90 hover:text-gold-500 transition-all duration-200 py-2 px-3 rounded-lg hover:bg-gray-700/30 flex items-center group"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
                     <div className="w-8 h-8 rounded-lg bg-gray-700/50 flex items-center justify-center ml-3 group-hover:bg-gray-700 transition-colors">
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gold-500/80 group-hover:text-gold-500 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <rect x="2" y="4" width="20" height="16" rx="2" />
@@ -655,7 +861,10 @@ const AuthHeader = () => {
                   </Link>
                   
                   <button 
-                    onClick={handleLogout}
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      handleLogout();
+                    }}
                     className="w-full text-right text-red-400 hover:text-red-300 transition-all duration-200 py-2 px-3 rounded-lg hover:bg-red-900/10 flex items-center mt-1 group"
                   >
                     <div className="w-8 h-8 rounded-lg bg-red-900/20 flex items-center justify-center ml-3 group-hover:bg-red-900/30 transition-colors">
@@ -665,7 +874,7 @@ const AuthHeader = () => {
                   </button>
                 </div>
               ) : (
-                <Link to="/login">
+                <Link to="/login" onClick={() => setIsMenuOpen(false)}>
                   <Button 
                     className="mt-3 w-full bg-gradient-to-r from-gold-500 to-amber-400 hover:from-gold-600 hover:to-amber-500 text-black font-medium text-sm rounded-lg shadow-md"
                   >

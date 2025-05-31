@@ -95,65 +95,62 @@ const AboutUs = () => {
         </div>
       </section>
       
-      {/* App Screenshot Section */}
+      {/* App Features Section - without screenshot */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gray-900/50">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <div className="inline-block mb-4 px-3 py-1 bg-gold-500/10 rounded-full text-gold-400 text-sm font-medium">
-                اپلیکیشن ما
-              </div>
-              <h2 className="text-3xl md:text-4xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-gold-400 to-amber-300">
-                تجربه کاربری فوق‌العاده
-              </h2>
-              <div className="space-y-6 text-gray-300 text-lg">
-                <p>
-                  اپلیکیشن لیفت لجندز با رابط کاربری ساده و زیبا طراحی شده است تا استفاده از آن برای همه کاربران آسان باشد.
-                </p>
-                <p>
-                  با استفاده از این اپلیکیشن می‌توانید به راحتی:
-                </p>
-                <ul className="space-y-3">
-                  <li className="flex items-start">
-                    <ArrowRight className="h-6 w-6 text-gold-500 ml-2 mt-0.5 flex-shrink-0" />
-                    <span>برنامه تمرینی شخصی‌سازی شده دریافت کنید</span>
-                  </li>
-                  <li className="flex items-start">
-                    <ArrowRight className="h-6 w-6 text-gold-500 ml-2 mt-0.5 flex-shrink-0" />
-                    <span>برنامه غذایی متناسب با اهداف خود داشته باشید</span>
-                  </li>
-                  <li className="flex items-start">
-                    <ArrowRight className="h-6 w-6 text-gold-500 ml-2 mt-0.5 flex-shrink-0" />
-                    <span>مشاوره تخصصی در زمینه مکمل‌ها و استروئیدها دریافت کنید</span>
-                  </li>
-                  <li className="flex items-start">
-                    <ArrowRight className="h-6 w-6 text-gold-500 ml-2 mt-0.5 flex-shrink-0" />
-                    <span>پیشرفت خود را به صورت دقیق پیگیری کنید</span>
-                  </li>
-                </ul>
-              </div>
-              
-              <div className="mt-8">
-                <Button 
-                  asChild
-                  className="bg-gradient-to-r from-gold-500 to-amber-500 hover:from-gold-600 hover:to-amber-600 text-black font-medium px-6 py-6 rounded-xl transition-all duration-300 shadow-lg shadow-gold-500/20 hover:shadow-gold-500/40"
-                >
-                  <Link to="/download">
-                    <Download className="ml-2 h-5 w-5" />
-                    دانلود اپلیکیشن
-                  </Link>
-                </Button>
-              </div>
+          <div className="text-center max-w-3xl mx-auto">
+            <div className="inline-block mb-4 px-3 py-1 bg-gold-500/10 rounded-full text-gold-400 text-sm font-medium">
+              اپلیکیشن ما
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-gold-400 to-amber-300">
+              تجربه کاربری فوق‌العاده
+            </h2>
+            <div className="space-y-6 text-gray-300 text-lg">
+              <p>
+                اپلیکیشن لیفت لجندز با رابط کاربری ساده و زیبا طراحی شده است تا استفاده از آن برای همه کاربران آسان باشد.
+              </p>
+              <p>
+                با استفاده از این اپلیکیشن می‌توانید به راحتی:
+              </p>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-10">
+            <div className="bg-gray-800/50 backdrop-blur-sm p-6 rounded-xl border border-gold-500/20 hover:border-gold-500/40 transition-all group">
+              <ArrowRight className="h-8 w-8 text-gold-500 mb-4 group-hover:scale-110 transition-transform" />
+              <h3 className="text-lg font-medium text-white mb-2">برنامه تمرینی شخصی‌سازی شده</h3>
+              <p className="text-gray-300 text-sm">برنامه‌های تمرینی متناسب با سطح آمادگی و اهداف شما</p>
             </div>
             
-            <div className="relative">
-              <div className="absolute -inset-4 bg-gold-500/20 rounded-xl blur-xl"></div>
-              <img 
-                src="https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends/app/app-screenshot.png" 
-                alt="اسکرین‌شات اپلیکیشن" 
-                className="relative rounded-xl shadow-2xl w-full h-auto object-cover"
-              />
+            <div className="bg-gray-800/50 backdrop-blur-sm p-6 rounded-xl border border-gold-500/20 hover:border-gold-500/40 transition-all group">
+              <ArrowRight className="h-8 w-8 text-gold-500 mb-4 group-hover:scale-110 transition-transform" />
+              <h3 className="text-lg font-medium text-white mb-2">برنامه غذایی هوشمند</h3>
+              <p className="text-gray-300 text-sm">برنامه غذایی متناسب با اهداف بدنسازی شما</p>
             </div>
+            
+            <div className="bg-gray-800/50 backdrop-blur-sm p-6 rounded-xl border border-gold-500/20 hover:border-gold-500/40 transition-all group">
+              <ArrowRight className="h-8 w-8 text-gold-500 mb-4 group-hover:scale-110 transition-transform" />
+              <h3 className="text-lg font-medium text-white mb-2">مشاوره مکمل و استروئید</h3>
+              <p className="text-gray-300 text-sm">مشاوره تخصصی در زمینه مکمل‌ها و استروئیدها</p>
+            </div>
+            
+            <div className="bg-gray-800/50 backdrop-blur-sm p-6 rounded-xl border border-gold-500/20 hover:border-gold-500/40 transition-all group">
+              <ArrowRight className="h-8 w-8 text-gold-500 mb-4 group-hover:scale-110 transition-transform" />
+              <h3 className="text-lg font-medium text-white mb-2">پیگیری پیشرفت</h3>
+              <p className="text-gray-300 text-sm">پیشرفت خود را به صورت دقیق پیگیری کنید</p>
+            </div>
+          </div>
+          
+          <div className="flex justify-center mt-12">
+            <Button 
+              asChild
+              className="bg-gradient-to-r from-gold-500 to-amber-500 hover:from-gold-600 hover:to-amber-600 text-black font-medium px-6 py-6 rounded-xl transition-all duration-300 shadow-lg shadow-gold-500/20 hover:shadow-gold-500/40"
+            >
+              <Link to="/download">
+                <Download className="ml-2 h-5 w-5" />
+                دانلود اپلیکیشن
+              </Link>
+            </Button>
           </div>
         </div>
       </section>

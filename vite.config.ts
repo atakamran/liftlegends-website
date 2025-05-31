@@ -10,6 +10,13 @@ export default defineConfig(({ mode }) => ({
     host: "::",
     port: 8080,
     cors: true, // Enable CORS for all origins
+    hmr: { overlay: true }, // Improve HMR error reporting
+    watch: {
+      usePolling: true, // Use polling for file changes (helps in some environments)
+    },
+    headers: {
+      'Cache-Control': 'no-store', // Prevent browser caching
+    },
   },
   plugins: [
     react(),

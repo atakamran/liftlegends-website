@@ -167,13 +167,13 @@ const FeaturesSection = () => {
           </div>
         </div>
         
-        {/* App screenshot showcase */}
+        {/* App experience showcase - without screenshots */}
         <div className="my-32 relative">
           <div className="absolute -z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl h-80 bg-gradient-to-r from-gold-500/10 to-amber-500/5 rounded-full blur-[100px]"></div>
           
           <div className="text-center mb-16">
             <span className="inline-block bg-gradient-to-r from-purple-500/20 to-blue-500/10 text-purple-400 text-sm px-5 py-2 rounded-full border border-purple-500/20 mb-5">
-              اسکرین‌شات‌های اپلیکیشن
+              ویژگی‌های کاربری
             </span>
             <h2 className="text-3xl md:text-4xl font-bold mb-6 text-white">تجربه کاربری فوق‌العاده</h2>
             <p className="text-white/70 max-w-2xl mx-auto">
@@ -182,32 +182,34 @@ const FeaturesSection = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            <div className="bg-gradient-to-br from-gray-900 to-black p-3 rounded-2xl border border-white/10 shadow-lg hover:shadow-[0_0_30px_rgba(255,215,0,0.1)] transition-all duration-500 hover:-translate-y-2 group">
-              <img 
-                src="https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends//homepage.jpg" 
-                alt="صفحه اصلی اپلیکیشن LiftLegends" 
-                className="w-full h-auto rounded-xl"
-                loading="lazy"
-              />
-              <p className="text-center text-white/70 mt-4 group-hover:text-gold-400 transition-colors">صفحه اصلی</p>
+            <div className="bg-gradient-to-br from-gray-900 to-black p-6 rounded-2xl border border-white/10 shadow-lg hover:shadow-[0_0_30px_rgba(255,215,0,0.1)] transition-all duration-500 hover:-translate-y-2 group">
+              <div className="w-16 h-16 mx-auto mb-4 bg-purple-500/20 rounded-full flex items-center justify-center">
+                <div className="w-8 h-8 bg-purple-500/60 rounded-full"></div>
+              </div>
+              <h3 className="text-xl font-bold text-center text-white mb-3">صفحه اصلی</h3>
+              <p className="text-center text-white/70 group-hover:text-purple-400 transition-colors">
+                دسترسی سریع به تمام ویژگی‌های اپلیکیشن با رابط کاربری ساده و زیبا
+              </p>
             </div>
-            <div className="bg-gradient-to-br from-gray-900 to-black p-3 rounded-2xl border border-white/10 shadow-lg hover:shadow-[0_0_30px_rgba(255,215,0,0.1)] transition-all duration-500 hover:-translate-y-2 group md:transform md:translate-y-8">
-              <img 
-                src="https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends//training.jpg" 
-                alt="برنامه تمرینی در اپلیکیشن LiftLegends" 
-                className="w-full h-auto rounded-xl"
-                loading="lazy"
-              />
-              <p className="text-center text-white/70 mt-4 group-hover:text-gold-400 transition-colors">برنامه تمرینی</p>
+            
+            <div className="bg-gradient-to-br from-gray-900 to-black p-6 rounded-2xl border border-white/10 shadow-lg hover:shadow-[0_0_30px_rgba(255,215,0,0.1)] transition-all duration-500 hover:-translate-y-2 group md:transform md:translate-y-8">
+              <div className="w-16 h-16 mx-auto mb-4 bg-gold-500/20 rounded-full flex items-center justify-center">
+                <div className="w-8 h-8 bg-gold-500/60 rounded-full"></div>
+              </div>
+              <h3 className="text-xl font-bold text-center text-white mb-3">برنامه تمرینی</h3>
+              <p className="text-center text-white/70 group-hover:text-gold-400 transition-colors">
+                برنامه‌های تمرینی شخصی‌سازی شده با جزئیات کامل و ویدیوهای آموزشی
+              </p>
             </div>
-            <div className="bg-gradient-to-br from-gray-900 to-black p-3 rounded-2xl border border-white/10 shadow-lg hover:shadow-[0_0_30px_rgba(255,215,0,0.1)] transition-all duration-500 hover:-translate-y-2 group">
-              <img 
-                src="https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends//supplements.jpg" 
-                alt="برنامه مکمل و استرویید در اپلیکیشن LiftLegends" 
-                className="w-full h-auto rounded-xl"
-                loading="lazy"
-              />
-              <p className="text-center text-white/70 mt-4 group-hover:text-gold-400 transition-colors">برنامه مکمل و استرویید</p>
+            
+            <div className="bg-gradient-to-br from-gray-900 to-black p-6 rounded-2xl border border-white/10 shadow-lg hover:shadow-[0_0_30px_rgba(255,215,0,0.1)] transition-all duration-500 hover:-translate-y-2 group">
+              <div className="w-16 h-16 mx-auto mb-4 bg-amber-500/20 rounded-full flex items-center justify-center">
+                <div className="w-8 h-8 bg-amber-500/60 rounded-full"></div>
+              </div>
+              <h3 className="text-xl font-bold text-center text-white mb-3">مکمل و استرویید</h3>
+              <p className="text-center text-white/70 group-hover:text-amber-400 transition-colors">
+                مشاوره تخصصی در زمینه مکمل‌ها و استروئیدها با توجه به اهداف شما
+              </p>
             </div>
           </div>
         </div>

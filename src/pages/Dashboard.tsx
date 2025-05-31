@@ -49,7 +49,7 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
-import { Loader2, Plus, Edit, Trash2, Check, X, Calendar, CreditCard, Shield, Zap } from "lucide-react";
+import { Loader2, Plus, Edit, Trash2, Check, X, Calendar, CreditCard, Shield, Zap, LogOut, Menu } from "lucide-react";
 import SubscriptionPlans from "@/components/SubscriptionPlans";
 
 // Define interfaces
@@ -113,6 +113,20 @@ interface BlogCategory {
   created_at: string;
 }
 
+interface UserPurchase {
+  id: string;
+  user_id: string;
+  plan_id: string;
+  purchase_date: string;
+  amount: number;
+  payment_id: string | null;
+  payment_status: string;
+  expires_at: string | null;
+  plan?: {
+    name: string;
+    description: string;
+  };
+}
 
 
 const Dashboard = () => {
@@ -121,7 +135,8 @@ const Dashboard = () => {
   const [pageLoading, setPageLoading] = useState(true);
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
   const [blogCategories, setBlogCategories] = useState<BlogCategory[]>([]);
-  const [activeTab, setActiveTab] = useState(user?.profile?.is_admin ? "blog" : "");
+  const [userPurchases, setUserPurchases] = useState<UserPurchase[]>([]);
+  const [activeTab, setActiveTab] = useState("training");
   
   // Blog form state
   const [blogFormData, setBlogFormData] = useState<Partial<BlogPost>>({
@@ -291,6 +306,68 @@ const Dashboard = () => {
         description: "مشکلی در دریافت لیست دسته‌بندی‌ها رخ داد. لطفاً دوباره تلاش کنید.",
       });
       return [];
+    }
+  };
+  
+  // Function to fetch user purchases
+  const fetchUserPurchases = async () => {
+    try {
+      if (!user) return;
+      
+      // First, let's get the purchases without the join to ensure we have the basic data
+      const { data, error } = await supabase
+        .from("user_purchases")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("purchase_date", { ascending: false });
+        
+      if (error) {
+        console.error("Error fetching user purchases:", error);
+        throw error;
+      }
+      
+      // Now, for each purchase, let's get the plan details
+      const purchasesWithPlans = await Promise.all(
+        (data || []).map(async (purchase) => {
+          try {
+            // Get the plan details
+            const { data: planData, error: planError } = await supabase
+              .from("fitness_plans")
+              .select("name, description")
+              .eq("id", purchase.plan_id)
+              .single();
+              
+            if (planError) {
+              console.error("Error fetching plan details:", planError);
+              return {
+                ...purchase,
+                plan: { name: "برنامه نامشخص", description: "" }
+              };
+            }
+            
+            return {
+              ...purchase,
+              plan: planData
+            };
+          } catch (err) {
+            console.error("Error processing plan data:", err);
+            return {
+              ...purchase,
+              plan: { name: "برنامه نامشخص", description: "" }
+            };
+          }
+        })
+      );
+      
+      console.log("User purchases fetched:", purchasesWithPlans.length);
+      setUserPurchases(purchasesWithPlans as UserPurchase[]);
+    } catch (error) {
+      console.error("Error fetching user purchases:", error);
+      toast({
+        variant: "destructive",
+        title: "خطا در بارگذاری تاریخچه پرداخت‌ها",
+        description: "مشکلی در دریافت تاریخچه پرداخت‌ها رخ داد. لطفاً دوباره تلاش کنید.",
+      });
     }
   };
   
@@ -997,12 +1074,7 @@ const Dashboard = () => {
   
   // Load user data on component mount
   useEffect(() => {
-    fetchUserData().then(() => {
-      // Set active tab based on user role
-      if (user?.profile?.is_admin) {
-        setActiveTab("blog");
-      }
-    });
+    fetchUserData();
   }, []);
   
   // Check for expired subscriptions when user data is loaded
@@ -1010,6 +1082,9 @@ const Dashboard = () => {
     if (user?.profile) {
       console.log("Checking subscription status...");
       checkExpiredSubscription();
+      
+      // Fetch user purchases
+      fetchUserPurchases();
       
       // Also set up an interval to check every minute while the user is on the page
       const intervalId = setInterval(() => {
@@ -1028,7 +1103,12 @@ const Dashboard = () => {
       fetchBlogPosts();
       fetchBlogCategories();
     }
-  }, [activeTab, user?.profile?.is_admin]);
+    
+    // Load user purchases when payments tab is active
+    if (activeTab === "payments" && user) {
+      fetchUserPurchases();
+    }
+  }, [activeTab, user?.profile?.is_admin, user]);
   
   // Fetch blog categories when component mounts
   useEffect(() => {
@@ -1054,361 +1134,1073 @@ const Dashboard = () => {
   }
   
   return (
-    <div className="min-h-screen bg-gray-900 text-white py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold text-center mb-8">داشبورد کاربری</h1>
-        
-        <Tabs defaultValue="blog" value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid grid-cols-1 mb-8 bg-gray-800/50 p-1 rounded-lg">
-            {user?.profile?.is_admin && (
-              <TabsTrigger value="blog" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-gold-500 data-[state=active]:to-amber-400 data-[state=active]:text-black data-[state=active]:font-medium rounded-md transition-all duration-300">
-                <Edit size={16} className="ml-2" />
-                مدیریت بلاگ
-              </TabsTrigger>
-            )}
-          </TabsList>
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white">
+      {/* Mobile Header Removed */}
+      
+      {/* Main Dashboard Layout */}
+      <div className="flex flex-col lg:flex-row h-full">
+        {/* Sidebar - Hidden on Mobile */}
+        <div className="hidden lg:flex lg:w-64 bg-gray-800/50 backdrop-blur-md border-l border-gray-700/30 h-screen sticky top-0 flex-col">
+          <div className="p-6">
+            <div className="relative">
+              <h1 className="text-2xl font-bold text-gold-500 mb-24"></h1>
+              <p className="text-sm text-gray-400 mb-6"></p>
+            </div>
+            
+            {/* Removed User Profile Summary */}
+          </div>
           
-          {/* Blog Management Tab - Only visible to admins */}
-          {user?.profile?.is_admin && (
-            <TabsContent value="blog" className="space-y-6">
-              <Card className="bg-gray-800/50 border-gray-700">
-                <CardHeader>
-                  <CardTitle className="text-xl text-gold-500">مدیریت بلاگ</CardTitle>
-                  <CardDescription className="text-gray-400">
-                    مقالات بلاگ را مدیریت کنید
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  {/* Blog Post Form */}
-                  <div className="bg-gray-700/30 rounded-lg p-4 border border-gray-700">
-                    <h3 className="text-lg font-medium mb-4">
-                      {isEditing ? "ویرایش مقاله" : "ایجاد مقاله جدید"}
-                    </h3>
-                    <div className="space-y-4">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="title">عنوان مقاله</Label>
-                          <Input
-                            id="title"
-                            name="title"
-                            placeholder="عنوان مقاله را وارد کنید"
-                            value={blogFormData.title}
-                            onChange={handleTitleChange}
-                            className="bg-gray-800 border-gray-700 text-white"
-                          />
+          {/* Navigation Menu */}
+          <nav className="flex-1 px-3">
+            <Tabs value={activeTab} onValueChange={setActiveTab}>
+              <TabsList className="flex flex-col w-full space-y-1 bg-transparent">
+                <TabsTrigger value="training" className="w-full justify-start px-4 py-3 text-right data-[state=active]:bg-gradient-to-r data-[state=active]:from-gold-500/20 data-[state=active]:to-transparent data-[state=active]:border-r-4 data-[state=active]:border-gold-500 data-[state=active]:text-white rounded-md transition-all duration-300">
+                  <Zap size={18} className="ml-3 text-gold-500" />
+                  برنامه‌های تمرینی
+                </TabsTrigger>
+                
+                <TabsTrigger value="meals" className="w-full justify-start px-4 py-3 text-right data-[state=active]:bg-gradient-to-r data-[state=active]:from-gold-500/20 data-[state=active]:to-transparent data-[state=active]:border-r-4 data-[state=active]:border-gold-500 data-[state=active]:text-white rounded-md transition-all duration-300">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-3 text-gold-500"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path><path d="M7 2v20"></path><path d="M21 15V2"></path><path d="M18 15V2"></path><path d="M21 15a3 3 0 1 1-6 0"></path></svg>
+                  برنامه‌های غذایی
+                </TabsTrigger>
+                
+                <TabsTrigger value="supplements" className="w-full justify-start px-4 py-3 text-right data-[state=active]:bg-gradient-to-r data-[state=active]:from-gold-500/20 data-[state=active]:to-transparent data-[state=active]:border-r-4 data-[state=active]:border-gold-500 data-[state=active]:text-white rounded-md transition-all duration-300">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-3 text-gold-500"><path d="m8 21 8-9"></path><path d="M12 21a9 9 0 0 0 0-18C7.5 3 4 7.5 4 11c0 2 1 4 2 6"></path><path d="M19.8 17.8a9 9 0 0 0 .2-2c0-2.8-1-5.5-2.8-7.4"></path><path d="M13.5 8.5A5 5 0 0 0 12 8a5 5 0 0 0-5 5c0 1.1.4 2.2 1 3"></path></svg>
+                  برنامه‌های مکمل
+                </TabsTrigger>
+                
+                <TabsTrigger value="orders" className="w-full justify-start px-4 py-3 text-right data-[state=active]:bg-gradient-to-r data-[state=active]:from-gold-500/20 data-[state=active]:to-transparent data-[state=active]:border-r-4 data-[state=active]:border-gold-500 data-[state=active]:text-white rounded-md transition-all duration-300">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-3 text-gold-500"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path><path d="M3 6h18"></path><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+                  سفارش‌ها
+                </TabsTrigger>
+                
+                <TabsTrigger value="payments" className="w-full justify-start px-4 py-3 text-right data-[state=active]:bg-gradient-to-r data-[state=active]:from-gold-500/20 data-[state=active]:to-transparent data-[state=active]:border-r-4 data-[state=active]:border-gold-500 data-[state=active]:text-white rounded-md transition-all duration-300">
+                  <CreditCard size={18} className="ml-3 text-gold-500" />
+                  پرداخت‌ها
+                </TabsTrigger>
+                
+                {user?.profile?.is_admin && (
+                  <TabsTrigger value="blog" className="w-full justify-start px-4 py-3 text-right data-[state=active]:bg-gradient-to-r data-[state=active]:from-gold-500/20 data-[state=active]:to-transparent data-[state=active]:border-r-4 data-[state=active]:border-gold-500 data-[state=active]:text-white rounded-md transition-all duration-300">
+                    <Edit size={18} className="ml-3 text-gold-500" />
+                    مدیریت بلاگ
+                  </TabsTrigger>
+                )}
+              </TabsList>
+            </Tabs>
+          </nav>
+          
+          {/* Logout Button */}
+          <div className="p-4 border-t border-gray-700/30">
+            <Button 
+              variant="ghost" 
+              className="w-full justify-start text-gray-400 hover:text-white hover:bg-gray-700/50"
+              onClick={async () => {
+                await supabase.auth.signOut();
+                localStorage.setItem('isLoggedIn', 'false');
+                localStorage.removeItem('headauth'); // Clear cached auth data
+                navigate('/');
+              }}
+            >
+              <LogOut size={18} className="ml-2" />
+              خروج از حساب
+            </Button>
+          </div>
+        </div>
+        
+        {/* Modern Mobile Footer Navigation */}
+        <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50">
+          <div className="bg-gray-900/95 backdrop-blur-xl border-t border-gray-700/30 rounded-t-xl shadow-lg">
+            <div className="px-2 pt-2 pb-1">
+              <h2 className="text-gold-500 text-center text-sm font-bold mb-2">لیفت لجندز</h2>
+              <Tabs value={activeTab} onValueChange={setActiveTab}>
+                <TabsList className="flex w-full bg-transparent justify-between p-1">
+                  <TabsTrigger value="training" className="flex-1 flex flex-col items-center py-2 text-xs rounded-lg data-[state=active]:bg-gray-800 data-[state=active]:text-gold-500 transition-all duration-200">
+                    <div className="w-10 h-10 rounded-full bg-gray-800/70 flex items-center justify-center mb-1 data-[state=active]:bg-gold-500/20">
+                      <Zap size={18} className="data-[state=active]:text-gold-500" />
+                    </div>
+                    <span>تمرین</span>
+                  </TabsTrigger>
+                  
+                  <TabsTrigger value="meals" className="flex-1 flex flex-col items-center py-2 text-xs rounded-lg data-[state=active]:bg-gray-800 data-[state=active]:text-gold-500 transition-all duration-200">
+                    <div className="w-10 h-10 rounded-full bg-gray-800/70 flex items-center justify-center mb-1 data-[state=active]:bg-gold-500/20">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path><path d="M7 2v20"></path><path d="M21 15V2"></path><path d="M18 15V2"></path><path d="M21 15a3 3 0 1 1-6 0"></path></svg>
+                    </div>
+                    <span>غذا</span>
+                  </TabsTrigger>
+                  
+                  <TabsTrigger value="supplements" className="flex-1 flex flex-col items-center py-2 text-xs rounded-lg data-[state=active]:bg-gray-800 data-[state=active]:text-gold-500 transition-all duration-200">
+                    <div className="w-10 h-10 rounded-full bg-gray-800/70 flex items-center justify-center mb-1 data-[state=active]:bg-gold-500/20">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m8 21 8-9"></path><path d="M12 21a9 9 0 0 0 0-18C7.5 3 4 7.5 4 11c0 2 1 4 2 6"></path><path d="M19.8 17.8a9 9 0 0 0 .2-2c0-2.8-1-5.5-2.8-7.4"></path><path d="M13.5 8.5A5 5 0 0 0 12 8a5 5 0 0 0-5 5c0 1.1.4 2.2 1 3"></path></svg>
+                    </div>
+                    <span>مکمل</span>
+                  </TabsTrigger>
+                  
+                  <TabsTrigger value="orders" className="flex-1 flex flex-col items-center py-2 text-xs rounded-lg data-[state=active]:bg-gray-800 data-[state=active]:text-gold-500 transition-all duration-200">
+                    <div className="w-10 h-10 rounded-full bg-gray-800/70 flex items-center justify-center mb-1 data-[state=active]:bg-gold-500/20">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path><path d="M3 6h18"></path><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+                    </div>
+                    <span>سفارش</span>
+                  </TabsTrigger>
+                  
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <button className="flex-1 flex flex-col items-center py-2 text-xs rounded-lg hover:bg-gray-800 transition-all duration-200">
+                        <div className="w-10 h-10 rounded-full bg-gray-800/70 flex items-center justify-center mb-1">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
                         </div>
-                        
-                        <div className="space-y-2">
-                          <Label htmlFor="slug">نامک (URL)</Label>
-                          <Input
-                            id="slug"
-                            name="slug"
-                            placeholder="نامک مقاله را وارد کنید"
-                            value={blogFormData.slug}
-                            onChange={handleBlogInputChange}
-                            className="bg-gray-800 border-gray-700 text-white"
-                          />
-                        </div>
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="excerpt">خلاصه مقاله</Label>
-                        <Textarea
-                          id="excerpt"
-                          name="excerpt"
-                          placeholder="خلاصه مقاله را وارد کنید"
-                          value={blogFormData.excerpt || ""}
-                          onChange={handleBlogInputChange}
-                          className="bg-gray-800 border-gray-700 text-white h-20"
-                        />
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="content">محتوای مقاله</Label>
-                        <Textarea
-                          id="content"
-                          name="content"
-                          placeholder="محتوای مقاله را وارد کنید"
-                          value={blogFormData.content}
-                          onChange={handleBlogInputChange}
-                          className="bg-gray-800 border-gray-700 text-white h-40"
-                        />
-                      </div>
-                      
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="cover_image">آدرس تصویر کاور</Label>
-                          <Input
-                            id="cover_image"
-                            name="cover_image"
-                            placeholder="آدرس تصویر کاور را وارد کنید"
-                            value={blogFormData.cover_image || ""}
-                            onChange={handleBlogInputChange}
-                            className="bg-gray-800 border-gray-700 text-white"
-                          />
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <Label htmlFor="category">دسته‌بندی</Label>
-                          <Select
-                            value={blogFormData.category || "none"}
-                            onValueChange={handleCategoryChange}
+                        <span>بیشتر</span>
+                      </button>
+                    </DialogTrigger>
+                    <DialogContent className="bg-gray-800 border-gray-700 text-white">
+                      <DialogHeader>
+                        <DialogTitle className="text-gold-500">گزینه‌های بیشتر</DialogTitle>
+                      </DialogHeader>
+                      <div className="flex flex-col space-y-2 py-4">
+                        <Button 
+                          variant="ghost" 
+                          className="justify-start text-white hover:bg-gray-700/50"
+                          onClick={() => setActiveTab("payments")}
+                        >
+                          <CreditCard size={18} className="ml-3 text-gold-500" />
+                          پرداخت‌ها
+                        </Button>
+                        {user?.profile?.is_admin && (
+                          <Button 
+                            variant="ghost" 
+                            className="justify-start text-white hover:bg-gray-700/50"
+                            onClick={() => setActiveTab("blog")}
                           >
-                            <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
-                              <SelectValue placeholder="دسته‌بندی را انتخاب کنید" />
-                            </SelectTrigger>
-                            <SelectContent className="bg-gray-800 border-gray-700 text-white">
-                              <SelectItem value="none">بدون دسته‌بندی</SelectItem>
-                              {blogCategories.map((category) => (
-                                <SelectItem key={category.id} value={category.slug}>
-                                  {category.name}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-center space-x-2 space-x-reverse">
-                        <Switch
-                          id="published"
-                          checked={blogFormData.published}
-                          onCheckedChange={handlePublishedChange}
-                        />
-                        <Label htmlFor="published">انتشار مقاله</Label>
-                      </div>
-                      
-                      <div className="flex justify-end space-x-2 space-x-reverse">
-                        {isEditing && (
-                          <Button
-                            variant="outline"
-                            onClick={cancelEditing}
-                            className="border-gray-600 text-gray-300 hover:bg-gray-700"
-                          >
-                            انصراف
+                            <Edit size={18} className="ml-3 text-gold-500" />
+                            مدیریت بلاگ
                           </Button>
                         )}
-                        <Button
-                          onClick={isEditing ? updateBlogPost : createBlogPost}
-                          disabled={!!loading}
-                          className="bg-gradient-to-r from-gold-500 to-amber-400 hover:from-gold-600 hover:to-amber-500 text-black"
-                        >
-                          {loading ? (
-                            <>
-                              <Loader2 className="ml-2 h-4 w-4 animate-spin" />
-                              در حال پردازش...
-                            </>
-                          ) : isEditing ? (
-                            "بروزرسانی مقاله"
-                          ) : (
-                            "ایجاد مقاله"
-                          )}
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  {/* Blog Categories */}
-                  <div className="bg-gray-700/30 rounded-lg p-4 border border-gray-700">
-                    <h3 className="text-lg font-medium mb-4">مدیریت دسته‌بندی‌ها</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="category_name">نام دسته‌بندی</Label>
-                        <Input
-                          id="category_name"
-                          name="name"
-                          placeholder="نام دسته‌بندی را وارد کنید"
-                          value={categoryFormData.name}
-                          onChange={handleCategoryNameChange}
-                          className="bg-gray-800 border-gray-700 text-white"
-                        />
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="category_slug">نامک دسته‌بندی</Label>
-                        <Input
-                          id="category_slug"
-                          name="slug"
-                          placeholder="نامک دسته‌بندی را وارد کنید"
-                          value={categoryFormData.slug}
-                          onChange={handleCategoryInputChange}
-                          className="bg-gray-800 border-gray-700 text-white"
-                        />
-                      </div>
-                    </div>
-                    
-                    <Button
-                      onClick={createCategory}
-                      disabled={!!loading}
-                      className="bg-gradient-to-r from-gold-500 to-amber-400 hover:from-gold-600 hover:to-amber-500 text-black"
-                    >
-                      {loading ? (
-                        <>
-                          <Loader2 className="ml-2 h-4 w-4 animate-spin" />
-                          در حال پردازش...
-                        </>
-                      ) : (
-                        "ایجاد دسته‌بندی"
-                      )}
-                    </Button>
-                    
-                    <div className="mt-6">
-                      <div className="flex items-center justify-between mb-3">
-                        <h4 className="text-sm font-medium">دسته‌بندی‌های موجود:</h4>
-                        <span className="text-xs text-gray-400">{blogCategories.length} دسته‌بندی</span>
-                      </div>
-                      
-                      <div className="relative mb-3">
-                        <Input
-                          placeholder="جستجوی دسته‌بندی..."
-                          value={categorySearch}
-                          onChange={handleCategorySearch}
-                          className="bg-gray-800 border-gray-700 text-white pr-9"
-                        />
-                        <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <circle cx="11" cy="11" r="8"></circle>
-                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                          </svg>
+                        <div className="border-t border-gray-700 my-2 pt-2">
+                          <Button 
+                            variant="ghost" 
+                            className="justify-start text-gray-400 hover:text-white hover:bg-gray-700/50 w-full"
+                            onClick={async () => {
+                              await supabase.auth.signOut();
+                              localStorage.setItem('isLoggedIn', 'false');
+                              localStorage.removeItem('headauth'); // Clear cached auth data
+                              navigate('/');
+                            }}
+                          >
+                            <LogOut size={18} className="ml-2" />
+                            خروج از حساب
+                          </Button>
                         </div>
                       </div>
-                      
-                      <div className="flex flex-wrap gap-2">
-                        {filteredCategories.map((category) => (
-                          <div 
-                            key={category.id} 
-                            className="group relative flex items-center bg-gradient-to-r from-gray-800 to-gray-700 hover:from-gray-700 hover:to-gray-600 rounded-full px-3 py-1.5 text-sm transition-all duration-200 hover:shadow-md"
-                          >
-                            <span className="font-medium text-white">{category.name}</span>
-                            <span className="mr-2 text-xs text-gray-400 opacity-70">({category.slug})</span>
-                            
-                            <button 
-                              className="mr-2 ml-1 p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-500/20 text-red-400"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                if (window.confirm(`آیا از حذف دسته‌بندی "${category.name}" اطمینان دارید؟`)) {
-                                  console.log("Confirmed delete for category:", category.id);
-                                  deleteCategory(category.id);
-                                }
-                              }}
-                              disabled={!!loading}
-                            >
-                              {loading && deletingCategoryId === category.id ? (
-                                <Loader2 className="h-3 w-3 animate-spin" />
-                              ) : (
-                                <Trash2 className="h-3 w-3" />
-                              )}
-                            </button>
-                            
-                            <div className="absolute inset-0 rounded-full ring-1 ring-white/10 transition-opacity group-hover:ring-white/20"></div>
-                          </div>
-                        ))}
-                        {filteredCategories.length === 0 && (
-                          <div className="w-full text-center py-6 text-gray-500 text-sm bg-gray-800/30 rounded-lg border border-dashed border-gray-700">
-                            {categorySearch.trim() !== "" 
-                              ? "هیچ دسته‌بندی‌ای با این عبارت یافت نشد" 
-                              : "هنوز دسته‌بندی‌ای ایجاد نشده است"}
-                          </div>
-                        )}
+                    </DialogContent>
+                  </Dialog>
+                </TabsList>
+              </Tabs>
+            </div>
+          </div>
+        </div>
+        
+        {/* Main Content Area */}
+        <div className="flex-1 p-4 lg:p-8 lg:mt-0 mb-28 lg:mb-0">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            {/* Training Programs Tab */}
+            <TabsContent value="training" className="space-y-6 animate-in fade-in-50 duration-300">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold text-white">برنامه‌های تمرینی</h2>
+                <Button className="bg-gold-500 hover:bg-gold-600 text-black">
+                  <Plus size={16} className="ml-2" />
+                  برنامه جدید
+                </Button>
+              </div>
+              
+              {/* Featured Training Program */}
+              <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700/50">
+                <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-gold-500/20 to-transparent opacity-50"></div>
+                <div className="relative p-6 lg:p-8 flex flex-col lg:flex-row items-start lg:items-center">
+                  <div className="w-16 h-16 lg:w-20 lg:h-20 rounded-full bg-gold-500/20 flex items-center justify-center mb-4 lg:mb-0 lg:ml-6">
+                    <Zap size={32} className="text-gold-500" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+                      <div>
+                        <h3 className="text-xl font-bold text-white mb-2">برنامه تمرینی پیشرفته بدنسازی</h3>
+                        <p className="text-gray-400 mb-4">این برنامه برای افزایش قدرت و حجم عضلانی طراحی شده است</p>
+                      </div>
+                      <div className="flex items-center mt-2 lg:mt-0">
+                        <span className="bg-gold-500/20 text-gold-500 text-xs font-medium px-2.5 py-1 rounded-full ml-2">پیشرفته</span>
+                        <span className="bg-gray-700/50 text-gray-300 text-xs font-medium px-2.5 py-1 rounded-full">۸ هفته</span>
                       </div>
                     </div>
-                  </div>
-                  
-                  {/* Blog Posts List */}
-                  <div className="bg-gray-700/30 rounded-lg p-4 border border-gray-700">
-                    <h3 className="text-lg font-medium mb-4">لیست مقالات</h3>
-                    <div className="overflow-x-auto">
-                      <Table>
-                        <TableCaption>لیست مقالات بلاگ</TableCaption>
-                        <TableHeader>
-                          <TableRow className="border-gray-700">
-                            <TableHead className="text-white">عنوان</TableHead>
-                            <TableHead className="text-white">وضعیت</TableHead>
-                            <TableHead className="text-white">دسته‌بندی</TableHead>
-                            <TableHead className="text-white">تاریخ ایجاد</TableHead>
-                            <TableHead className="text-white">عملیات</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {blogPosts.length === 0 ? (
-                            <TableRow className="border-gray-700">
-                              <TableCell colSpan={5} className="text-center text-gray-400">
-                                هیچ مقاله‌ای یافت نشد
-                              </TableCell>
-                            </TableRow>
-                          ) : (
-                            blogPosts.map((post) => (
-                              <TableRow key={post.id} className="border-gray-700">
-                                <TableCell className="font-medium">{post.title}</TableCell>
-                                <TableCell>
-                                  {post.published ? (
-                                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-900/30 text-green-400">
-                                      منتشر شده
-                                    </span>
-                                  ) : (
-                                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-700 text-gray-400">
-                                      پیش‌نویس
-                                    </span>
-                                  )}
-                                </TableCell>
-                                <TableCell>{post.category || "بدون دسته‌بندی"}</TableCell>
-                                <TableCell>{formatDate(post.created_at)}</TableCell>
-                                <TableCell>
-                                  <div className="flex space-x-2 space-x-reverse">
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      onClick={() => editBlogPost(post)}
-                                      className="h-8 w-8 p-0 text-blue-400 hover:text-blue-300 hover:bg-blue-900/20"
-                                    >
-                                      <Edit className="h-4 w-4" />
-                                    </Button>
-                                    <Dialog>
-                                      <DialogTrigger asChild>
-                                        <Button
-                                          variant="ghost"
-                                          size="sm"
-                                          className="h-8 w-8 p-0 text-red-400 hover:text-red-300 hover:bg-red-900/20"
-                                        >
-                                          <Trash2 className="h-4 w-4" />
-                                        </Button>
-                                      </DialogTrigger>
-                                      <DialogContent className="bg-gray-800 border-gray-700">
-                                        <DialogHeader>
-                                          <DialogTitle>حذف مقاله</DialogTitle>
-                                          <DialogDescription className="text-gray-400">
-                                            آیا از حذف مقاله "{post.title}" اطمینان دارید؟
-                                          </DialogDescription>
-                                        </DialogHeader>
-                                        <DialogFooter className="flex space-x-2 space-x-reverse">
-                                          <DialogClose asChild>
-                                            <Button variant="outline" className="border-gray-600">
-                                              انصراف
-                                            </Button>
-                                          </DialogClose>
-                                          <Button
-                                            variant="destructive"
-                                            onClick={() => deleteBlogPost(post.id)}
-                                          >
-                                            حذف
-                                          </Button>
-                                        </DialogFooter>
-                                      </DialogContent>
-                                    </Dialog>
-                                  </div>
-                                </TableCell>
-                              </TableRow>
-                            ))
-                          )}
-                        </TableBody>
-                      </Table>
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      <Button variant="outline" className="border-gray-700 hover:border-gold-500 hover:bg-gold-500/10">مشاهده جزئیات</Button>
+                      <Button className="bg-gold-500 hover:bg-gold-600 text-black">شروع برنامه</Button>
                     </div>
                   </div>
+                </div>
+              </div>
+              
+              {/* Training Programs Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {/* Program Card 1 */}
+                <Card className="bg-gray-800/50 border-gray-700 hover:border-gold-500/50 transition-all duration-300 overflow-hidden">
+                  <div className="h-40 bg-gradient-to-br from-blue-500/20 to-purple-500/20 relative">
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-400 opacity-50"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line></svg>
+                    </div>
+                    <div className="absolute top-2 right-2">
+                      <span className="bg-blue-500/20 text-blue-300 text-xs font-medium px-2.5 py-1 rounded-full">مبتدی</span>
+                    </div>
+                  </div>
+                  <CardHeader>
+                    <CardTitle className="text-lg">برنامه تمرینی مبتدی</CardTitle>
+                    <CardDescription>مناسب برای افراد تازه‌کار</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-gray-400">۴ جلسه در هفته - ۶ هفته</p>
+                  </CardContent>
+                  <CardFooter>
+                    <Button variant="outline" className="w-full border-gray-700 hover:border-blue-500 hover:bg-blue-500/10">مشاهده برنامه</Button>
+                  </CardFooter>
+                </Card>
+                
+                {/* Program Card 2 */}
+                <Card className="bg-gray-800/50 border-gray-700 hover:border-gold-500/50 transition-all duration-300 overflow-hidden">
+                  <div className="h-40 bg-gradient-to-br from-green-500/20 to-emerald-500/20 relative">
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-green-400 opacity-50"><circle cx="12" cy="12" r="10"></circle><path d="m4.9 4.9 14.2 14.2"></path></svg>
+                    </div>
+                    <div className="absolute top-2 right-2">
+                      <span className="bg-green-500/20 text-green-300 text-xs font-medium px-2.5 py-1 rounded-full">متوسط</span>
+                    </div>
+                  </div>
+                  <CardHeader>
+                    <CardTitle className="text-lg">برنامه تمرینی چربی‌سوزی</CardTitle>
+                    <CardDescription>کاهش وزن و چربی بدن</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-gray-400">۵ جلسه در هفته - ۸ هفته</p>
+                  </CardContent>
+                  <CardFooter>
+                    <Button variant="outline" className="w-full border-gray-700 hover:border-green-500 hover:bg-green-500/10">مشاهده برنامه</Button>
+                  </CardFooter>
+                </Card>
+                
+                {/* Program Card 3 */}
+                <Card className="bg-gray-800/50 border-gray-700 hover:border-gold-500/50 transition-all duration-300 overflow-hidden">
+                  <div className="h-40 bg-gradient-to-br from-gold-500/20 to-amber-500/20 relative">
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gold-400 opacity-50"><path d="M6.5 6.5 17.5 17.5"></path><path d="M17.5 6.5 6.5 17.5"></path><circle cx="12" cy="12" r="10"></circle></svg>
+                    </div>
+                    <div className="absolute top-2 right-2">
+                      <span className="bg-gold-500/20 text-gold-300 text-xs font-medium px-2.5 py-1 rounded-full">پیشرفته</span>
+                    </div>
+                  </div>
+                  <CardHeader>
+                    <CardTitle className="text-lg">برنامه قدرتی پیشرفته</CardTitle>
+                    <CardDescription>افزایش قدرت و عملکرد</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-gray-400">۶ جلسه در هفته - ۱۲ هفته</p>
+                  </CardContent>
+                  <CardFooter>
+                    <Button variant="outline" className="w-full border-gray-700 hover:border-gold-500 hover:bg-gold-500/10">مشاهده برنامه</Button>
+                  </CardFooter>
+                </Card>
+              </div>
+            </TabsContent>
+            
+            {/* Meal Plans Tab */}
+            <TabsContent value="meals" className="space-y-6 animate-in fade-in-50 duration-300">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold text-white">برنامه‌های غذایی</h2>
+                <Button className="bg-green-500 hover:bg-green-600 text-white">
+                  <Plus size={16} className="ml-2" />
+                  برنامه جدید
+                </Button>
+              </div>
+              
+              {/* Featured Meal Plan */}
+              <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700/50">
+                <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-green-500/20 to-transparent opacity-50"></div>
+                <div className="relative p-6 lg:p-8 flex flex-col lg:flex-row items-start lg:items-center">
+                  <div className="w-16 h-16 lg:w-20 lg:h-20 rounded-full bg-green-500/20 flex items-center justify-center mb-4 lg:mb-0 lg:ml-6">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-green-500"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path><path d="M7 2v20"></path><path d="M21 15V2"></path><path d="M18 15V2"></path><path d="M21 15a3 3 0 1 1-6 0"></path></svg>
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+                      <div>
+                        <h3 className="text-xl font-bold text-white mb-2">برنامه غذایی کاهش وزن</h3>
+                        <p className="text-gray-400 mb-4">برنامه غذایی متعادل برای کاهش وزن سالم و پایدار</p>
+                      </div>
+                      <div className="flex items-center mt-2 lg:mt-0">
+                        <span className="bg-green-500/20 text-green-400 text-xs font-medium px-2.5 py-1 rounded-full ml-2">کاهش وزن</span>
+                        <span className="bg-gray-700/50 text-gray-300 text-xs font-medium px-2.5 py-1 rounded-full">۱۶۰۰ کالری</span>
+                      </div>
+                    </div>
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      <Button variant="outline" className="border-gray-700 hover:border-green-500 hover:bg-green-500/10">مشاهده جزئیات</Button>
+                      <Button className="bg-green-500 hover:bg-green-600 text-white">شروع برنامه</Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Meal Plans Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {/* Meal Plan Card 1 */}
+                <Card className="bg-gray-800/50 border-gray-700 hover:border-green-500/50 transition-all duration-300 overflow-hidden">
+                  <div className="h-40 bg-gradient-to-br from-green-500/20 to-teal-500/20 relative">
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-green-400 opacity-50"><path d="M12 2a8 8 0 0 0-8 8c0 6 8 12 8 12s8-6 8-12a8 8 0 0 0-8-8z"></path></svg>
+                    </div>
+                    <div className="absolute top-2 right-2">
+                      <span className="bg-green-500/20 text-green-300 text-xs font-medium px-2.5 py-1 rounded-full">کاهش وزن</span>
+                    </div>
+                  </div>
+                  <CardHeader>
+                    <CardTitle className="text-lg">رژیم کم کربوهیدرات</CardTitle>
+                    <CardDescription>مناسب برای کاهش وزن سریع</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-gray-400">۱۴۰۰ کالری - ۴ وعده در روز</p>
+                  </CardContent>
+                  <CardFooter>
+                    <Button variant="outline" className="w-full border-gray-700 hover:border-green-500 hover:bg-green-500/10">مشاهده برنامه</Button>
+                  </CardFooter>
+                </Card>
+                
+                {/* Meal Plan Card 2 */}
+                <Card className="bg-gray-800/50 border-gray-700 hover:border-green-500/50 transition-all duration-300 overflow-hidden">
+                  <div className="h-40 bg-gradient-to-br from-blue-500/20 to-indigo-500/20 relative">
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-400 opacity-50"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"></path><line x1="16" y1="8" x2="2" y2="22"></line><line x1="17.5" y1="15" x2="9" y2="15"></line></svg>
+                    </div>
+                    <div className="absolute top-2 right-2">
+                      <span className="bg-blue-500/20 text-blue-300 text-xs font-medium px-2.5 py-1 rounded-full">افزایش وزن</span>
+                    </div>
+                  </div>
+                  <CardHeader>
+                    <CardTitle className="text-lg">رژیم پرکالری</CardTitle>
+                    <CardDescription>مناسب برای افزایش وزن و حجم</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-gray-400">۳۰۰۰ کالری - ۶ وعده در روز</p>
+                  </CardContent>
+                  <CardFooter>
+                    <Button variant="outline" className="w-full border-gray-700 hover:border-blue-500 hover:bg-blue-500/10">مشاهده برنامه</Button>
+                  </CardFooter>
+                </Card>
+                
+                {/* Meal Plan Card 3 */}
+                <Card className="bg-gray-800/50 border-gray-700 hover:border-green-500/50 transition-all duration-300 overflow-hidden">
+                  <div className="h-40 bg-gradient-to-br from-purple-500/20 to-pink-500/20 relative">
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-purple-400 opacity-50"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"></path><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"></path><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"></path><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"></path></svg>
+                    </div>
+                    <div className="absolute top-2 right-2">
+                      <span className="bg-purple-500/20 text-purple-300 text-xs font-medium px-2.5 py-1 rounded-full">متعادل</span>
+                    </div>
+                  </div>
+                  <CardHeader>
+                    <CardTitle className="text-lg">رژیم متعادل</CardTitle>
+                    <CardDescription>مناسب برای حفظ وزن و سلامتی</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-gray-400">۲۲۰۰ کالری - ۵ وعده در روز</p>
+                  </CardContent>
+                  <CardFooter>
+                    <Button variant="outline" className="w-full border-gray-700 hover:border-purple-500 hover:bg-purple-500/10">مشاهده برنامه</Button>
+                  </CardFooter>
+                </Card>
+              </div>
+            </TabsContent>
+            
+            {/* Supplement Plans Tab */}
+            <TabsContent value="supplements" className="space-y-6 animate-in fade-in-50 duration-300">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold text-white">برنامه‌های مکمل</h2>
+                <Button className="bg-purple-500 hover:bg-purple-600 text-white">
+                  <Plus size={16} className="ml-2" />
+                  برنامه جدید
+                </Button>
+              </div>
+              
+              {/* Featured Supplement Plan */}
+              <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700/50">
+                <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-purple-500/20 to-transparent opacity-50"></div>
+                <div className="relative p-6 lg:p-8 flex flex-col lg:flex-row items-start lg:items-center">
+                  <div className="w-16 h-16 lg:w-20 lg:h-20 rounded-full bg-purple-500/20 flex items-center justify-center mb-4 lg:mb-0 lg:ml-6">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-purple-500"><path d="m8 21 8-9"></path><path d="M12 21a9 9 0 0 0  0-18C7.5 3 4 7.5 4 11c0 2 1 4 2 6"></path><path d="M19.8 17.8a9 9 0 0 0 .2-2c0-2.8-1-5.5-2.8-7.4"></path><path d="M13.5 8.5A5 5 0 0 0 12 8a5 5 0 0 0-5 5c0 1.1.4 2.2 1 3"></path></svg>
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+                      <div>
+                        <h3 className="text-xl font-bold text-white mb-2">برنامه مکمل افزایش حجم</h3>
+                        <p className="text-gray-400 mb-4">مکمل‌های مناسب برای افزایش حجم عضلانی و قدرت</p>
+                      </div>
+                      <div className="flex items-center mt-2 lg:mt-0">
+                        <span className="bg-purple-500/20 text-purple-400 text-xs font-medium px-2.5 py-1 rounded-full ml-2">افزایش حجم</span>
+                        <span className="bg-gray-700/50 text-gray-300 text-xs font-medium px-2.5 py-1 rounded-full">۵ مکمل</span>
+                      </div>
+                    </div>
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      <Button variant="outline" className="border-gray-700 hover:border-purple-500 hover:bg-purple-500/10">مشاهده جزئیات</Button>
+                      <Button className="bg-purple-500 hover:bg-purple-600 text-white">شروع برنامه</Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Supplement Plans Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {/* Supplement Plan Card 1 */}
+                <Card className="bg-gray-800/50 border-gray-700 hover:border-purple-500/50 transition-all duration-300 overflow-hidden">
+                  <div className="h-40 bg-gradient-to-br from-purple-500/20 to-blue-500/20 relative">
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-purple-400 opacity-50"><path d="M8.3 10a.7.7 0 0 1-.626-1.079L11.4 3a.7.7 0 0 1 1.198-.043L16.3 8.9a.7.7 0 0 1-.572 1.1Z"></path><rect x="3" y="14" width="7" height="7" rx="1"></rect><circle cx="17.5" cy="17.5" r="3.5"></circle></svg>
+                    </div>
+                    <div className="absolute top-2 right-2">
+                      <span className="bg-purple-500/20 text-purple-300 text-xs font-medium px-2.5 py-1 rounded-full">افزایش حجم</span>
+                    </div>
+                  </div>
+                  <CardHeader>
+                    <CardTitle className="text-lg">مکمل‌های افزایش حجم</CardTitle>
+                    <CardDescription>مناسب برای افزایش حجم عضلانی</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-gray-400">۵ مکمل - برنامه ۱۲ هفته‌ای</p>
+                  </CardContent>
+                  <CardFooter>
+                    <Button variant="outline" className="w-full border-gray-700 hover:border-purple-500 hover:bg-purple-500/10">مشاهده برنامه</Button>
+                  </CardFooter>
+                </Card>
+                
+                {/* Supplement Plan Card 2 */}
+                <Card className="bg-gray-800/50 border-gray-700 hover:border-purple-500/50 transition-all duration-300 overflow-hidden">
+                  <div className="h-40 bg-gradient-to-br from-green-500/20 to-teal-500/20 relative">
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-green-400 opacity-50"><path d="m18 16 4-4-4-4"></path><path d="m6 8-4 4 4 4"></path><path d="m14.5 4-5 16"></path></svg>
+                    </div>
+                    <div className="absolute top-2 right-2">
+                      <span className="bg-green-500/20 text-green-300 text-xs font-medium px-2.5 py-1 rounded-full">چربی‌سوزی</span>
+                    </div>
+                  </div>
+                  <CardHeader>
+                    <CardTitle className="text-lg">مکمل‌های چربی‌سوزی</CardTitle>
+                    <CardDescription>مناسب برای کاهش چربی بدن</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-gray-400">۴ مکمل - برنامه ۸ هفته‌ای</p>
+                  </CardContent>
+                  <CardFooter>
+                    <Button variant="outline" className="w-full border-gray-700 hover:border-green-500 hover:bg-green-500/10">مشاهده برنامه</Button>
+                  </CardFooter>
+                </Card>
+                
+                {/* Supplement Plan Card 3 */}
+                <Card className="bg-gray-800/50 border-gray-700 hover:border-purple-500/50 transition-all duration-300 overflow-hidden">
+                  <div className="h-40 bg-gradient-to-br from-amber-500/20 to-orange-500/20 relative">
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-amber-400 opacity-50"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
+                    </div>
+                    <div className="absolute top-2 right-2">
+                      <span className="bg-amber-500/20 text-amber-300 text-xs font-medium px-2.5 py-1 rounded-full">انرژی</span>
+                    </div>
+                  </div>
+                  <CardHeader>
+                    <CardTitle className="text-lg">مکمل‌های انرژی‌زا</CardTitle>
+                    <CardDescription>افزایش انرژی و عملکرد ورزشی</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-gray-400">۳ مکمل - برنامه ۶ هفته‌ای</p>
+                  </CardContent>
+                  <CardFooter>
+                    <Button variant="outline" className="w-full border-gray-700 hover:border-amber-500 hover:bg-amber-500/10">مشاهده برنامه</Button>
+                  </CardFooter>
+                </Card>
+              </div>
+            </TabsContent>
+            
+            {/* Orders Tab */}
+            <TabsContent value="orders" className="space-y-6 animate-in fade-in-50 duration-300">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold text-white">سفارش‌ها</h2>
+                <Button variant="outline" className="border-gray-700 hover:border-blue-500 hover:bg-blue-500/10">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                  دانلود تاریخچه
+                </Button>
+              </div>
+              
+              {/* Orders Table */}
+              <Card className="bg-gray-800/50 border-gray-700">
+                <CardContent className="p-0">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="border-gray-700 hover:bg-gray-800/50">
+                        <TableHead className="text-gray-400">شماره سفارش</TableHead>
+                        <TableHead className="text-gray-400">تاریخ</TableHead>
+                        <TableHead className="text-gray-400">محصول</TableHead>
+                        <TableHead className="text-gray-400">مبلغ</TableHead>
+                        <TableHead className="text-gray-400">وضعیت</TableHead>
+                        <TableHead className="text-gray-400 text-left">عملیات</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      <TableRow className="border-gray-700 hover:bg-gray-800/50">
+                        <TableCell className="font-medium">#ORD-1234</TableCell>
+                        <TableCell>۱۴۰۲/۰۶/۱۵</TableCell>
+                        <TableCell>برنامه تمرینی پیشرفته</TableCell>
+                        <TableCell>۲۵۰,۰۰۰ تومان</TableCell>
+                        <TableCell>
+                          <span className="bg-green-500/20 text-green-400 text-xs font-medium px-2.5 py-1 rounded-full">تکمیل شده</span>
+                        </TableCell>
+                        <TableCell>
+                          <Button variant="ghost" size="sm" className="h-8 px-2 text-gray-400 hover:text-white">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                          </Button>
+                          <Button variant="ghost" size="sm" className="h-8 px-2 text-gray-400 hover:text-white">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                      <TableRow className="border-gray-700 hover:bg-gray-800/50">
+                        <TableCell className="font-medium">#ORD-1235</TableCell>
+                        <TableCell>۱۴۰۲/۰۶/۱۰</TableCell>
+                        <TableCell>برنامه غذایی کاهش وزن</TableCell>
+                        <TableCell>۱۸۰,۰۰۰ تومان</TableCell>
+                        <TableCell>
+                          <span className="bg-green-500/20 text-green-400 text-xs font-medium px-2.5 py-1 rounded-full">تکمیل شده</span>
+                        </TableCell>
+                        <TableCell>
+                          <Button variant="ghost" size="sm" className="h-8 px-2 text-gray-400 hover:text-white">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                          </Button>
+                          <Button variant="ghost" size="sm" className="h-8 px-2 text-gray-400 hover:text-white">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                      <TableRow className="border-gray-700 hover:bg-gray-800/50">
+                        <TableCell className="font-medium">#ORD-1236</TableCell>
+                        <TableCell>۱۴۰۲/۰۵/۲۵</TableCell>
+                        <TableCell>مکمل پروتئین وی</TableCell>
+                        <TableCell>۴۵۰,۰۰۰ تومان</TableCell>
+                        <TableCell>
+                          <span className="bg-blue-500/20 text-blue-400 text-xs font-medium px-2.5 py-1 rounded-full">در حال ارسال</span>
+                        </TableCell>
+                        <TableCell>
+                          <Button variant="ghost" size="sm" className="h-8 px-2 text-gray-400 hover:text-white">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
                 </CardContent>
               </Card>
             </TabsContent>
-          )}
-        </Tabs>
+            
+            {/* Payments Tab */}
+            <TabsContent value="payments" className="space-y-6 animate-in fade-in-50 duration-300">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold text-white">پرداخت‌ها</h2>
+                <Button 
+                  variant="outline" 
+                  className="border-gray-700 hover:border-blue-500 hover:bg-blue-500/10"
+                  onClick={fetchUserPurchases}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                  بروزرسانی
+                </Button>
+              </div>
+              
+              {/* Payment Summary Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Card className="bg-gray-800/50 border-gray-700">
+                  <CardHeader className="pb-2">
+                    <CardDescription className="text-gray-400">مجموع پرداخت‌ها</CardDescription>
+                    <CardTitle className="text-2xl text-white">
+                      {userPurchases.reduce((total, purchase) => total + (purchase.amount || 0), 0).toLocaleString('fa-IR')} تومان
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-sm text-gray-400 flex items-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-1"><path d="M12 20v-6"></path><path d="M18 20V10"></path><path d="M6 20v-3"></path></svg>
+                      تعداد کل پرداخت‌ها: {userPurchases.length}
+                    </div>
+                  </CardContent>
+                </Card>
+                
+                <Card className="bg-gray-800/50 border-gray-700">
+                  <CardHeader className="pb-2">
+                    <CardDescription className="text-gray-400">آخرین پرداخت</CardDescription>
+                    <CardTitle className="text-2xl text-white">
+                      {userPurchases.length > 0 
+                        ? new Intl.NumberFormat('fa-IR').format(userPurchases[0]?.amount || 0) + ' تومان'
+                        : 'بدون پرداخت'}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-sm text-gray-400 flex items-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-1"><path d="M12 2v20"></path><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                      {userPurchases.length > 0 && userPurchases[0]?.purchase_date
+                        ? formatDate(userPurchases[0].purchase_date)
+                        : 'بدون تاریخ'}
+                    </div>
+                  </CardContent>
+                </Card>
+                
+                <Card className="bg-gray-800/50 border-gray-700">
+                  <CardHeader className="pb-2">
+                    <CardDescription className="text-gray-400">وضعیت اشتراک</CardDescription>
+                    <CardTitle className="text-2xl text-white">
+                      {user?.profile?.subscription_plan === 'basic' ? 'پایه' : 
+                       user?.profile?.subscription_plan === 'pro' ? 'حرفه‌ای' : 
+                       user?.profile?.subscription_plan === 'ultimate' ? 'نامحدود' : 'نامشخص'}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-sm text-amber-400 flex items-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-1"><path d="M12 2v20"></path><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                      {user?.profile?.subscription_end_date 
+                        ? `تا تاریخ ${formatDate(user.profile.subscription_end_date)}`
+                        : 'بدون محدودیت زمانی'}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+              
+              {/* Payments Table */}
+              <Card className="bg-gray-800/50 border-gray-700">
+                <CardContent className="p-0">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="border-gray-700 hover:bg-gray-800/50">
+                        <TableHead className="text-gray-400">شناسه پرداخت</TableHead>
+                        <TableHead className="text-gray-400">تاریخ</TableHead>
+                        <TableHead className="text-gray-400">برنامه</TableHead>
+                        <TableHead className="text-gray-400">مبلغ</TableHead>
+                        <TableHead className="text-gray-400">وضعیت</TableHead>
+                        <TableHead className="text-gray-400">تاریخ انقضا</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {userPurchases.length > 0 ? (
+                        userPurchases.map((purchase) => (
+                          <TableRow key={purchase.id} className="border-gray-700 hover:bg-gray-800/50">
+                            <TableCell className="font-medium">
+                              {purchase.payment_id ? purchase.payment_id.substring(0, 8) : 'نامشخص'}
+                            </TableCell>
+                            <TableCell>
+                              {purchase.purchase_date ? formatDate(purchase.purchase_date) : 'نامشخص'}
+                            </TableCell>
+                            <TableCell>
+                              {purchase.plan?.name || 'برنامه نامشخص'}
+                            </TableCell>
+                            <TableCell>
+                              {new Intl.NumberFormat('fa-IR').format(purchase.amount)} تومان
+                            </TableCell>
+                            <TableCell>
+                              <span className={`${
+                                purchase.payment_status === 'completed' ? 'bg-green-500/20 text-green-400' : 
+                                purchase.payment_status === 'pending' ? 'bg-yellow-500/20 text-yellow-400' : 
+                                'bg-red-500/20 text-red-400'
+                              } text-xs font-medium px-2.5 py-1 rounded-full`}>
+                                {purchase.payment_status === 'completed' ? 'موفق' : 
+                                 purchase.payment_status === 'pending' ? 'در انتظار' : 'ناموفق'}
+                              </span>
+                            </TableCell>
+                            <TableCell>
+                              {purchase.expires_at ? formatDate(purchase.expires_at) : 'نامحدود'}
+                            </TableCell>
+                          </TableRow>
+                        ))
+                      ) : (
+                        <TableRow>
+                          <TableCell colSpan={6} className="text-center py-6 text-gray-400">
+                            هیچ پرداختی یافت نشد
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            </TabsContent>
+            
+            {/* Blog Management Tab - Only visible to admins */}
+            {user?.profile?.is_admin && (
+              <TabsContent value="blog" className="space-y-6 animate-in fade-in-50 duration-300">
+                <Card className="bg-gray-800/50 border-gray-700">
+                  <CardHeader>
+                    <CardTitle className="text-xl text-gold-500">مدیریت بلاگ</CardTitle>
+                    <CardDescription className="text-gray-400">
+                      مقالات بلاگ را مدیریت کنید
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    {/* Blog Post Form */}
+                    <div className="bg-gray-700/30 rounded-lg p-4 border border-gray-700">
+                      <h3 className="text-lg font-medium mb-4">
+                        {isEditing ? "ویرایش مقاله" : "ایجاد مقاله جدید"}
+                      </h3>
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="title">عنوان مقاله</Label>
+                            <Input
+                              id="title"
+                              name="title"
+                              placeholder="عنوان مقاله را وارد کنید"
+                              value={blogFormData.title}
+                              onChange={handleTitleChange}
+                              className="bg-gray-800 border-gray-700 text-white"
+                            />
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <Label htmlFor="slug">نامک (URL)</Label>
+                            <Input
+                              id="slug"
+                              name="slug"
+                              placeholder="نامک مقاله را وارد کنید"
+                              value={blogFormData.slug}
+                              onChange={handleBlogInputChange}
+                              className="bg-gray-800 border-gray-700 text-white"
+                            />
+                          </div>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label htmlFor="excerpt">خلاصه مقاله</Label>
+                          <Textarea
+                            id="excerpt"
+                            name="excerpt"
+                            placeholder="خلاصه مقاله را وارد کنید"
+                            value={blogFormData.excerpt || ""}
+                            onChange={handleBlogInputChange}
+                            className="bg-gray-800 border-gray-700 text-white h-20"
+                          />
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label htmlFor="content">محتوای مقاله</Label>
+                          <Textarea
+                            id="content"
+                            name="content"
+                            placeholder="محتوای مقاله را وارد کنید"
+                            value={blogFormData.content}
+                            onChange={handleBlogInputChange}
+                            className="bg-gray-800 border-gray-700 text-white h-40"
+                          />
+                        </div>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="cover_image">آدرس تصویر کاور</Label>
+                            <Input
+                              id="cover_image"
+                              name="cover_image"
+                              placeholder="آدرس تصویر کاور را وارد کنید"
+                              value={blogFormData.cover_image || ""}
+                              onChange={handleBlogInputChange}
+                              className="bg-gray-800 border-gray-700 text-white"
+                            />
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <Label htmlFor="category">دسته‌بندی</Label>
+                            <Select
+                              value={blogFormData.category || "none"}
+                              onValueChange={handleCategoryChange}
+                            >
+                              <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
+                                <SelectValue placeholder="دسته‌بندی را انتخاب کنید" />
+                              </SelectTrigger>
+                              <SelectContent className="bg-gray-800 border-gray-700 text-white">
+                                <SelectItem value="none">بدون دسته‌بندی</SelectItem>
+                                {blogCategories.map((category) => (
+                                  <SelectItem key={category.id} value={category.slug}>
+                                    {category.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-center space-x-2 space-x-reverse">
+                          <Switch
+                            id="published"
+                            checked={blogFormData.published}
+                            onCheckedChange={handlePublishedChange}
+                          />
+                          <Label htmlFor="published">انتشار مقاله</Label>
+                        </div>
+                        
+                        <div className="flex justify-end space-x-2 space-x-reverse">
+                          {isEditing && (
+                            <Button
+                              variant="outline"
+                              onClick={() => {
+                                setIsEditing(false);
+                                setCurrentBlogId(null);
+                                setBlogFormData({
+                                  title: "",
+                                  content: "",
+                                  excerpt: "",
+                                  slug: "",
+                                  cover_image: "",
+                                  published: false,
+                                  category: "none"
+                                });
+                              }}
+                              className="border-gray-600"
+                            >
+                              انصراف
+                            </Button>
+                          )}
+                          
+                          <Button
+                            onClick={isEditing ? updateBlogPost : createBlogPost}
+                            disabled={pageLoading}
+                            className="bg-gold-500 hover:bg-gold-600 text-black"
+                          >
+                            {pageLoading ? (
+                              <>
+                                <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                                در حال پردازش...
+                              </>
+                            ) : isEditing ? (
+                              <>
+                                <Edit className="ml-2 h-4 w-4" />
+                                بروزرسانی مقاله
+                              </>
+                            ) : (
+                              <>
+                                <Plus className="ml-2 h-4 w-4" />
+                                ایجاد مقاله
+                              </>
+                            )}
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Blog Categories */}
+                    <div className="bg-gray-700/30 rounded-lg p-4 border border-gray-700">
+                      <h3 className="text-lg font-medium mb-4">مدیریت دسته‌بندی‌ها</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="category_name">نام دسته‌بندی</Label>
+                          <Input
+                            id="category_name"
+                            name="name"
+                            placeholder="نام دسته‌بندی را وارد کنید"
+                            value={categoryFormData.name}
+                            onChange={handleCategoryNameChange}
+                            className="bg-gray-800 border-gray-700 text-white"
+                          />
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label htmlFor="category_slug">نامک دسته‌بندی</Label>
+                          <Input
+                            id="category_slug"
+                            name="slug"
+                            placeholder="نامک دسته‌بندی را وارد کنید"
+                            value={categoryFormData.slug}
+                            onChange={handleCategoryInputChange}
+                            className="bg-gray-800 border-gray-700 text-white"
+                          />
+                        </div>
+                      </div>
+                      
+                      <Button
+                        onClick={createCategory}
+                        disabled={!!loading}
+                        className="bg-gradient-to-r from-gold-500 to-amber-400 hover:from-gold-600 hover:to-amber-500 text-black"
+                      >
+                        {loading ? (
+                          <>
+                            <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                            در حال پردازش...
+                          </>
+                        ) : (
+                          "ایجاد دسته‌بندی"
+                        )}
+                      </Button>
+                      
+                      <div className="mt-6">
+                        <div className="flex items-center justify-between mb-3">
+                          <h4 className="text-sm font-medium">دسته‌بندی‌های موجود:</h4>
+                          <span className="text-xs text-gray-400">{blogCategories.length} دسته‌بندی</span>
+                        </div>
+                        
+                        <div className="relative mb-3">
+                          <Input
+                            placeholder="جستجوی دسته‌بندی..."
+                            value={categorySearch}
+                            onChange={handleCategorySearch}
+                            className="bg-gray-800 border-gray-700 text-white pr-9"
+                          />
+                          <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <circle cx="11" cy="11" r="8"></circle>
+                              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            </svg>
+                          </div>
+                        </div>
+                        
+                        <div className="flex flex-wrap gap-2">
+                          {filteredCategories.map((category) => (
+                            <div 
+                              key={category.id} 
+                              className="group relative flex items-center bg-gradient-to-r from-gray-800 to-gray-700 hover:from-gray-700 hover:to-gray-600 rounded-full px-3 py-1.5 text-sm transition-all duration-200 hover:shadow-md"
+                            >
+                              <span className="font-medium text-white">{category.name}</span>
+                              <span className="mr-2 text-xs text-gray-400 opacity-70">({category.slug})</span>
+                              
+                              <button 
+                                className="mr-2 ml-1 p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-500/20 text-red-400"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  if (window.confirm(`آیا از حذف دسته‌بندی "${category.name}" اطمینان دارید؟`)) {
+                                    console.log("Confirmed delete for category:", category.id);
+                                    deleteCategory(category.id);
+                                  }
+                                }}
+                                disabled={!!loading}
+                              >
+                                {loading && deletingCategoryId === category.id ? (
+                                  <Loader2 className="h-3 w-3 animate-spin" />
+                                ) : (
+                                  <Trash2 className="h-3 w-3" />
+                                )}
+                              </button>
+                              
+                              <div className="absolute inset-0 rounded-full ring-1 ring-white/10 transition-opacity group-hover:ring-white/20"></div>
+                            </div>
+                          ))}
+                          {filteredCategories.length === 0 && (
+                            <div className="w-full text-center py-6 text-gray-500 text-sm bg-gray-800/30 rounded-lg border border-dashed border-gray-700">
+                              {categorySearch.trim() !== "" 
+                                ? "هیچ دسته‌بندی‌ای با این عبارت یافت نشد" 
+                                : "هنوز دسته‌بندی‌ای ایجاد نشده است"}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Blog Posts List */}
+                    <div className="bg-gray-700/30 rounded-lg p-4 border border-gray-700">
+                      <h3 className="text-lg font-medium mb-4">لیست مقالات</h3>
+                      <div className="overflow-x-auto">
+                        <Table>
+                          <TableCaption>لیست مقالات بلاگ</TableCaption>
+                          <TableHeader>
+                            <TableRow className="border-gray-700 hover:bg-gray-800/50">
+                              <TableHead className="text-gray-400">عنوان</TableHead>
+                              <TableHead className="text-gray-400">نامک</TableHead>
+                              <TableHead className="text-gray-400">وضعیت</TableHead>
+                              <TableHead className="text-gray-400">تاریخ ایجاد</TableHead>
+                              <TableHead className="text-gray-400 text-left">عملیات</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {blogPosts.length === 0 ? (
+                              <TableRow>
+                                <TableCell colSpan={5} className="text-center py-8 text-gray-500">
+                                  هنوز مقاله‌ای ایجاد نشده است
+                                </TableCell>
+                              </TableRow>
+                            ) : (
+                              blogPosts.map((post) => (
+                                <TableRow key={post.id} className="border-gray-700 hover:bg-gray-800/50">
+                                  <TableCell className="font-medium">{post.title}</TableCell>
+                                  <TableCell>{post.slug}</TableCell>
+                                  <TableCell>
+                                    {post.published ? (
+                                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-900/30 text-green-400">
+                                        منتشر شده
+                                      </span>
+                                    ) : (
+                                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-500/20 text-gray-400">
+                                        پیش‌نویس
+                                      </span>
+                                    )}
+                                  </TableCell>
+                                  <TableCell>
+                                    {new Date(post.created_at).toLocaleDateString('fa-IR')}
+                                  </TableCell>
+                                  <TableCell>
+                                    <div className="flex items-center space-x-2 space-x-reverse">
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => {
+                                          setIsEditing(true);
+                                          setCurrentBlogId(post.id);
+                                          setBlogFormData({
+                                            title: post.title,
+                                            content: post.content,
+                                            excerpt: post.excerpt,
+                                            slug: post.slug,
+                                            cover_image: post.cover_image,
+                                            published: post.published,
+                                            category: post.category || "none"
+                                          });
+                                        }}
+                                        className="h-8 px-2 text-blue-400 hover:text-blue-300 hover:bg-blue-900/20"
+                                      >
+                                        <Edit className="h-4 w-4" />
+                                      </Button>
+                                      <Dialog>
+                                        <DialogTrigger asChild>
+                                          <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            className="h-8 px-2 text-red-400 hover:text-red-300 hover:bg-red-900/20"
+                                          >
+                                            <Trash2 className="h-4 w-4" />
+                                          </Button>
+                                        </DialogTrigger>
+                                        <DialogContent className="bg-gray-800 border-gray-700">
+                                          <DialogHeader>
+                                            <DialogTitle>حذف مقاله</DialogTitle>
+                                            <DialogDescription className="text-gray-400">
+                                              آیا از حذف مقاله "{post.title}" اطمینان دارید؟
+                                            </DialogDescription>
+                                          </DialogHeader>
+                                          <DialogFooter className="flex space-x-2 space-x-reverse">
+                                            <DialogClose asChild>
+                                              <Button variant="outline" className="border-gray-600">
+                                                انصراف
+                                              </Button>
+                                            </DialogClose>
+                                            <Button
+                                              variant="destructive"
+                                              onClick={() => deleteBlogPost(post.id)}
+                                            >
+                                              حذف
+                                            </Button>
+                                          </DialogFooter>
+                                        </DialogContent>
+                                      </Dialog>
+                                    </div>
+                                  </TableCell>
+                                </TableRow>   
+                              ))
+                            )}
+                          </TableBody>        
+                        </Table>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            )}
+          </Tabs>
+        </div>
       </div>
     </div>
   );

@@ -1,44 +1,21 @@
 
 import { Button } from "@/components/ui/button";
-import { ArrowDown, Download, Star, Shield, Zap, Brain, QrCode, ChevronRight, Smartphone } from "lucide-react";
-import { useEffect, useState, useRef } from "react";
+import { ArrowDown, Download, Star, Shield, Zap, Brain, Smartphone } from "lucide-react";
+import { useEffect, useState } from "react";
 
 const HeroSection = () => {
   const [isVisible, setIsVisible] = useState(false);
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const slidesRef = useRef<HTMLDivElement>(null);
   
-  const appScreenshots = [
-    {
-      image: "https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends//homepage.jpg",
-      alt: "صفحه اصلی اپلیکیشن LiftLegends"
-    },
-    {
-      image: "https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends//training.jpg",
-      alt: "برنامه تمرینی در اپلیکیشن LiftLegends"
-    },
-    {
-      image: "https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends//supplements.jpg",
-      alt: "برنامه مکمل و استرویید در اپلیکیشن LiftLegends"
-    }
-  ];
-
   useEffect(() => {
     // Trigger animation after component mounts with a small delay to improve FCP
     const timer = setTimeout(() => {
       setIsVisible(true);
     }, 100);
     
-    // Auto-rotate screenshots
-    const slideInterval = setInterval(() => {
-      setCurrentSlide(prev => (prev + 1) % appScreenshots.length);
-    }, 5000);
-    
     return () => {
       clearTimeout(timer);
-      clearInterval(slideInterval);
     };
-  }, [appScreenshots.length]);
+  }, []);
 
   // SEO structured data
   useEffect(() => {
@@ -143,10 +120,10 @@ const HeroSection = () => {
             <Button 
               variant="outline"
               className="border-gold-500/30 text-white hover:bg-gold-500/10 px-8 py-6 text-lg font-medium rounded-xl transition-all hover:border-gold-500/70"
-              onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
+              onClick={() => window.location.href = "/programs"}
             >
-              <Smartphone size={20} className="ml-2" />
-              ویژگی‌های اپلیکیشن
+              <ArrowDown size={20} className="ml-2" />
+              مشاهده برنامه‌ها
             </Button>
           </div>
           
@@ -172,137 +149,87 @@ const HeroSection = () => {
           
         </div>
         
-        {/* App screenshots slider - completely redesigned */}
+        {/* Modern simplified mobile app representation */}
         <div className={`order-1 md:order-2 flex justify-center transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`} style={{ transitionDelay: "200ms" }}>
           <div className="relative">
-            {/* Phone frame with screenshot slider */}
-            <div className="relative z-10 w-full max-w-[320px] mx-auto">
-              <div className="bg-gradient-to-br from-gray-800 to-black p-4 rounded-[36px] glass-morphism border border-white/10 shadow-[0_0_30px_rgba(255,215,0,0.15)] hover:shadow-[0_0_40px_rgba(255,215,0,0.25)] transition-all duration-500">
-                <div className="aspect-[9/19.5] overflow-hidden rounded-[28px] border-[8px] border-black bg-gradient-to-b from-gray-900 to-black flex flex-col">
+            {/* Simple modern phone frame */}
+            <div className="relative z-10 w-full max-w-[280px] mx-auto">
+              <div className="bg-gradient-to-br from-gray-800 to-black p-3 rounded-[32px] glass-morphism border border-white/10 shadow-[0_0_20px_rgba(255,215,0,0.15)] hover:shadow-[0_0_30px_rgba(255,215,0,0.25)] transition-all duration-500">
+                <div className="aspect-[9/19.5] overflow-hidden rounded-[24px] border-[6px] border-black bg-gradient-to-b from-gray-900 to-black flex flex-col">
                   {/* Status bar */}
-                  <div className="h-6 bg-black/40 flex items-center justify-between px-3">
-                    <div className="text-white text-[10px]">12:30</div>
+                  <div className="h-5 bg-black/40 flex items-center justify-between px-3">
+                    <div className="text-white text-[8px]">12:30</div>
                     <div className="flex items-center gap-1">
-                      <div className="w-2 h-2 rounded-full bg-white/80"></div>
-                      <div className="w-2 h-2 rounded-full bg-white/80"></div>
-                      <div className="w-2 h-2 rounded-full bg-white/80"></div>
+                      <div className="w-1.5 h-1.5 rounded-full bg-white/80"></div>
+                      <div className="w-1.5 h-1.5 rounded-full bg-white/80"></div>
                     </div>
                   </div>
                   
-                  {/* App content with screenshot slider */}
-                  <div className="flex-1 overflow-hidden relative">
-                    <div 
-                      ref={slidesRef}
-                      className="flex transition-transform duration-500 ease-in-out h-full"
-                      style={{ transform: `translateX(${currentSlide * 100}%)` }}
-                    >
-                      {/* App mockup screen */}
-                      <div className="min-w-full h-full flex flex-col">
-                        <div className="flex-1 flex flex-col items-center p-4">
-                          {/* Logo */}
-                          <div className="w-full flex justify-center items-center mt-4 mb-4">
-                            <img 
-                              src="https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends//white%20logo.png" 
-                              alt="LiftLegends Logo" 
-                              className="w-28 h-auto"
-                              loading="eager"
-                              width="112"
-                              height="112"
-                            />
-                          </div>
-                          
-                          {/* App elements */}
-                          <div className="w-full space-y-4 mb-4">
-                            {/* Stats cards */}
-                            <div className="grid grid-cols-2 gap-2">
-                              <div className="bg-gold-500/10 rounded-lg p-2 border border-gold-500/30 hover:border-gold-500/50 transition-all">
-                                <div className="text-gold-400 text-xs">تمرین امروز</div>
-                                <div className="text-white text-sm font-bold">پرس سینه</div>
-                              </div>
-                              <div className="bg-gold-500/10 rounded-lg p-2 border border-gold-500/30 hover:border-gold-500/50 transition-all">
-                                <div className="text-gold-400 text-xs">کالری</div>
-                                <div className="text-white text-sm font-bold">۱۲۰۰ / ۲۰۰۰</div>
-                              </div>
-                            </div>
-                            
-                            {/* Menu items */}
-                            <div className="bg-gray-800/50 rounded-lg p-2">
-                              <div className="flex items-center gap-2 p-1 hover:bg-gold-500/10 rounded transition-colors">
-                                <div className="w-3 h-3 rounded-full bg-gold-500"></div>
-                                <div className="text-white text-xs">برنامه تمرینی</div>
-                              </div>
-                              <div className="flex items-center gap-2 p-1 hover:bg-gold-500/10 rounded transition-colors">
-                                <div className="w-3 h-3 rounded-full bg-gold-500/60"></div>
-                                <div className="text-white text-xs">رژیم غذایی</div>
-                              </div>
-                              <div className="flex items-center gap-2 p-1 hover:bg-gold-500/10 rounded transition-colors">
-                                <div className="w-3 h-3 rounded-full bg-gold-500/60"></div>
-                                <div className="text-white text-xs">پیشرفت</div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        {/* Bottom navigation */}
-                        <div className="w-full bg-gray-800/30 rounded-full py-1 px-2 flex justify-around mb-2">
-                          <div className="w-6 h-6 rounded-full bg-gold-500/20 flex items-center justify-center">
-                            <div className="w-2 h-2 bg-gold-500 rounded-full"></div>
-                          </div>
-                          <div className="w-6 h-6 rounded-full bg-gold-500/80 flex items-center justify-center">
-                            <div className="w-2 h-2 bg-white rounded-full"></div>
-                          </div>
-                          <div className="w-6 h-6 rounded-full bg-gold-500/20 flex items-center justify-center">
-                            <div className="w-2 h-2 bg-gold-500 rounded-full"></div>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      {/* Additional app screenshots */}
-                      {appScreenshots.map((screenshot, index) => (
-                        <div key={index} className="min-w-full h-full">
-                          <img 
-                            src={screenshot.image} 
-                            alt={screenshot.alt}
-                            className="w-full h-full object-cover"
-                            loading="lazy"
-                          />
-                        </div>
-                      ))}
+                  {/* App content - simplified */}
+                  <div className="flex-1 flex flex-col items-center p-3">
+                    {/* Logo */}
+                    <div className="w-full flex justify-center items-center mt-3 mb-3">
+                      <img 
+                        src="https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends//white%20logo.png" 
+                        alt="LiftLegends Logo" 
+                        className="w-20 h-auto"
+                        loading="eager"
+                        width="80"
+                        height="80"
+                      />
                     </div>
                     
-                    {/* Slider indicators */}
-                    <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 flex gap-1.5">
-                      {[0, ...Array(appScreenshots.length).keys()].map((_, index) => (
-                        <button 
-                          key={index}
-                          className={`w-2 h-2 rounded-full transition-all ${currentSlide === index ? 'bg-gold-500 w-4' : 'bg-white/30'}`}
-                          onClick={() => setCurrentSlide(index)}
-                          aria-label={`اسلاید ${index + 1}`}
-                        />
-                      ))}
+                    {/* Simplified app elements */}
+                    <div className="w-full space-y-3 mb-3">
+                      {/* Feature cards */}
+                      <div className="bg-gold-500/10 rounded-lg p-2 border border-gold-500/30">
+                        <div className="text-gold-400 text-xs font-medium text-center">مربی هوشمند بدنسازی</div>
+                      </div>
+                      
+                      {/* Menu items - simplified */}
+                      <div className="bg-gray-800/50 rounded-lg p-2">
+                        <div className="flex items-center gap-2 p-1">
+                          <div className="w-2 h-2 rounded-full bg-gold-500"></div>
+                          <div className="text-white text-xs">برنامه تمرینی</div>
+                        </div>
+                        <div className="flex items-center gap-2 p-1">
+                          <div className="w-2 h-2 rounded-full bg-gold-500/60"></div>
+                          <div className="text-white text-xs">رژیم غذایی</div>
+                        </div>
+                        <div className="flex items-center gap-2 p-1">
+                          <div className="w-2 h-2 rounded-full bg-gold-500/60"></div>
+                          <div className="text-white text-xs">پیشرفت</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Bottom navigation - simplified */}
+                  <div className="w-full bg-gray-800/30 rounded-full py-1 px-2 flex justify-around mb-2">
+                    <div className="w-5 h-5 rounded-full bg-gold-500/20 flex items-center justify-center">
+                      <div className="w-1.5 h-1.5 bg-gold-500 rounded-full"></div>
+                    </div>
+                    <div className="w-5 h-5 rounded-full bg-gold-500/80 flex items-center justify-center">
+                      <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
+                    </div>
+                    <div className="w-5 h-5 rounded-full bg-gold-500/20 flex items-center justify-center">
+                      <div className="w-1.5 h-1.5 bg-gold-500 rounded-full"></div>
                     </div>
                   </div>
                 </div>
               </div>
               
-              {/* Enhanced decorative elements */}
-              <div className="absolute top-1/2 -right-16 transform -translate-y-1/2 w-40 h-40 bg-gradient-to-r from-gold-400 to-gold-600 rounded-full blur-[80px] opacity-20 animate-pulse"></div>
-              <div className="absolute -bottom-6 -left-6 w-16 h-16 bg-gold-500 rounded-full blur-[30px] opacity-30"></div>
-              <div className="absolute -top-8 left-1/3 w-20 h-20 bg-purple-500 rounded-full blur-[40px] opacity-10"></div>
+              {/* Simplified decorative elements */}
+              <div className="absolute top-1/2 -right-8 transform -translate-y-1/2 w-24 h-24 bg-gradient-to-r from-gold-400 to-gold-600 rounded-full blur-[60px] opacity-20 animate-pulse"></div>
+              <div className="absolute -bottom-4 -left-4 w-12 h-12 bg-gold-500 rounded-full blur-[20px] opacity-30"></div>
             </div>
             
-            {/* Enhanced feature highlights with better animations */}
-            <div className="absolute -top-4 -right-4 bg-gray-900/80 backdrop-blur-sm px-3 py-2 rounded-lg border border-gold-500/30 shadow-lg animate-float hover:border-gold-500/70 transition-colors">
+            {/* Simplified feature highlights */}
+            <div className="absolute -top-4 -right-4 bg-gray-900/80 backdrop-blur-sm px-3 py-2 rounded-lg border border-gold-500/30 shadow-lg animate-float">
               <p className="text-sm text-gold-400 font-medium">برنامه تمرینی هوشمند</p>
             </div>
-            <div className="absolute bottom-12 -left-8 bg-gray-900/80 backdrop-blur-sm px-3 py-2 rounded-lg border border-gold-500/30 shadow-lg animate-float hover:border-gold-500/70 transition-colors" style={{ animationDelay: "1s" }}>
+            <div className="absolute bottom-12 -left-8 bg-gray-900/80 backdrop-blur-sm px-3 py-2 rounded-lg border border-gold-500/30 shadow-lg animate-float" style={{ animationDelay: "1s" }}>
               <p className="text-sm text-gold-400 font-medium">رژیم غذایی شخصی</p>
-            </div>
-            <div className="absolute top-1/3 left-[105%] bg-gray-900/80 backdrop-blur-sm px-3 py-2 rounded-lg border border-gold-500/30 shadow-lg animate-float hover:border-gold-500/70 transition-colors" style={{ animationDelay: "2s" }}>
-              <p className="text-sm text-gold-400 font-medium">برنامه مکمل و استرویید</p>
-            </div>
-            <div className="absolute top-1/2 right-[105%] bg-gray-900/80 backdrop-blur-sm px-3 py-2 rounded-lg border border-gold-500/30 shadow-lg animate-float hover:border-gold-500/70 transition-colors" style={{ animationDelay: "1.5s" }}>
-              <p className="text-sm text-gold-400 font-medium">تحلیل بدن</p>
             </div>
           </div>
         </div>

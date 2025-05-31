@@ -60,7 +60,7 @@ export const SUBSCRIPTION_PLANS: Record<SubscriptionPlan, SubscriptionPlanDetail
   ultimate: {
     name: 'ultimate',
     price: {
-      monthly: 15000,
+      monthly: 199000,
       yearly: 1990000
     },
     features: [
