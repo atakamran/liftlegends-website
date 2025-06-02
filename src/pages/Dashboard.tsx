@@ -143,7 +143,7 @@ interface Program {
   image_url: string | null;
   created_at: string;
   updated_at: string;
-  program_url?: string | null;
+  program_url: string | null;
 }
 
 
@@ -289,7 +289,8 @@ const Dashboard = () => {
     description: "",
     price: 0,
     category: "training",
-    image_url: ""
+    image_url: "",
+    program_url: ""
   });
   const [isEditingProduct, setIsEditingProduct] = useState(false);
   const [currentProductId, setCurrentProductId] = useState<string | null>(null);
@@ -312,12 +313,12 @@ const Dashboard = () => {
         title: program.title,
         description: program.description,
         price: program.price,
-        category: program.category,
+        category: program.category as 'training' | 'diet' | 'supplement',
         image_url: program.image_url,
         created_at: program.created_at || new Date().toISOString(),
         updated_at: program.updated_at || new Date().toISOString(),
         program_url: program.program_url || null
-      })) : [];
+      } as Program)) : [];
       
       setProducts(programsData);
       
@@ -366,6 +367,7 @@ const Dashboard = () => {
           price: productFormData.price || 0,
           category: productFormData.category || "training",
           image_url: productFormData.image_url || null,
+          program_url: productFormData.program_url || null,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
         })
@@ -383,7 +385,8 @@ const Dashboard = () => {
         description: "",
         price: 0,
         category: "training",
-        image_url: ""
+        image_url: "",
+        program_url: ""
       });
       
       toast({
@@ -428,6 +431,7 @@ const Dashboard = () => {
           price: productFormData.price,
           category: productFormData.category,
           image_url: productFormData.image_url,
+          program_url: productFormData.program_url,
           updated_at: new Date().toISOString()
         })
         .eq("id", currentProductId)
@@ -504,7 +508,8 @@ const Dashboard = () => {
       description: product.description,
       price: product.price,
       category: product.category,
-      image_url: product.image_url
+      image_url: product.image_url,
+      program_url: product.program_url
     });
     setIsEditingProduct(true);
     setCurrentProductId(product.id);
@@ -607,7 +612,7 @@ const Dashboard = () => {
               // Get the program details
               const { data: programData, error: programError } = await supabase
                 .from("programs_sale")
-                .select("title, description, image_url, category")
+                .select("title, description, image_url, category, program_url")
                 .eq("id", purchase.program_id)
                 .single();
                 
@@ -624,7 +629,7 @@ const Dashboard = () => {
               const program = {
                 title: programData.title,
                 description: programData.description,
-                program_url: null, // Add the expected field with a default value
+                program_url: programData.program_url, // Use the actual program_url from the database
                 category: programData.category
               };
               
@@ -1375,15 +1380,7 @@ const Dashboard = () => {
     }).format(date);
   };
   
-  // Function to check if user has purchased a specific program
-  const hasPurchasedProgram = (programId: string): boolean => {
-    if (!userPurchases || userPurchases.length === 0) return false;
-    
-    return userPurchases.some(purchase => 
-      purchase.program_id === programId && 
-      purchase.payment_status === 'completed'
-    );
-  };
+  // Function to check if user has purchased a specific program is defined above
   
 
   
@@ -1545,7 +1542,6 @@ const Dashboard = () => {
         <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50">
           <div className="bg-gray-900/95 backdrop-blur-xl border-t border-gray-700/30 rounded-t-xl shadow-lg">
             <div className="px-2 pt-2 pb-1">
-              <h2 className="text-gold-500 text-center text-sm font-bold mb-2">لیفت لجندز</h2>
               <Tabs value={activeTab} onValueChange={setActiveTab}>
                 <TabsList className="flex w-full bg-transparent justify-between p-1">
                   <TabsTrigger value="training" className="flex-1 flex flex-col items-center py-2 text-xs rounded-lg data-[state=active]:bg-gray-800 data-[state=active]:text-gold-500 transition-all duration-200">
@@ -1639,37 +1635,15 @@ const Dashboard = () => {
             <TabsContent value="training" className="space-y-6 animate-in fade-in-50 duration-300">
               <div className="flex items-center justify-between">
                 <h2 className="text-2xl font-bold text-white">برنامه‌های تمرینی</h2>
-                <Button className="bg-gold-500 hover:bg-gold-600 text-black">
+                <Button 
+                  className="bg-gold-500 hover:bg-gold-600 text-black"
+                  onClick={() => navigate('/programs')}
+                >
                   <Plus size={16} className="ml-2" />
                   برنامه جدید
                 </Button>
               </div>
-              
-              {/* Featured Training Program */}
-              <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700/50">
-                <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-gold-500/20 to-transparent opacity-50"></div>
-                <div className="relative p-6 lg:p-8 flex flex-col lg:flex-row items-start lg:items-center">
-                  <div className="w-16 h-16 lg:w-20 lg:h-20 rounded-full bg-gold-500/20 flex items-center justify-center mb-4 lg:mb-0 lg:ml-6">
-                    <Zap size={32} className="text-gold-500" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
-                      <div>
-                        <h3 className="text-xl font-bold text-white mb-2">برنامه تمرینی پیشرفته بدنسازی</h3>
-                        <p className="text-gray-400 mb-4">این برنامه برای افزایش قدرت و حجم عضلانی طراحی شده است</p>
-                      </div>
-                      <div className="flex items-center mt-2 lg:mt-0">
-                        <span className="bg-gold-500/20 text-gold-500 text-xs font-medium px-2.5 py-1 rounded-full ml-2">پیشرفته</span>
-                        <span className="bg-gray-700/50 text-gray-300 text-xs font-medium px-2.5 py-1 rounded-full">۸ هفته</span>
-                      </div>
-                    </div>
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      <Button variant="outline" className="border-gray-700 hover:border-gold-500 hover:bg-gold-500/10">مشاهده جزئیات</Button>
-                      <Button className="bg-gold-500 hover:bg-gold-600 text-black">شروع برنامه</Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
+
               
               {/* Training Programs Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -1739,37 +1713,15 @@ const Dashboard = () => {
             <TabsContent value="meals" className="space-y-6 animate-in fade-in-50 duration-300">
               <div className="flex items-center justify-between">
                 <h2 className="text-2xl font-bold text-white">برنامه‌های غذایی</h2>
-                <Button className="bg-green-500 hover:bg-green-600 text-white">
+                <Button 
+                  className="bg-green-500 hover:bg-green-600 text-white"
+                  onClick={() => navigate('/programs')}
+                >
                   <Plus size={16} className="ml-2" />
                   برنامه جدید
                 </Button>
               </div>
-              
-              {/* Featured Meal Plan */}
-              <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700/50">
-                <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-green-500/20 to-transparent opacity-50"></div>
-                <div className="relative p-6 lg:p-8 flex flex-col lg:flex-row items-start lg:items-center">
-                  <div className="w-16 h-16 lg:w-20 lg:h-20 rounded-full bg-green-500/20 flex items-center justify-center mb-4 lg:mb-0 lg:ml-6">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-green-500"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path><path d="M7 2v20"></path><path d="M21 15V2"></path><path d="M18 15V2"></path><path d="M21 15a3 3 0 1 1-6 0"></path></svg>
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
-                      <div>
-                        <h3 className="text-xl font-bold text-white mb-2">برنامه غذایی کاهش وزن</h3>
-                        <p className="text-gray-400 mb-4">برنامه غذایی متعادل برای کاهش وزن سالم و پایدار</p>
-                      </div>
-                      <div className="flex items-center mt-2 lg:mt-0">
-                        <span className="bg-green-500/20 text-green-400 text-xs font-medium px-2.5 py-1 rounded-full ml-2">کاهش وزن</span>
-                        <span className="bg-gray-700/50 text-gray-300 text-xs font-medium px-2.5 py-1 rounded-full">۱۶۰۰ کالری</span>
-                      </div>
-                    </div>
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      <Button variant="outline" className="border-gray-700 hover:border-green-500 hover:bg-green-500/10">مشاهده جزئیات</Button>
-                      <Button className="bg-green-500 hover:bg-green-600 text-white">شروع برنامه</Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
+
               
               {/* Meal Plans Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -1839,7 +1791,10 @@ const Dashboard = () => {
             <TabsContent value="supplements" className="space-y-6 animate-in fade-in-50 duration-300">
               <div className="flex items-center justify-between">
                 <h2 className="text-2xl font-bold text-white">برنامه‌های مکمل</h2>
-                <Button className="bg-purple-500 hover:bg-purple-600 text-white">
+                <Button 
+                  className="bg-purple-500 hover:bg-purple-600 text-white"
+                  onClick={() => navigate('/programs')}
+                >
                   <Plus size={16} className="ml-2" />
                   برنامه جدید
                 </Button>
@@ -1939,77 +1894,12 @@ const Dashboard = () => {
             <TabsContent value="orders" className="space-y-6 animate-in fade-in-50 duration-300">
               <div className="flex items-center justify-between">
                 <h2 className="text-2xl font-bold text-white">سفارش‌ها</h2>
-                <Button variant="outline" className="border-gray-700 hover:border-blue-500 hover:bg-blue-500/10">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                  دانلود تاریخچه
-                </Button>
               </div>
               
-              {/* Orders Table */}
+              {/* Empty Orders Tab */}
               <Card className="bg-gray-800/50 border-gray-700">
-                <CardContent className="p-0">
-                  <Table>
-                    <TableHeader>
-                      <TableRow className="border-gray-700 hover:bg-gray-800/50">
-                        <TableHead className="text-gray-400">شماره سفارش</TableHead>
-                        <TableHead className="text-gray-400">تاریخ</TableHead>
-                        <TableHead className="text-gray-400">محصول</TableHead>
-                        <TableHead className="text-gray-400">مبلغ</TableHead>
-                        <TableHead className="text-gray-400">وضعیت</TableHead>
-                        <TableHead className="text-gray-400 text-left">عملیات</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      <TableRow className="border-gray-700 hover:bg-gray-800/50">
-                        <TableCell className="font-medium">#ORD-1234</TableCell>
-                        <TableCell>۱۴۰۲/۰۶/۱۵</TableCell>
-                        <TableCell>برنامه تمرینی پیشرفته</TableCell>
-                        <TableCell>۲۵۰,۰۰۰ تومان</TableCell>
-                        <TableCell>
-                          <span className="bg-green-500/20 text-green-400 text-xs font-medium px-2.5 py-1 rounded-full">تکمیل شده</span>
-                        </TableCell>
-                        <TableCell>
-                          <Button variant="ghost" size="sm" className="h-8 px-2 text-gray-400 hover:text-white">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                          </Button>
-                          <Button variant="ghost" size="sm" className="h-8 px-2 text-gray-400 hover:text-white">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                      <TableRow className="border-gray-700 hover:bg-gray-800/50">
-                        <TableCell className="font-medium">#ORD-1235</TableCell>
-                        <TableCell>۱۴۰۲/۰۶/۱۰</TableCell>
-                        <TableCell>برنامه غذایی کاهش وزن</TableCell>
-                        <TableCell>۱۸۰,۰۰۰ تومان</TableCell>
-                        <TableCell>
-                          <span className="bg-green-500/20 text-green-400 text-xs font-medium px-2.5 py-1 rounded-full">تکمیل شده</span>
-                        </TableCell>
-                        <TableCell>
-                          <Button variant="ghost" size="sm" className="h-8 px-2 text-gray-400 hover:text-white">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                          </Button>
-                          <Button variant="ghost" size="sm" className="h-8 px-2 text-gray-400 hover:text-white">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                      <TableRow className="border-gray-700 hover:bg-gray-800/50">
-                        <TableCell className="font-medium">#ORD-1236</TableCell>
-                        <TableCell>۱۴۰۲/۰۵/۲۵</TableCell>
-                        <TableCell>مکمل پروتئین وی</TableCell>
-                        <TableCell>۴۵۰,۰۰۰ تومان</TableCell>
-                        <TableCell>
-                          <span className="bg-blue-500/20 text-blue-400 text-xs font-medium px-2.5 py-1 rounded-full">در حال ارسال</span>
-                        </TableCell>
-                        <TableCell>
-                          <Button variant="ghost" size="sm" className="h-8 px-2 text-gray-400 hover:text-white">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    </TableBody>
-                  </Table>
+                <CardContent className="p-6 text-center">
+                  <p className="text-gray-400 py-8">این بخش در حال حاضر خالی است.</p>
                 </CardContent>
               </Card>
             </TabsContent>
@@ -2108,10 +1998,10 @@ const Dashboard = () => {
                             </div>
                           </CardContent>
                           <CardFooter className="pt-0">
-                            {purchase.program?.programurl ? (
+                            {purchase.program?.program_url ? (
                               <Button 
                                 className="w-full" 
-                                onClick={() => navigate(purchase.program?.programurl || '/')}
+                                onClick={() => navigate(purchase.program?.program_url || '/')}
                               >
                                 مشاهده برنامه
                               </Button>
@@ -2245,6 +2135,15 @@ const Dashboard = () => {
                               value={productFormData.image_url || ""}
                               onChange={(e) => setProductFormData({...productFormData, image_url: e.target.value})}
                               placeholder="آدرس تصویر محصول را وارد کنید"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="product-url">آدرس برنامه</Label>
+                            <Input
+                              id="product-url"
+                              value={productFormData.program_url || ""}
+                              onChange={(e) => setProductFormData({...productFormData, program_url: e.target.value})}
+                              placeholder="آدرس برنامه را وارد کنید"
                             />
                           </div>
                         </div>

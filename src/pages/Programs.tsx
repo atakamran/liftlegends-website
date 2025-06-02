@@ -36,6 +36,7 @@ interface Program {
   price: number;
   category: 'training' | 'diet' | 'supplement';
   image_url: string | null;
+  program_url: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -81,6 +82,7 @@ const Programs = () => {
         price: program.price,
         category: program.category,
         image_url: program.image_url,
+        program_url: program.program_url || null,
         created_at: program.created_at || new Date().toISOString(),
         updated_at: program.updated_at || new Date().toISOString()
       })) : [];

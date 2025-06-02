@@ -385,6 +385,7 @@ export type Database = {
           price: number
           category: 'training' | 'diet' | 'supplement'
           image_url: string | null
+          program_url: string | null
           created_at: string | null
           updated_at: string | null
         }
@@ -395,6 +396,7 @@ export type Database = {
           price: number
           category: 'training' | 'diet' | 'supplement'
           image_url?: string | null
+          program_url?: string | null
           created_at?: string | null
           updated_at?: string | null
         }
@@ -405,6 +407,7 @@ export type Database = {
           price?: number
           category?: 'training' | 'diet' | 'supplement'
           image_url?: string | null
+          program_url?: string | null
           created_at?: string | null
           updated_at?: string | null
         }

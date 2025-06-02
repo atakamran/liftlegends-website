@@ -235,14 +235,14 @@ const HeroSection = () => {
         </div>
       </div>
 
-      {/* Enhanced scroll indicator */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+      {/* Enhanced responsive scroll indicator */}
+      <div className="absolute bottom-4 sm:bottom-6 md:bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
         <button 
-          className="text-gold-500 hover:text-gold-400 transition-colors group bg-gray-900/50 backdrop-blur-sm p-3 rounded-full border border-gold-500/20 hover:border-gold-500/40" 
+          className="text-gold-500 hover:text-gold-400 transition-colors group bg-gray-900/50 backdrop-blur-sm p-2 sm:p-2.5 md:p-3 rounded-full border border-gold-500/20 hover:border-gold-500/40 shadow-lg hover:shadow-gold-500/20" 
           onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
           aria-label="مشاهده ویژگی‌ها"
         >
-          <ArrowDown size={24} className="group-hover:scale-110 transition-transform" />
+          <ArrowDown size={20} className="sm:w-5 sm:h-5 md:w-6 md:h-6 group-hover:scale-110 transition-transform" />
           <span className="sr-only">مشاهده ویژگی‌ها</span>
         </button>
       </div>
