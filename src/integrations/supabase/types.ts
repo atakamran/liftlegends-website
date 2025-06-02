@@ -413,6 +413,75 @@ export type Database = {
         }
         Relationships: []
       }
+      orders: {
+        Row: {
+          id: string
+          user_id: string
+          program_id: string
+          amount: number
+          discount_amount: number
+          status: string
+          phone_number: string
+          discount_code: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          program_id: string
+          amount: number
+          discount_amount: number
+          status: string
+          phone_number: string
+          discount_code?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          program_id?: string
+          amount?: number
+          discount_amount?: number
+          status?: string
+          phone_number?: string
+          discount_code?: string | null
+          created_at?: string
+        }
+        Relationships: []
+      }
+      discount_codes: {
+        Row: {
+          id: string
+          code: string
+          discount_type: 'percentage' | 'fixed'
+          discount_value: number
+          is_active: boolean
+          program_id: string | null
+          created_at: string
+          expires_at: string | null
+        }
+        Insert: {
+          id?: string
+          code: string
+          discount_type: 'percentage' | 'fixed'
+          discount_value: number
+          is_active: boolean
+          program_id?: string | null
+          created_at?: string
+          expires_at?: string | null
+        }
+        Update: {
+          id?: string
+          code?: string
+          discount_type?: 'percentage' | 'fixed'
+          discount_value?: number
+          is_active?: boolean
+          program_id?: string | null
+          created_at?: string
+          expires_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

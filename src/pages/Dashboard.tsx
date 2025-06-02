@@ -1800,31 +1800,6 @@ const Dashboard = () => {
                 </Button>
               </div>
               
-              {/* Featured Supplement Plan */}
-              <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700/50">
-                <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-purple-500/20 to-transparent opacity-50"></div>
-                <div className="relative p-6 lg:p-8 flex flex-col lg:flex-row items-start lg:items-center">
-                  <div className="w-16 h-16 lg:w-20 lg:h-20 rounded-full bg-purple-500/20 flex items-center justify-center mb-4 lg:mb-0 lg:ml-6">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-purple-500"><path d="m8 21 8-9"></path><path d="M12 21a9 9 0 0 0  0-18C7.5 3 4 7.5 4 11c0 2 1 4 2 6"></path><path d="M19.8 17.8a9 9 0 0 0 .2-2c0-2.8-1-5.5-2.8-7.4"></path><path d="M13.5 8.5A5 5 0 0 0 12 8a5 5 0 0 0-5 5c0 1.1.4 2.2 1 3"></path></svg>
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
-                      <div>
-                        <h3 className="text-xl font-bold text-white mb-2">برنامه مکمل افزایش حجم</h3>
-                        <p className="text-gray-400 mb-4">مکمل‌های مناسب برای افزایش حجم عضلانی و قدرت</p>
-                      </div>
-                      <div className="flex items-center mt-2 lg:mt-0">
-                        <span className="bg-purple-500/20 text-purple-400 text-xs font-medium px-2.5 py-1 rounded-full ml-2">افزایش حجم</span>
-                        <span className="bg-gray-700/50 text-gray-300 text-xs font-medium px-2.5 py-1 rounded-full">۵ مکمل</span>
-                      </div>
-                    </div>
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      <Button variant="outline" className="border-gray-700 hover:border-purple-500 hover:bg-purple-500/10">مشاهده جزئیات</Button>
-                      <Button className="bg-purple-500 hover:bg-purple-600 text-white">شروع برنامه</Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
               
               {/* Supplement Plans Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

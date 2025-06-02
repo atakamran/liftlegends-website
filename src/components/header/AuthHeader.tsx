@@ -615,7 +615,7 @@ const AuthHeader = () => {
                     <User className="h-4 w-4 ml-2 text-gold-500" />
                     <span className="text-sm font-medium truncate max-w-[100px]">{user.profile?.name || user.email}</span>
                   </Button>
-                  <div className="absolute right-0 mt-2 w-52 bg-gray-800/95 backdrop-blur-md rounded-xl shadow-2xl py-2 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 border border-gray-700/50 scale-95 group-hover:scale-100 origin-top-right">
+                  <div className="absolute right-0 mt-2 w-52 bg-gray-800/95 backdrop-blur-md rounded-xl shadow-2xl py-2 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 border border-gray-700/50 scale-95 group-hover:scale-100 origin-top-right max-h-[calc(100vh-100px)] overflow-y-auto">
                     <div className="px-4 py-2 border-b border-gray-700/30 mb-1">
                       <div className="flex items-center space-x-2 space-x-reverse">
                         <div className="w-8 h-8 rounded-full bg-gold-500/10 flex items-center justify-center text-gold-500 border border-gold-500/20">
@@ -708,7 +708,7 @@ const AuthHeader = () => {
         </div>
 
         {/* Mobile Menu - Modern Slide Down */}
-        <div className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${isMenuOpen ? 'max-h-[500px] opacity-100 mt-3' : 'max-h-0 opacity-0'}`}>
+        <div className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${isMenuOpen ? 'max-h-[800px] opacity-100 mt-3' : 'max-h-0 opacity-0'}`}>
           <div className="py-3 border-t border-white/5 text-right bg-gray-800/80 backdrop-blur-md rounded-xl px-4 shadow-xl">
             {user && (
               <div className="mb-3 pb-3 border-b border-gray-700/30">
@@ -782,7 +782,7 @@ const AuthHeader = () => {
                     <line x1="14" y1="1" x2="14" y2="4"></line>
                   </svg>
                 </div>
-                <span className="group-hover:translate-x-0.5 transition-transform duration-150">برنامه تمرینی</span>
+                <span className="group-hover:translate-x-0.5 transition-transform duration-150">اشتراک ها</span>
               </Link>
               
               <Link 
@@ -811,7 +811,7 @@ const AuthHeader = () => {
                     <line x1="12" y1="8" x2="12.01" y2="8"></line>
                   </svg>
                 </div>
-                <span className="group-hover:translate-x-0.5 transition-transform duration-150">تماس با ما</span>
+                <span className="group-hover:translate-x-0.5 transition-transform duration-150">درباره ما</span>
               </Link>
               
               {user ? (
