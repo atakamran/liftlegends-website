@@ -562,9 +562,9 @@ const AuthHeader = () => {
   };
 
   return (
-    <header className="bg-gray-900/90 backdrop-blur-lg border-b border-white/5 sticky top-0 z-50 dir-ltr shadow-md">
-      <div className="container mx-auto px-4 py-2">
-        <div className="flex items-center justify-between flex-row-reverse h-14">
+    <header className="bg-gray-900/90 backdrop-blur-lg border-b border-white/5 sticky top-0 z-50 dir-ltr shadow-md w-full">
+      <div className="container mx-auto px-3 sm:px-4 py-2 mobile-safe-area">
+        <div className="flex items-center justify-between flex-row-reverse h-12 sm:h-14">
           {/* Logo */}
           <Link 
             to="/" 
@@ -709,7 +709,7 @@ const AuthHeader = () => {
 
         {/* Mobile Menu - Modern Slide Down */}
         <div className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${isMenuOpen ? 'max-h-[800px] opacity-100 mt-3' : 'max-h-0 opacity-0'}`}>
-          <div className="py-3 border-t border-white/5 text-right bg-gray-800/80 backdrop-blur-md rounded-xl px-4 shadow-xl">
+          <div className="py-3 border-t border-white/5 text-right bg-gray-800/80 backdrop-blur-md rounded-xl px-3 sm:px-4 shadow-xl mobile-safe-area">
             {user && (
               <div className="mb-3 pb-3 border-b border-gray-700/30">
                 <div className="flex items-center space-x-3 space-x-reverse">

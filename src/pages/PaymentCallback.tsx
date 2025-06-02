@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import axios from "axios";
 import { SubscriptionPlan } from "@/types/user";
-import { Loader2, CheckCircle, XCircle } from "lucide-react";
+import { Loader2, CheckCircle, XCircle, ShoppingBag, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -31,6 +31,7 @@ const PaymentCallback = () => {
   const [loading, setLoading] = useState(true);
   const [success, setSuccess] = useState(false);
   const [message, setMessage] = useState("");
+  const [isProgramPurchase, setIsProgramPurchase] = useState(false);
 
   useEffect(() => {
     const verifyPayment = async () => {
@@ -87,7 +88,17 @@ const PaymentCallback = () => {
           // Payment was successful
           setSuccess(true);
           const refId = response.data.data.ref_id;
-          setMessage(`پرداخت با موفقیت انجام شد. کد پیگیری: ${refId}`);
+          
+          // Check if this is a program purchase or subscription
+          const programPurchase = paymentInfo.program_id ? true : false;
+          setIsProgramPurchase(programPurchase);
+          
+          // Set appropriate success message
+          if (programPurchase) {
+            setMessage(`خرید برنامه با موفقیت انجام شد. کد پیگیری: ${refId}`);
+          } else {
+            setMessage(`خرید اشتراک با موفقیت انجام شد. کد پیگیری: ${refId}`);
+          }
           
           console.log(`Payment successful! Reference ID: ${refId}`);
 
@@ -99,11 +110,11 @@ const PaymentCallback = () => {
             };
             localStorage.setItem('payment_info', JSON.stringify(updatedPaymentInfo));
             
-            // Update user subscription in database
-            await updateUserSubscription(paymentInfo.plan_id, paymentInfo.user_id, paymentInfo.plan_period);
-            
             // Check if this is a program purchase
             const programId = paymentInfo.program_id || null;
+            
+            // Update user subscription or record program purchase in database
+            await updateUserSubscription(paymentInfo.plan_id, paymentInfo.user_id, paymentInfo.plan_period);
             
             // Show appropriate success toast based on purchase type
             if (programId) {
@@ -117,17 +128,31 @@ const PaymentCallback = () => {
                 description: "اشتراک شما با موفقیت فعال شد و از هم‌اکنون قابل استفاده است.",
               });
             }
-          } catch (subscriptionError) {
-            console.error("Error activating subscription:", subscriptionError);
+          } catch (error) {
+            console.error("Error processing payment:", error);
             
-            // Still show success for payment but note the subscription issue
-            setMessage(`پرداخت با موفقیت انجام شد اما در فعال‌سازی اشتراک مشکلی پیش آمد. لطفاً با پشتیبانی تماس بگیرید. کد پیگیری: ${refId}`);
+            // Check if this is a program purchase
+            const programId = paymentInfo.program_id || null;
+            setIsProgramPurchase(!!programId);
             
-            toast({
-              variant: "destructive",
-              title: "خطا در فعال‌سازی اشتراک",
-              description: "پرداخت موفق بود اما در فعال‌سازی اشتراک مشکلی پیش آمد. لطفاً با پشتیبانی تماس بگیرید.",
-            });
+            // Show appropriate error message based on purchase type
+            if (programId) {
+              setMessage(`پرداخت با موفقیت انجام شد اما در ثبت خرید برنامه مشکلی پیش آمد. لطفاً با پشتیبانی تماس بگیرید. کد پیگیری: ${refId}`);
+              
+              toast({
+                variant: "destructive",
+                title: "خطا در ثبت خرید برنامه",
+                description: "پرداخت موفق بود اما در ثبت خرید برنامه مشکلی پیش آمد. لطفاً با پشتیبانی تماس بگیرید.",
+              });
+            } else {
+              setMessage(`پرداخت با موفقیت انجام شد اما در فعال‌سازی اشتراک مشکلی پیش آمد. لطفاً با پشتیبانی تماس بگیرید. کد پیگیری: ${refId}`);
+              
+              toast({
+                variant: "destructive",
+                title: "خطا در فعال‌سازی اشتراک",
+                description: "پرداخت موفق بود اما در فعال‌سازی اشتراک مشکلی پیش آمد. لطفاً با پشتیبانی تماس بگیرید.",
+              });
+            }
           }
         } else {
           // Payment failed
@@ -184,35 +209,30 @@ const PaymentCallback = () => {
         console.log(`This is a program purchase. Program ID: ${programId}`);
         
         // Insert purchase record into user_purchases table for program
-        try {
-          const { data: purchaseData, error: purchaseError } = await supabase
-            .from('user_purchases')
-            .insert({
-              user_id: userId,
-              plan_id: "00000000-0000-0000-0000-000000000000", // Placeholder for program purchases
-              program_id: programId, // Set the program_id for program purchases
-              amount: amount,
-              payment_id: refId || authority,
-              payment_status: 'completed',
-              purchase_date: new Date().toISOString()
-            })
-            .select();
-            
-          if (purchaseError) {
-            console.error("Error recording program purchase:", purchaseError);
-            throw purchaseError;
-          } else {
-            console.log("Program purchase recorded successfully:", purchaseData);
-            
-            // Clear payment info from localStorage
-            localStorage.removeItem("payment_info");
-            
-            return true;
-          }
-        } catch (purchaseInsertError) {
-          console.error("Exception when recording program purchase:", purchaseInsertError);
-          throw purchaseInsertError;
+        const { data: purchaseData, error: purchaseError } = await supabase
+          .from('user_purchases')
+          .insert({
+            user_id: userId,
+            plan_id: "00000000-0000-0000-0000-000000000000", // Placeholder for program purchases
+            program_id: programId, // Set the program_id for program purchases
+            amount: amount,
+            payment_id: refId || authority,
+            payment_status: 'completed',
+            purchase_date: new Date().toISOString()
+          })
+          .select();
+          
+        if (purchaseError) {
+          console.error("Error recording program purchase:", purchaseError);
+          throw new Error(`خطا در ثبت خرید برنامه: ${purchaseError.message}`);
         }
+        
+        console.log("Program purchase recorded successfully:", purchaseData);
+        
+        // Clear payment info from localStorage
+        localStorage.removeItem("payment_info");
+        
+        return true;
       } else {
         // This is a subscription purchase
         console.log(`This is a subscription purchase. Plan ID: ${planId}`);
@@ -239,7 +259,7 @@ const PaymentCallback = () => {
           
         if (userError) {
           console.error("Error fetching user profile:", userError);
-          throw new Error("User profile not found");
+          throw new Error("پروفایل کاربر یافت نشد");
         }
         
         console.log("Current user profile:", userData);
@@ -259,13 +279,13 @@ const PaymentCallback = () => {
           
         if (error) {
           console.error("Error updating subscription in database:", error);
-          throw error;
+          throw new Error(`خطا در به‌روزرسانی اشتراک: ${error.message}`);
         }
         
         console.log("Subscription activated successfully:", data);
         
         // Fetch the corresponding fitness plan UUID based on the plan type
-        let fitnessPlanId;
+        let fitnessPlanId = "00000000-0000-0000-0000-000000000000"; // Default placeholder
         
         try {
           const { data: planData, error: planError } = await supabase
@@ -274,45 +294,36 @@ const PaymentCallback = () => {
             .eq('type', planId)
             .single();
             
-          if (planError) {
-            console.error("Error fetching fitness plan ID:", planError);
-            throw new Error(`Could not find fitness plan with type: ${planId}`);
-          }
-          
-          fitnessPlanId = planData?.id;
-          console.log(`Found fitness plan ID: ${fitnessPlanId} for plan type: ${planId}`);
-          
-          if (!fitnessPlanId) {
-            throw new Error(`Fitness plan ID is null or undefined for plan type: ${planId}`);
+          if (!planError && planData?.id) {
+            fitnessPlanId = planData.id;
+            console.log(`Found fitness plan ID: ${fitnessPlanId} for plan type: ${planId}`);
+          } else {
+            console.warn(`Could not find fitness plan with type: ${planId}, using placeholder UUID`);
           }
         } catch (planFetchError) {
           console.error("Error in fitness plan lookup:", planFetchError);
-          // If we can't find the plan, log the error but continue with the subscription process
-          // We'll use a placeholder UUID that will need to be updated manually
           console.warn("Using placeholder UUID for fitness plan");
-          fitnessPlanId = "00000000-0000-0000-0000-000000000000";
         }
         
         // Insert purchase record into user_purchases table
         try {
-          const { data: purchaseData, error: purchaseError } = await supabase
+          const { error: purchaseError } = await supabase
             .from('user_purchases')
             .insert({
               user_id: userId,
-              plan_id: fitnessPlanId, // Use the UUID from the fitness_plans table
+              plan_id: fitnessPlanId,
               amount: amount,
-              payment_id: refId || authority, // Use reference ID if available, otherwise use authority
+              payment_id: refId || authority,
               payment_status: 'completed',
               expires_at: endDate.toISOString(),
               purchase_date: startDate.toISOString()
-            })
-            .select();
+            });
             
           if (purchaseError) {
             console.error("Error recording purchase in database:", purchaseError);
             // Don't throw here, as the subscription is already activated
           } else {
-            console.log("Purchase recorded successfully:", purchaseData);
+            console.log("Purchase recorded successfully");
           }
         } catch (purchaseInsertError) {
           console.error("Exception when recording purchase:", purchaseInsertError);
@@ -320,20 +331,25 @@ const PaymentCallback = () => {
         }
         
         // Also log the subscription transaction to subscription_logs table
-        const { error: logError } = await supabase
-          .from('subscription_logs')
-          .insert({
-            user_id: userId,
-            plan_id: planId,
-            period: period,
-            amount: amount,
-            start_date: startDate.toISOString(),
-            end_date: endDate.toISOString(),
-            created_at: new Date().toISOString()
-          });
-          
-        if (logError) {
-          console.error("Error logging subscription transaction:", logError);
+        try {
+          const { error: logError } = await supabase
+            .from('subscription_logs')
+            .insert({
+              user_id: userId,
+              plan_id: planId,
+              period: period,
+              amount: amount,
+              start_date: startDate.toISOString(),
+              end_date: endDate.toISOString(),
+              created_at: new Date().toISOString()
+            });
+            
+          if (logError) {
+            console.error("Error logging subscription transaction:", logError);
+            // Don't throw here, as the subscription is already activated
+          }
+        } catch (logError) {
+          console.error("Exception when logging subscription:", logError);
           // Don't throw here, as the subscription is already activated
         }
         
@@ -361,7 +377,14 @@ const PaymentCallback = () => {
           {loading ? (
             <Loader2 className="h-16 w-16 animate-spin text-primary" />
           ) : success ? (
-            <CheckCircle className="h-16 w-16 text-green-500" />
+            <div className="flex flex-col items-center">
+              <CheckCircle className="h-16 w-16 text-green-500 mb-2" />
+              {isProgramPurchase ? (
+                <ShoppingBag className="h-10 w-10 text-gold-500" />
+              ) : (
+                <CreditCard className="h-10 w-10 text-gold-500" />
+              )}
+            </div>
           ) : (
             <XCircle className="h-16 w-16 text-red-500" />
           )}
@@ -373,7 +396,9 @@ const PaymentCallback = () => {
             disabled={loading}
             className="w-full max-w-xs"
           >
-            بازگشت به داشبورد
+            {success && isProgramPurchase 
+              ? "مشاهده برنامه‌های خریداری شده" 
+              : "بازگشت به داشبورد"}
           </Button>
         </CardFooter>
       </Card>

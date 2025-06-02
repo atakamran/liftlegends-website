@@ -8,9 +8,9 @@ interface LayoutProps {
 
 const Layout = ({ children }: LayoutProps) => {
   return (
-    <div className="min-h-screen bg-black text-white flex flex-col">
+    <div className="min-h-screen mobile-full-height bg-black text-white flex flex-col w-full overflow-x-hidden">
       <AuthHeader />
-      <main className="flex-grow">
+      <main className="flex-grow w-full mobile-safe-area">
         {children}
       </main>
     </div>

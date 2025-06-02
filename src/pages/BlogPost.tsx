@@ -215,7 +215,7 @@ const BlogPostPage = () => {
             "dateModified": post.updated_at || post.created_at,
             "author": {
               "@type": "Person",
-              "name": post.author || "تیم لیفت لجندز"
+              "name": "تیم لیفت لجندز"
             },
             "publisher": {
               "@type": "Organization",
@@ -236,7 +236,7 @@ const BlogPostPage = () => {
       </Helmet>
       
       {/* Hero Section */}
-      <div className="relative h-[50vh] md:h-[60vh] overflow-hidden">
+      <div className="relative h-[40vh] sm:h-[50vh] md:h-[60vh] overflow-hidden">
         {/* Background Image */}
         <div className="absolute inset-0">
           <img 
@@ -248,33 +248,33 @@ const BlogPostPage = () => {
         </div>
         
         {/* Content */}
-        <div className="container mx-auto px-4 h-full flex flex-col justify-end pb-12">
+        <div className="container mx-auto px-4 h-full flex flex-col justify-end pb-8 sm:pb-12">
           <div className={`max-w-4xl transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
             <Link 
               to="/blog" 
-              className="inline-flex items-center text-white/70 hover:text-gold-400 transition-colors mb-6"
+              className="inline-flex items-center text-white/70 hover:text-gold-400 transition-colors mb-4 sm:mb-6 text-sm sm:text-base"
               title="بازگشت به صفحه اصلی بلاگ"
               aria-label="بازگشت به صفحه اصلی بلاگ"
             >
-              <ArrowRight className="ml-2" size={16} />
+              <ArrowRight className="ml-1 sm:ml-2" size={14} />
               بازگشت به بلاگ
             </Link>
             
-            <Badge variant="outline" className="text-yellow-400 border-yellow-400 bg-yellow-400/10 mb-4">
+            <Badge variant="outline" className="text-yellow-400 border-yellow-400 bg-yellow-400/10 mb-3 sm:mb-4 text-xs sm:text-sm">
               {getCategoryIcon(post.category)} {getCategoryName(post.category)}
             </Badge>
             
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
+            <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold mb-3 sm:mb-4">
               {post.title}
             </h1>
             
-            <div className="flex flex-wrap items-center gap-4 text-white/70 text-sm">
+            <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-white/70 text-xs sm:text-sm">
               <div className="flex items-center">
-                <Calendar className="ml-1" size={14} />
+                <Calendar className="ml-1" size={12} />
                 {formatDate(post.created_at)}
               </div>
               <div className="flex items-center">
-                <Clock className="ml-1" size={14} />
+                <Clock className="ml-1" size={12} />
                 ۵ دقیقه مطالعه
               </div>
             </div>
@@ -283,11 +283,11 @@ const BlogPostPage = () => {
       </div>
       
       {/* Article Content */}
-      <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <div className="container mx-auto px-4 py-8 sm:py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8">
           {/* Main Content */}
           <div className="lg:col-span-8 lg:order-1 order-2">
-            <article className={`prose prose-lg prose-invert max-w-none transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+            <article className={`prose prose-sm sm:prose-base md:prose-lg prose-invert max-w-none transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
               <div dangerouslySetInnerHTML={{ __html: post.content }} />
             </article>
             
@@ -429,7 +429,7 @@ const BlogPostPage = () => {
               </div>
               
               {/* Newsletter Subscription */}
-              <Card className="bg-zinc-900 border-zinc-800">
+              {/* <Card className="bg-zinc-900 border-zinc-800">
                 <CardContent className="p-6">
                   <h3 className="text-lg font-bold mb-3">عضویت در خبرنامه</h3>
                   <p className="text-white/70 text-sm mb-4">
@@ -446,7 +446,7 @@ const BlogPostPage = () => {
                     </Button>
                   </form>
                 </CardContent>
-              </Card>
+              </Card> */}
             </div>
           </div>
         </div>

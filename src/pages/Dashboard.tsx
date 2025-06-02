@@ -1459,7 +1459,7 @@ const Dashboard = () => {
   }
   
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white">
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white pb-20 lg:pb-0">
       {/* Mobile Header Removed */}
       
       {/* Main Dashboard Layout */}
@@ -1476,66 +1476,215 @@ const Dashboard = () => {
           </div>
           
           {/* Navigation Menu */}
-          <nav className="flex-1 px-3">
+          <nav className="flex-1 px-3 py-6">
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="flex flex-col w-full space-y-1 bg-transparent">
-                <TabsTrigger value="training" className="w-full justify-start px-4 py-3 text-right data-[state=active]:bg-gradient-to-r data-[state=active]:from-gold-500/20 data-[state=active]:to-transparent data-[state=active]:border-r-4 data-[state=active]:border-gold-500 data-[state=active]:text-white rounded-md transition-all duration-300">
-                  <Zap size={18} className="ml-3 text-gold-500" />
-                  برنامه‌های تمرینی
+              <TabsList className="flex flex-col w-full space-y-2 bg-transparent">
+                {/* User Profile Section */}
+                <div className="mb-6 px-2">
+                  <div className="flex items-center space-x-3 space-x-reverse mb-4">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-gold-500 to-amber-600 flex items-center justify-center text-black font-bold text-lg shadow-lg shadow-gold-500/20">
+                      {user?.email?.charAt(0).toUpperCase() || "U"}
+                    </div>
+                    <div>
+                      <h3 className="font-medium text-white">{user?.profile?.name || user?.email?.split('@')[0] || "کاربر"}</h3>
+                      <p className="text-xs text-gray-400">{user?.email || ""}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-gray-800/50 rounded-lg p-3 border border-gray-700/50 mb-6">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs text-gray-400">اشتراک فعال</span>
+                      <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-gold-500/20 text-gold-400">
+                        {user?.profile?.subscription_plan === "basic" && "پایه"}
+                        {user?.profile?.subscription_plan === "pro" && "پرو"}
+                        {user?.profile?.subscription_plan === "ultimate" && "آلتیمیت"}
+                      </span>
+                    </div>
+                    
+                    {user?.profile?.subscription_plan !== "basic" && user?.profile?.subscription_end_date && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-gray-400">زمان باقیمانده</span>
+                        <span className="text-xs font-medium">
+                          {calculateRemainingDays(user?.profile?.subscription_end_date)} روز
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                
+                <div className="px-2 mb-2">
+                  <h4 className="text-xs uppercase tracking-wider text-gray-500 mb-2">منوی اصلی</h4>
+                </div>
+                
+                {/* Main Navigation Items */}
+                <TabsTrigger 
+                  value="training" 
+                  className="group w-full justify-start px-4 py-3 text-right rounded-lg transition-all duration-300
+                    data-[state=active]:bg-gradient-to-r data-[state=active]:from-gold-500/20 data-[state=active]:to-transparent 
+                    data-[state=active]:border-r-4 data-[state=active]:border-gold-500 data-[state=active]:text-white
+                    hover:bg-gray-700/30"
+                >
+                  <div className="flex items-center">
+                    <div className="w-8 h-8 rounded-md bg-gradient-to-br from-gold-500/10 to-amber-600/10 flex items-center justify-center mr-3 ml-3 group-data-[state=active]:bg-gradient-to-br group-data-[state=active]:from-gold-500/20 group-data-[state=active]:to-amber-600/20">
+                      <Zap size={18} className="text-gold-500" />
+                    </div>
+                    <span>برنامه‌های تمرینی</span>
+                  </div>
                 </TabsTrigger>
                 
-                <TabsTrigger value="meals" className="w-full justify-start px-4 py-3 text-right data-[state=active]:bg-gradient-to-r data-[state=active]:from-gold-500/20 data-[state=active]:to-transparent data-[state=active]:border-r-4 data-[state=active]:border-gold-500 data-[state=active]:text-white rounded-md transition-all duration-300">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-3 text-gold-500"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path><path d="M7 2v20"></path><path d="M21 15V2"></path><path d="M18 15V2"></path><path d="M21 15a3 3 0 1 1-6 0"></path></svg>
-                  برنامه‌های غذایی
+                <TabsTrigger 
+                  value="meals" 
+                  className="group w-full justify-start px-4 py-3 text-right rounded-lg transition-all duration-300
+                    data-[state=active]:bg-gradient-to-r data-[state=active]:from-gold-500/20 data-[state=active]:to-transparent 
+                    data-[state=active]:border-r-4 data-[state=active]:border-gold-500 data-[state=active]:text-white
+                    hover:bg-gray-700/30"
+                >
+                  <div className="flex items-center">
+                    <div className="w-8 h-8 rounded-md bg-gradient-to-br from-gold-500/10 to-amber-600/10 flex items-center justify-center mr-3 ml-3 group-data-[state=active]:bg-gradient-to-br group-data-[state=active]:from-gold-500/20 group-data-[state=active]:to-amber-600/20">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gold-500">
+                        <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path>
+                        <path d="M7 2v20"></path>
+                        <path d="M21 15V2"></path>
+                        <path d="M18 15V2"></path>
+                        <path d="M21 15a3 3 0 1 1-6 0"></path>
+                      </svg>
+                    </div>
+                    <span>برنامه‌های غذایی</span>
+                  </div>
                 </TabsTrigger>
                 
-                <TabsTrigger value="supplements" className="w-full justify-start px-4 py-3 text-right data-[state=active]:bg-gradient-to-r data-[state=active]:from-gold-500/20 data-[state=active]:to-transparent data-[state=active]:border-r-4 data-[state=active]:border-gold-500 data-[state=active]:text-white rounded-md transition-all duration-300">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-3 text-gold-500"><path d="m8 21 8-9"></path><path d="M12 21a9 9 0 0 0 0-18C7.5 3 4 7.5 4 11c0 2 1 4 2 6"></path><path d="M19.8 17.8a9 9 0 0 0 .2-2c0-2.8-1-5.5-2.8-7.4"></path><path d="M13.5 8.5A5 5 0 0 0 12 8a5 5 0 0 0-5 5c0 1.1.4 2.2 1 3"></path></svg>
-                  برنامه‌های مکمل
+                <TabsTrigger 
+                  value="supplements" 
+                  className="group w-full justify-start px-4 py-3 text-right rounded-lg transition-all duration-300
+                    data-[state=active]:bg-gradient-to-r data-[state=active]:from-gold-500/20 data-[state=active]:to-transparent 
+                    data-[state=active]:border-r-4 data-[state=active]:border-gold-500 data-[state=active]:text-white
+                    hover:bg-gray-700/30"
+                >
+                  <div className="flex items-center">
+                    <div className="w-8 h-8 rounded-md bg-gradient-to-br from-gold-500/10 to-amber-600/10 flex items-center justify-center mr-3 ml-3 group-data-[state=active]:bg-gradient-to-br group-data-[state=active]:from-gold-500/20 group-data-[state=active]:to-amber-600/20">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gold-500">
+                        <path d="m8 21 8-9"></path>
+                        <path d="M12 21a9 9 0 0 0 0-18C7.5 3 4 7.5 4 11c0 2 1 4 2 6"></path>
+                        <path d="M19.8 17.8a9 9 0 0 0 .2-2c0-2.8-1-5.5-2.8-7.4"></path>
+                        <path d="M13.5 8.5A5 5 0 0 0 12 8a5 5 0 0 0-5 5c0 1.1.4 2.2 1 3"></path>
+                      </svg>
+                    </div>
+                    <span>برنامه‌های مکمل</span>
+                  </div>
                 </TabsTrigger>
                 
-                <TabsTrigger value="orders" className="w-full justify-start px-4 py-3 text-right data-[state=active]:bg-gradient-to-r data-[state=active]:from-gold-500/20 data-[state=active]:to-transparent data-[state=active]:border-r-4 data-[state=active]:border-gold-500 data-[state=active]:text-white rounded-md transition-all duration-300">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-3 text-gold-500"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path><path d="M3 6h18"></path><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
-                  سفارش‌ها
+                <TabsTrigger 
+                  value="orders" 
+                  className="group w-full justify-start px-4 py-3 text-right rounded-lg transition-all duration-300
+                    data-[state=active]:bg-gradient-to-r data-[state=active]:from-gold-500/20 data-[state=active]:to-transparent 
+                    data-[state=active]:border-r-4 data-[state=active]:border-gold-500 data-[state=active]:text-white
+                    hover:bg-gray-700/30"
+                >
+                  <div className="flex items-center">
+                    <div className="w-8 h-8 rounded-md bg-gradient-to-br from-gold-500/10 to-amber-600/10 flex items-center justify-center mr-3 ml-3 group-data-[state=active]:bg-gradient-to-br group-data-[state=active]:from-gold-500/20 group-data-[state=active]:to-amber-600/20">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gold-500">
+                        <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+                        <path d="M3 6h18"></path>
+                        <path d="M16 10a4 4 0 0 1-8 0"></path>
+                      </svg>
+                    </div>
+                    <span>سفارش‌ها</span>
+                  </div>
                 </TabsTrigger>
                 
-                <TabsTrigger value="payments" className="w-full justify-start px-4 py-3 text-right data-[state=active]:bg-gradient-to-r data-[state=active]:from-gold-500/20 data-[state=active]:to-transparent data-[state=active]:border-r-4 data-[state=active]:border-gold-500 data-[state=active]:text-white rounded-md transition-all duration-300">
-                  <CreditCard size={18} className="ml-3 text-gold-500" />
-                  پرداخت‌ها
+                <TabsTrigger 
+                  value="payments" 
+                  className="group w-full justify-start px-4 py-3 text-right rounded-lg transition-all duration-300
+                    data-[state=active]:bg-gradient-to-r data-[state=active]:from-gold-500/20 data-[state=active]:to-transparent 
+                    data-[state=active]:border-r-4 data-[state=active]:border-gold-500 data-[state=active]:text-white
+                    hover:bg-gray-700/30"
+                >
+                  <div className="flex items-center">
+                    <div className="w-8 h-8 rounded-md bg-gradient-to-br from-gold-500/10 to-amber-600/10 flex items-center justify-center mr-3 ml-3 group-data-[state=active]:bg-gradient-to-br group-data-[state=active]:from-gold-500/20 group-data-[state=active]:to-amber-600/20">
+                      <CreditCard size={18} className="text-gold-500" />
+                    </div>
+                    <span>پرداخت‌ها</span>
+                  </div>
+                </TabsTrigger>
+                
+                <TabsTrigger 
+                  value="profile" 
+                  className="group w-full justify-start px-4 py-3 text-right rounded-lg transition-all duration-300
+                    data-[state=active]:bg-gradient-to-r data-[state=active]:from-gold-500/20 data-[state=active]:to-transparent 
+                    data-[state=active]:border-r-4 data-[state=active]:border-gold-500 data-[state=active]:text-white
+                    hover:bg-gray-700/30"
+                >
+                  <div className="flex items-center">
+                    <div className="w-8 h-8 rounded-md bg-gradient-to-br from-gold-500/10 to-amber-600/10 flex items-center justify-center mr-3 ml-3 group-data-[state=active]:bg-gradient-to-br group-data-[state=active]:from-gold-500/20 group-data-[state=active]:to-amber-600/20">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gold-500">
+                        <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                      </svg>
+                    </div>
+                    <span>پروفایل</span>
+                  </div>
                 </TabsTrigger>
                 
                 {user?.profile?.is_admin && (
                   <>
-                    <TabsTrigger value="products" className="w-full justify-start px-4 py-3 text-right data-[state=active]:bg-gradient-to-r data-[state=active]:from-gold-500/20 data-[state=active]:to-transparent data-[state=active]:border-r-4 data-[state=active]:border-gold-500 data-[state=active]:text-white rounded-md transition-all duration-300">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-3 text-gold-500"><rect width="20" height="14" x="2" y="5" rx="2"></rect><line x1="2" x2="22" y1="10" y2="10"></line></svg>
-                      مدیریت محصولات
+                    <div className="px-2 mt-6 mb-2">
+                      <h4 className="text-xs uppercase tracking-wider text-gray-500 mb-2">مدیریت</h4>
+                    </div>
+                    
+                    <TabsTrigger 
+                      value="products" 
+                      className="group w-full justify-start px-4 py-3 text-right rounded-lg transition-all duration-300
+                        data-[state=active]:bg-gradient-to-r data-[state=active]:from-gold-500/20 data-[state=active]:to-transparent 
+                        data-[state=active]:border-r-4 data-[state=active]:border-gold-500 data-[state=active]:text-white
+                        hover:bg-gray-700/30"
+                    >
+                      <div className="flex items-center">
+                        <div className="w-8 h-8 rounded-md bg-gradient-to-br from-gold-500/10 to-amber-600/10 flex items-center justify-center mr-3 ml-3 group-data-[state=active]:bg-gradient-to-br group-data-[state=active]:from-gold-500/20 group-data-[state=active]:to-amber-600/20">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gold-500">
+                            <rect width="20" height="14" x="2" y="5" rx="2"></rect>
+                            <line x1="2" x2="22" y1="10" y2="10"></line>
+                          </svg>
+                        </div>
+                        <span>مدیریت محصولات</span>
+                      </div>
                     </TabsTrigger>
-                    <TabsTrigger value="blog" className="w-full justify-start px-4 py-3 text-right data-[state=active]:bg-gradient-to-r data-[state=active]:from-gold-500/20 data-[state=active]:to-transparent data-[state=active]:border-r-4 data-[state=active]:border-gold-500 data-[state=active]:text-white rounded-md transition-all duration-300">
-                      <Edit size={18} className="ml-3 text-gold-500" />
-                      مدیریت بلاگ
+                    
+                    <TabsTrigger 
+                      value="blog" 
+                      className="group w-full justify-start px-4 py-3 text-right rounded-lg transition-all duration-300
+                        data-[state=active]:bg-gradient-to-r data-[state=active]:from-gold-500/20 data-[state=active]:to-transparent 
+                        data-[state=active]:border-r-4 data-[state=active]:border-gold-500 data-[state=active]:text-white
+                        hover:bg-gray-700/30"
+                    >
+                      <div className="flex items-center">
+                        <div className="w-8 h-8 rounded-md bg-gradient-to-br from-gold-500/10 to-amber-600/10 flex items-center justify-center mr-3 ml-3 group-data-[state=active]:bg-gradient-to-br group-data-[state=active]:from-gold-500/20 group-data-[state=active]:to-amber-600/20">
+                          <Edit size={18} className="text-gold-500" />
+                        </div>
+                        <span>مدیریت بلاگ</span>
+                      </div>
                     </TabsTrigger>
                   </>
                 )}
+                
+                {/* Logout Button */}
+                <div className="mt-auto pt-6 px-2">
+                  <Button 
+                    variant="outline" 
+                    className="w-full border-gray-700 hover:border-red-500 hover:bg-red-500/10 text-gray-400 hover:text-red-400 flex items-center justify-center"
+                    onClick={async () => {
+                      await supabase.auth.signOut();
+                      navigate('/');
+                    }}
+                  >
+                    <LogOut size={16} className="ml-2" />
+                    خروج از حساب
+                  </Button>
+                </div>
               </TabsList>
             </Tabs>
           </nav>
           
-          {/* Logout Button */}
-          <div className="p-4 border-t border-gray-700/30">
-            <Button 
-              variant="ghost" 
-              className="w-full justify-start text-gray-400 hover:text-white hover:bg-gray-700/50"
-              onClick={async () => {
-                await supabase.auth.signOut();
-                localStorage.setItem('isLoggedIn', 'false');
-                localStorage.removeItem('headauth'); // Clear cached auth data
-                navigate('/');
-              }}
-            >
-              <LogOut size={18} className="ml-2" />
-              خروج از حساب
-            </Button>
-          </div>
+
         </div>
         
         {/* Modern Mobile Footer Navigation */}
@@ -2640,7 +2789,342 @@ const Dashboard = () => {
                 </Card>
               </TabsContent>
             )}
+            
+            {/* Profile Tab */}
+            <TabsContent value="profile" className="space-y-6 animate-in fade-in-50 duration-300">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold text-white">پروفایل کاربری</h2>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* User Information Card */}
+                <Card className="bg-gray-800/50 border-gray-700">
+                  <CardHeader>
+                    <CardTitle className="text-xl text-gold-500">اطلاعات کاربری</CardTitle>
+                    <CardDescription className="text-gray-400">
+                      اطلاعات شخصی حساب کاربری شما
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="flex flex-col space-y-1">
+                      <span className="text-sm text-gray-400">ایمیل</span>
+                      <span className="text-white font-medium">{user?.email || "ثبت نشده"}</span>
+                    </div>
+                    
+                    <div className="flex flex-col space-y-1">
+                      <span className="text-sm text-gray-400">نام</span>
+                      <span className="text-white font-medium">{user?.profile?.name || "ثبت نشده"}</span>
+                    </div>
+                    
+                    <div className="flex flex-col space-y-1">
+                      <span className="text-sm text-gray-400">شماره تماس</span>
+                      <span className="text-white font-medium">{user?.profile?.phoneNumber || "ثبت نشده"}</span>
+                    </div>
+                    
+                    <div className="flex flex-col space-y-1">
+                      <span className="text-sm text-gray-400">تاریخ عضویت</span>
+                      <span className="text-white font-medium">{formatDateToPersian(user?.created_at) || "نامشخص"}</span>
+                    </div>
+                    
+                    <Button 
+                      variant="outline" 
+                      className="w-full mt-4 border-gray-700 hover:border-gold-500 hover:bg-gold-500/10"
+                      onClick={() => navigate('/profile')}
+                    >
+                      ویرایش اطلاعات
+                    </Button>
+                  </CardContent>
+                </Card>
+                
+                {/* Subscription Information Card */}
+                <Card className="bg-gray-800/50 border-gray-700">
+                  <CardHeader>
+                    <CardTitle className="text-xl text-gold-500">اطلاعات اشتراک</CardTitle>
+                    <CardDescription className="text-gray-400">
+                      وضعیت اشتراک فعلی شما
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="flex flex-col space-y-1">
+                      <span className="text-sm text-gray-400">نوع اشتراک</span>
+                      <div className="flex items-center">
+                        <Shield className="h-5 w-5 text-gold-500 mr-2" />
+                        <span className="text-white font-medium">
+                          {user?.profile?.subscription_plan === "basic" && "اشتراک پایه"}
+                          {user?.profile?.subscription_plan === "pro" && "اشتراک پرو"}
+                          {user?.profile?.subscription_plan === "ultimate" && "اشتراک آلتیمیت"}
+                          {!user?.profile?.subscription_plan && "بدون اشتراک"}
+                        </span>
+                      </div>
+                    </div>
+                    
+                    {user?.profile?.subscription_plan !== "basic" && (
+                      <div className="flex flex-col space-y-1">
+                        <span className="text-sm text-gray-400">تاریخ شروع</span>
+                        <span className="text-white font-medium">
+                          {formatDateToPersian(user?.profile?.subscription_start_date) || "نامشخص"}
+                        </span>
+                      </div>
+                    )}
+                    
+                    {user?.profile?.subscription_plan !== "basic" && (
+                      <div className="flex flex-col space-y-1">
+                        <span className="text-sm text-gray-400">تاریخ پایان</span>
+                        <span className="text-white font-medium">
+                          {formatDateToPersian(user?.profile?.subscription_end_date) || "نامشخص"}
+                        </span>
+                      </div>
+                    )}
+                    
+                    {user?.profile?.subscription_plan !== "basic" && user?.profile?.subscription_end_date && (
+                      <div className="flex flex-col space-y-1">
+                        <span className="text-sm text-gray-400">روزهای باقیمانده</span>
+                        <div className="flex items-center">
+                          <Calendar className="h-5 w-5 text-gold-500 mr-2" />
+                          <span className="text-white font-medium">
+                            {calculateRemainingDays(user?.profile?.subscription_end_date)} روز
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+                
+                {/* Account Actions Card */}
+                <Card className="bg-gray-800/50 border-gray-700 md:col-span-2">
+                  <CardHeader>
+                    <CardTitle className="text-xl text-gold-500">عملیات حساب کاربری</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <Button 
+                        variant="outline" 
+                        className="border-gray-700 hover:border-amber-500 hover:bg-amber-500/10 flex items-center justify-center"
+                        onClick={() => navigate('/change-password')}
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-2 text-amber-500"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                        تغییر رمز عبور
+                      </Button>
+                      
+                      <Button 
+                        variant="outline" 
+                        className="border-gray-700 hover:border-red-500 hover:bg-red-500/10 flex items-center justify-center"
+                        onClick={async () => {
+                          await supabase.auth.signOut();
+                          navigate('/');
+                        }}
+                      >
+                        <LogOut className="ml-2 h-5 w-5 text-red-500" />
+                        خروج از حساب کاربری
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
           </Tabs>
+        </div>
+      </div>
+      
+      {/* Mobile Footer Navigation - Visible only on mobile and tablet */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50">
+        <div className="bg-gray-800/95 backdrop-blur-md border-t border-gray-700/30 shadow-lg shadow-black/50">
+          {/* Main Navigation */}
+          <nav className="flex justify-around items-center h-16">
+            <button 
+              onClick={() => setActiveTab("training")}
+              className={`flex flex-col items-center justify-center w-full h-full transition-all duration-300 ${
+                activeTab === "training" 
+                  ? "text-gold-500" 
+                  : "text-gray-400 hover:text-gray-300"
+              }`}
+            >
+              <Zap size={20} className={`mb-1 ${activeTab === "training" ? "text-gold-500" : ""}`} />
+              <span className="text-xs font-medium">تمرینی</span>
+              {activeTab === "training" && (
+                <div className="absolute top-0 h-0.5 left-0 right-0 bg-gradient-to-r from-gold-500 to-amber-500 transform scale-x-25"></div>
+              )}
+            </button>
+            
+            <button 
+              onClick={() => setActiveTab("meals")}
+              className={`flex flex-col items-center justify-center w-full h-full transition-all duration-300 ${
+                activeTab === "meals" 
+                  ? "text-gold-500" 
+                  : "text-gray-400 hover:text-gray-300"
+              }`}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`mb-1 ${activeTab === "meals" ? "text-gold-500" : ""}`}>
+                <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path>
+                <path d="M7 2v20"></path>
+                <path d="M21 15V2"></path>
+                <path d="M18 15V2"></path>
+                <path d="M21 15a3 3 0 1 1-6 0"></path>
+              </svg>
+              <span className="text-xs font-medium">غذایی</span>
+              {activeTab === "meals" && (
+                <div className="absolute top-0 h-0.5 left-0 right-0 bg-gradient-to-r from-gold-500 to-amber-500 transform scale-x-25"></div>
+              )}
+            </button>
+            
+            <button 
+              onClick={() => setActiveTab("supplements")}
+              className={`flex flex-col items-center justify-center w-full h-full transition-all duration-300 ${
+                activeTab === "supplements" 
+                  ? "text-gold-500" 
+                  : "text-gray-400 hover:text-gray-300"
+              }`}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`mb-1 ${activeTab === "supplements" ? "text-gold-500" : ""}`}>
+                <path d="m8 21 8-9"></path>
+                <path d="M12 21a9 9 0 0 0 0-18C7.5 3 4 7.5 4 11c0 2 1 4 2 6"></path>
+                <path d="M19.8 17.8a9 9 0 0 0 .2-2c0-2.8-1-5.5-2.8-7.4"></path>
+                <path d="M13.5 8.5A5 5 0 0 0 12 8a5 5 0 0 0-5 5c0 1.1.4 2.2 1 3"></path>
+              </svg>
+              <span className="text-xs font-medium">مکمل</span>
+              {activeTab === "supplements" && (
+                <div className="absolute top-0 h-0.5 left-0 right-0 bg-gradient-to-r from-gold-500 to-amber-500 transform scale-x-25"></div>
+              )}
+            </button>
+            
+            <button 
+              onClick={() => setActiveTab("payments")}
+              className={`flex flex-col items-center justify-center w-full h-full transition-all duration-300 ${
+                activeTab === "payments" 
+                  ? "text-gold-500" 
+                  : "text-gray-400 hover:text-gray-300"
+              }`}
+            >
+              <CreditCard size={20} className={`mb-1 ${activeTab === "payments" ? "text-gold-500" : ""}`} />
+              <span className="text-xs font-medium">پرداخت‌ها</span>
+              {activeTab === "payments" && (
+                <div className="absolute top-0 h-0.5 left-0 right-0 bg-gradient-to-r from-gold-500 to-amber-500 transform scale-x-25"></div>
+              )}
+            </button>
+            
+            <button 
+              onClick={() => {
+                // Toggle the more menu
+                const moreMenu = document.getElementById('mobile-more-menu');
+                if (moreMenu) {
+                  moreMenu.classList.toggle('hidden');
+                }
+              }}
+              className="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-gray-300 transition-all duration-300"
+            >
+              <Menu size={20} className="mb-1" />
+              <span className="text-xs font-medium">بیشتر</span>
+            </button>
+          </nav>
+          
+          {/* Extended Menu (Hidden by default) */}
+          <div id="mobile-more-menu" className="hidden bg-gray-800/95 backdrop-blur-md border-t border-gray-700/30 py-4 px-2 animate-in slide-in-from-bottom duration-300">
+            <div className="grid grid-cols-3 gap-4">
+              <button 
+                onClick={() => {
+                  setActiveTab("profile");
+                  document.getElementById('mobile-more-menu')?.classList.add('hidden');
+                }}
+                className={`flex flex-col items-center justify-center p-3 rounded-lg transition-all duration-300 ${
+                  activeTab === "profile" 
+                    ? "bg-gray-700/50 text-gold-500" 
+                    : "text-gray-400 hover:text-gray-300 hover:bg-gray-700/30"
+                }`}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <span className="text-xs font-medium mt-2">پروفایل</span>
+              </button>
+              
+              <button 
+                onClick={() => {
+                  setActiveTab("orders");
+                  document.getElementById('mobile-more-menu')?.classList.add('hidden');
+                }}
+                className={`flex flex-col items-center justify-center p-3 rounded-lg transition-all duration-300 ${
+                  activeTab === "orders" 
+                    ? "bg-gray-700/50 text-gold-500" 
+                    : "text-gray-400 hover:text-gray-300 hover:bg-gray-700/30"
+                }`}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+                  <path d="M3 6h18"></path>
+                  <path d="M16 10a4 4 0 0 1-8 0"></path>
+                </svg>
+                <span className="text-xs font-medium mt-2">سفارش‌ها</span>
+              </button>
+              
+              <button 
+                onClick={() => {
+                  navigate('/subscription');
+                  document.getElementById('mobile-more-menu')?.classList.add('hidden');
+                }}
+                className="flex flex-col items-center justify-center p-3 rounded-lg text-gray-400 hover:text-gray-300 hover:bg-gray-700/30 transition-all duration-300"
+              >
+                <Shield size={24} className="text-gold-500" />
+                <span className="text-xs font-medium mt-2">ارتقاء اشتراک</span>
+              </button>
+              
+              {user?.profile?.is_admin && (
+                <>
+                  <button 
+                    onClick={() => {
+                      setActiveTab("products");
+                      document.getElementById('mobile-more-menu')?.classList.add('hidden');
+                    }}
+                    className={`flex flex-col items-center justify-center p-3 rounded-lg transition-all duration-300 ${
+                      activeTab === "products" 
+                        ? "bg-gray-700/50 text-gold-500" 
+                        : "text-gray-400 hover:text-gray-300 hover:bg-gray-700/30"
+                    }`}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect width="20" height="14" x="2" y="5" rx="2"></rect>
+                      <line x1="2" x2="22" y1="10" y2="10"></line>
+                    </svg>
+                    <span className="text-xs font-medium mt-2">مدیریت محصولات</span>
+                  </button>
+                  
+                  <button 
+                    onClick={() => {
+                      setActiveTab("blog");
+                      document.getElementById('mobile-more-menu')?.classList.add('hidden');
+                    }}
+                    className={`flex flex-col items-center justify-center p-3 rounded-lg transition-all duration-300 ${
+                      activeTab === "blog" 
+                        ? "bg-gray-700/50 text-gold-500" 
+                        : "text-gray-400 hover:text-gray-300 hover:bg-gray-700/30"
+                    }`}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"></path>
+                      <path d="M18 14h-8"></path>
+                      <path d="M15 18h-5"></path>
+                      <path d="M10 6h8v4h-8V6Z"></path>
+                    </svg>
+                    <span className="text-xs font-medium mt-2">مدیریت بلاگ</span>
+                  </button>
+                </>
+              )}
+              
+              <button 
+                onClick={async () => {
+                  await supabase.auth.signOut();
+                  navigate('/');
+                }}
+                className="flex flex-col items-center justify-center p-3 rounded-lg text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-all duration-300"
+              >
+                <LogOut size={24} className="text-red-400" />
+                <span className="text-xs font-medium mt-2">خروج</span>
+              </button>
+            </div>
+          </div>
+          
+          {/* Glowing effect at the bottom */}
+          <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-gold-500/30 to-transparent"></div>
         </div>
       </div>
     </div>

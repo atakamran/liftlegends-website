@@ -15,6 +15,7 @@ const BlogPostCard = ({ post }: BlogPostCardProps) => {
       to={`/blog/${post.slug || post.id}`}
       title={post.title}
       aria-label={`مشاهده مقاله: ${post.title}`}
+      className="block w-full"
     >
       <Card className="bg-zinc-900 border-zinc-800 hover:border-yellow-500 hover:shadow-[0_0_30px_rgba(234,179,8,0.1)] transition-all duration-300 h-full overflow-hidden">
         <div className="aspect-video w-full overflow-hidden relative">
@@ -29,22 +30,22 @@ const BlogPostCard = ({ post }: BlogPostCardProps) => {
           />
           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-t from-black/60 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
         </div>
-        <CardHeader className="pb-2">
+        <CardHeader className="pb-2 px-3 sm:px-6 pt-3 sm:pt-6">
           <div className="flex items-center mb-2">
-            <Badge variant="outline" className="text-yellow-400 border-yellow-400 bg-yellow-400/10">
+            <Badge variant="outline" className="text-yellow-400 border-yellow-400 bg-yellow-400/10 text-xs sm:text-sm">
               {post.icon} {post.category}
             </Badge>
           </div>
-          <CardTitle className="text-xl font-bold hover:text-yellow-400 transition-colors line-clamp-2">
+          <CardTitle className="text-base sm:text-xl font-bold hover:text-yellow-400 transition-colors line-clamp-2">
             {post.title}
           </CardTitle>
         </CardHeader>
-        <CardContent className="pb-2">
-          <CardDescription className="text-gray-400 line-clamp-3">
+        <CardContent className="pb-2 px-3 sm:px-6">
+          <CardDescription className="text-gray-400 text-xs sm:text-sm line-clamp-2 sm:line-clamp-3">
             {post.description}
           </CardDescription>
         </CardContent>
-        <CardFooter className="text-sm text-gray-400 flex justify-between items-center">
+        <CardFooter className="text-xs sm:text-sm text-gray-400 flex justify-between items-center px-3 sm:px-6 pb-3 sm:pb-6">
           <div className="flex items-center">
             <Calendar className="w-3 h-3 ml-1" />
             <span>{post.date}</span>

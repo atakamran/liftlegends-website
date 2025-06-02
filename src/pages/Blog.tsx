@@ -271,8 +271,8 @@ const Blog = () => {
 
       {/* Error Message */}
       {error && (
-        <div className="container mx-auto px-4 py-8">
-          <div className="bg-red-500/10 border border-red-500/30 text-red-500 p-4 rounded-lg text-center">
+        <div className="container mx-auto px-4 py-6 sm:py-8">
+          <div className="bg-red-500/10 border border-red-500/30 text-red-500 p-3 sm:p-4 rounded-lg text-center text-sm sm:text-base">
             {error}
           </div>
         </div>
@@ -284,7 +284,7 @@ const Blog = () => {
       )}
 
       {/* All Posts */}
-      <main className="container mx-auto px-4 pb-24">
+      <main className="container mx-auto px-4 pb-16 sm:pb-24">
         {filteredPosts.length > 0 ? (
           <BlogPostList 
             posts={filteredPosts} 
@@ -292,9 +292,9 @@ const Blog = () => {
             isVisible={isVisible} 
           />
         ) : (
-          <div className="text-center py-16">
-            <h2 className="text-2xl font-bold mb-4">مقاله‌ای در این دسته‌بندی یافت نشد</h2>
-            <p className="text-white/70 mb-8">لطفاً دسته‌بندی دیگری را انتخاب کنید یا بعداً دوباره بررسی کنید.</p>
+          <div className="text-center py-12 sm:py-16">
+            <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">مقاله‌ای در این دسته‌بندی یافت نشد</h2>
+            <p className="text-white/70 mb-6 sm:mb-8 text-sm sm:text-base px-4">لطفاً دسته‌بندی دیگری را انتخاب کنید یا بعداً دوباره بررسی کنید.</p>
           </div>
         )}
         

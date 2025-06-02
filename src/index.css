@@ -5,6 +5,17 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Fix for iOS 100vh issue */
+:root {
+  --vh: 1vh;
+}
+
+@media (max-width: 767px) {
+  .min-h-screen {
+    min-height: calc(var(--vh, 1vh) * 100);
+  }
+}
+
 @layer base {
   :root {
     --background: 240 10% 3.9%;
@@ -42,13 +53,87 @@
     @apply border-border selection:bg-gold/20 selection:text-gold;
   }
   
+  /* Prevent text selection on mobile */
+  @media (max-width: 767px) {
+    body {
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      -webkit-touch-callout: none;
+    }
+    
+    /* Override selection highlight */
+    ::selection {
+      background-color: transparent !important;
+      color: inherit !important;
+    }
+    
+    /* Class to prevent cursor during touch */
+    .no-cursor, .no-cursor * {
+      caret-color: transparent !important;
+      -webkit-user-select: none !important;
+      -moz-user-select: none !important;
+      -ms-user-select: none !important;
+      user-select: none !important;
+    }
+    
+    /* Ensure text is not selectable */
+    p, h1, h2, h3, h4, h5, h6, span, div:not([contenteditable="true"]) {
+      -webkit-user-select: none !important;
+      user-select: none !important;
+      -webkit-touch-callout: none !important;
+    }
+    
+    /* Allow selection only in specific elements where it might be needed */
+    input, textarea, [contenteditable="true"] {
+      -webkit-user-select: text;
+      -moz-user-select: text;
+      -ms-user-select: text;
+      user-select: text;
+    }
+    
+    /* Prevent cursor on interactive elements */
+    a, button, [role="button"], .cursor-pointer {
+      -webkit-tap-highlight-color: transparent;
+      cursor: pointer;
+    }
+    
+    /* Hide caret on all elements except inputs and textareas */
+    * {
+      caret-color: transparent !important;
+      -webkit-tap-highlight-color: transparent !important;
+    }
+    
+    /* Only show cursor in these elements */
+    input, textarea, [contenteditable="true"] {
+      caret-color: auto !important;
+      -webkit-user-select: text !important;
+      user-select: text !important;
+    }
+    
+    /* Additional fix for iOS */
+    body {
+      -webkit-tap-highlight-color: rgba(0,0,0,0) !important;
+    }
+  }
+  
   body {
-    @apply bg-background text-foreground antialiased font-['Vazirmatn'] overflow-x-hidden;
+    @apply bg-background text-foreground antialiased font-['Vazirmatn'] overflow-x-hidden touch-manipulation;
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    width: 100%;
+    min-height: 100vh;
+    position: relative;
   }
 
   html {
     @apply scroll-smooth;
     direction: rtl;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    width: 100%;
+    overflow-x: hidden;
   }
 
   .ltr {
@@ -76,5 +161,27 @@
   
   .text-gradient {
     @apply bg-gradient-to-r from-gold-300 via-gold-500 to-gold-400 bg-clip-text text-transparent;
+  }
+  
+  /* Mobile responsive utilities */
+  .mobile-container {
+    @apply w-full px-4 sm:px-6 md:px-8 max-w-full overflow-hidden;
+  }
+  
+  .mobile-safe-area {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+  
+  .mobile-safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  /* Fix for iOS 100vh issue */
+  .mobile-full-height {
+    height: 100vh; /* Fallback */
+    height: -webkit-fill-available;
+    height: -moz-available;
+    height: stretch;
   }
 }
