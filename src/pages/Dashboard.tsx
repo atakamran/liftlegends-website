@@ -128,6 +128,17 @@ interface UserPurchase {
   };
 }
 
+interface Program {
+  id: string;
+  title: string;
+  description: string;
+  price: number;
+  category: 'training' | 'diet' | 'supplement';
+  image_url: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -260,6 +271,237 @@ const Dashboard = () => {
     }
   };
   
+  // State for products
+  const [products, setProducts] = useState<Program[]>([]);
+  const [productLoading, setProductLoading] = useState(false);
+  const [productFormData, setProductFormData] = useState<Partial<Program>>({
+    title: "",
+    description: "",
+    price: 0,
+    category: "training",
+    image_url: ""
+  });
+  const [isEditingProduct, setIsEditingProduct] = useState(false);
+  const [currentProductId, setCurrentProductId] = useState<string | null>(null);
+
+  // Function to fetch products
+  const fetchProducts = async () => {
+    try {
+      setProductLoading(true);
+      
+      const { data, error } = await supabase
+        .from("programs_sale")
+        .select("*")
+        .order("created_at", { ascending: false });
+        
+      if (error) throw error;
+      
+      // Map programs_sale data to Program interface
+      const programsData = data ? data.map(program => ({
+        id: program.id,
+        title: program.title,
+        description: program.description,
+        price: program.price,
+        category: program.category,
+        image_url: program.image_url,
+        created_at: program.created_at || new Date().toISOString(),
+        updated_at: program.updated_at || new Date().toISOString()
+      })) : [];
+      
+      setProducts(programsData);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+      toast({
+        variant: "destructive",
+        title: "خطا در بارگذاری محصولات",
+        description: "مشکلی در دریافت لیست محصولات رخ داد. لطفاً دوباره تلاش کنید.",
+      });
+    } finally {
+      setProductLoading(false);
+    }
+  };
+
+  // Function to create a new product
+  const createProduct = async () => {
+    try {
+      // Validate form data
+      if (!productFormData.title || !productFormData.description || productFormData.price <= 0) {
+        toast({
+          variant: "destructive",
+          title: "خطا در ثبت محصول",
+          description: "لطفاً عنوان، توضیحات و قیمت محصول را وارد کنید.",
+        });
+        return;
+      }
+      
+      setProductLoading(true);
+      
+      // Create new product
+      const { data, error } = await supabase
+        .from("programs_sale")
+        .insert({
+          title: productFormData.title || "",
+          description: productFormData.description || "",
+          price: productFormData.price || 0,
+          category: productFormData.category || "training",
+          image_url: productFormData.image_url || null,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .select()
+        .single();
+        
+      if (error) throw error;
+      
+      // Refresh products
+      fetchProducts();
+      
+      // Reset form
+      setProductFormData({
+        title: "",
+        description: "",
+        price: 0,
+        category: "training",
+        image_url: ""
+      });
+      
+      toast({
+        title: "محصول جدید ایجاد شد",
+        description: "محصول جدید با موفقیت ایجاد شد.",
+      });
+    } catch (error) {
+      console.error("Error creating product:", error);
+      toast({
+        variant: "destructive",
+        title: "خطا در ایجاد محصول",
+        description: "مشکلی در ایجاد محصول جدید رخ داد. لطفاً دوباره تلاش کنید.",
+      });
+    } finally {
+      setProductLoading(false);
+    }
+  };
+
+  // Function to update a product
+  const updateProduct = async () => {
+    try {
+      if (!currentProductId) return;
+      
+      // Validate form data
+      if (!productFormData.title || !productFormData.description || productFormData.price <= 0) {
+        toast({
+          variant: "destructive",
+          title: "خطا در بروزرسانی محصول",
+          description: "لطفاً عنوان، توضیحات و قیمت محصول را وارد کنید.",
+        });
+        return;
+      }
+      
+      setProductLoading(true);
+      
+      // Update product
+      const { data, error } = await supabase
+        .from("programs_sale")
+        .update({
+          title: productFormData.title,
+          description: productFormData.description,
+          price: productFormData.price,
+          category: productFormData.category,
+          image_url: productFormData.image_url,
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", currentProductId)
+        .select();
+        
+      if (error) throw error;
+      
+      // Refresh products
+      fetchProducts();
+      
+      // Reset form and editing state
+      setProductFormData({
+        title: "",
+        description: "",
+        price: 0,
+        category: "training",
+        image_url: ""
+      });
+      setIsEditingProduct(false);
+      setCurrentProductId(null);
+      
+      toast({
+        title: "محصول بروزرسانی شد",
+        description: "محصول با موفقیت بروزرسانی شد.",
+      });
+    } catch (error) {
+      console.error("Error updating product:", error);
+      toast({
+        variant: "destructive",
+        title: "خطا در بروزرسانی محصول",
+        description: "مشکلی در بروزرسانی محصول رخ داد. لطفاً دوباره تلاش کنید.",
+      });
+    } finally {
+      setProductLoading(false);
+    }
+  };
+
+  // Function to delete a product
+  const deleteProduct = async (id: string) => {
+    try {
+      setProductLoading(true);
+      
+      // Delete product
+      const { error } = await supabase
+        .from("programs_sale")
+        .delete()
+        .eq("id", id);
+        
+      if (error) throw error;
+      
+      // Refresh products
+      fetchProducts();
+      
+      toast({
+        title: "محصول حذف شد",
+        description: "محصول با موفقیت حذف شد.",
+      });
+    } catch (error) {
+      console.error("Error deleting product:", error);
+      toast({
+        variant: "destructive",
+        title: "خطا در حذف محصول",
+        description: "مشکلی در حذف محصول رخ داد. لطفاً دوباره تلاش کنید.",
+      });
+    } finally {
+      setProductLoading(false);
+    }
+  };
+
+  // Function to edit a product
+  const editProduct = (product: Program) => {
+    setProductFormData({
+      title: product.title,
+      description: product.description,
+      price: product.price,
+      category: product.category,
+      image_url: product.image_url
+    });
+    setIsEditingProduct(true);
+    setCurrentProductId(product.id);
+  };
+
+  // Function to cancel editing
+  const cancelEditProduct = () => {
+    setProductFormData({
+      title: "",
+      description: "",
+      price: 0,
+      category: "training",
+      image_url: ""
+    });
+    setIsEditingProduct(false);
+    setCurrentProductId(null);
+  };
+
   // Function to fetch blog posts
   const fetchBlogPosts = async () => {
     try {
@@ -1097,6 +1339,13 @@ const Dashboard = () => {
     }
   }, [user?.profile]);
   
+  // Load products data when products tab is active and user is admin
+  useEffect(() => {
+    if (activeTab === "products" && user?.profile?.is_admin) {
+      fetchProducts();
+    }
+  }, [activeTab, user?.profile?.is_admin]);
+
   // Load blog data when blog tab is active and user is admin
   useEffect(() => {
     if (activeTab === "blog" && user?.profile?.is_admin) {
@@ -1180,10 +1429,16 @@ const Dashboard = () => {
                 </TabsTrigger>
                 
                 {user?.profile?.is_admin && (
-                  <TabsTrigger value="blog" className="w-full justify-start px-4 py-3 text-right data-[state=active]:bg-gradient-to-r data-[state=active]:from-gold-500/20 data-[state=active]:to-transparent data-[state=active]:border-r-4 data-[state=active]:border-gold-500 data-[state=active]:text-white rounded-md transition-all duration-300">
-                    <Edit size={18} className="ml-3 text-gold-500" />
-                    مدیریت بلاگ
-                  </TabsTrigger>
+                  <>
+                    <TabsTrigger value="products" className="w-full justify-start px-4 py-3 text-right data-[state=active]:bg-gradient-to-r data-[state=active]:from-gold-500/20 data-[state=active]:to-transparent data-[state=active]:border-r-4 data-[state=active]:border-gold-500 data-[state=active]:text-white rounded-md transition-all duration-300">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-3 text-gold-500"><rect width="20" height="14" x="2" y="5" rx="2"></rect><line x1="2" x2="22" y1="10" y2="10"></line></svg>
+                      مدیریت محصولات
+                    </TabsTrigger>
+                    <TabsTrigger value="blog" className="w-full justify-start px-4 py-3 text-right data-[state=active]:bg-gradient-to-r data-[state=active]:from-gold-500/20 data-[state=active]:to-transparent data-[state=active]:border-r-4 data-[state=active]:border-gold-500 data-[state=active]:text-white rounded-md transition-all duration-300">
+                      <Edit size={18} className="ml-3 text-gold-500" />
+                      مدیریت بلاگ
+                    </TabsTrigger>
+                  </>
                 )}
               </TabsList>
             </Tabs>
@@ -1825,6 +2080,214 @@ const Dashboard = () => {
                 </CardContent>
               </Card>
             </TabsContent>
+            
+            {/* Products Management Tab - Only visible to admins */}
+            {user?.profile?.is_admin && (
+              <TabsContent value="products" className="space-y-6 animate-in fade-in-50 duration-300">
+                <Card className="bg-gray-800/50 border-gray-700">
+                  <CardHeader>
+                    <CardTitle className="text-xl text-gold-500">مدیریت محصولات</CardTitle>
+                    <CardDescription>
+                      در این بخش می‌توانید محصولات سایت را مدیریت کنید.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-6">
+                      {/* Product Form */}
+                      <div className="bg-gray-900/50 p-4 rounded-lg border border-gray-700">
+                        <h3 className="text-lg font-medium mb-4">
+                          {isEditingProduct ? "ویرایش محصول" : "افزودن محصول جدید"}
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="product-title">عنوان محصول</Label>
+                            <Input
+                              id="product-title"
+                              value={productFormData.title}
+                              onChange={(e) => setProductFormData({...productFormData, title: e.target.value})}
+                              placeholder="عنوان محصول را وارد کنید"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="product-price">قیمت (تومان)</Label>
+                            <Input
+                              id="product-price"
+                              type="number"
+                              value={productFormData.price}
+                              onChange={(e) => setProductFormData({...productFormData, price: parseInt(e.target.value) || 0})}
+                              placeholder="قیمت محصول را وارد کنید"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="product-category">دسته‌بندی</Label>
+                            <Select
+                              value={productFormData.category}
+                              onValueChange={(value) => setProductFormData({...productFormData, category: value as 'training' | 'diet' | 'supplement'})}
+                            >
+                              <SelectTrigger id="product-category">
+                                <SelectValue placeholder="دسته‌بندی را انتخاب کنید" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="training">برنامه تمرینی</SelectItem>
+                                <SelectItem value="diet">برنامه غذایی</SelectItem>
+                                <SelectItem value="supplement">مکمل</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="product-image">آدرس تصویر</Label>
+                            <Input
+                              id="product-image"
+                              value={productFormData.image_url || ""}
+                              onChange={(e) => setProductFormData({...productFormData, image_url: e.target.value})}
+                              placeholder="آدرس تصویر محصول را وارد کنید"
+                            />
+                          </div>
+                        </div>
+                        <div className="space-y-2 mb-4">
+                          <Label htmlFor="product-description">توضیحات محصول</Label>
+                          <Textarea
+                            id="product-description"
+                            value={productFormData.description}
+                            onChange={(e) => setProductFormData({...productFormData, description: e.target.value})}
+                            placeholder="توضیحات محصول را وارد کنید"
+                            rows={5}
+                          />
+                        </div>
+                        <div className="flex justify-end space-x-2 space-x-reverse">
+                          {isEditingProduct ? (
+                            <>
+                              <Button
+                                variant="outline"
+                                onClick={cancelEditProduct}
+                                disabled={productLoading}
+                              >
+                                انصراف
+                              </Button>
+                              <Button
+                                onClick={updateProduct}
+                                disabled={productLoading}
+                              >
+                                {productLoading ? (
+                                  <>
+                                    <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                                    در حال بروزرسانی...
+                                  </>
+                                ) : (
+                                  "بروزرسانی محصول"
+                                )}
+                              </Button>
+                            </>
+                          ) : (
+                            <Button
+                              onClick={createProduct}
+                              disabled={productLoading}
+                            >
+                              {productLoading ? (
+                                <>
+                                  <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                                  در حال ثبت...
+                                </>
+                              ) : (
+                                "افزودن محصول"
+                              )}
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Products List */}
+                      <div>
+                        <h3 className="text-lg font-medium mb-4">لیست محصولات</h3>
+                        {productLoading && products.length === 0 ? (
+                          <div className="flex justify-center items-center py-8">
+                            <Loader2 className="h-8 w-8 animate-spin text-gold-500" />
+                          </div>
+                        ) : (
+                          <div className="overflow-x-auto">
+                            <Table>
+                              <TableCaption>لیست محصولات موجود</TableCaption>
+                              <TableHeader>
+                                <TableRow>
+                                  <TableHead>عنوان</TableHead>
+                                  <TableHead>دسته‌بندی</TableHead>
+                                  <TableHead>قیمت (تومان)</TableHead>
+                                  <TableHead>تاریخ ایجاد</TableHead>
+                                  <TableHead>عملیات</TableHead>
+                                </TableRow>
+                              </TableHeader>
+                              <TableBody>
+                                {products.length === 0 ? (
+                                  <TableRow>
+                                    <TableCell colSpan={5} className="text-center py-8">
+                                      محصولی یافت نشد
+                                    </TableCell>
+                                  </TableRow>
+                                ) : (
+                                  products.map((product) => (
+                                    <TableRow key={product.id}>
+                                      <TableCell className="font-medium">{product.title}</TableCell>
+                                      <TableCell>
+                                        {product.category === 'training' && 'برنامه تمرینی'}
+                                        {product.category === 'diet' && 'برنامه غذایی'}
+                                        {product.category === 'supplement' && 'مکمل'}
+                                      </TableCell>
+                                      <TableCell>{new Intl.NumberFormat('fa-IR').format(product.price)}</TableCell>
+                                      <TableCell>{new Date(product.created_at).toLocaleDateString('fa-IR')}</TableCell>
+                                      <TableCell>
+                                        <div className="flex space-x-2 space-x-reverse">
+                                          <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => editProduct(product)}
+                                          >
+                                            <Edit className="h-4 w-4" />
+                                          </Button>
+                                          <Dialog>
+                                            <DialogTrigger asChild>
+                                              <Button
+                                                variant="destructive"
+                                                size="sm"
+                                              >
+                                                <Trash2 className="h-4 w-4" />
+                                              </Button>
+                                            </DialogTrigger>
+                                            <DialogContent>
+                                              <DialogHeader>
+                                                <DialogTitle>حذف محصول</DialogTitle>
+                                                <DialogDescription>
+                                                  آیا از حذف محصول "{product.title}" اطمینان دارید؟
+                                                  این عمل غیرقابل بازگشت است.
+                                                </DialogDescription>
+                                              </DialogHeader>
+                                              <DialogFooter>
+                                                <DialogClose asChild>
+                                                  <Button variant="outline">انصراف</Button>
+                                                </DialogClose>
+                                                <Button
+                                                  variant="destructive"
+                                                  onClick={() => deleteProduct(product.id)}
+                                                >
+                                                  حذف
+                                                </Button>
+                                              </DialogFooter>
+                                            </DialogContent>
+                                          </Dialog>
+                                        </div>
+                                      </TableCell>
+                                    </TableRow>
+                                  ))
+                                )}
+                              </TableBody>
+                            </Table>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            )}
             
             {/* Blog Management Tab - Only visible to admins */}
             {user?.profile?.is_admin && (
