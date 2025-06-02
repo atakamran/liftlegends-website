@@ -122,9 +122,15 @@ interface UserPurchase {
   payment_id: string | null;
   payment_status: string;
   expires_at: string | null;
+  program_id?: string | null;
   plan?: {
     name: string;
     description: string;
+  };
+  program?: {
+    title: string;
+    description: string;
+    programurl?: string | null;
   };
 }
 
@@ -568,31 +574,63 @@ const Dashboard = () => {
         throw error;
       }
       
-      // Now, for each purchase, let's get the plan details
-      const purchasesWithPlans = await Promise.all(
-        (data || []).map(async (purchase) => {
+      // Now, for each purchase, let's get the plan or program details
+      const purchasesWithDetails = await Promise.all(
+        (data || []).map(async (purchase: UserPurchase) => {
           try {
-            // Get the plan details
-            const { data: planData, error: planError } = await supabase
-              .from("fitness_plans")
-              .select("name, description")
-              .eq("id", purchase.plan_id)
-              .single();
+            // Check if this is a program purchase
+            if (purchase.program_id) {
+              // Get the program details
+              const { data: programData, error: programError } = await supabase
+                .from("programs_sale")
+                .select("title, description, image_url")
+                .eq("id", purchase.program_id)
+                .single();
+                
+              if (programError) {
+                console.error("Error fetching program details:", programError);
+                return {
+                  ...purchase,
+                  plan: { name: "برنامه نامشخص", description: "" },
+                  program: { title: "برنامه نامشخص", description: "", programurl: null }
+                };
+              }
               
-            if (planError) {
-              console.error("Error fetching plan details:", planError);
+              // Create a properly typed program object with the programurl field
+              const program = {
+                title: programData.title,
+                description: programData.description,
+                programurl: null // Add the expected field with a default value
+              };
+              
               return {
                 ...purchase,
-                plan: { name: "برنامه نامشخص", description: "" }
+                program: program,
+                plan: { name: "خرید برنامه", description: program.title }
+              };
+            } else {
+              // Get the plan details
+              const { data: planData, error: planError } = await supabase
+                .from("fitness_plans")
+                .select("name, description")
+                .eq("id", purchase.plan_id)
+                .single();
+                
+              if (planError) {
+                console.error("Error fetching plan details:", planError);
+                return {
+                  ...purchase,
+                  plan: { name: "برنامه نامشخص", description: "" }
+                };
+              }
+              
+              return {
+                ...purchase,
+                plan: planData
               };
             }
-            
-            return {
-              ...purchase,
-              plan: planData
-            };
           } catch (err) {
-            console.error("Error processing plan data:", err);
+            console.error("Error processing purchase data:", err);
             return {
               ...purchase,
               plan: { name: "برنامه نامشخص", description: "" }
@@ -601,8 +639,8 @@ const Dashboard = () => {
         })
       );
       
-      console.log("User purchases fetched:", purchasesWithPlans.length);
-      setUserPurchases(purchasesWithPlans as UserPurchase[]);
+      console.log("User purchases fetched:", purchasesWithDetails.length);
+      setUserPurchases(purchasesWithDetails as UserPurchase[]);
     } catch (error) {
       console.error("Error fetching user purchases:", error);
       toast({
@@ -2022,6 +2060,49 @@ const Dashboard = () => {
                   </CardContent>
                 </Card>
               </div>
+              
+              {/* Purchased Programs */}
+              {userPurchases.some(purchase => purchase.program_id) && (
+                <Card className="bg-gray-800/50 border-gray-700 mb-6">
+                  <CardHeader>
+                    <CardTitle className="text-xl">برنامه‌های خریداری شده</CardTitle>
+                    <CardDescription>برنامه‌هایی که خریداری کرده‌اید</CardDescription>
+                  </CardHeader>
+                  <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {userPurchases
+                      .filter(purchase => purchase.program_id && purchase.program)
+                      .map((purchase) => (
+                        <Card key={purchase.id} className="bg-gray-900 border-gray-700 overflow-hidden">
+                          <CardHeader className="pb-2">
+                            <CardTitle className="text-lg">{purchase.program?.title || 'برنامه نامشخص'}</CardTitle>
+                            <CardDescription className="line-clamp-2">
+                              {purchase.program?.description || 'بدون توضیحات'}
+                            </CardDescription>
+                          </CardHeader>
+                          <CardContent className="pt-0">
+                            <div className="text-xs text-gray-400 mb-3">
+                              تاریخ خرید: {purchase.purchase_date ? formatDate(purchase.purchase_date) : 'نامشخص'}
+                            </div>
+                          </CardContent>
+                          <CardFooter className="pt-0">
+                            {purchase.program?.programurl ? (
+                              <Button 
+                                className="w-full" 
+                                onClick={() => navigate(purchase.program?.programurl || '/')}
+                              >
+                                مشاهده برنامه
+                              </Button>
+                            ) : (
+                              <Button className="w-full" disabled>
+                                برنامه در دسترس نیست
+                              </Button>
+                            )}
+                          </CardFooter>
+                        </Card>
+                      ))}
+                  </CardContent>
+                </Card>
+              )}
               
               {/* Payments Table */}
               <Card className="bg-gray-800/50 border-gray-700">

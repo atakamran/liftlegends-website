@@ -40,6 +40,7 @@ interface PaymentData {
   payment_method: string;
   user_id: string;
   timestamp: string;
+  program_id?: string; // Add program_id for program purchases
 }
 
 const Payment = () => {
