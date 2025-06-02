@@ -130,7 +130,7 @@ interface UserPurchase {
   program?: {
     title: string;
     description: string;
-    programurl?: string | null;
+    program_url?: string | null;
   };
 }
 
@@ -143,6 +143,7 @@ interface Program {
   image_url: string | null;
   created_at: string;
   updated_at: string;
+  program_url?: string | null;
 }
 
 
@@ -279,6 +280,9 @@ const Dashboard = () => {
   
   // State for products
   const [products, setProducts] = useState<Program[]>([]);
+  const [trainingPrograms, setTrainingPrograms] = useState<Program[]>([]);
+  const [dietPrograms, setDietPrograms] = useState<Program[]>([]);
+  const [supplementPrograms, setSupplementPrograms] = useState<Program[]>([]);
   const [productLoading, setProductLoading] = useState(false);
   const [productFormData, setProductFormData] = useState<Partial<Program>>({
     title: "",
@@ -311,10 +315,21 @@ const Dashboard = () => {
         category: program.category,
         image_url: program.image_url,
         created_at: program.created_at || new Date().toISOString(),
-        updated_at: program.updated_at || new Date().toISOString()
+        updated_at: program.updated_at || new Date().toISOString(),
+        program_url: program.program_url || null
       })) : [];
       
       setProducts(programsData);
+      
+      // Categorize programs
+      setTrainingPrograms(programsData.filter(program => program.category === 'training'));
+      setDietPrograms(programsData.filter(program => program.category === 'diet'));
+      setSupplementPrograms(programsData.filter(program => program.category === 'supplement'));
+      
+      console.log("Programs fetched:", programsData.length);
+      console.log("Training programs:", programsData.filter(program => program.category === 'training').length);
+      console.log("Diet programs:", programsData.filter(program => program.category === 'diet').length);
+      console.log("Supplement programs:", programsData.filter(program => program.category === 'supplement').length);
     } catch (error) {
       console.error("Error fetching products:", error);
       toast({
@@ -557,6 +572,15 @@ const Dashboard = () => {
     }
   };
   
+  // Helper function to check if user has purchased a specific program
+  const hasPurchasedProgram = (programId: string): boolean => {
+    if (!userPurchases || userPurchases.length === 0) return false;
+    
+    return userPurchases.some(
+      purchase => purchase.program_id === programId && purchase.payment_status === 'completed'
+    );
+  };
+
   // Function to fetch user purchases
   const fetchUserPurchases = async () => {
     try {
@@ -583,7 +607,7 @@ const Dashboard = () => {
               // Get the program details
               const { data: programData, error: programError } = await supabase
                 .from("programs_sale")
-                .select("title, description, image_url")
+                .select("title, description, image_url, category")
                 .eq("id", purchase.program_id)
                 .single();
                 
@@ -592,15 +616,16 @@ const Dashboard = () => {
                 return {
                   ...purchase,
                   plan: { name: "برنامه نامشخص", description: "" },
-                  program: { title: "برنامه نامشخص", description: "", programurl: null }
+                  program: { title: "برنامه نامشخص", description: "", program_url: null, category: null }
                 };
               }
               
-              // Create a properly typed program object with the programurl field
+              // Create a properly typed program object with the program_url field
               const program = {
                 title: programData.title,
                 description: programData.description,
-                programurl: null // Add the expected field with a default value
+                program_url: null, // Add the expected field with a default value
+                category: programData.category
               };
               
               return {
@@ -1350,6 +1375,16 @@ const Dashboard = () => {
     }).format(date);
   };
   
+  // Function to check if user has purchased a specific program
+  const hasPurchasedProgram = (programId: string): boolean => {
+    if (!userPurchases || userPurchases.length === 0) return false;
+    
+    return userPurchases.some(purchase => 
+      purchase.program_id === programId && 
+      purchase.payment_status === 'completed'
+    );
+  };
+  
 
   
   // Load user data on component mount
@@ -1370,6 +1405,8 @@ const Dashboard = () => {
       const intervalId = setInterval(() => {
         console.log("Periodic subscription check...");
         checkExpiredSubscription();
+        // Also periodically refresh user purchases
+        fetchUserPurchases();
       }, 60000); // Check every minute
       
       // Clean up the interval when the component unmounts
@@ -1378,8 +1415,12 @@ const Dashboard = () => {
   }, [user?.profile]);
   
   // Load products data when products tab is active and user is admin
+  // Also load programs data for training, meals, and supplements tabs
   useEffect(() => {
-    if (activeTab === "products" && user?.profile?.is_admin) {
+    if ((activeTab === "products" && user?.profile?.is_admin) || 
+        activeTab === "training" || 
+        activeTab === "meals" || 
+        activeTab === "supplements") {
       fetchProducts();
     }
   }, [activeTab, user?.profile?.is_admin]);
@@ -1632,71 +1673,65 @@ const Dashboard = () => {
               
               {/* Training Programs Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {/* Program Card 1 */}
-                <Card className="bg-gray-800/50 border-gray-700 hover:border-gold-500/50 transition-all duration-300 overflow-hidden">
-                  <div className="h-40 bg-gradient-to-br from-blue-500/20 to-purple-500/20 relative">
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-400 opacity-50"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line></svg>
-                    </div>
-                    <div className="absolute top-2 right-2">
-                      <span className="bg-blue-500/20 text-blue-300 text-xs font-medium px-2.5 py-1 rounded-full">مبتدی</span>
-                    </div>
+                {productLoading ? (
+                  <div className="col-span-3 flex justify-center items-center py-12">
+                    <Loader2 className="h-8 w-8 animate-spin text-gold-500" />
+                    <span className="mr-2 text-gray-400">در حال بارگذاری برنامه‌ها...</span>
                   </div>
-                  <CardHeader>
-                    <CardTitle className="text-lg">برنامه تمرینی مبتدی</CardTitle>
-                    <CardDescription>مناسب برای افراد تازه‌کار</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-gray-400">۴ جلسه در هفته - ۶ هفته</p>
-                  </CardContent>
-                  <CardFooter>
-                    <Button variant="outline" className="w-full border-gray-700 hover:border-blue-500 hover:bg-blue-500/10">مشاهده برنامه</Button>
-                  </CardFooter>
-                </Card>
-                
-                {/* Program Card 2 */}
-                <Card className="bg-gray-800/50 border-gray-700 hover:border-gold-500/50 transition-all duration-300 overflow-hidden">
-                  <div className="h-40 bg-gradient-to-br from-green-500/20 to-emerald-500/20 relative">
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-green-400 opacity-50"><circle cx="12" cy="12" r="10"></circle><path d="m4.9 4.9 14.2 14.2"></path></svg>
-                    </div>
-                    <div className="absolute top-2 right-2">
-                      <span className="bg-green-500/20 text-green-300 text-xs font-medium px-2.5 py-1 rounded-full">متوسط</span>
-                    </div>
+                ) : trainingPrograms.length > 0 ? (
+                  trainingPrograms.map((program) => (
+                    <Card key={program.id} className="bg-gray-800/50 border-gray-700 hover:border-gold-500/50 transition-all duration-300 overflow-hidden">
+                      <div className="h-40 bg-gradient-to-br from-gold-500/20 to-amber-500/20 relative">
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          {program.image_url ? (
+                            <img 
+                              src={program.image_url} 
+                              alt={program.title} 
+                              className="object-cover w-full h-full opacity-60"
+                            />
+                          ) : (
+                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gold-400 opacity-50"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line></svg>
+                          )}
+                        </div>
+                        <div className="absolute top-2 right-2 flex gap-1">
+                          <span className="bg-gold-500/20 text-gold-300 text-xs font-medium px-2.5 py-1 rounded-full">تمرینی</span>
+                          {hasPurchasedProgram(program.id) && (
+                            <span className="bg-gold-500/20 text-gold-300 text-xs font-medium px-2.5 py-1 rounded-full flex items-center">
+                              <Check size={12} className="ml-1" />
+                              خریداری شده
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <CardHeader>
+                        <CardTitle className="text-lg">{program.title}</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-sm text-gray-400">قیمت: {program.price.toLocaleString()} تومان</p>
+                      </CardContent>
+                      <CardFooter>
+                        <Button 
+                          variant="outline" 
+                          className="w-full border-gray-700 hover:border-gold-500 hover:bg-gold-500/10"
+                          onClick={() => {
+                            if (hasPurchasedProgram(program.id) && program.program_url) {
+                              navigate(program.program_url);
+                            } else {
+                              // Navigate to program details or purchase page
+                              navigate(`/programs/${program.id}`);
+                            }
+                          }}
+                        >
+                          {hasPurchasedProgram(program.id) ? "مشاهده برنامه" : "خرید برنامه"}
+                        </Button>
+                      </CardFooter>
+                    </Card>
+                  ))
+                ) : (
+                  <div className="col-span-3 text-center py-12">
+                    <p className="text-gray-400">هیچ برنامه تمرینی یافت نشد.</p>
                   </div>
-                  <CardHeader>
-                    <CardTitle className="text-lg">برنامه تمرینی چربی‌سوزی</CardTitle>
-                    <CardDescription>کاهش وزن و چربی بدن</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-gray-400">۵ جلسه در هفته - ۸ هفته</p>
-                  </CardContent>
-                  <CardFooter>
-                    <Button variant="outline" className="w-full border-gray-700 hover:border-green-500 hover:bg-green-500/10">مشاهده برنامه</Button>
-                  </CardFooter>
-                </Card>
-                
-                {/* Program Card 3 */}
-                <Card className="bg-gray-800/50 border-gray-700 hover:border-gold-500/50 transition-all duration-300 overflow-hidden">
-                  <div className="h-40 bg-gradient-to-br from-gold-500/20 to-amber-500/20 relative">
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gold-400 opacity-50"><path d="M6.5 6.5 17.5 17.5"></path><path d="M17.5 6.5 6.5 17.5"></path><circle cx="12" cy="12" r="10"></circle></svg>
-                    </div>
-                    <div className="absolute top-2 right-2">
-                      <span className="bg-gold-500/20 text-gold-300 text-xs font-medium px-2.5 py-1 rounded-full">پیشرفته</span>
-                    </div>
-                  </div>
-                  <CardHeader>
-                    <CardTitle className="text-lg">برنامه قدرتی پیشرفته</CardTitle>
-                    <CardDescription>افزایش قدرت و عملکرد</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-gray-400">۶ جلسه در هفته - ۱۲ هفته</p>
-                  </CardContent>
-                  <CardFooter>
-                    <Button variant="outline" className="w-full border-gray-700 hover:border-gold-500 hover:bg-gold-500/10">مشاهده برنامه</Button>
-                  </CardFooter>
-                </Card>
+                )}
               </div>
             </TabsContent>
             
@@ -1738,71 +1773,65 @@ const Dashboard = () => {
               
               {/* Meal Plans Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {/* Meal Plan Card 1 */}
-                <Card className="bg-gray-800/50 border-gray-700 hover:border-green-500/50 transition-all duration-300 overflow-hidden">
-                  <div className="h-40 bg-gradient-to-br from-green-500/20 to-teal-500/20 relative">
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-green-400 opacity-50"><path d="M12 2a8 8 0 0 0-8 8c0 6 8 12 8 12s8-6 8-12a8 8 0 0 0-8-8z"></path></svg>
-                    </div>
-                    <div className="absolute top-2 right-2">
-                      <span className="bg-green-500/20 text-green-300 text-xs font-medium px-2.5 py-1 rounded-full">کاهش وزن</span>
-                    </div>
+                {productLoading ? (
+                  <div className="col-span-3 flex justify-center items-center py-12">
+                    <Loader2 className="h-8 w-8 animate-spin text-green-500" />
+                    <span className="mr-2 text-gray-400">در حال بارگذاری برنامه‌ها...</span>
                   </div>
-                  <CardHeader>
-                    <CardTitle className="text-lg">رژیم کم کربوهیدرات</CardTitle>
-                    <CardDescription>مناسب برای کاهش وزن سریع</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-gray-400">۱۴۰۰ کالری - ۴ وعده در روز</p>
-                  </CardContent>
-                  <CardFooter>
-                    <Button variant="outline" className="w-full border-gray-700 hover:border-green-500 hover:bg-green-500/10">مشاهده برنامه</Button>
-                  </CardFooter>
-                </Card>
-                
-                {/* Meal Plan Card 2 */}
-                <Card className="bg-gray-800/50 border-gray-700 hover:border-green-500/50 transition-all duration-300 overflow-hidden">
-                  <div className="h-40 bg-gradient-to-br from-blue-500/20 to-indigo-500/20 relative">
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-400 opacity-50"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"></path><line x1="16" y1="8" x2="2" y2="22"></line><line x1="17.5" y1="15" x2="9" y2="15"></line></svg>
-                    </div>
-                    <div className="absolute top-2 right-2">
-                      <span className="bg-blue-500/20 text-blue-300 text-xs font-medium px-2.5 py-1 rounded-full">افزایش وزن</span>
-                    </div>
+                ) : dietPrograms.length > 0 ? (
+                  dietPrograms.map((program) => (
+                    <Card key={program.id} className="bg-gray-800/50 border-gray-700 hover:border-green-500/50 transition-all duration-300 overflow-hidden">
+                      <div className="h-40 bg-gradient-to-br from-green-500/20 to-teal-500/20 relative">
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          {program.image_url ? (
+                            <img 
+                              src={program.image_url} 
+                              alt={program.title} 
+                              className="object-cover w-full h-full opacity-60"
+                            />
+                          ) : (
+                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-green-400 opacity-50"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path><path d="M7 2v20"></path><path d="M21 15V2"></path><path d="M18 15V2"></path><path d="M21 15a3 3 0 1 1-6 0"></path></svg>
+                          )}
+                        </div>
+                        <div className="absolute top-2 right-2 flex gap-1">
+                          <span className="bg-green-500/20 text-green-300 text-xs font-medium px-2.5 py-1 rounded-full">غذایی</span>
+                          {hasPurchasedProgram(program.id) && (
+                            <span className="bg-gold-500/20 text-gold-300 text-xs font-medium px-2.5 py-1 rounded-full flex items-center">
+                              <Check size={12} className="ml-1" />
+                              خریداری شده
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <CardHeader>
+                        <CardTitle className="text-lg">{program.title}</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-sm text-gray-400">قیمت: {program.price.toLocaleString()} تومان</p>
+                      </CardContent>
+                      <CardFooter>
+                        <Button 
+                          variant="outline" 
+                          className="w-full border-gray-700 hover:border-green-500 hover:bg-green-500/10"
+                          onClick={() => {
+                            if (hasPurchasedProgram(program.id) && program.program_url) {
+                              navigate(program.program_url);
+                            } else {
+                              // Navigate to program details or purchase page
+                              navigate(`/programs/${program.id}`);
+                            }
+                          }}
+                        >
+                          {hasPurchasedProgram(program.id) ? "مشاهده برنامه" : "خرید برنامه"}
+                        </Button>
+                      </CardFooter>
+                    </Card>
+                  ))
+                ) : (
+                  <div className="col-span-3 text-center py-12">
+                    <p className="text-gray-400">هیچ برنامه غذایی یافت نشد.</p>
                   </div>
-                  <CardHeader>
-                    <CardTitle className="text-lg">رژیم پرکالری</CardTitle>
-                    <CardDescription>مناسب برای افزایش وزن و حجم</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-gray-400">۳۰۰۰ کالری - ۶ وعده در روز</p>
-                  </CardContent>
-                  <CardFooter>
-                    <Button variant="outline" className="w-full border-gray-700 hover:border-blue-500 hover:bg-blue-500/10">مشاهده برنامه</Button>
-                  </CardFooter>
-                </Card>
-                
-                {/* Meal Plan Card 3 */}
-                <Card className="bg-gray-800/50 border-gray-700 hover:border-green-500/50 transition-all duration-300 overflow-hidden">
-                  <div className="h-40 bg-gradient-to-br from-purple-500/20 to-pink-500/20 relative">
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-purple-400 opacity-50"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"></path><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"></path><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"></path><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"></path></svg>
-                    </div>
-                    <div className="absolute top-2 right-2">
-                      <span className="bg-purple-500/20 text-purple-300 text-xs font-medium px-2.5 py-1 rounded-full">متعادل</span>
-                    </div>
-                  </div>
-                  <CardHeader>
-                    <CardTitle className="text-lg">رژیم متعادل</CardTitle>
-                    <CardDescription>مناسب برای حفظ وزن و سلامتی</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-gray-400">۲۲۰۰ کالری - ۵ وعده در روز</p>
-                  </CardContent>
-                  <CardFooter>
-                    <Button variant="outline" className="w-full border-gray-700 hover:border-purple-500 hover:bg-purple-500/10">مشاهده برنامه</Button>
-                  </CardFooter>
-                </Card>
+                )}
               </div>
             </TabsContent>
             
@@ -1844,71 +1873,65 @@ const Dashboard = () => {
               
               {/* Supplement Plans Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {/* Supplement Plan Card 1 */}
-                <Card className="bg-gray-800/50 border-gray-700 hover:border-purple-500/50 transition-all duration-300 overflow-hidden">
-                  <div className="h-40 bg-gradient-to-br from-purple-500/20 to-blue-500/20 relative">
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-purple-400 opacity-50"><path d="M8.3 10a.7.7 0 0 1-.626-1.079L11.4 3a.7.7 0 0 1 1.198-.043L16.3 8.9a.7.7 0 0 1-.572 1.1Z"></path><rect x="3" y="14" width="7" height="7" rx="1"></rect><circle cx="17.5" cy="17.5" r="3.5"></circle></svg>
-                    </div>
-                    <div className="absolute top-2 right-2">
-                      <span className="bg-purple-500/20 text-purple-300 text-xs font-medium px-2.5 py-1 rounded-full">افزایش حجم</span>
-                    </div>
+                {productLoading ? (
+                  <div className="col-span-3 flex justify-center items-center py-12">
+                    <Loader2 className="h-8 w-8 animate-spin text-purple-500" />
+                    <span className="mr-2 text-gray-400">در حال بارگذاری برنامه‌ها...</span>
                   </div>
-                  <CardHeader>
-                    <CardTitle className="text-lg">مکمل‌های افزایش حجم</CardTitle>
-                    <CardDescription>مناسب برای افزایش حجم عضلانی</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-gray-400">۵ مکمل - برنامه ۱۲ هفته‌ای</p>
-                  </CardContent>
-                  <CardFooter>
-                    <Button variant="outline" className="w-full border-gray-700 hover:border-purple-500 hover:bg-purple-500/10">مشاهده برنامه</Button>
-                  </CardFooter>
-                </Card>
-                
-                {/* Supplement Plan Card 2 */}
-                <Card className="bg-gray-800/50 border-gray-700 hover:border-purple-500/50 transition-all duration-300 overflow-hidden">
-                  <div className="h-40 bg-gradient-to-br from-green-500/20 to-teal-500/20 relative">
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-green-400 opacity-50"><path d="m18 16 4-4-4-4"></path><path d="m6 8-4 4 4 4"></path><path d="m14.5 4-5 16"></path></svg>
-                    </div>
-                    <div className="absolute top-2 right-2">
-                      <span className="bg-green-500/20 text-green-300 text-xs font-medium px-2.5 py-1 rounded-full">چربی‌سوزی</span>
-                    </div>
+                ) : supplementPrograms.length > 0 ? (
+                  supplementPrograms.map((program) => (
+                    <Card key={program.id} className="bg-gray-800/50 border-gray-700 hover:border-purple-500/50 transition-all duration-300 overflow-hidden">
+                      <div className="h-40 bg-gradient-to-br from-purple-500/20 to-blue-500/20 relative">
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          {program.image_url ? (
+                            <img 
+                              src={program.image_url} 
+                              alt={program.title} 
+                              className="object-cover w-full h-full opacity-60"
+                            />
+                          ) : (
+                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-purple-400 opacity-50"><path d="M8.3 10a.7.7 0 0 1-.626-1.079L11.4 3a.7.7 0 0 1 1.198-.043L16.3 8.9a.7.7 0 0 1-.572 1.1Z"></path><rect x="3" y="14" width="7" height="7" rx="1"></rect><circle cx="17.5" cy="17.5" r="3.5"></circle></svg>
+                          )}
+                        </div>
+                        <div className="absolute top-2 right-2 flex gap-1">
+                          <span className="bg-purple-500/20 text-purple-300 text-xs font-medium px-2.5 py-1 rounded-full">مکمل</span>
+                          {hasPurchasedProgram(program.id) && (
+                            <span className="bg-gold-500/20 text-gold-300 text-xs font-medium px-2.5 py-1 rounded-full flex items-center">
+                              <Check size={12} className="ml-1" />
+                              خریداری شده
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <CardHeader>
+                        <CardTitle className="text-lg">{program.title}</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-sm text-gray-400">قیمت: {program.price.toLocaleString()} تومان</p>
+                      </CardContent>
+                      <CardFooter>
+                        <Button 
+                          variant="outline" 
+                          className="w-full border-gray-700 hover:border-purple-500 hover:bg-purple-500/10"
+                          onClick={() => {
+                            if (hasPurchasedProgram(program.id) && program.program_url) {
+                              navigate(program.program_url);
+                            } else {
+                              // Navigate to program details or purchase page
+                              navigate(`/programs/${program.id}`);
+                            }
+                          }}
+                        >
+                          {hasPurchasedProgram(program.id) ? "مشاهده برنامه" : "خرید برنامه"}
+                        </Button>
+                      </CardFooter>
+                    </Card>
+                  ))
+                ) : (
+                  <div className="col-span-3 text-center py-12">
+                    <p className="text-gray-400">هیچ برنامه مکملی یافت نشد.</p>
                   </div>
-                  <CardHeader>
-                    <CardTitle className="text-lg">مکمل‌های چربی‌سوزی</CardTitle>
-                    <CardDescription>مناسب برای کاهش چربی بدن</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-gray-400">۴ مکمل - برنامه ۸ هفته‌ای</p>
-                  </CardContent>
-                  <CardFooter>
-                    <Button variant="outline" className="w-full border-gray-700 hover:border-green-500 hover:bg-green-500/10">مشاهده برنامه</Button>
-                  </CardFooter>
-                </Card>
-                
-                {/* Supplement Plan Card 3 */}
-                <Card className="bg-gray-800/50 border-gray-700 hover:border-purple-500/50 transition-all duration-300 overflow-hidden">
-                  <div className="h-40 bg-gradient-to-br from-amber-500/20 to-orange-500/20 relative">
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-amber-400 opacity-50"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
-                    </div>
-                    <div className="absolute top-2 right-2">
-                      <span className="bg-amber-500/20 text-amber-300 text-xs font-medium px-2.5 py-1 rounded-full">انرژی</span>
-                    </div>
-                  </div>
-                  <CardHeader>
-                    <CardTitle className="text-lg">مکمل‌های انرژی‌زا</CardTitle>
-                    <CardDescription>افزایش انرژی و عملکرد ورزشی</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-gray-400">۳ مکمل - برنامه ۶ هفته‌ای</p>
-                  </CardContent>
-                  <CardFooter>
-                    <Button variant="outline" className="w-full border-gray-700 hover:border-amber-500 hover:bg-amber-500/10">مشاهده برنامه</Button>
-                  </CardFooter>
-                </Card>
+                )}
               </div>
             </TabsContent>
             

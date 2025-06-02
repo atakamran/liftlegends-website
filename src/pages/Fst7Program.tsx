@@ -1,11 +1,14 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Helmet } from "react-helmet";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import { 
   Card, 
   CardContent, 
   CardDescription, 
   CardHeader, 
-  CardTitle 
+  CardTitle,
+  CardFooter
 } from "@/components/ui/card";
 import { 
   Accordion, 
@@ -15,7 +18,8 @@ import {
 } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Dumbbell, Clock, Flame, Calendar, Info } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Dumbbell, Clock, Flame, Calendar, Info, Lock, ShoppingCart } from "lucide-react";
 
 // Define interfaces for exercise and workout data
 interface Exercise {
@@ -39,7 +43,68 @@ interface WeekProgram {
   workouts: DayWorkout[];
 }
 
+// Define interface for user purchases
+interface UserPurchase {
+  id: string;
+  user_id: string;
+  program_id: string;
+  payment_status: string;
+  created_at: string;
+}
+
+// Import the PurchasePrompt component
+import PurchasePrompt from "@/components/program/PurchasePrompt";
+
 const Fst7Program = () => {
+  const navigate = useNavigate();
+  const [hasPurchased, setHasPurchased] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  
+  // FST-7 Program ID (the one you provided)
+  const FST7_PROGRAM_ID = "22cfde61-03b7-48d5-936f-0a2f6fa04bdc";
+  
+  // Check if user has purchased the program
+  useEffect(() => {
+    const checkPurchaseStatus = async () => {
+      try {
+        setIsLoading(true);
+        
+        // Get current user
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (!user) {
+          // User is not logged in
+          setHasPurchased(false);
+          setIsLoading(false);
+          return;
+        }
+        
+        // Check if user has purchased this program
+        const { data, error } = await supabase
+          .from('user_purchases')
+          .select('id')
+          .eq('user_id', user.id)
+          .eq('program_id', FST7_PROGRAM_ID)
+          .eq('payment_status', 'completed');
+          
+        if (error) {
+          console.error("Error checking purchase status:", error);
+          setHasPurchased(false);
+        } else {
+          // If there are any purchases, the user has purchased the program
+          setHasPurchased(data && data.length > 0);
+        }
+      } catch (error) {
+        console.error("Error in purchase check:", error);
+        setHasPurchased(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    checkPurchaseStatus();
+  }, []);
+  
   // FST-7 Program data
   const programData: WeekProgram[] = [
     {
@@ -469,8 +534,17 @@ const Fst7Program = () => {
         </CardContent>
       </Card>
 
-      {/* Program Tabs */}
-      <Tabs defaultValue="week1" className="w-full">
+      {/* Purchase Prompt - Show if user hasn't purchased the program */}
+      {!isLoading && !hasPurchased && (
+        <PurchasePrompt 
+          programId={FST7_PROGRAM_ID}
+          programTitle="FST-7"
+          description="برنامه تمرینی FST-7 یک روش پیشرفته برای افزایش حجم و تفکیک عضلات است. برای دسترسی به جزئیات کامل برنامه، تمرینات هر روز و نکات تخصصی، لطفاً این برنامه را خریداری کنید."
+        />
+      )}
+
+      {/* Program Tabs - Show full content if purchased, or limited preview if not */}
+      <Tabs defaultValue="week1" className="w-full mt-8">
         <TabsList className="grid grid-cols-4 mb-6">
           <TabsTrigger value="week1">هفته اول</TabsTrigger>
           <TabsTrigger value="week2">هفته دوم</TabsTrigger>
@@ -484,8 +558,9 @@ const Fst7Program = () => {
               <h2 className="text-xl font-semibold text-gold-500">{weekData.description}</h2>
             </div>
             
+            {/* If user hasn't purchased, only show first day of each week */}
             <Accordion type="single" collapsible className="w-full">
-              {weekData.workouts.map((workout, dayIndex) => (
+              {(hasPurchased ? weekData.workouts : weekData.workouts.slice(0, 1)).map((workout, dayIndex) => (
                 <AccordionItem key={dayIndex} value={`day-${weekIndex}-${dayIndex}`} className="border-gray-800">
                   <AccordionTrigger className="hover:no-underline py-4 px-4 hover:bg-gray-900/50 rounded-lg">
                     <div className="flex items-center justify-between w-full">
@@ -511,43 +586,91 @@ const Fst7Program = () => {
                   </AccordionContent>
                 </AccordionItem>
               ))}
+              
+              {/* Show locked message if not purchased */}
+              {!hasPurchased && weekData.workouts.length > 1 && (
+                <div className="mt-4 p-4 bg-gray-900/50 rounded-lg border border-gray-800 text-gray-300 flex items-center justify-between">
+                  <div className="flex items-center">
+                    <Lock className="h-5 w-5 text-gold-500 ml-2" />
+                    <span>برای مشاهده سایر روزهای تمرینی این هفته، لطفاً برنامه را خریداری کنید</span>
+                  </div>
+                  <Button 
+                    onClick={() => navigate(`/product/${FST7_PROGRAM_ID}`)}
+                    size="sm"
+                    className="bg-gold-500 hover:bg-gold-600 text-black"
+                  >
+                    خرید برنامه
+                  </Button>
+                </div>
+              )}
             </Accordion>
           </TabsContent>
         ))}
       </Tabs>
 
-      {/* Tips Section */}
+      {/* Tips Section - Only show full tips if purchased */}
       <Card className="mt-10 bg-gradient-to-br from-gray-900 to-black border border-gray-800">
         <CardHeader>
           <CardTitle className="text-gold-500">نکات مهم برنامه FST-7</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <ul className="space-y-3 text-gray-300">
-            <li className="flex items-start">
-              <div className="w-2 h-2 mt-2 ml-2 rounded-full bg-gold-500"></div>
-              <span>در تمرینات FST-7، استراحت بین ست‌ها باید کوتاه باشد (30-45 ثانیه) تا پمپ عضلانی حفظ شود.</span>
-            </li>
-            <li className="flex items-start">
-              <div className="w-2 h-2 mt-2 ml-2 rounded-full bg-gold-500"></div>
-              <span>مصرف آب کافی قبل و حین تمرین برای این روش بسیار مهم است.</span>
-            </li>
-            <li className="flex items-start">
-              <div className="w-2 h-2 mt-2 ml-2 rounded-full bg-gold-500"></div>
-              <span>وزنه‌ها باید طوری انتخاب شوند که بتوانید تمام 7 ست را با تکنیک صحیح انجام دهید.</span>
-            </li>
-            <li className="flex items-start">
-              <div className="w-2 h-2 mt-2 ml-2 rounded-full bg-gold-500"></div>
-              <span>تغذیه مناسب قبل و بعد از تمرین برای بازسازی عضلات ضروری است.</span>
-            </li>
-            <li className="flex items-start">
-              <div className="w-2 h-2 mt-2 ml-2 rounded-full bg-gold-500"></div>
-              <span>این برنامه برای افراد مبتدی مناسب نیست و نیاز به آمادگی جسمانی مناسب دارد.</span>
-            </li>
-            <li className="flex items-start">
-              <div className="w-2 h-2 mt-2 ml-2 rounded-full bg-gold-500"></div>
-              <span>در صورت احساس درد غیرطبیعی، تمرین را متوقف کنید و با مربی مشورت کنید.</span>
-            </li>
-          </ul>
+          {hasPurchased ? (
+            <ul className="space-y-3 text-gray-300">
+              <li className="flex items-start">
+                <div className="w-2 h-2 mt-2 ml-2 rounded-full bg-gold-500"></div>
+                <span>در تمرینات FST-7، استراحت بین ست‌ها باید کوتاه باشد (30-45 ثانیه) تا پمپ عضلانی حفظ شود.</span>
+              </li>
+              <li className="flex items-start">
+                <div className="w-2 h-2 mt-2 ml-2 rounded-full bg-gold-500"></div>
+                <span>مصرف آب کافی قبل و حین تمرین برای این روش بسیار مهم است.</span>
+              </li>
+              <li className="flex items-start">
+                <div className="w-2 h-2 mt-2 ml-2 rounded-full bg-gold-500"></div>
+                <span>وزنه‌ها باید طوری انتخاب شوند که بتوانید تمام 7 ست را با تکنیک صحیح انجام دهید.</span>
+              </li>
+              <li className="flex items-start">
+                <div className="w-2 h-2 mt-2 ml-2 rounded-full bg-gold-500"></div>
+                <span>تغذیه مناسب قبل و بعد از تمرین برای بازسازی عضلات ضروری است.</span>
+              </li>
+              <li className="flex items-start">
+                <div className="w-2 h-2 mt-2 ml-2 rounded-full bg-gold-500"></div>
+                <span>این برنامه برای افراد مبتدی مناسب نیست و نیاز به آمادگی جسمانی مناسب دارد.</span>
+              </li>
+              <li className="flex items-start">
+                <div className="w-2 h-2 mt-2 ml-2 rounded-full bg-gold-500"></div>
+                <span>در صورت احساس درد غیرطبیعی، تمرین را متوقف کنید و با مربی مشورت کنید.</span>
+              </li>
+            </ul>
+          ) : (
+            <div className="space-y-4">
+              {/* Show only 2 tips as preview */}
+              <ul className="space-y-3 text-gray-300">
+                <li className="flex items-start">
+                  <div className="w-2 h-2 mt-2 ml-2 rounded-full bg-gold-500"></div>
+                  <span>در تمرینات FST-7، استراحت بین ست‌ها باید کوتاه باشد (30-45 ثانیه) تا پمپ عضلانی حفظ شود.</span>
+                </li>
+                <li className="flex items-start">
+                  <div className="w-2 h-2 mt-2 ml-2 rounded-full bg-gold-500"></div>
+                  <span>مصرف آب کافی قبل و حین تمرین برای این روش بسیار مهم است.</span>
+                </li>
+              </ul>
+              
+              {/* Locked content message */}
+              <div className="p-4 bg-gray-900/50 rounded-lg border border-gray-700 flex items-center justify-between">
+                <div className="flex items-center">
+                  <Lock className="h-5 w-5 text-gold-500 ml-2" />
+                  <span className="text-gray-300">برای مشاهده تمام نکات تخصصی، لطفاً برنامه را خریداری کنید</span>
+                </div>
+                <Button 
+                  onClick={() => navigate(`/product/${FST7_PROGRAM_ID}`)}
+                  size="sm"
+                  className="bg-gold-500 hover:bg-gold-600 text-black"
+                >
+                  خرید برنامه
+                </Button>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
