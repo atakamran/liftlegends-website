@@ -37,7 +37,8 @@ interface RelatedProgram {
 }
 
 const ProductPage = () => {
-  const { id } = useParams<{ id: string }>();
+  // Handle both ID-based and slug-based URLs
+  const { id, slug } = useParams<{ id?: string, slug?: string }>();
   const navigate = useNavigate();
   const [program, setProgram] = useState<Program | null>(null);
   const [relatedPrograms, setRelatedPrograms] = useState<RelatedProgram[]>([]);
@@ -48,16 +49,26 @@ const ProductPage = () => {
     try {
       setLoading(true);
       
-      if (!id) {
+      // If neither id nor slug is provided, redirect to programs page
+      if (!id && !slug) {
         navigate("/programs");
         return;
       }
       
-      const { data, error } = await supabase
+      let query = supabase
         .from("programs_sale")
-        .select("*")
-        .eq("id", id)
-        .single();
+        .select("*");
+      
+      // If we have an ID, use it for the query
+      if (id) {
+        query = query.eq("id", id);
+      } 
+      // Otherwise use the slug (program_url)
+      else if (slug) {
+        query = query.eq("program_url", slug);
+      }
+      
+      const { data, error } = await query.single();
         
       if (error) throw error;
       
@@ -153,10 +164,10 @@ const ProductPage = () => {
     navigate(`/payment?program=${program.id}`);
   };
   
-  // Load program details on component mount
+  // Load program details on component mount or when URL parameters change
   useEffect(() => {
     fetchProgramDetails();
-  }, [id]);
+  }, [id, slug]);
   
   // If loading, show loading spinner
   if (loading) {

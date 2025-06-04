@@ -71,7 +71,7 @@ interface ProgramDetails {
     estimated_duration: string;
     calories_burned: string;
   };
-  weeks: WeekProgram[];
+  workouts: DayWorkout[];
   created_at?: string;
   updated_at?: string;
 }
@@ -113,7 +113,7 @@ interface WeekProgress {
 interface ProgramProgress {
   viewed: boolean;
   lastViewed: number;
-  weeks: Record<number, WeekProgress>;
+  workouts: Record<number, WorkoutProgress>;
   overallProgress: number;
 }
 
@@ -125,7 +125,7 @@ const ProgramDetails = () => {
   const [programData, setProgramData] = useState<ProgramDetails | null>(null);
   const [programInfo, setProgramInfo] = useState<ProgramSaleInfo | null>(null);
   const [progress, setProgress] = useState<ProgramProgress | null>(null);
-  const [activeTab, setActiveTab] = useState<string>("week1");
+  // No longer need tabs
   const [activeAccordion, setActiveAccordion] = useState<string | null>(null);
   
   // Initialize or get program progress from localStorage
@@ -151,29 +151,21 @@ const ProgramDetails = () => {
         viewed: true,
         lastViewed: Date.now(),
         overallProgress: 0,
-        weeks: {}
+        workouts: {}
       };
       
       // Initialize progress structure based on program data
-      programData.weeks.forEach(week => {
-        newProgress.weeks[week.week_number] = {
+      programData.workouts.forEach(workout => {
+        newProgress.workouts[workout.day_number] = {
           completed: false,
-          workouts: {},
+          exercises: {},
           timestamp: 0
         };
         
-        week.workouts.forEach(workout => {
-          newProgress.weeks[week.week_number].workouts[workout.day_number] = {
-            completed: false,
-            exercises: {},
-            timestamp: 0
+        workout.exercises.forEach((_, index) => {
+          newProgress.workouts[workout.day_number].exercises[index] = {
+            completed: false
           };
-          
-          workout.exercises.forEach((_, index) => {
-            newProgress.weeks[week.week_number].workouts[workout.day_number].exercises[index] = {
-              completed: false
-            };
-          });
         });
       });
       
@@ -185,7 +177,7 @@ const ProgramDetails = () => {
         viewed: true,
         lastViewed: Date.now(),
         overallProgress: 0,
-        weeks: {}
+        workouts: {}
       };
     }
   };
@@ -200,18 +192,18 @@ const ProgramDetails = () => {
   };
   
   // Toggle exercise completion status
-  const toggleExerciseCompletion = (weekNumber: number, dayNumber: number, exerciseIndex: number) => {
+  const toggleExerciseCompletion = (dayNumber: number, exerciseIndex: number) => {
     if (!progress || !hasPurchased) return;
     
     const updatedProgress = { ...progress };
-    const exerciseProgress = updatedProgress.weeks[weekNumber]?.workouts[dayNumber]?.exercises[exerciseIndex];
+    const exerciseProgress = updatedProgress.workouts[dayNumber]?.exercises[exerciseIndex];
     
     if (exerciseProgress) {
       exerciseProgress.completed = !exerciseProgress.completed;
       exerciseProgress.timestamp = Date.now();
       
       // Update workout completion status
-      const workout = updatedProgress.weeks[weekNumber]?.workouts[dayNumber];
+      const workout = updatedProgress.workouts[dayNumber];
       if (workout) {
         const allExercisesCompleted = Object.values(workout.exercises).every(ex => ex.completed);
         workout.completed = allExercisesCompleted;
@@ -220,27 +212,13 @@ const ProgramDetails = () => {
         }
       }
       
-      // Update week completion status
-      const week = updatedProgress.weeks[weekNumber];
-      if (week) {
-        const allWorkoutsCompleted = Object.values(week.workouts).every(w => w.completed);
-        week.completed = allWorkoutsCompleted;
-        if (allWorkoutsCompleted) {
-          week.timestamp = Date.now();
-        }
-      }
-      
       // Calculate overall progress
-      const totalExercises = Object.values(updatedProgress.weeks).flatMap(week => 
-        Object.values(week.workouts).flatMap(workout => 
-          Object.values(workout.exercises)
-        )
+      const totalExercises = Object.values(updatedProgress.workouts).flatMap(workout => 
+        Object.values(workout.exercises)
       ).length;
       
-      const completedExercises = Object.values(updatedProgress.weeks).flatMap(week => 
-        Object.values(week.workouts).flatMap(workout => 
-          Object.values(workout.exercises).filter(ex => ex.completed)
-        )
+      const completedExercises = Object.values(updatedProgress.workouts).flatMap(workout => 
+        Object.values(workout.exercises).filter(ex => ex.completed)
       ).length;
       
       updatedProgress.overallProgress = totalExercises > 0 
@@ -268,13 +246,7 @@ const ProgramDetails = () => {
         Array.isArray(data.details.equipment_needed) &&
         typeof data.details.estimated_duration === 'string' &&
         typeof data.details.calories_burned === 'string' &&
-        Array.isArray(data.weeks) &&
-        // Validate that weeks have the expected structure
-        data.weeks.every((week: WeekProgram) => 
-          typeof week.week_number === 'number' &&
-          typeof week.description === 'string' &&
-          Array.isArray(week.workouts)
-        )
+        Array.isArray(data.workouts || data.weeks) // Accept either workouts or weeks for backward compatibility
       );
     } catch (error) {
       console.error("Error validating program details:", error);
@@ -326,16 +298,28 @@ const ProgramDetails = () => {
           console.error("Program sale info does not match expected format:", programSaleInfo);
         }
         
+        // Transform data if needed
+        let transformedProgramDetails = { ...programDetails };
+        
+        // Always use the workouts directly from the data provided
+        if (programDetails.weeks && Array.isArray(programDetails.weeks)) {
+          // Get all workouts from all weeks
+          const allWorkouts = programDetails.weeks.flatMap(week => week.workouts);
+          
+          // Set workouts directly on the program details
+          transformedProgramDetails.workouts = allWorkouts;
+        }
+        
         // Validate program details before using them
-        if (validateProgramDetails(programDetails)) {
-          setProgramData(programDetails);
+        if (validateProgramDetails(transformedProgramDetails)) {
+          setProgramData(transformedProgramDetails);
           
           // Initialize progress tracking
-          const initialProgress = initializeProgress(programDetails);
+          const initialProgress = initializeProgress(transformedProgramDetails);
           setProgress(initialProgress);
           saveProgress(initialProgress);
         } else {
-          console.error("Program details do not match expected format:", programDetails);
+          console.error("Program details do not match expected format:", transformedProgramDetails);
           setIsLoading(false);
           return;
         }
@@ -414,10 +398,10 @@ const ProgramDetails = () => {
     
     // Clean up observer on unmount
     return () => observer.disconnect();
-  }, [activeTab]); // Re-run when active tab changes
+  }, []); // Run once on mount
   
   // Function to render exercise rows
-  const renderExercises = (exercises: Exercise[], weekNumber: number, dayNumber: number) => {
+  const renderExercises = (exercises: Exercise[], dayNumber: number) => {
     if (!exercises || exercises.length === 0) {
       return (
         <div className="relative overflow-hidden rounded-xl border border-blue-500/20 bg-blue-900/5 transition-all duration-300 py-6 px-4 my-2">
@@ -440,7 +424,7 @@ const ProgramDetails = () => {
     return (
       <div className="space-y-3">
         {exercises.map((exercise, index) => {
-          const isCompleted = progress?.weeks[weekNumber]?.workouts[dayNumber]?.exercises[index]?.completed || false;
+          const isCompleted = progress?.workouts[dayNumber]?.exercises[index]?.completed || false;
           
           return (
             <div 
@@ -448,7 +432,7 @@ const ProgramDetails = () => {
               className={`rounded-lg border ${isCompleted ? 'border-green-500/20 bg-green-900/5' : 'border-gray-700/30 bg-gray-800/30'} 
                 ${exercise.is_fst7 ? 'border-gold-500/20' : ''} p-3 transition-all duration-300 cursor-pointer
                 hover:border-gold-500/30 hover:shadow-md hover:shadow-black/20`}
-              onClick={() => hasPurchased && toggleExerciseCompletion(weekNumber, dayNumber, index)}
+              onClick={() => hasPurchased && toggleExerciseCompletion(dayNumber, index)}
             >
               <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
                 <div className="flex items-center gap-2">
@@ -627,7 +611,7 @@ const ProgramDetails = () => {
           <CardFooter>
             <Button 
               className="w-full bg-gradient-to-r from-gold-600 to-gold-500 hover:from-gold-700 hover:to-gold-600 text-black shadow-lg shadow-gold-500/20"
-              onClick={() => navigate(`/checkout/${programId}`)}
+              onClick={() => navigate(`/product/${programId}`)}
             >
               <ShoppingCart className="h-4 w-4 mr-2" />
               خرید این برنامه - {programInfo.price.toLocaleString()} تومان
@@ -644,7 +628,7 @@ const ProgramDetails = () => {
             <div className="flex items-center gap-2">
               <BarChart className="h-5 w-5 text-gold-500" />
               <span className="text-sm text-gray-400">
-                {Object.values(progress.weeks).filter(w => w.completed).length} از {programData.weeks.length} هفته تکمیل شده
+                {progress.overallProgress}% تکمیل شده
               </span>
             </div>
           )}
@@ -660,7 +644,7 @@ const ProgramDetails = () => {
               </p>
               <Button 
                 className="bg-gradient-to-r from-gold-600 to-gold-500 hover:from-gold-700 hover:to-gold-600 text-black shadow-lg shadow-gold-500/20"
-                onClick={() => navigate(`/checkout/${programId}`)}
+                onClick={() => navigate(`/product/${programId}`)}
               >
                 <ShoppingCart className="h-4 w-4 mr-2" />
                 خرید این برنامه
@@ -668,56 +652,21 @@ const ProgramDetails = () => {
             </CardContent>
           </Card>
         ) : (
-          <Tabs 
-            defaultValue="week1" 
-            className="w-full"
-            value={activeTab}
-            onValueChange={setActiveTab}
-          >
-            <div className="mb-6 overflow-hidden">
-              <TabsList className="w-full overflow-x-auto flex flex-nowrap justify-start md:justify-center p-1 bg-gray-800/50 rounded-lg gap-1 no-scrollbar">
-                {programData.weeks.map((week) => {
-                  const isCompleted = progress?.weeks[week.week_number]?.completed || false;
-                  return (
-                    <TabsTrigger 
-                      key={week.week_number} 
-                      value={`week${week.week_number}`}
-                      className={`whitespace-nowrap relative px-4 py-2 rounded-md transition-all duration-200 
-                        ${isCompleted ? 'bg-green-900/20 text-green-400 border border-green-500/20' : 'bg-gray-800 border border-gray-700/30 hover:bg-gray-700/50'}`}
-                    >
-                      {isCompleted && (
-                        <CheckCircle className="h-3 w-3 absolute -top-1 -right-1 fill-green-500 text-black" />
-                      )}
-                      <span className="text-xs font-medium">هفته</span>
-                      <span className="mr-1 font-bold">{week.week_number}</span>
-                    </TabsTrigger>
-                  );
-                })}
-              </TabsList>
-            </div>
-            
-            {programData.weeks.map((week) => (
-              <TabsContent key={week.week_number} value={`week${week.week_number}`}>
-                <Card className="bg-gray-900 border border-gray-800 shadow-xl">
-                  <CardHeader>
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <CardTitle>هفته {week.week_number}</CardTitle>
-                        <CardDescription>{week.description}</CardDescription>
-                      </div>
-                      {progress?.weeks[week.week_number]?.completed && (
-                        <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
-                          <CheckCircle className="h-3.5 w-3.5 mr-1" />
-                          تکمیل شده
-                        </Badge>
-                      )}
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mb-4">
-                      {week.workouts.map((workout, index) => {
-                        const isWorkoutCompleted = progress?.weeks[week.week_number]?.workouts[workout.day_number]?.completed || false;
-                        const dayId = `day-${week.week_number}-${index}`;
+          <div className="w-full">
+            <Card className="bg-gray-900 border border-gray-800 shadow-xl">
+              <CardHeader>
+                <div className="flex justify-between items-center">
+                  <div>
+                    <CardTitle>برنامه تمرینی</CardTitle>
+                    <CardDescription>{programData.description}</CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mb-4">
+                  {programData.workouts.map((workout, index) => {
+                    const isWorkoutCompleted = progress?.workouts[workout.day_number]?.completed || false;
+                    const dayId = `day-${workout.day_number}-${index}`;
                         
                         return (
                           <div 
@@ -790,7 +739,7 @@ const ProgramDetails = () => {
                                       <strong className="text-gold-500">نکته:</strong> {workout.notes}
                                     </div>
                                   )}
-                                  {renderExercises(workout.exercises, week.week_number, workout.day_number)}
+                                  {renderExercises(workout.exercises, workout.day_number)}
                                 </AccordionContent>
                               </AccordionItem>
                             </Accordion>
@@ -803,10 +752,8 @@ const ProgramDetails = () => {
                     </div>
                   </CardContent>
                 </Card>
-              </TabsContent>
-            ))}
-          </Tabs>
-        )}
+              </div>
+            )}
       </div>
 
       {/* Tips Section */}

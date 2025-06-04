@@ -382,9 +382,14 @@ const ProgramCard = ({ program }: { program: Program }) => {
     }
   };
 
-  // Handle card click to navigate to product page
+  // Handle card click to navigate to product page using program_url as slug
   const handleCardClick = () => {
-    navigate(`/product/${program.id}`);
+    // If program_url exists, use it as the slug; otherwise, fall back to the ID-based URL
+    if (program.program_url) {
+      navigate(`/programs/${program.program_url}`);
+    } else {
+      navigate(`/product/${program.id}`);
+    }
   };
 
   return (
@@ -429,7 +434,12 @@ const ProgramCard = ({ program }: { program: Program }) => {
           className="w-full bg-gold-500 hover:bg-gold-600 text-black"
           onClick={(e) => {
             e.stopPropagation(); // Prevent the card click event from firing
-            navigate(`/product/${program.id}`);
+            // Use program_url as the slug if available, otherwise fall back to ID-based URL
+            if (program.program_url) {
+              navigate(`/programs/${program.program_url}`);
+            } else {
+              navigate(`/product/${program.id}`);
+            }
           }}
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-2"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path><path d="M11 8v6"></path><path d="M8 11h6"></path></svg>
