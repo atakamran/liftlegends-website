@@ -13,7 +13,7 @@
 
   <meta charset="UTF-8" />
   <meta name="viewport"
-    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, shrink-to-fit=no" />
   <meta name="HandheldFriendly" content="true" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-touch-fullscreen" content="yes" />
@@ -212,6 +212,18 @@
     function setVhVariable() {
       let vh = window.innerHeight * 0.01;
       document.documentElement.style.setProperty('--vh', `${vh}px`);
+      
+      // Force redraw on iOS
+      document.body.style.display = 'none';
+      document.body.offsetHeight; // Trigger a reflow
+      document.body.style.display = '';
+      
+      // Ensure no horizontal overflow
+      document.documentElement.style.width = '100%';
+      document.documentElement.style.maxWidth = '100vw';
+      document.body.style.width = '100%';
+      document.body.style.maxWidth = '100vw';
+      document.body.style.overflowX = 'hidden';
     }
 
     // Set the variable initially
@@ -220,6 +232,9 @@
     // Update on resize and orientation change
     window.addEventListener('resize', setVhVariable);
     window.addEventListener('orientationchange', setVhVariable);
+    
+    // Also update after page load to ensure correct sizing
+    window.addEventListener('load', setVhVariable);
 
     // Prevent text cursor and selection on mobile
     // Handle touchstart to prevent the initial cursor

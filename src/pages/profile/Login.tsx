@@ -138,9 +138,9 @@ const Login = () => {
   };
 
   return (
-      <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-gray-900 to-black dir-rtl">
-        <div className="container mx-auto px-4 py-2">
-          <div className="max-w-md w-full mx-auto space-y-8 bg-gray-900/95 backdrop-blur-md border border-gray-700/50 rounded-xl p-8 shadow-2xl text-right">
+      <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center py-8 px-3 sm:px-6 lg:px-8 bg-gradient-to-b from-gray-900 to-black dir-rtl">
+        <div className="w-full max-w-md mx-auto">
+          <div className="w-full mx-auto space-y-6 bg-gray-900/95 backdrop-blur-md border border-gray-700/50 rounded-xl p-5 sm:p-8 shadow-2xl text-right form-container">
           <div>
             <div className="flex justify-center">
               <img 
