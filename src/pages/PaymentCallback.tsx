@@ -213,7 +213,6 @@ const PaymentCallback = () => {
           .from('user_purchases')
           .insert({
             user_id: userId,
-            plan_id: "00000000-0000-0000-0000-000000000000", // Placeholder for program purchases
             program_id: programId, // Set the program_id for program purchases
             amount: amount,
             payment_id: refId || authority,
@@ -224,6 +223,7 @@ const PaymentCallback = () => {
           
         if (purchaseError) {
           console.error("Error recording program purchase:", purchaseError);
+          console.error("Program purchase error details:", JSON.stringify(purchaseError));
           throw new Error(`خطا در ثبت خرید برنامه: ${purchaseError.message}`);
         }
         
@@ -231,6 +231,7 @@ const PaymentCallback = () => {
         
         // Clear payment info from localStorage
         localStorage.removeItem("payment_info");
+        console.log("Payment info cleared from localStorage after program purchase");
         
         return true;
       } else {
@@ -307,20 +308,31 @@ const PaymentCallback = () => {
         
         // Insert purchase record into user_purchases table
         try {
+          console.log("Inserting subscription purchase record with data:", {
+            user_id: userId,
+            amount: amount,
+            payment_id: refId || authority,
+            payment_status: 'completed',
+            expires_at: endDate.toISOString(),
+            purchase_date: startDate.toISOString(),
+            program_id: null
+          });
+          
           const { error: purchaseError } = await supabase
             .from('user_purchases')
             .insert({
               user_id: userId,
-              plan_id: fitnessPlanId,
               amount: amount,
               payment_id: refId || authority,
               payment_status: 'completed',
               expires_at: endDate.toISOString(),
-              purchase_date: startDate.toISOString()
+              purchase_date: startDate.toISOString(),
+              program_id: null // Explicitly set to null for subscription purchases
             });
             
           if (purchaseError) {
             console.error("Error recording purchase in database:", purchaseError);
+            console.error("Error details:", JSON.stringify(purchaseError));
             // Don't throw here, as the subscription is already activated
           } else {
             console.log("Purchase recorded successfully");
@@ -346,6 +358,7 @@ const PaymentCallback = () => {
             
           if (logError) {
             console.error("Error logging subscription transaction:", logError);
+            console.error("Subscription log error details:", JSON.stringify(logError));
             // Don't throw here, as the subscription is already activated
           }
         } catch (logError) {
@@ -355,6 +368,7 @@ const PaymentCallback = () => {
         
         // Clear payment info from localStorage
         localStorage.removeItem("payment_info");
+        console.log("Payment info cleared from localStorage after subscription purchase");
         
         return true;
       }

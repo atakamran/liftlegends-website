@@ -1,0 +1,134 @@
+{
+    "breadcrumbs": [
+        {
+            "path": "/",
+            "breadcrumb": [
+                {
+                    "position": 1,
+                    "name": "صفحه اصلی",
+                    "item": "https://liftlegends.ir/"
+                }
+            ]
+        },
+        {
+            "path": "/programs",
+            "breadcrumb": [
+                {
+                    "position": 1,
+                    "name": "صفحه اصلی",
+                    "item": "https://liftlegends.ir/"
+                },
+                {
+                    "position": 2,
+                    "name": "برنامه‌های تمرینی بدنسازی",
+                    "item": "https://liftlegends.ir/programs"
+                }
+            ]
+        },
+        {
+            "path": "/blog",
+            "breadcrumb": [
+                {
+                    "position": 1,
+                    "name": "صفحه اصلی",
+                    "item": "https://liftlegends.ir/"
+                },
+                {
+                    "position": 2,
+                    "name": "بلاگ بدنسازی",
+                    "item": "https://liftlegends.ir/blog"
+                }
+            ]
+        },
+        {
+            "path": "/blog/category/workout",
+            "breadcrumb": [
+                {
+                    "position": 1,
+                    "name": "صفحه اصلی",
+                    "item": "https://liftlegends.ir/"
+                },
+                {
+                    "position": 2,
+                    "name": "بلاگ بدنسازی",
+                    "item": "https://liftlegends.ir/blog"
+                },
+                {
+                    "position": 3,
+                    "name": "تمرینات بدنسازی",
+                    "item": "https://liftlegends.ir/blog/category/workout"
+                }
+            ]
+        },
+        {
+            "path": "/blog/category/nutrition",
+            "breadcrumb": [
+                {
+                    "position": 1,
+                    "name": "صفحه اصلی",
+                    "item": "https://liftlegends.ir/"
+                },
+                {
+                    "position": 2,
+                    "name": "بلاگ بدنسازی",
+                    "item": "https://liftlegends.ir/blog"
+                },
+                {
+                    "position": 3,
+                    "name": "تغذیه بدنسازی",
+                    "item": "https://liftlegends.ir/blog/category/nutrition"
+                }
+            ]
+        },
+        {
+            "path": "/blog/category/supplements",
+            "breadcrumb": [
+                {
+                    "position": 1,
+                    "name": "صفحه اصلی",
+                    "item": "https://liftlegends.ir/"
+                },
+                {
+                    "position": 2,
+                    "name": "بلاگ بدنسازی",
+                    "item": "https://liftlegends.ir/blog"
+                },
+                {
+                    "position": 3,
+                    "name": "مکمل‌های بدنسازی",
+                    "item": "https://liftlegends.ir/blog/category/supplements"
+                }
+            ]
+        },
+        {
+            "path": "/download",
+            "breadcrumb": [
+                {
+                    "position": 1,
+                    "name": "صفحه اصلی",
+                    "item": "https://liftlegends.ir/"
+                },
+                {
+                    "position": 2,
+                    "name": "دانلود اپلیکیشن بدنسازی",
+                    "item": "https://liftlegends.ir/download"
+                }
+            ]
+        },
+        {
+            "path": "/about",
+            "breadcrumb": [
+                {
+                    "position": 1,
+                    "name": "صفحه اصلی",
+                    "item": "https://liftlegends.ir/"
+                },
+                {
+                    "position": 2,
+                    "name": "درباره ما",
+                    "item": "https://liftlegends.ir/about"
+                }
+            ]
+        }
+    ]
+}

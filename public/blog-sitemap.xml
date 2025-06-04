@@ -12,9 +12,17 @@
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://uploadkon.ir/uploads/4b3815_25بهترین-برنامه‌های-تمرینی-برای-افزایش-حجم-عضلات.jpg</image:loc>
-      <image:title>بلاگ لیفت لجندز</image:title>
-      <image:caption>مقالات تخصصی بدنسازی و تناسب اندام</image:caption>
+      <image:title>بلاگ بدنسازی لیفت لجندز</image:title>
+      <image:caption>مقالات تخصصی بدنسازی، تمرینات، تغذیه و مکمل‌ها</image:caption>
     </image:image>
+    <news:news>
+      <news:publication>
+        <news:name>LiftLegends - بدنسازی هوشمند</news:name>
+        <news:language>fa</news:language>
+      </news:publication>
+      <news:publication_date>2024-08-15</news:publication_date>
+      <news:title>بلاگ تخصصی بدنسازی و تناسب اندام</news:title>
+    </news:news>
   </url>
 
   <!-- دسته‌بندی‌های بلاگ -->

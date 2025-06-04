@@ -16,21 +16,34 @@ const Index = () => {
     script.innerHTML = JSON.stringify({
       "@context": "https://schema.org",
       "@type": "WebSite",
-      "name": "LiftLegends - مربی بدنسازی هوشمند",
+      "name": "بدنسازی هوشمند با LiftLegends",
       "url": "https://liftlegends.ir/",
       "potentialAction": {
         "@type": "SearchAction",
         "target": "https://liftlegends.ir/search?q={search_term_string}",
         "query-input": "required name=search_term_string"
       },
-      "description": "مربی بدنسازی هوشمند با هوش مصنوعی پیشرفته، برنامه تمرینی و رژیم غذایی شخصی‌سازی شده",
+      "description": "بهترین برنامه بدنسازی و تناسب اندام با هوش مصنوعی - برنامه تمرینی هوشمند، رژیم غذایی شخصی‌سازی شده و مشاوره تخصصی مکمل و استرویید",
+      "keywords": "بدنسازی، برنامه بدنسازی، تناسب اندام، مربی بدنسازی، برنامه تمرینی بدنسازی، رژیم غذایی بدنسازی، مکمل بدنسازی، استرویید، فیتنس، اپلیکیشن بدنسازی",
       "publisher": {
         "@type": "Organization",
-        "name": "LiftLegends",
+        "name": "LiftLegends - بدنسازی هوشمند",
         "logo": {
           "@type": "ImageObject",
           "url": "https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends//white%20logo.png"
         }
+      },
+      "mainEntity": {
+        "@type": "SoftwareApplication",
+        "name": "LiftLegends - اپلیکیشن بدنسازی",
+        "applicationCategory": "HealthApplication",
+        "operatingSystem": "Android",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "IRR"
+        },
+        "description": "اپلیکیشن بدنسازی هوشمند با برنامه تمرینی و رژیم غذایی شخصی‌سازی شده"
       }
     });
     document.head.appendChild(script);
@@ -43,17 +56,17 @@ const Index = () => {
   return (
     <>
       <Helmet>
-        <title>LiftLegends - مربی بدنسازی هوشمند با هوش مصنوعی</title>
-        <meta name="description" content="مربی بدنسازی هوشمند با هوش مصنوعی پیشرفته، برنامه تمرینی و رژیم غذایی شخصی‌سازی شده. دانلود اپلیکیشن LiftLegends برای اندروید." />
-        <meta name="keywords" content="مربی بدنسازی, هوش مصنوعی, برنامه تمرینی, رژیم غذایی, مکمل, استرویید, اپلیکیشن بدنسازی" />
-        <meta property="og:title" content="LiftLegends - مربی بدنسازی هوشمند با هوش مصنوعی" />
-        <meta property="og:description" content="مربی بدنسازی هوشمند با هوش مصنوعی پیشرفته، برنامه تمرینی و رژیم غذایی شخصی‌سازی شده. دانلود اپلیکیشن LiftLegends برای اندروید." />
+        <title>بدنسازی هوشمند با LiftLegends | برنامه تمرینی و رژیم غذایی شخصی‌سازی شده</title>
+        <meta name="description" content="بهترین برنامه بدنسازی و تناسب اندام با هوش مصنوعی - برنامه تمرینی هوشمند، رژیم غذایی شخصی‌سازی شده و مشاوره تخصصی مکمل و استرویید. دانلود اپلیکیشن رایگان بدنسازی LiftLegends." />
+        <meta name="keywords" content="بدنسازی، برنامه بدنسازی، تناسب اندام، مربی بدنسازی، برنامه تمرینی بدنسازی، رژیم غذایی بدنسازی، مکمل بدنسازی، استرویید، فیتنس، اپلیکیشن بدنسازی" />
+        <meta property="og:title" content="بدنسازی هوشمند با LiftLegends | برنامه تمرینی و رژیم غذایی" />
+        <meta property="og:description" content="بهترین برنامه بدنسازی و تناسب اندام با هوش مصنوعی - برنامه تمرینی هوشمند، رژیم غذایی شخصی‌سازی شده و مشاوره تخصصی. دانلود اپلیکیشن رایگان!" />
         <meta property="og:image" content="https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends//white%20logo.png" />
         <meta property="og:url" content="https://liftlegends.ir/" />
         <meta property="og:type" content="website" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="LiftLegends - مربی بدنسازی هوشمند با هوش مصنوعی" />
-        <meta name="twitter:description" content="مربی بدنسازی هوشمند با هوش مصنوعی پیشرفته، برنامه تمرینی و رژیم غذایی شخصی‌سازی شده. دانلود اپلیکیشن LiftLegends برای اندروید." />
+        <meta name="twitter:title" content="بدنسازی هوشمند با LiftLegends | برنامه تمرینی و رژیم غذایی" />
+        <meta name="twitter:description" content="بهترین برنامه بدنسازی و تناسب اندام با هوش مصنوعی - برنامه تمرینی هوشمند، رژیم غذایی شخصی‌سازی شده و مشاوره تخصصی. دانلود اپلیکیشن رایگان!" />
         <meta name="twitter:image" content="https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends//white%20logo.png" />
         <link rel="canonical" href="https://liftlegends.ir/" />
       </Helmet>
