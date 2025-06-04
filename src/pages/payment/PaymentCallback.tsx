@@ -19,7 +19,8 @@ interface PaymentInfo {
   authority: string;
   amount: number;
   plan_id: SubscriptionPlan;
-  plan_period: 'monthly' | 'yearly';
+  plan_period?: 'monthly' | 'yearly';
+  period?: 'monthly' | 'yearly'; // Support both field names for compatibility
   user_id: string;
   timestamp: string;
   program_id?: string; // Add program_id for program purchases
@@ -49,10 +50,21 @@ const PaymentCallback = () => {
 
         const paymentInfo: PaymentInfo = JSON.parse(paymentInfoStr);
         
-        // Add plan_period if it doesn't exist (for backward compatibility)
-        if (!paymentInfo.plan_period) {
-          console.log("Adding missing plan_period to payment info");
-          paymentInfo.plan_period = 'monthly'; // Default to monthly if not specified
+        // Normalize period field name (support both 'period' and 'plan_period')
+        const period = paymentInfo.plan_period || paymentInfo.period || 'monthly';
+        paymentInfo.plan_period = period;
+
+        console.log("Payment info received:", {
+          plan_id: paymentInfo.plan_id,
+          period: period,
+          program_id: paymentInfo.program_id,
+          user_id: paymentInfo.user_id,
+          amount: paymentInfo.amount
+        });
+
+        // Validate payment info for subscription purchases
+        if (!paymentInfo.program_id && !paymentInfo.plan_id) {
+          throw new Error("اطلاعات پرداخت ناقص است - نوع خرید مشخص نیست");
         }
 
         // Check if payment was successful
@@ -114,7 +126,7 @@ const PaymentCallback = () => {
             const programId = paymentInfo.program_id || null;
             
             // Update user subscription or record program purchase in database
-            await updateUserSubscription(paymentInfo.plan_id, paymentInfo.user_id, paymentInfo.plan_period);
+            await updateUserSubscription(paymentInfo.plan_id, paymentInfo.user_id, period);
             
             // Show appropriate success toast based on purchase type
             if (programId) {
@@ -272,7 +284,6 @@ const PaymentCallback = () => {
             subscription_plan: planId,
             subscription_start_date: startDate.toISOString(),
             subscription_end_date: endDate.toISOString(),
-            is_subscription_active: true,
             updated_at: new Date().toISOString()
           })
           .eq("user_id", userId)
@@ -284,27 +295,6 @@ const PaymentCallback = () => {
         }
         
         console.log("Subscription activated successfully:", data);
-        
-        // Fetch the corresponding fitness plan UUID based on the plan type
-        let fitnessPlanId = "00000000-0000-0000-0000-000000000000"; // Default placeholder
-        
-        try {
-          const { data: planData, error: planError } = await supabase
-            .from('fitness_plans')
-            .select('id')
-            .eq('type', planId)
-            .single();
-            
-          if (!planError && planData?.id) {
-            fitnessPlanId = planData.id;
-            console.log(`Found fitness plan ID: ${fitnessPlanId} for plan type: ${planId}`);
-          } else {
-            console.warn(`Could not find fitness plan with type: ${planId}, using placeholder UUID`);
-          }
-        } catch (planFetchError) {
-          console.error("Error in fitness plan lookup:", planFetchError);
-          console.warn("Using placeholder UUID for fitness plan");
-        }
         
         // Insert purchase record into user_purchases table
         try {
@@ -339,30 +329,6 @@ const PaymentCallback = () => {
           }
         } catch (purchaseInsertError) {
           console.error("Exception when recording purchase:", purchaseInsertError);
-          // Don't throw here, as the subscription is already activated
-        }
-        
-        // Also log the subscription transaction to subscription_logs table
-        try {
-          const { error: logError } = await supabase
-            .from('subscription_logs')
-            .insert({
-              user_id: userId,
-              plan_id: planId,
-              period: period,
-              amount: amount,
-              start_date: startDate.toISOString(),
-              end_date: endDate.toISOString(),
-              created_at: new Date().toISOString()
-            });
-            
-          if (logError) {
-            console.error("Error logging subscription transaction:", logError);
-            console.error("Subscription log error details:", JSON.stringify(logError));
-            // Don't throw here, as the subscription is already activated
-          }
-        } catch (logError) {
-          console.error("Exception when logging subscription:", logError);
           // Don't throw here, as the subscription is already activated
         }
         

@@ -106,6 +106,68 @@ const Subscription = () => {
     setSelectedCycle(cycle);
   };
 
+  // Function to get plan level for comparison
+  const getPlanLevel = (plan: SubscriptionPlan): number => {
+    switch (plan) {
+      case 'basic': return 1;
+      case 'pro': return 2;
+      case 'ultimate': return 3;
+      default: return 0;
+    }
+  };
+
+  // Function to check if a plan should be disabled
+  const isPlanDisabled = (planId: SubscriptionPlan): boolean => {
+    const currentPlan = user?.profile?.subscription_plan;
+    if (!currentPlan) return false;
+    
+    const currentLevel = getPlanLevel(currentPlan as SubscriptionPlan);
+    const targetLevel = getPlanLevel(planId);
+    
+    // Disable if user already has this plan or a higher plan
+    return targetLevel <= currentLevel;
+  };
+
+  // Function to get button text and icon
+  const getButtonContent = (planId: SubscriptionPlan) => {
+    const currentPlan = user?.profile?.subscription_plan;
+    const currentLevel = getPlanLevel(currentPlan as SubscriptionPlan);
+    const targetLevel = getPlanLevel(planId);
+
+    if (currentPlan === planId) {
+      return {
+        icon: <Shield size={18} className="ml-2" />,
+        text: "اشتراک فعال"
+      };
+    } else if (currentPlan && targetLevel < currentLevel) {
+      return {
+        icon: <Shield size={18} className="ml-2" />,
+        text: "پلن بالاتر فعال است"
+      };
+    } else {
+      return {
+        icon: <CreditCard size={18} className="ml-2" />,
+        text: "انتخاب این طرح"
+      };
+    }
+  };
+
+  // Function to format subscription end date
+  const formatSubscriptionEndDate = (dateString: string | null): string => {
+    if (!dateString) return '';
+    
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('fa-IR', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    } catch {
+      return '';
+    }
+  };
+
   // Plan options
   const planOptions: PlanOption[] = [
     {
@@ -217,6 +279,11 @@ const Subscription = () => {
                     پیشنهاد ویژه
                   </div>
                 )}
+                {user?.profile?.subscription_plan === plan.id && (
+                  <div className="absolute top-0 left-0 bg-gradient-to-r from-green-500 to-emerald-500 text-white text-xs font-bold px-3 py-1 rounded-br-lg z-10">
+                    پلن فعال
+                  </div>
+                )}
                 <div className={`h-1.5 w-full bg-gradient-to-r from-${plan.color}-500 to-${plan.color === 'gold' ? 'amber' : plan.color}-600`}></div>
                 <div className={`p-6 ${plan.popular ? 'pb-8' : ''}`}>
                   <div className="flex justify-between items-start mb-4">
@@ -252,22 +319,37 @@ const Subscription = () => {
                     ))}
                   </ul>
                   
+                  {/* Show subscription end date if this is the active plan */}
+                  {user?.profile?.subscription_plan === plan.id && user?.profile?.subscription_end_date && (
+                    <div className="mb-4 p-3 bg-green-500/10 border border-green-500/30 rounded-lg">
+                      <div className="flex items-center text-green-400 text-sm">
+                        <Calendar size={16} className="ml-2" />
+                        <span>تا {formatSubscriptionEndDate(user.profile.subscription_end_date)} فعال</span>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Show message if user has a higher plan */}
+                  {user?.profile?.subscription_plan && 
+                   user.profile.subscription_plan !== plan.id && 
+                   getPlanLevel(user.profile.subscription_plan as SubscriptionPlan) > getPlanLevel(plan.id) && (
+                    <div className="mb-4 p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+                      <div className="flex items-center text-blue-400 text-sm">
+                        <Shield size={16} className="ml-2" />
+                        <span>شما در حال حاضر پلن بالاتری دارید</span>
+                      </div>
+                    </div>
+                  )}
+                  
                   <Button
                     onClick={() => handlePlanSelect(plan.id)}
-                    disabled={user?.profile?.subscription_plan === plan.id}
-                    className={`w-full bg-gradient-to-r from-${plan.color}-500 to-${plan.color === 'gold' ? 'amber' : plan.color}-600 hover:from-${plan.color}-600 hover:to-${plan.color === 'gold' ? 'amber' : plan.color}-700 ${plan.color !== 'gold' ? 'text-white' : 'text-black'} py-3 rounded-xl transition-all duration-300 shadow-lg shadow-${plan.color}-500/20 hover:shadow-${plan.color}-500/40`}
+                    disabled={isPlanDisabled(plan.id)}
+                    className={`w-full bg-gradient-to-r from-${plan.color}-500 to-${plan.color === 'gold' ? 'amber' : plan.color}-600 hover:from-${plan.color}-600 hover:to-${plan.color === 'gold' ? 'amber' : plan.color}-700 ${plan.color !== 'gold' ? 'text-white' : 'text-black'} py-3 rounded-xl transition-all duration-300 shadow-lg shadow-${plan.color}-500/20 hover:shadow-${plan.color}-500/40 ${isPlanDisabled(plan.id) ? 'opacity-60 cursor-not-allowed' : ''}`}
                   >
-                    {user?.profile?.subscription_plan === plan.id ? (
-                      <span className="flex items-center justify-center">
-                        <Shield size={18} className="ml-2" />
-                        اشتراک فعال
-                      </span>
-                    ) : (
-                      <span className="flex items-center justify-center">
-                        <CreditCard size={18} className="ml-2" />
-                        انتخاب این طرح
-                      </span>
-                    )}
+                    <span className="flex items-center justify-center">
+                      {getButtonContent(plan.id).icon}
+                      {getButtonContent(plan.id).text}
+                    </span>
                   </Button>
                 </div>
               </div>
