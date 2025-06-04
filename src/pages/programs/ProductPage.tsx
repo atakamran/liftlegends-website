@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
@@ -192,8 +193,80 @@ const ProductPage = () => {
     );
   }
   
+  // Create a clean description for meta tags (remove extra whitespace)
+  const getCleanDescription = () => {
+    if (!program) return '';
+    return program.description
+      .replace(/\s+/g, ' ')
+      .trim()
+      .substring(0, 160) + (program.description.length > 160 ? '...' : '');
+  };
+
+  // Get structured data for product
+  const getStructuredData = () => {
+    if (!program) return null;
+    
+    return {
+      "@context": "https://schema.org/",
+      "@type": "Product",
+      "name": program.title,
+      "description": getCleanDescription(),
+      "image": program.image_url || "https://liftlegends.ir/images/default-product.jpg",
+      "offers": {
+        "@type": "Offer",
+        "url": `https://liftlegends.ir/programs/${program.program_url || program.id}`,
+        "priceCurrency": "IRR",
+        "price": program.price * 10, // Convert to Rial for international standards
+        "availability": "https://schema.org/InStock"
+      },
+      "brand": {
+        "@type": "Brand",
+        "name": "لیفت لجندز"
+      },
+      "category": getCategoryLabel(program.category)
+    };
+  };
+
+  // Get canonical URL
+  const getCanonicalUrl = () => {
+    if (!program) return 'https://liftlegends.ir/programs';
+    return program.program_url 
+      ? `https://liftlegends.ir/programs/${program.program_url}`
+      : `https://liftlegends.ir/product/${program.id}`;
+  };
+
   return (
     <div className="container mx-auto py-8 px-4 md:px-6 lg:py-12">
+      {program && (
+        <Helmet>
+          <title>{program.title} | لیفت لجندز</title>
+          <meta name="description" content={getCleanDescription()} />
+          <meta name="keywords" content={`${program.title}, ${getCategoryLabel(program.category)}, لیفت لجندز, تناسب اندام, بدنسازی, فیتنس`} />
+          <link rel="canonical" href={getCanonicalUrl()} />
+          
+          {/* Open Graph / Facebook */}
+          <meta property="og:type" content="product" />
+          <meta property="og:url" content={getCanonicalUrl()} />
+          <meta property="og:title" content={`${program.title} | لیفت لجندز`} />
+          <meta property="og:description" content={getCleanDescription()} />
+          <meta property="og:image" content={program.image_url || "https://liftlegends.ir/images/default-product.jpg"} />
+          <meta property="product:price:amount" content={program.price.toString()} />
+          <meta property="product:price:currency" content="IRR" />
+          
+          {/* Twitter */}
+          <meta property="twitter:card" content="summary_large_image" />
+          <meta property="twitter:url" content={getCanonicalUrl()} />
+          <meta property="twitter:title" content={`${program.title} | لیفت لجندز`} />
+          <meta property="twitter:description" content={getCleanDescription()} />
+          <meta property="twitter:image" content={program.image_url || "https://liftlegends.ir/images/default-product.jpg"} />
+          
+          {/* Structured Data */}
+          <script type="application/ld+json">
+            {JSON.stringify(getStructuredData())}
+          </script>
+        </Helmet>
+      )}
+      
       {/* Breadcrumb */}
       <div className="flex items-center text-sm text-gray-400 mb-6 flex-wrap">
         <button onClick={() => navigate("/")} className="hover:text-gold-500 transition-colors">

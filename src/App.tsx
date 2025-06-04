@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "@/components/Layout";
 import BreadcrumbSchema from "@/components/BreadcrumbSchema";
+import ProductSchema from "@/components/ProductSchema";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import PrivacyPolicy from "./pages/company/PrivacyPolicy";
@@ -35,6 +36,7 @@ const App = () => (
     <TooltipProvider>
       <BrowserRouter>
         <BreadcrumbSchema />
+        <ProductSchema />
         <Layout>
           <Routes>
             <Route path="/" element={<Index />} />

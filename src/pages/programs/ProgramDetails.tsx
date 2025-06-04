@@ -508,9 +508,50 @@ const ProgramDetails = () => {
   return (
     <div className="container mx-auto py-8 px-4 md:px-6 lg:py-12">
       <Helmet>
-        <title>{programInfo.title} | لیفت لجندز</title>
-        <meta name="robots" content="noindex" />
-        <meta name="description" content={programInfo.description} />
+        <title>{programInfo.title} | جزئیات برنامه | لیفت لجندز</title>
+        <meta name="description" content={`جزئیات کامل برنامه ${programInfo.title} شامل تمرینات، برنامه روزانه و نکات تخصصی. ${programInfo.description.substring(0, 120)}...`} />
+        <meta name="keywords" content={`${programInfo.title}, جزئیات برنامه, لیفت لجندز, تناسب اندام, بدنسازی, فیتنس, برنامه تمرینی`} />
+        <link rel="canonical" href={`https://liftlegends.ir/programs/${programId}/details`} />
+        
+        {/* Open Graph / Facebook */}
+        <meta property="og:type" content="article" />
+        <meta property="og:url" content={`https://liftlegends.ir/programs/${programId}/details`} />
+        <meta property="og:title" content={`${programInfo.title} | جزئیات برنامه | لیفت لجندز`} />
+        <meta property="og:description" content={`جزئیات کامل برنامه ${programInfo.title} شامل تمرینات، برنامه روزانه و نکات تخصصی.`} />
+        
+        {/* Twitter */}
+        <meta property="twitter:card" content="summary_large_image" />
+        <meta property="twitter:url" content={`https://liftlegends.ir/programs/${programId}/details`} />
+        <meta property="twitter:title" content={`${programInfo.title} | جزئیات برنامه | لیفت لجندز`} />
+        <meta property="twitter:description" content={`جزئیات کامل برنامه ${programInfo.title} شامل تمرینات، برنامه روزانه و نکات تخصصی.`} />
+        
+        {/* Structured Data for Article */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Article",
+            "headline": `${programInfo.title} | جزئیات برنامه`,
+            "description": `جزئیات کامل برنامه ${programInfo.title} شامل تمرینات، برنامه روزانه و نکات تخصصی.`,
+            "author": {
+              "@type": "Organization",
+              "name": "لیفت لجندز"
+            },
+            "publisher": {
+              "@type": "Organization",
+              "name": "لیفت لجندز",
+              "logo": {
+                "@type": "ImageObject",
+                "url": "https://liftlegends.ir/images/logo.png"
+              }
+            },
+            "mainEntityOfPage": {
+              "@type": "WebPage",
+              "@id": `https://liftlegends.ir/programs/${programId}/details`
+            },
+            "datePublished": programData?.created_at || new Date().toISOString(),
+            "dateModified": programData?.updated_at || new Date().toISOString()
+          })}
+        </script>
       </Helmet>
 
       {/* Header Section with Progress Bar */}

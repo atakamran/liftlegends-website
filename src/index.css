@@ -167,11 +167,19 @@ a[href="#"] {
     position: relative;
     overflow-x: hidden;
     box-sizing: border-box;
+    
+    /* RTL scrollbar hack */
+    direction: ltr;
+  }
+  
+  /* Keep content RTL */
+  #root {
+    direction: rtl;
   }
 
   html {
     @apply scroll-smooth;
-    direction: rtl;
+    direction: ltr; /* Changed to ltr for scrollbar positioning */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     width: 100%;
@@ -201,6 +209,9 @@ a[href="#"] {
   ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
+    position: absolute;
+    left: 0;
+    right: auto;
   }
   
   ::-webkit-scrollbar-track {
@@ -217,11 +228,26 @@ a[href="#"] {
     background: rgba(255, 255, 255, 0.3);
   }
   
-  /* Ensure scrollbar appears on the right side for RTL */
-  html[dir="rtl"] body,
-  body {
+  /* Move scrollbar to right side */
+  * {
     scrollbar-width: thin;
     scrollbar-color: rgba(255, 255, 255, 0.2) rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Override default RTL scrollbar position */
+  html {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+  
+  /* Custom scrollbar container */
+  .right-scrollbar {
+    direction: ltr;
+    overflow: auto;
+  }
+  
+  .right-scrollbar > * {
+    direction: rtl;
   }
 
   .glass-morphism {
@@ -253,6 +279,10 @@ a[href="#"] {
     padding-bottom: env(safe-area-inset-bottom);
   }
   
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom, 20px);
+  }
+  
   /* Fix for iOS 100vh issue */
   .mobile-full-height {
     height: 100vh; /* Fallback */
@@ -275,6 +305,18 @@ a[href="#"] {
     input, select, textarea {
       max-width: 100% !important;
       box-sizing: border-box !important;
+    }
+    
+    /* Add bottom padding for mobile */
+    main {
+      padding-bottom: 20px !important;
+    }
+    
+    /* Add extra bottom padding for iOS devices */
+    @supports (-webkit-touch-callout: none) {
+      main {
+        padding-bottom: calc(20px + env(safe-area-inset-bottom, 20px)) !important;
+      }
     }
   }
 }

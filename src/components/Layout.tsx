@@ -28,9 +28,10 @@ const Layout = ({ children }: LayoutProps) => {
   return (
     <div className="min-h-screen mobile-full-height bg-black text-white flex flex-col w-full overflow-x-hidden max-w-[100vw]">
       <AuthHeader />
-      <main className="flex-grow w-full mobile-safe-area overflow-x-hidden">
+      <main className="flex-grow w-full mobile-safe-area overflow-x-hidden pb-safe">
         {children}
       </main>
+      <div className="h-[20px] md:h-0 mobile-safe-bottom"></div>
     </div>
   );
 };

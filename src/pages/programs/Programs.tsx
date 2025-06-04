@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
+import { Helmet } from "react-helmet";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -170,8 +171,57 @@ const Programs = () => {
     }
   };
 
+  // Get category name for title and meta description
+  const getCategoryName = () => {
+    switch (activeTab) {
+      case 'training':
+        return 'برنامه‌های تمرینی';
+      case 'diet':
+        return 'برنامه‌های غذایی';
+      case 'supplement':
+        return 'مکمل‌ها';
+      default:
+        return 'محصولات';
+    }
+  };
+
+  // Generate meta description based on active category
+  const getMetaDescription = () => {
+    switch (activeTab) {
+      case 'training':
+        return 'مجموعه کاملی از برنامه‌های تمرینی تخصصی لیفت لجندز برای بدنسازی، فیتنس و تناسب اندام. برنامه‌های تمرینی با کیفیت برای رسیدن به اهداف بدنی شما.';
+      case 'diet':
+        return 'برنامه‌های غذایی تخصصی لیفت لجندز برای کاهش وزن، افزایش وزن و حجم عضلانی. رژیم‌های غذایی متناسب با اهداف بدنی و سبک زندگی شما.';
+      case 'supplement':
+        return 'مکمل‌های ورزشی و غذایی با کیفیت لیفت لجندز برای بهبود عملکرد ورزشی، افزایش حجم عضلانی و بهبود سلامت. مکمل‌های مورد تایید متخصصین تغذیه.';
+      default:
+        return 'محصولات تخصصی لیفت لجندز شامل برنامه‌های تمرینی، رژیم‌های غذایی و مکمل‌های ورزشی برای رسیدن به اهداف تناسب اندام و سلامتی شما.';
+    }
+  };
+
   return (
     <div className="container mx-auto py-8 px-4 md:px-6 lg:py-12">
+      <Helmet>
+        <title>{getCategoryName()} | لیفت لجندز</title>
+        <meta name="description" content={getMetaDescription()} />
+        <meta name="keywords" content={`لیفت لجندز, ${getCategoryName()}, تناسب اندام, بدنسازی, فیتنس, برنامه تمرینی, رژیم غذایی, مکمل ورزشی`} />
+        <link rel="canonical" href={`https://liftlegends.ir/programs?category=${activeTab}`} />
+        
+        {/* Open Graph / Facebook */}
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={`https://liftlegends.ir/programs?category=${activeTab}`} />
+        <meta property="og:title" content={`${getCategoryName()} | لیفت لجندز`} />
+        <meta property="og:description" content={getMetaDescription()} />
+        <meta property="og:image" content="https://liftlegends.ir/images/og-programs.jpg" />
+        
+        {/* Twitter */}
+        <meta property="twitter:card" content="summary_large_image" />
+        <meta property="twitter:url" content={`https://liftlegends.ir/programs?category=${activeTab}`} />
+        <meta property="twitter:title" content={`${getCategoryName()} | لیفت لجندز`} />
+        <meta property="twitter:description" content={getMetaDescription()} />
+        <meta property="twitter:image" content="https://liftlegends.ir/images/og-programs.jpg" />
+      </Helmet>
+      
       <div className="text-center mb-8 md:mb-12">
         <h1 className="text-3xl md:text-4xl font-bold text-gold-500 mb-4">برنامه‌های لیفت لجندز</h1>
         <p className="text-lg text-gray-300 max-w-3xl mx-auto">

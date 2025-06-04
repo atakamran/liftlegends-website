@@ -95,6 +95,74 @@
     <priority>0.7</priority>
   </url>
 
+  <!-- صفحات محصولات -->
+  <url>
+    <loc>https://liftlegends.ir/programs</loc>
+    <lastmod>2024-08-15</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://liftlegends.ir/programs?category=training</loc>
+    <lastmod>2024-08-15</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://liftlegends.ir/programs?category=diet</loc>
+    <lastmod>2024-08-15</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://liftlegends.ir/programs?category=supplement</loc>
+    <lastmod>2024-08-15</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <!-- نمونه محصولات -->
+  <url>
+    <loc>https://liftlegends.ir/programs/hypertrophy-program</loc>
+    <lastmod>2024-08-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://liftlegends.ir/images/products/hypertrophy-program.jpg</image:loc>
+      <image:title>برنامه هایپرتروفی عضلانی</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://liftlegends.ir/programs/fat-loss-diet</loc>
+    <lastmod>2024-08-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://liftlegends.ir/images/products/fat-loss-diet.jpg</image:loc>
+      <image:title>برنامه غذایی کاهش چربی</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://liftlegends.ir/programs/strength-program</loc>
+    <lastmod>2024-08-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://liftlegends.ir/images/products/strength-program.jpg</image:loc>
+      <image:title>برنامه افزایش قدرت</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://liftlegends.ir/programs/protein-supplement</loc>
+    <lastmod>2024-08-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://liftlegends.ir/images/products/protein-supplement.jpg</image:loc>
+      <image:title>مکمل پروتئین</image:title>
+    </image:image>
+  </url>
+  
   <!-- مقالات بلاگ -->
   <url>
     <loc>https://liftlegends.ir/blog/workout-plans-for-muscle-growth</loc>
