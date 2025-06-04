@@ -605,21 +605,34 @@ const Dashboard = () => {
       
       // Now, for each purchase, let's get the plan or program details
       const purchasesWithDetails = await Promise.all(
-        (data || []).map(async (purchase: UserPurchase) => {
+        (data || []).map(async (purchase) => {
+          // Create a properly typed UserPurchase object from the database result
+          const typedPurchase: UserPurchase = {
+            id: purchase.id as string,
+            user_id: purchase.user_id as string,
+            plan_id: 'plan_id' in purchase ? purchase.plan_id as string : "", // Check if property exists
+            purchase_date: purchase.purchase_date as string,
+            amount: Number(purchase.amount),
+            payment_id: purchase.payment_id as string | null,
+            payment_status: 'payment_status' in purchase ? purchase.payment_status as string : "pending",
+            expires_at: purchase.expires_at as string | null,
+            program_id: purchase.program_id as string | null
+          };
+          
           try {
             // Check if this is a program purchase
-            if (purchase.program_id) {
+            if (typedPurchase.program_id) {
               // Get the program details
               const { data: programData, error: programError } = await supabase
                 .from("programs_sale")
                 .select("title, description, image_url, category, program_url")
-                .eq("id", purchase.program_id)
+                .eq("id", typedPurchase.program_id)
                 .single();
                 
               if (programError) {
                 console.error("Error fetching program details:", programError);
                 return {
-                  ...purchase,
+                  ...typedPurchase,
                   plan: { name: "برنامه نامشخص", description: "" },
                   program: { title: "برنامه نامشخص", description: "", program_url: null, category: null }
                 };
@@ -634,7 +647,7 @@ const Dashboard = () => {
               };
               
               return {
-                ...purchase,
+                ...typedPurchase,
                 program: program,
                 plan: { name: "خرید برنامه", description: program.title }
               };
@@ -643,26 +656,26 @@ const Dashboard = () => {
               const { data: planData, error: planError } = await supabase
                 .from("fitness_plans")
                 .select("name, description")
-                .eq("id", purchase.plan_id)
+                .eq("id", typedPurchase.plan_id)
                 .single();
                 
               if (planError) {
                 console.error("Error fetching plan details:", planError);
                 return {
-                  ...purchase,
+                  ...typedPurchase,
                   plan: { name: "برنامه نامشخص", description: "" }
                 };
               }
               
               return {
-                ...purchase,
+                ...typedPurchase,
                 plan: planData
               };
             }
           } catch (err) {
             console.error("Error processing purchase data:", err);
             return {
-              ...purchase,
+              ...typedPurchase,
               plan: { name: "برنامه نامشخص", description: "" }
             };
           }
@@ -1837,10 +1850,11 @@ const Dashboard = () => {
                           variant="outline" 
                           className="w-full border-gray-700 hover:border-gold-500 hover:bg-gold-500/10"
                           onClick={() => {
-                            if (hasPurchasedProgram(program.id) && program.program_url) {
-                              navigate(program.program_url);
+                            if (hasPurchasedProgram(program.id)) {
+                              // Navigate to program details page
+                              navigate(`/programs/${program.id}/details`);
                             } else {
-                              // Navigate to program details or purchase page
+                              // Navigate to purchase page
                               navigate(`/programs/${program.id}`);
                             }
                           }}
@@ -1915,10 +1929,11 @@ const Dashboard = () => {
                           variant="outline" 
                           className="w-full border-gray-700 hover:border-green-500 hover:bg-green-500/10"
                           onClick={() => {
-                            if (hasPurchasedProgram(program.id) && program.program_url) {
-                              navigate(program.program_url);
+                            if (hasPurchasedProgram(program.id)) {
+                              // Navigate to program details page
+                              navigate(`/programs/${program.id}/details`);
                             } else {
-                              // Navigate to program details or purchase page
+                              // Navigate to purchase page
                               navigate(`/programs/${program.id}`);
                             }
                           }}
@@ -1993,10 +2008,11 @@ const Dashboard = () => {
                           variant="outline" 
                           className="w-full border-gray-700 hover:border-purple-500 hover:bg-purple-500/10"
                           onClick={() => {
-                            if (hasPurchasedProgram(program.id) && program.program_url) {
-                              navigate(program.program_url);
+                            if (hasPurchasedProgram(program.id)) {
+                              // Navigate to program details page
+                              navigate(`/programs/${program.id}/details`);
                             } else {
-                              // Navigate to program details or purchase page
+                              // Navigate to purchase page
                               navigate(`/programs/${program.id}`);
                             }
                           }}
@@ -2122,10 +2138,12 @@ const Dashboard = () => {
                             </div>
                           </CardContent>
                           <CardFooter className="pt-0">
-                            {purchase.program?.program_url ? (
+                            {purchase.program_id ? (
                               <Button 
                                 className="w-full" 
-                                onClick={() => navigate(purchase.program?.program_url || '/')}
+                                onClick={() => {
+                                  navigate(`/programs/${purchase.program_id}/details`);
+                                }}
                               >
                                 مشاهده برنامه
                               </Button>

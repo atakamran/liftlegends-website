@@ -26,7 +26,7 @@ import AboutUs from "./pages/company/AboutUs";
 import Login from "./pages/profile/Login";
 import Programs from "./pages/programs/Programs";
 import ProductPage from "./pages/programs/ProductPage";
-import Fst7Program from "./pages/programs/Fst7Program";
+import ProgramDetails from "./pages/programs/ProgramDetails";
 
 const queryClient = new QueryClient();
 
@@ -56,7 +56,7 @@ const App = () => (
             <Route path="/login" element={<Login />} />
             <Route path="/programs" element={<Programs />} />
             <Route path="/product/:id" element={<ProductPage />} />
-            <Route path="/fst7Program" element={<Fst7Program />} />
+            <Route path="/programs/:programId/details" element={<ProgramDetails />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
