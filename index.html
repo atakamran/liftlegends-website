@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fa">
+<html lang="fa" dir="rtl">
 
 <head>
   <!-- Google tag (gtag.js) -->
@@ -123,7 +123,7 @@
         "keywords": "بدنسازی، تناسب اندام، برنامه تمرینی، رژیم غذایی، مکمل، استرویید"
       }
     </script>
-    
+
   <!-- Structured Data for WebSite with Sitelinks Search Box -->
   <script type="application/ld+json">
       {
@@ -139,7 +139,7 @@
         }
       }
     </script>
-    
+
   <!-- Structured Data for SiteNavigationElement to help with sitelinks -->
   <script type="application/ld+json">
       {
@@ -196,7 +196,7 @@
 
   <!-- Fix scrolling issues -->
   <script src="/fix-scroll.js"></script>
-  
+
   <!-- Service Worker Registration -->
   <script>
     if ('serviceWorker' in navigator) {
@@ -215,12 +215,12 @@
     function setVhVariable() {
       let vh = window.innerHeight * 0.01;
       document.documentElement.style.setProperty('--vh', `${vh}px`);
-      
+
       // Force redraw on iOS
       document.body.style.display = 'none';
       document.body.offsetHeight; // Trigger a reflow
       document.body.style.display = '';
-      
+
       // Ensure no horizontal overflow
       document.documentElement.style.width = '100%';
       document.documentElement.style.maxWidth = '100vw';
@@ -235,7 +235,7 @@
     // Update on resize and orientation change
     window.addEventListener('resize', setVhVariable);
     window.addEventListener('orientationchange', setVhVariable);
-    
+
     // Also update after page load to ensure correct sizing
     window.addEventListener('load', setVhVariable);
 
