@@ -5,6 +5,37 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Fix for scrolling issues */
+html, body {
+  overscroll-behavior: none; /* Prevents pull-to-refresh and overscrolling */
+  overflow-x: hidden;
+  position: relative;
+  height: 100%;
+  width: 100%;
+  max-width: 100vw;
+}
+
+body {
+  -webkit-overflow-scrolling: touch; /* Enables momentum scrolling on iOS */
+  touch-action: pan-y; /* Allow only vertical scrolling */
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow-y: auto;
+}
+
+/* Class added during touch events to prevent scroll reset */
+html.scrolling {
+  overflow: auto;
+}
+
+/* Fix for anchor links */
+a[href="#"] {
+  pointer-events: none;
+}
+
 /* Fix for iOS 100vh issue */
 :root {
   --vh: 1vh;

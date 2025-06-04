@@ -156,10 +156,13 @@ const FeaturesSection = () => {
                     <p className="text-white/70 leading-relaxed">{feature.description}</p>
                     
                     {/* Learn more link */}
-                    <a href="#" className="text-gold-400 hover:text-gold-300 flex items-center gap-1 text-sm mt-2 group-hover:translate-x-1 transition-transform">
+                    <button 
+                      type="button"
+                      className="text-gold-400 hover:text-gold-300 flex items-center gap-1 text-sm mt-2 group-hover:translate-x-1 transition-transform border-0 bg-transparent p-0"
+                    >
                       اطلاعات بیشتر
                       <ChevronRight size={16} />
-                    </a>
+                    </button>
                   </div>
                 </div>
               </div>

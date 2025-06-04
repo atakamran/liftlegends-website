@@ -1855,7 +1855,7 @@ const Dashboard = () => {
                               navigate(`/programs/${program.id}/details`);
                             } else {
                               // Navigate to purchase page
-                              navigate(`/programs/${program.id}`);
+                              navigate(`/product/${program.id}`);
                             }
                           }}
                         >
@@ -1934,7 +1934,7 @@ const Dashboard = () => {
                               navigate(`/programs/${program.id}/details`);
                             } else {
                               // Navigate to purchase page
-                              navigate(`/programs/${program.id}`);
+                              navigate(`/product/${program.id}`);
                             }
                           }}
                         >
@@ -2013,7 +2013,7 @@ const Dashboard = () => {
                               navigate(`/programs/${program.id}/details`);
                             } else {
                               // Navigate to purchase page
-                              navigate(`/programs/${program.id}`);
+                              navigate(`/product/${program.id}`);
                             }
                           }}
                         >
@@ -2139,14 +2139,25 @@ const Dashboard = () => {
                           </CardContent>
                           <CardFooter className="pt-0">
                             {purchase.program_id ? (
-                              <Button 
-                                className="w-full" 
-                                onClick={() => {
-                                  navigate(`/programs/${purchase.program_id}/details`);
-                                }}
-                              >
-                                مشاهده برنامه
-                              </Button>
+                              <div className="flex flex-col gap-2 w-full">
+                                <Button 
+                                  className="w-full" 
+                                  onClick={() => {
+                                    navigate(`/programs/${purchase.program_id}/details`);
+                                  }}
+                                >
+                                  مشاهده برنامه
+                                </Button>
+                                <Button 
+                                  variant="outline"
+                                  className="w-full" 
+                                  onClick={() => {
+                                    navigate(`/product/${purchase.program_id}`);
+                                  }}
+                                >
+                                  صفحه محصول
+                                </Button>
+                              </div>
                             ) : (
                               <Button className="w-full" disabled>
                                 برنامه در دسترس نیست
@@ -2184,7 +2195,16 @@ const Dashboard = () => {
                               {purchase.purchase_date ? formatDate(purchase.purchase_date) : 'نامشخص'}
                             </TableCell>
                             <TableCell>
-                              {purchase.plan?.name || 'برنامه نامشخص'}
+                              {purchase.program_id ? (
+                                <a 
+                                  href={`/product/${purchase.program_id}`}
+                                  className="text-gold-400 hover:text-gold-300 hover:underline"
+                                >
+                                  {purchase.plan?.name || 'برنامه نامشخص'}
+                                </a>
+                              ) : (
+                                purchase.plan?.name || 'برنامه نامشخص'
+                              )}
                             </TableCell>
                             <TableCell>
                               {new Intl.NumberFormat('fa-IR').format(purchase.amount)} تومان

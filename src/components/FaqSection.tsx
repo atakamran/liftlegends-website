@@ -160,13 +160,13 @@ const FaqSection = () => {
               <MessageCircle size={18} />
               تماس با پشتیبانی
             </a>
-            <a 
-              href="#" 
+            <button 
+              type="button" 
               className="bg-gray-800 hover:bg-gold-500/20 text-white hover:text-gold-400 px-6 py-3 rounded-xl transition-all inline-flex items-center justify-center gap-2 border border-transparent hover:border-gold-500/30"
             >
               <Download size={18} />
               دانلود راهنمای کامل
-            </a>
+            </button>
           </div>
         </div>
       </div>
