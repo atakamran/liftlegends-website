@@ -700,10 +700,11 @@ const AuthHeader = () => {
 
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden text-white/90 hover:text-gold-500 bg-gray-800/40 hover:bg-gray-800/60 p-1.5 rounded-md transition-all duration-200 border border-white/5 hover:border-gold-500/30"
+            className="md:hidden text-white/90 hover:text-gold-500 bg-gray-800/40 hover:bg-gray-800/60 p-1.5 rounded-md transition-all duration-200 border border-white/5 hover:border-gold-500/30 flex items-center gap-1"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
             {isMenuOpen ? <X size={18} /> : <Menu size={18} />}
+            <span className="text-sm font-medium">{isMenuOpen ? "" : "منو"}</span>
           </button>
         </div>
 

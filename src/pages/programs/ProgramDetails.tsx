@@ -374,72 +374,126 @@ const ProgramDetails = () => {
     }
   }, [programId]);
   
+  // Add event listener to update button text based on accordion state
+  useEffect(() => {
+    const handleAccordionStateChange = () => {
+      // Find all accordion triggers
+      const accordionTriggers = document.querySelectorAll('[data-accordion-trigger]');
+      
+      // For each trigger, update the text based on its state
+      accordionTriggers.forEach(trigger => {
+        const state = trigger.getAttribute('data-state');
+        const textElement = trigger.querySelector('[data-state-text]');
+        
+        if (textElement) {
+          if (state === 'open') {
+            textElement.textContent = 'بستن جزئیات';
+          } else {
+            textElement.textContent = 'مشاهده جزئیات';
+          }
+        }
+      });
+    };
+    
+    // Run once on mount to set initial states
+    handleAccordionStateChange();
+    
+    // Set up a mutation observer to watch for state changes
+    const observer = new MutationObserver(mutations => {
+      mutations.forEach(mutation => {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'data-state') {
+          handleAccordionStateChange();
+        }
+      });
+    });
+    
+    // Observe all accordion triggers
+    document.querySelectorAll('[data-accordion-trigger]').forEach(trigger => {
+      observer.observe(trigger, { attributes: true });
+    });
+    
+    // Clean up observer on unmount
+    return () => observer.disconnect();
+  }, [activeTab]); // Re-run when active tab changes
+  
   // Function to render exercise rows
   const renderExercises = (exercises: Exercise[], weekNumber: number, dayNumber: number) => {
     if (!exercises || exercises.length === 0) {
       return (
-        <div className="text-center py-4 text-gray-400">
-          روز استراحت - بدن نیاز به ریکاوری دارد
+        <div className="relative overflow-hidden rounded-xl border border-blue-500/20 bg-blue-900/5 transition-all duration-300 py-6 px-4 my-2">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/10 rounded-full -mr-8 -mt-8 z-0"></div>
+          <div className="absolute bottom-0 left-0 w-16 h-16 bg-blue-500/10 rounded-full -ml-6 -mb-6 z-0"></div>
+          
+          <div className="flex flex-col items-center gap-3 relative z-10">
+            <div className="bg-blue-900/30 p-3 rounded-full border border-blue-500/20 shadow-lg shadow-blue-900/10">
+              <Clock className="h-6 w-6 text-blue-400" />
+            </div>
+            <p className="text-blue-300 font-bold text-lg">روز استراحت</p>
+            <div className="bg-blue-900/20 px-4 py-2 rounded-lg border border-blue-500/10 text-center">
+              <p className="text-gray-300 text-sm">بدن نیاز به ریکاوری دارد</p>
+            </div>
+          </div>
         </div>
       );
     }
 
     return (
-      <div className="overflow-x-auto">
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="border-b border-gray-800">
-              <th className="py-2 px-3 text-right text-gray-400 font-medium">تمرین</th>
-              <th className="py-2 px-3 text-center text-gray-400 font-medium">ست</th>
-              <th className="py-2 px-3 text-center text-gray-400 font-medium">تکرار</th>
-              <th className="py-2 px-3 text-center text-gray-400 font-medium">استراحت</th>
-              {hasPurchased && <th className="py-2 px-3 text-center text-gray-400 font-medium">وضعیت</th>}
-            </tr>
-          </thead>
-          <tbody>
-            {exercises.map((exercise, index) => {
-              const isCompleted = progress?.weeks[weekNumber]?.workouts[dayNumber]?.exercises[index]?.completed || false;
-              
-              return (
-                <tr 
-                  key={index} 
-                  className={`border-b border-gray-800 ${exercise.is_fst7 ? 'bg-gold-500/5' : ''} ${isCompleted ? 'bg-green-900/10' : ''}`}
-                >
-                  <td className="py-3 px-3 text-right">
-                    <div className="flex items-center justify-end">
-                      <span className={isCompleted ? 'text-green-400' : ''}>{exercise.name}</span>
-                      {exercise.is_fst7 && (
-                        <Badge className="mr-2 bg-gold-500/20 text-gold-500 border-gold-500/30">
-                          FST-7
-                        </Badge>
-                      )}
-                    </div>
-                    {exercise.notes && (
-                      <div className="text-xs text-gray-400 mt-1">{exercise.notes}</div>
-                    )}
-                  </td>
-                  <td className="py-3 px-3 text-center">{exercise.sets}</td>
-                  <td className="py-3 px-3 text-center">{exercise.reps}</td>
-                  <td className="py-3 px-3 text-center">{exercise.rest}</td>
+      <div className="space-y-3">
+        {exercises.map((exercise, index) => {
+          const isCompleted = progress?.weeks[weekNumber]?.workouts[dayNumber]?.exercises[index]?.completed || false;
+          
+          return (
+            <div 
+              key={index}
+              className={`rounded-lg border ${isCompleted ? 'border-green-500/20 bg-green-900/5' : 'border-gray-700/30 bg-gray-800/30'} 
+                ${exercise.is_fst7 ? 'border-gold-500/20' : ''} p-3 transition-all duration-300 cursor-pointer
+                hover:border-gold-500/30 hover:shadow-md hover:shadow-black/20`}
+              onClick={() => hasPurchased && toggleExerciseCompletion(weekNumber, dayNumber, index)}
+            >
+              <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+                <div className="flex items-center gap-2">
                   {hasPurchased && (
-                    <td className="py-3 px-3 text-center">
-                      <button
-                        onClick={() => toggleExerciseCompletion(weekNumber, dayNumber, index)}
-                        className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
-                          isCompleted 
-                            ? 'bg-green-500/20 text-green-500 hover:bg-green-500/30' 
-                            : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-                        }`}
-                      >
-                        <CheckCircle className={`h-5 w-5 ${isCompleted ? 'fill-green-500' : ''}`} />
-                      </button>
-                    </td>
+                    <div
+                      className={`w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center transition-all ${
+                        isCompleted 
+                          ? 'bg-green-500 text-black' 
+                          : 'bg-gray-700 text-gray-300'
+                      }`}
+                    >
+                      <CheckCircle className={`h-5 w-5 ${isCompleted ? '' : ''}`} />
+                    </div>
                   )}
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+                  <h4 className={`font-medium ${isCompleted ? 'text-green-400' : 'text-white'}`}>
+                    {exercise.name}
+                  </h4>
+                  {exercise.is_fst7 && (
+                    <Badge className="bg-gold-500/20 text-gold-500 border-gold-500/30">
+                      FST-7
+                    </Badge>
+                  )}
+                </div>
+                
+                <div className="flex items-center gap-2 flex-wrap">
+                  <div className={`px-2 py-1 rounded-md text-xs ${isCompleted ? 'bg-green-900/20 text-green-300' : 'bg-gray-700 text-gray-300'}`}>
+                    <span className="font-bold">{exercise.sets}</span> ست
+                  </div>
+                  <div className={`px-2 py-1 rounded-md text-xs ${isCompleted ? 'bg-green-900/20 text-green-300' : 'bg-gray-700 text-gray-300'}`}>
+                    <span className="font-bold">{exercise.reps}</span> تکرار
+                  </div>
+                  <div className={`px-2 py-1 rounded-md text-xs ${isCompleted ? 'bg-green-900/20 text-green-300' : 'bg-gray-700 text-gray-300'}`}>
+                    <span className="font-bold">{exercise.rest}</span> استراحت
+                  </div>
+                </div>
+              </div>
+              
+              {exercise.notes && (
+                <div className={`text-sm mt-2 p-2 rounded-md ${isCompleted ? 'bg-green-900/10 text-gray-300' : 'bg-gray-800 text-gray-400'}`}>
+                  {exercise.notes}
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
     );
   };
@@ -478,10 +532,7 @@ const ProgramDetails = () => {
       {/* Header Section with Progress Bar */}
       <div className="mb-10">
         <div className="text-center mb-6">
-          <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">{programInfo.title}</h1>
-          <p className="text-gray-400 max-w-3xl mx-auto mb-6">
-            {programInfo.description}
-          </p>
+          <h1 className="text-3xl md:text-4xl font-bold text-white mb-6">{programInfo.title}</h1>
           
           {hasPurchased && progress && (
             <div className="max-w-xl mx-auto">
@@ -623,23 +674,27 @@ const ProgramDetails = () => {
             value={activeTab}
             onValueChange={setActiveTab}
           >
-            <TabsList className="mb-6 w-full overflow-x-auto flex flex-nowrap justify-start md:justify-center p-1 bg-gray-900 rounded-lg">
-              {programData.weeks.map((week) => {
-                const isCompleted = progress?.weeks[week.week_number]?.completed || false;
-                return (
-                  <TabsTrigger 
-                    key={week.week_number} 
-                    value={`week${week.week_number}`}
-                    className={`whitespace-nowrap relative ${isCompleted ? 'text-green-400' : ''}`}
-                  >
-                    {isCompleted && (
-                      <CheckCircle className="h-3 w-3 absolute -top-1 -right-1 fill-green-500 text-black" />
-                    )}
-                    هفته {week.week_number}
-                  </TabsTrigger>
-                );
-              })}
-            </TabsList>
+            <div className="mb-6 overflow-hidden">
+              <TabsList className="w-full overflow-x-auto flex flex-nowrap justify-start md:justify-center p-1 bg-gray-800/50 rounded-lg gap-1 no-scrollbar">
+                {programData.weeks.map((week) => {
+                  const isCompleted = progress?.weeks[week.week_number]?.completed || false;
+                  return (
+                    <TabsTrigger 
+                      key={week.week_number} 
+                      value={`week${week.week_number}`}
+                      className={`whitespace-nowrap relative px-4 py-2 rounded-md transition-all duration-200 
+                        ${isCompleted ? 'bg-green-900/20 text-green-400 border border-green-500/20' : 'bg-gray-800 border border-gray-700/30 hover:bg-gray-700/50'}`}
+                    >
+                      {isCompleted && (
+                        <CheckCircle className="h-3 w-3 absolute -top-1 -right-1 fill-green-500 text-black" />
+                      )}
+                      <span className="text-xs font-medium">هفته</span>
+                      <span className="mr-1 font-bold">{week.week_number}</span>
+                    </TabsTrigger>
+                  );
+                })}
+              </TabsList>
+            </div>
             
             {programData.weeks.map((week) => (
               <TabsContent key={week.week_number} value={`week${week.week_number}`}>
@@ -659,52 +714,93 @@ const ProgramDetails = () => {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <Accordion 
-                      type="single" 
-                      collapsible 
-                      className="w-full"
-                      value={activeAccordion}
-                      onValueChange={setActiveAccordion}
-                    >
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mb-4">
                       {week.workouts.map((workout, index) => {
                         const isWorkoutCompleted = progress?.weeks[week.week_number]?.workouts[workout.day_number]?.completed || false;
                         const dayId = `day-${week.week_number}-${index}`;
                         
                         return (
-                          <AccordionItem 
-                            key={index} 
-                            value={dayId}
-                            className={`border-b border-gray-800 ${isWorkoutCompleted ? 'bg-green-900/5' : ''}`}
+                          <div 
+                            key={index}
+                            className={`relative overflow-hidden rounded-xl border ${isWorkoutCompleted ? 'border-green-500/30 bg-green-900/10' : 'border-gray-700/50 bg-gray-800/30'} 
+                              transition-all duration-300 hover:shadow-lg hover:shadow-gold-900/10 group cursor-pointer`}
+                            onClick={(e) => {
+                              // Get the current state of the accordion
+                              const accordionTrigger = document.querySelector(`[data-state][data-accordion-trigger="${dayId}"]`);
+                              const isOpen = accordionTrigger?.getAttribute('data-state') === 'open';
+                              
+                              // Only open if it's currently closed
+                              if (!isOpen && accordionTrigger) {
+                                (accordionTrigger as HTMLElement).click();
+                              }
+                            }}
                           >
-                            <AccordionTrigger className="text-right">
-                              <div className="flex items-center justify-between w-full">
-                                <div className="flex items-center">
-                                  <span className={isWorkoutCompleted ? 'text-green-400' : ''}>
-                                    {workout.day_name}: {workout.title}
-                                  </span>
-                                  {isWorkoutCompleted && (
-                                    <CheckCircle className="h-4 w-4 ml-2 text-green-500" />
-                                  )}
-                                </div>
-                                <div className="flex items-center gap-2">
-                                  <Badge variant="outline" className="ml-2">
-                                    {workout.exercises.length} تمرین
-                                  </Badge>
+                            {/* Day badge */}
+                            <div className="absolute top-3 right-3 z-10">
+                              <div className={`flex items-center justify-center w-8 h-8 rounded-full 
+                                ${isWorkoutCompleted ? 'bg-green-500 text-black' : 'bg-gold-500/20 text-gold-300'} 
+                                font-bold text-sm transition-all duration-300`}>
+                                {workout.day_number}
+                              </div>
+                            </div>
+                            
+                            {/* Completed checkmark */}
+                            {isWorkoutCompleted && (
+                              <div className="absolute top-3 left-3 z-10">
+                                <div className="flex items-center justify-center w-8 h-8 rounded-full bg-green-500/20 text-green-400">
+                                  <CheckCircle className="h-5 w-5" />
                                 </div>
                               </div>
-                            </AccordionTrigger>
-                            <AccordionContent>
-                              {workout.notes && (
-                                <div className="mb-4 p-3 bg-gray-800/50 rounded-md text-gray-300 text-sm">
-                                  <strong className="text-gold-500">نکته:</strong> {workout.notes}
+                            )}
+                            
+                            {/* Card content */}
+                            <Accordion 
+                              type="single" 
+                              collapsible 
+                              className="w-full"
+                            >
+                              <AccordionItem 
+                                value={dayId}
+                                className="border-0"
+                              >
+                                <div className="pt-12 px-4 pb-4">
+                                  <div className="flex flex-col">
+                                    <h3 className={`font-bold text-lg mb-2 ${isWorkoutCompleted ? 'text-green-400' : 'text-white'}`}>
+                                      {workout.title}
+                                    </h3>
+                                    <div className="flex items-center gap-2 mb-3">
+                                      <Badge variant="outline" className={`${isWorkoutCompleted ? 'bg-green-900/20 border-green-500/30 text-green-400' : 'bg-gray-800/80 border-gray-700 text-gold-300'}`}>
+                                        {workout.exercises.length} تمرین
+                                      </Badge>
+                                      <Badge variant="outline" className={`${isWorkoutCompleted ? 'bg-green-900/20 border-green-500/30 text-green-400' : 'bg-gray-800/80 border-gray-700 text-gold-300'}`}>
+                                        {workout.day_name}
+                                      </Badge>
+                                    </div>
+                                  </div>
+                                  
+                                  {/* Expandable button */}
+                                  <AccordionTrigger data-accordion-trigger={dayId} className="py-2 px-4 rounded-lg bg-gray-800/80 hover:bg-gray-700/80 transition-all duration-200 w-full flex justify-between items-center">
+                                    <span className="text-sm font-medium" data-state-text="true">مشاهده جزئیات</span>
+                                  </AccordionTrigger>
                                 </div>
-                              )}
-                              {renderExercises(workout.exercises, week.week_number, workout.day_number)}
-                            </AccordionContent>
-                          </AccordionItem>
+                                
+                                <AccordionContent className="px-4 pb-4">
+                                  {workout.notes && (
+                                    <div className="mb-4 p-3 bg-gray-800/50 rounded-md text-gray-300 text-sm">
+                                      <strong className="text-gold-500">نکته:</strong> {workout.notes}
+                                    </div>
+                                  )}
+                                  {renderExercises(workout.exercises, week.week_number, workout.day_number)}
+                                </AccordionContent>
+                              </AccordionItem>
+                            </Accordion>
+                            
+                            {/* Hover effect overlay */}
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                          </div>
                         );
                       })}
-                    </Accordion>
+                    </div>
                   </CardContent>
                 </Card>
               </TabsContent>
