@@ -14,7 +14,7 @@ const ZarinpalTest = () => {
     
     try {
       const data = JSON.stringify({
-        "merchant_id": "f2cb1b4e-fc81-4d70-b91f-d3158a29f939",
+        "merchant_id": "89999bca-a25d-4ada-9846-62ec13a250b1",
         "amount": "15000",
         "description": "test",
         "metadata": {
@@ -39,7 +39,7 @@ const ZarinpalTest = () => {
       // If the request was successful and contains a payment URL, redirect to it
       if (response.data.data && response.data.data.authority) {
         const authority = response.data.data.authority;
-        window.location.href = `https://sandbox.zarinpal.com/pg/StartPay/${authority}`;
+        window.location.href = `https://staging.zarinpal.com/pg/StartPay/${authority}`;
       }
     } catch (error) {
       console.error(error);

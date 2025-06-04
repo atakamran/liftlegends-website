@@ -368,7 +368,7 @@ const Payment = () => {
       
       // Prepare data for Zarinpal API
       const data = {
-        merchant_id: "f2cb1b4e-fc81-4d70-b91f-d3158a29f939",
+        merchant_id: "89999bca-a25d-4ada-9846-62ec13a250b1",
         amount: amount.toString(),
         description: description,
         metadata: {
@@ -396,7 +396,7 @@ const Payment = () => {
           localStorage.setItem('payment_info', JSON.stringify(updatedPaymentInfo));
           
           // Redirect to Zarinpal payment page
-          window.location.href = `https://sandbox.zarinpal.com/pg/StartPay/${response.data.data.authority}`;
+          window.location.href = `https://staging.zarinpal.com/pg/StartPay/${response.data.data.authority}`;
         } else {
           throw new Error(response.data.errors?.message || 'خطا در اتصال به درگاه پرداخت');
         }
