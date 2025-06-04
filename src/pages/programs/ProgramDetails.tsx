@@ -253,7 +253,7 @@ const ProgramDetails = () => {
   };
   
   // Function to validate if data conforms to ProgramDetails interface
-  const validateProgramDetails = (data: unknown): data is ProgramDetails => {
+  const validateProgramDetails = (data: any): data is ProgramDetails => {
     try {
       return (
         data &&
