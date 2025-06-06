@@ -206,8 +206,8 @@ const ProductPage = () => {
     // If user has already purchased, redirect to program details
     if (hasPurchased) {
       const detailsUrl = program.program_url 
-        ? `/programs/${program.program_url}/details`
-        : `/programs/${program.id}/details`;
+        ? `/programs/${program.id}/details`
+        : `/programs/${program.program_url}/details`;
       navigate(detailsUrl);
       return;
     }

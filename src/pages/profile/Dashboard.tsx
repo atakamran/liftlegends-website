@@ -2021,6 +2021,12 @@ const Dashboard = () => {
                               خریداری شده
                             </span>
                           )}
+                          {user?.profile?.is_admin && !hasPurchasedProgram(program.id) && (
+                            <span className="bg-blue-500/20 text-blue-300 text-xs font-medium px-2.5 py-1 rounded-full flex items-center">
+                              <Shield size={12} className="ml-1" />
+                              دسترسی ادمین
+                            </span>
+                          )}
                         </div>
                       </div>
                       <CardHeader>
@@ -2034,7 +2040,7 @@ const Dashboard = () => {
                           variant="outline" 
                           className="w-full border-gray-700 hover:border-gold-500 hover:bg-gold-500/10"
                           onClick={() => {
-                            if (hasPurchasedProgram(program.id)) {
+                            if (hasPurchasedProgram(program.id) || user?.profile?.is_admin) {
                               // Navigate to program details page
                               navigate(`/programs/${program.id}/details`);
                             } else {
@@ -2043,7 +2049,7 @@ const Dashboard = () => {
                             }
                           }}
                         >
-                          {hasPurchasedProgram(program.id) ? "مشاهده برنامه" : "خرید برنامه"}
+                          {(hasPurchasedProgram(program.id) || user?.profile?.is_admin) ? "مشاهده برنامه" : "خرید برنامه"}
                         </Button>
                       </CardFooter>
                     </Card>
@@ -2100,6 +2106,12 @@ const Dashboard = () => {
                               خریداری شده
                             </span>
                           )}
+                          {user?.profile?.is_admin && !hasPurchasedProgram(program.id) && (
+                            <span className="bg-blue-500/20 text-blue-300 text-xs font-medium px-2.5 py-1 rounded-full flex items-center">
+                              <Shield size={12} className="ml-1" />
+                              دسترسی ادمین
+                            </span>
+                          )}
                         </div>
                       </div>
                       <CardHeader>
@@ -2113,7 +2125,7 @@ const Dashboard = () => {
                           variant="outline" 
                           className="w-full border-gray-700 hover:border-green-500 hover:bg-green-500/10"
                           onClick={() => {
-                            if (hasPurchasedProgram(program.id)) {
+                            if (hasPurchasedProgram(program.id) || user?.profile?.is_admin) {
                               // Navigate to program details page
                               navigate(`/programs/${program.id}/details`);
                             } else {
@@ -2122,7 +2134,7 @@ const Dashboard = () => {
                             }
                           }}
                         >
-                          {hasPurchasedProgram(program.id) ? "مشاهده برنامه" : "خرید برنامه"}
+                          {(hasPurchasedProgram(program.id) || user?.profile?.is_admin) ? "مشاهده برنامه" : "خرید برنامه"}
                         </Button>
                       </CardFooter>
                     </Card>
@@ -2179,6 +2191,12 @@ const Dashboard = () => {
                               خریداری شده
                             </span>
                           )}
+                          {user?.profile?.is_admin && !hasPurchasedProgram(program.id) && (
+                            <span className="bg-blue-500/20 text-blue-300 text-xs font-medium px-2.5 py-1 rounded-full flex items-center">
+                              <Shield size={12} className="ml-1" />
+                              دسترسی ادمین
+                            </span>
+                          )}
                         </div>
                       </div>
                       <CardHeader>
@@ -2192,7 +2210,7 @@ const Dashboard = () => {
                           variant="outline" 
                           className="w-full border-gray-700 hover:border-purple-500 hover:bg-purple-500/10"
                           onClick={() => {
-                            if (hasPurchasedProgram(program.id)) {
+                            if (hasPurchasedProgram(program.id) || user?.profile?.is_admin) {
                               // Navigate to program details page
                               navigate(`/programs/${program.id}/details`);
                             } else {
@@ -2201,7 +2219,7 @@ const Dashboard = () => {
                             }
                           }}
                         >
-                          {hasPurchasedProgram(program.id) ? "مشاهده برنامه" : "خرید برنامه"}
+                          {(hasPurchasedProgram(program.id) || user?.profile?.is_admin) ? "مشاهده برنامه" : "خرید برنامه"}
                         </Button>
                       </CardFooter>
                     </Card>

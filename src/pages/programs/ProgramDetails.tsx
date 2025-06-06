@@ -58,6 +58,64 @@ interface WeekProgram {
   workouts: DayWorkout[];
 }
 
+// Define interfaces for nutrition program
+interface Food {
+  name: string;
+  amount: string;
+  calories: number;
+  protein: string;
+  carbs: string;
+  fat: string;
+  notes?: string;
+}
+
+interface Meal {
+  meal_type: string;
+  time: string;
+  title: string;
+  foods: Food[];
+  total_calories: number;
+  notes?: string;
+}
+
+interface NutritionWeek {
+  week_number: number;
+  description: string;
+  meals: Meal[];
+  daily_calories: number;
+  daily_protein: string;
+  daily_carbs: string;
+  daily_fat: string;
+}
+
+// Define interfaces for supplement program
+interface Supplement {
+  name: string;
+  dosage: string;
+  timing: string;
+  frequency: string;
+  duration: string;
+  benefits: string;
+  side_effects: string;
+  price_range: string;
+  brands: string[];
+  notes?: string;
+}
+
+interface SupplementCategory {
+  category: string;
+  time: string;
+  items: Supplement[];
+}
+
+interface SupplementWeek {
+  week_number: number;
+  description: string;
+  supplements: SupplementCategory[];
+  total_monthly_cost: string;
+  safety_reminders: string[];
+}
+
 interface ProgramDetails {
   id: string;
   program_id: string;
@@ -67,11 +125,22 @@ interface ProgramDetails {
     language: string;
     difficulty_level: string;
     target_audience: string;
-    equipment_needed: string[];
+    equipment_needed?: string[];
     estimated_duration: string;
-    calories_burned: string;
+    calories_burned?: string;
+    // Nutrition specific
+    calories_per_day?: string;
+    meal_count?: number;
+    macros_ratio?: string;
+    // Supplement specific
+    goal?: string;
+    budget_range?: string;
+    safety_notes?: string;
   };
-  workouts: DayWorkout[];
+  workouts?: DayWorkout[];
+  meals?: Meal[];
+  supplements?: SupplementCategory[];
+  weeks?: any[];
   created_at?: string;
   updated_at?: string;
 }
@@ -230,6 +299,20 @@ const ProgramDetails = () => {
     }
   };
   
+  // Function to determine program type
+  const getProgramType = (data: ProgramDetails): 'workout' | 'nutrition' | 'supplement' => {
+    if (data.weeks && Array.isArray(data.weeks)) {
+      const firstWeek = data.weeks[0];
+      if (firstWeek?.workouts) return 'workout';
+      if (firstWeek?.meals) return 'nutrition';
+      if (firstWeek?.supplements) return 'supplement';
+    }
+    if (data.workouts && Array.isArray(data.workouts)) return 'workout';
+    if (data.meals && Array.isArray(data.meals)) return 'nutrition';
+    if (data.supplements && Array.isArray(data.supplements)) return 'supplement';
+    return 'workout'; // default
+  };
+
   // Function to validate if data conforms to ProgramDetails interface
   const validateProgramDetails = (data: any): data is ProgramDetails => {
     try {
@@ -243,10 +326,8 @@ const ProgramDetails = () => {
         typeof data.details.language === 'string' &&
         typeof data.details.difficulty_level === 'string' &&
         typeof data.details.target_audience === 'string' &&
-        Array.isArray(data.details.equipment_needed) &&
         typeof data.details.estimated_duration === 'string' &&
-        typeof data.details.calories_burned === 'string' &&
-        Array.isArray(data.workouts || data.weeks) // Accept either workouts or weeks for backward compatibility
+        (Array.isArray(data.workouts) || Array.isArray(data.meals) || Array.isArray(data.supplements) || Array.isArray(data.weeks)) // Accept different program types
       );
     } catch (error) {
       console.error("Error validating program details:", error);
@@ -301,13 +382,25 @@ const ProgramDetails = () => {
         // Transform data if needed
         const transformedProgramDetails = { ...programDetails };
         
-        // Always use the workouts directly from the data provided
+        // Handle different program types
         if (programDetails.weeks && Array.isArray(programDetails.weeks)) {
-          // Get all workouts from all weeks
-          const allWorkouts = programDetails.weeks.flatMap(week => week.workouts);
+          const firstWeek = programDetails.weeks[0];
           
-          // Set workouts directly on the program details
-          transformedProgramDetails.workouts = allWorkouts;
+          // Workout program
+          if (firstWeek?.workouts) {
+            const allWorkouts = programDetails.weeks.flatMap(week => week.workouts);
+            transformedProgramDetails.workouts = allWorkouts;
+          }
+          // Nutrition program
+          else if (firstWeek?.meals) {
+            // Keep weeks structure for nutrition programs
+            transformedProgramDetails.weeks = programDetails.weeks;
+          }
+          // Supplement program
+          else if (firstWeek?.supplements) {
+            // Keep weeks structure for supplement programs
+            transformedProgramDetails.weeks = programDetails.weeks;
+          }
         }
         
         // Validate program details before using them
@@ -482,6 +575,139 @@ const ProgramDetails = () => {
     );
   };
 
+  // Function to render meals for nutrition programs
+  const renderMeals = (meals: Meal[]) => {
+    return (
+      <div className="space-y-4">
+        {meals.map((meal, index) => (
+          <div key={index} className="rounded-lg border border-gray-700/30 bg-gray-800/30 p-4 transition-all duration-300 hover:border-gold-500/30">
+            <div className="flex justify-between items-start mb-3">
+              <div>
+                <h4 className="font-medium text-white text-lg">{meal.title}</h4>
+                <div className="flex items-center gap-2 mt-1">
+                  <Badge variant="outline" className="bg-green-900/20 border-green-500/30 text-green-400">
+                    {meal.meal_type}
+                  </Badge>
+                  <Badge variant="outline" className="bg-blue-900/20 border-blue-500/30 text-blue-400">
+                    {meal.time}
+                  </Badge>
+                  <Badge variant="outline" className="bg-orange-900/20 border-orange-500/30 text-orange-400">
+                    {meal.total_calories} کالری
+                  </Badge>
+                </div>
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              {meal.foods.map((food, foodIndex) => (
+                <div key={foodIndex} className="flex justify-between items-center p-2 rounded bg-gray-900/50">
+                  <div>
+                    <span className="text-white font-medium">{food.name}</span>
+                    <span className="text-gray-400 text-sm mr-2">({food.amount})</span>
+                  </div>
+                  <div className="flex gap-2 text-xs">
+                    <span className="bg-red-900/20 text-red-400 px-2 py-1 rounded">{food.calories} کال</span>
+                    <span className="bg-blue-900/20 text-blue-400 px-2 py-1 rounded">پ: {food.protein}</span>
+                    <span className="bg-yellow-900/20 text-yellow-400 px-2 py-1 rounded">ک: {food.carbs}</span>
+                    <span className="bg-green-900/20 text-green-400 px-2 py-1 rounded">چ: {food.fat}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            {meal.notes && (
+              <div className="text-sm mt-3 p-2 rounded-md bg-gray-800 text-gray-400">
+                <strong className="text-gold-500">نکته:</strong> {meal.notes}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  // Function to render supplements for supplement programs
+  const renderSupplements = (supplements: SupplementCategory[]) => {
+    return (
+      <div className="space-y-6">
+        {supplements.map((category, index) => (
+          <div key={index} className="rounded-lg border border-gray-700/30 bg-gray-800/30 p-4">
+            <div className="flex justify-between items-center mb-4">
+              <h4 className="font-bold text-white text-lg">{category.category}</h4>
+              <Badge variant="outline" className="bg-purple-900/20 border-purple-500/30 text-purple-400">
+                {category.time}
+              </Badge>
+            </div>
+            
+            <div className="space-y-4">
+              {category.items.map((supplement, suppIndex) => (
+                <div key={suppIndex} className="border border-gray-600/30 rounded-lg p-3 bg-gray-900/30">
+                  <div className="flex justify-between items-start mb-2">
+                    <h5 className="font-medium text-white">{supplement.name}</h5>
+                    <Badge className="bg-gold-500/20 text-gold-400 border-gold-500/30">
+                      {supplement.dosage}
+                    </Badge>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                    <div>
+                      <span className="text-gray-400">زمان مصرف:</span>
+                      <span className="text-white mr-2">{supplement.timing}</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-400">تناوب:</span>
+                      <span className="text-white mr-2">{supplement.frequency}</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-400">مدت:</span>
+                      <span className="text-white mr-2">{supplement.duration}</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-400">قیمت:</span>
+                      <span className="text-green-400 mr-2">{supplement.price_range}</span>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-3 space-y-2">
+                    <div>
+                      <span className="text-green-400 font-medium">فواید:</span>
+                      <p className="text-gray-300 text-sm mt-1">{supplement.benefits}</p>
+                    </div>
+                    
+                    {supplement.side_effects && (
+                      <div>
+                        <span className="text-red-400 font-medium">عوارض جانبی:</span>
+                        <p className="text-gray-300 text-sm mt-1">{supplement.side_effects}</p>
+                      </div>
+                    )}
+                    
+                    <div>
+                      <span className="text-blue-400 font-medium">برندهای پیشنهادی:</span>
+                      <div className="flex flex-wrap gap-1 mt-1">
+                        {supplement.brands.map((brand, brandIndex) => (
+                          <Badge key={brandIndex} variant="outline" className="text-xs">
+                            {brand}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    {supplement.notes && (
+                      <div className="bg-gray-800/50 p-2 rounded text-sm">
+                        <span className="text-gold-500 font-medium">نکته:</span>
+                        <span className="text-gray-300 mr-2">{supplement.notes}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   if (isLoading) {
     return (
       <div className="container mx-auto py-8 px-4 md:px-6 lg:py-12 text-center">
@@ -632,20 +858,96 @@ const ProgramDetails = () => {
                 <p>{programData.details.estimated_duration}</p>
               </div>
             </div>
-            <div className="flex items-start gap-3 p-3 rounded-lg bg-gray-800/30 hover:bg-gray-800/50 transition-colors">
-              <Clock className="h-5 w-5 text-gold-500 mt-0.5" />
-              <div>
-                <h3 className="font-medium text-white">تجهیزات مورد نیاز</h3>
-                <p>{programData.details.equipment_needed.join('، ')}</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3 p-3 rounded-lg bg-gray-800/30 hover:bg-gray-800/50 transition-colors md:col-span-2">
-              <Flame className="h-5 w-5 text-gold-500 mt-0.5" />
-              <div>
-                <h3 className="font-medium text-white">کالری سوزی</h3>
-                <p>{programData.details.calories_burned}</p>
-              </div>
-            </div>
+            
+            {/* Workout specific details */}
+            {getProgramType(programData) === 'workout' && (
+              <>
+                {programData.details.equipment_needed && (
+                  <div className="flex items-start gap-3 p-3 rounded-lg bg-gray-800/30 hover:bg-gray-800/50 transition-colors">
+                    <Clock className="h-5 w-5 text-gold-500 mt-0.5" />
+                    <div>
+                      <h3 className="font-medium text-white">تجهیزات مورد نیاز</h3>
+                      <p>{programData.details.equipment_needed.join('، ')}</p>
+                    </div>
+                  </div>
+                )}
+                {programData.details.calories_burned && (
+                  <div className="flex items-start gap-3 p-3 rounded-lg bg-gray-800/30 hover:bg-gray-800/50 transition-colors md:col-span-2">
+                    <Flame className="h-5 w-5 text-gold-500 mt-0.5" />
+                    <div>
+                      <h3 className="font-medium text-white">کالری سوزی</h3>
+                      <p>{programData.details.calories_burned}</p>
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+            
+            {/* Nutrition specific details */}
+            {getProgramType(programData) === 'nutrition' && (
+              <>
+                {programData.details.calories_per_day && (
+                  <div className="flex items-start gap-3 p-3 rounded-lg bg-gray-800/30 hover:bg-gray-800/50 transition-colors">
+                    <Flame className="h-5 w-5 text-gold-500 mt-0.5" />
+                    <div>
+                      <h3 className="font-medium text-white">کالری روزانه</h3>
+                      <p>{programData.details.calories_per_day}</p>
+                    </div>
+                  </div>
+                )}
+                {programData.details.meal_count && (
+                  <div className="flex items-start gap-3 p-3 rounded-lg bg-gray-800/30 hover:bg-gray-800/50 transition-colors">
+                    <Clock className="h-5 w-5 text-gold-500 mt-0.5" />
+                    <div>
+                      <h3 className="font-medium text-white">تعداد وعده</h3>
+                      <p>{programData.details.meal_count} وعده در روز</p>
+                    </div>
+                  </div>
+                )}
+                {programData.details.macros_ratio && (
+                  <div className="flex items-start gap-3 p-3 rounded-lg bg-gray-800/30 hover:bg-gray-800/50 transition-colors md:col-span-2">
+                    <BarChart className="h-5 w-5 text-gold-500 mt-0.5" />
+                    <div>
+                      <h3 className="font-medium text-white">نسبت ماکروها</h3>
+                      <p>{programData.details.macros_ratio}</p>
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+            
+            {/* Supplement specific details */}
+            {getProgramType(programData) === 'supplement' && (
+              <>
+                {programData.details.goal && (
+                  <div className="flex items-start gap-3 p-3 rounded-lg bg-gray-800/30 hover:bg-gray-800/50 transition-colors">
+                    <Award className="h-5 w-5 text-gold-500 mt-0.5" />
+                    <div>
+                      <h3 className="font-medium text-white">هدف</h3>
+                      <p>{programData.details.goal}</p>
+                    </div>
+                  </div>
+                )}
+                {programData.details.budget_range && (
+                  <div className="flex items-start gap-3 p-3 rounded-lg bg-gray-800/30 hover:bg-gray-800/50 transition-colors">
+                    <ShoppingCart className="h-5 w-5 text-gold-500 mt-0.5" />
+                    <div>
+                      <h3 className="font-medium text-white">بودجه مورد نیاز</h3>
+                      <p>{programData.details.budget_range}</p>
+                    </div>
+                  </div>
+                )}
+                {programData.details.safety_notes && (
+                  <div className="flex items-start gap-3 p-3 rounded-lg bg-red-900/20 border border-red-500/20 hover:bg-red-900/30 transition-colors md:col-span-2">
+                    <Info className="h-5 w-5 text-red-400 mt-0.5" />
+                    <div>
+                      <h3 className="font-medium text-red-400">نکات ایمنی</h3>
+                      <p className="text-red-300">{programData.details.safety_notes}</p>
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
           </div>
         </CardContent>
         {!hasPurchased && (
@@ -698,16 +1000,22 @@ const ProgramDetails = () => {
               <CardHeader>
                 <div className="flex justify-between items-center">
                   <div>
-                    <CardTitle>برنامه تمرینی</CardTitle>
+                    <CardTitle>
+                      {getProgramType(programData) === 'workout' && 'برنامه تمرینی'}
+                      {getProgramType(programData) === 'nutrition' && 'برنامه غذایی'}
+                      {getProgramType(programData) === 'supplement' && 'برنامه مکمل‌یاری'}
+                    </CardTitle>
                     <CardDescription>{programData.description}</CardDescription>
                   </div>
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mb-4">
-                  {programData.workouts.map((workout, index) => {
-                    const isWorkoutCompleted = progress?.workouts[workout.day_number]?.completed || false;
-                    const dayId = `day-${workout.day_number}-${index}`;
+                {/* Workout Program Content */}
+                {getProgramType(programData) === 'workout' && programData.workouts && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mb-4">
+                    {programData.workouts.map((workout, index) => {
+                      const isWorkoutCompleted = progress?.workouts[workout.day_number]?.completed || false;
+                      const dayId = `day-${workout.day_number}-${index}`;
                         
                         return (
                           <div 
@@ -791,10 +1099,65 @@ const ProgramDetails = () => {
                         );
                       })}
                     </div>
-                  </CardContent>
-                </Card>
-              </div>
-            )}
+                )}
+                
+                {/* Nutrition Program Content */}
+                {getProgramType(programData) === 'nutrition' && programData.weeks && (
+                  <div className="space-y-6">
+                    {programData.weeks.map((week: NutritionWeek, weekIndex: number) => (
+                      <div key={weekIndex} className="border border-gray-700/50 rounded-lg p-4 bg-gray-800/20">
+                        <div className="flex justify-between items-center mb-4">
+                          <h3 className="text-xl font-bold text-white">هفته {week.week_number}</h3>
+                          <div className="flex gap-2">
+                            <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
+                              {week.daily_calories} کالری
+                            </Badge>
+                            <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30">
+                              پروتئین: {week.daily_protein}
+                            </Badge>
+                          </div>
+                        </div>
+                        <p className="text-gray-400 mb-4">{week.description}</p>
+                        {renderMeals(week.meals)}
+                      </div>
+                    ))}
+                  </div>
+                )}
+                
+                {/* Supplement Program Content */}
+                {getProgramType(programData) === 'supplement' && programData.weeks && (
+                  <div className="space-y-6">
+                    {programData.weeks.map((week: SupplementWeek, weekIndex: number) => (
+                      <div key={weekIndex} className="border border-gray-700/50 rounded-lg p-4 bg-gray-800/20">
+                        <div className="flex justify-between items-center mb-4">
+                          <h3 className="text-xl font-bold text-white">هفته {week.week_number}</h3>
+                          <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30">
+                            {week.total_monthly_cost}
+                          </Badge>
+                        </div>
+                        <p className="text-gray-400 mb-4">{week.description}</p>
+                        
+                        {/* Safety reminders */}
+                        {week.safety_reminders && week.safety_reminders.length > 0 && (
+                          <div className="mb-6 p-4 bg-red-900/20 border border-red-500/20 rounded-lg">
+                            <h4 className="text-red-400 font-medium mb-2">⚠️ نکات ایمنی مهم:</h4>
+                            <ul className="space-y-1">
+                              {week.safety_reminders.map((reminder, index) => (
+                                <li key={index} className="text-red-300 text-sm">• {reminder}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                        
+                        {renderSupplements(week.supplements)}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        )}
       </div>
 
       {/* Tips Section */}
@@ -805,21 +1168,65 @@ const ProgramDetails = () => {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="p-4 rounded-lg bg-gray-800/30 hover:bg-gray-800/50 transition-all border border-gray-700/50 hover:border-gold-500/30">
-              <p className="text-gray-300">• قبل از شروع تمرین، حتما بدن خود را گرم کنید.</p>
-            </div>
-            <div className="p-4 rounded-lg bg-gray-800/30 hover:bg-gray-800/50 transition-all border border-gray-700/50 hover:border-gold-500/30">
-              <p className="text-gray-300">• در تمرینات FST-7، استراحت بین ست‌ها باید کوتاه باشد تا پمپ عضلانی حفظ شود.</p>
-            </div>
-            <div className="p-4 rounded-lg bg-gray-800/30 hover:bg-gray-800/50 transition-all border border-gray-700/50 hover:border-gold-500/30">
-              <p className="text-gray-300">• در طول برنامه، مصرف پروتئین و کربوهیدرات کافی را فراموش نکنید.</p>
-            </div>
-            <div className="p-4 rounded-lg bg-gray-800/30 hover:bg-gray-800/50 transition-all border border-gray-700/50 hover:border-gold-500/30">
-              <p className="text-gray-300">• برای جلوگیری از آسیب، فرم صحیح حرکات را رعایت کنید.</p>
-            </div>
-            <div className="p-4 rounded-lg bg-gray-800/30 hover:bg-gray-800/50 transition-all border border-gray-700/50 hover:border-gold-500/30 md:col-span-2">
-              <p className="text-gray-300">• بین جلسات تمرینی، به بدن خود استراحت کافی بدهید.</p>
-            </div>
+            {/* Workout Tips */}
+            {getProgramType(programData) === 'workout' && (
+              <>
+                <div className="p-4 rounded-lg bg-gray-800/30 hover:bg-gray-800/50 transition-all border border-gray-700/50 hover:border-gold-500/30">
+                  <p className="text-gray-300">• قبل از شروع تمرین، حتما بدن خود را گرم کنید.</p>
+                </div>
+                <div className="p-4 rounded-lg bg-gray-800/30 hover:bg-gray-800/50 transition-all border border-gray-700/50 hover:border-gold-500/30">
+                  <p className="text-gray-300">• برای جلوگیری از آسیب، فرم صحیح حرکات را رعایت کنید.</p>
+                </div>
+                <div className="p-4 rounded-lg bg-gray-800/30 hover:bg-gray-800/50 transition-all border border-gray-700/50 hover:border-gold-500/30">
+                  <p className="text-gray-300">• در طول برنامه، مصرف پروتئین و کربوهیدرات کافی را فراموش نکنید.</p>
+                </div>
+                <div className="p-4 rounded-lg bg-gray-800/30 hover:bg-gray-800/50 transition-all border border-gray-700/50 hover:border-gold-500/30">
+                  <p className="text-gray-300">• بین جلسات تمرینی، به بدن خود استراحت کافی بدهید.</p>
+                </div>
+              </>
+            )}
+            
+            {/* Nutrition Tips */}
+            {getProgramType(programData) === 'nutrition' && (
+              <>
+                <div className="p-4 rounded-lg bg-gray-800/30 hover:bg-gray-800/50 transition-all border border-gray-700/50 hover:border-gold-500/30">
+                  <p className="text-gray-300">• وعده‌های غذایی را در زمان‌های مشخص شده مصرف کنید.</p>
+                </div>
+                <div className="p-4 rounded-lg bg-gray-800/30 hover:bg-gray-800/50 transition-all border border-gray-700/50 hover:border-gold-500/30">
+                  <p className="text-gray-300">• روزانه حداقل 2-3 لیتر آب بنوشید.</p>
+                </div>
+                <div className="p-4 rounded-lg bg-gray-800/30 hover:bg-gray-800/50 transition-all border border-gray-700/50 hover:border-gold-500/30">
+                  <p className="text-gray-300">• از غذاهای فرآوری شده و شکر اضافی پرهیز کنید.</p>
+                </div>
+                <div className="p-4 rounded-lg bg-gray-800/30 hover:bg-gray-800/50 transition-all border border-gray-700/50 hover:border-gold-500/30">
+                  <p className="text-gray-300">• میوه و سبزیجات تازه را در برنامه خود بگنجانید.</p>
+                </div>
+                <div className="p-4 rounded-lg bg-gray-800/30 hover:bg-gray-800/50 transition-all border border-gray-700/50 hover:border-gold-500/30 md:col-span-2">
+                  <p className="text-gray-300">• در صورت حساسیت غذایی، با متخصص تغذیه مشورت کنید.</p>
+                </div>
+              </>
+            )}
+            
+            {/* Supplement Tips */}
+            {getProgramType(programData) === 'supplement' && (
+              <>
+                <div className="p-4 rounded-lg bg-red-900/20 border border-red-500/20 hover:bg-red-900/30 transition-all">
+                  <p className="text-red-300">• قبل از شروع هر مکملی با پزشک مشورت کنید.</p>
+                </div>
+                <div className="p-4 rounded-lg bg-gray-800/30 hover:bg-gray-800/50 transition-all border border-gray-700/50 hover:border-gold-500/30">
+                  <p className="text-gray-300">• مکمل‌ها را در زمان‌های مشخص شده مصرف کنید.</p>
+                </div>
+                <div className="p-4 rounded-lg bg-gray-800/30 hover:bg-gray-800/50 transition-all border border-gray-700/50 hover:border-gold-500/30">
+                  <p className="text-gray-300">• مصرف آب را در طول روز افزایش دهید.</p>
+                </div>
+                <div className="p-4 rounded-lg bg-gray-800/30 hover:bg-gray-800/50 transition-all border border-gray-700/50 hover:border-gold-500/30">
+                  <p className="text-gray-300">• از برندهای معتبر و دارای مجوز خریداری کنید.</p>
+                </div>
+                <div className="p-4 rounded-lg bg-red-900/20 border border-red-500/20 hover:bg-red-900/30 transition-all md:col-span-2">
+                  <p className="text-red-300">• در صورت بروز عوارض جانبی، فوراً مصرف را متوقف کنید.</p>
+                </div>
+              </>
+            )}
           </div>
         </CardContent>
       </Card>
