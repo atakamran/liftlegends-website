@@ -11,9 +11,9 @@ import { toast } from "@/hooks/use-toast";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
+import ProfileSkeleton from "@/components/ui/profile-skeleton";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Calendar, Clock, TrendingUp, AlertCircle, CheckCircle, Crown } from "lucide-react";
+import { Calendar, Clock, TrendingUp, AlertCircle, CheckCircle, Crown, User, Mail, Phone, Target, Weight, Ruler, Save } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 
 interface UserProfile {
@@ -196,21 +196,7 @@ const Profile = () => {
   };
 
   if (loading) {
-    return (
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
-        <div className="space-y-6">
-          <Skeleton className="h-12 w-[250px]" />
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="md:col-span-1">
-              <Skeleton className="h-[300px] w-full rounded-lg" />
-            </div>
-            <div className="md:col-span-2">
-              <Skeleton className="h-[400px] w-full rounded-lg" />
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+    return <ProfileSkeleton />;
   }
 
   if (!user) {
@@ -310,387 +296,420 @@ const Profile = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <div className="space-y-6">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-          <h1 className="text-3xl font-bold text-white">پروفایل کاربری</h1>
-          <div className="flex items-center space-x-2 mt-2 md:mt-0">
-            <Badge variant={getSubscriptionBadgeVariant()} className="px-3 py-1">
+    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-black to-gray-950">
+      <div className="container mx-auto px-4 py-16 max-w-6xl">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-16">
+          <h1 className="text-4xl lg:text-5xl font-light text-white">پروفایل کاربری</h1>
+          <div className="flex items-center space-x-4 mt-4 md:mt-0 rtl:space-x-reverse">
+            <Badge 
+              variant={getSubscriptionBadgeVariant()} 
+              className="px-4 py-2 text-sm backdrop-blur-sm border-0"
+            >
               {getSubscriptionStatus()}
             </Badge>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Main Content */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           {/* User Info Card */}
-          <div className="md:col-span-1">
-            <Card className="bg-gray-900/90 border-gray-800 text-white shadow-xl">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-xl">اطلاعات کاربر</CardTitle>
-                <CardDescription className="text-gray-400">مشخصات حساب کاربری شما</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex flex-col items-center justify-center py-4">
-                  <Avatar className="h-24 w-24 mb-4 border-2 border-gold-500">
+          <div className="lg:col-span-1">
+            <div className="bg-gray-900/30 backdrop-blur-sm rounded-3xl border border-gray-800/50 p-8 space-y-8">
+              {/* User Avatar & Basic Info */}
+              <div className="text-center space-y-6">
+                <div className="relative inline-block">
+                  <Avatar className="h-32 w-32 border-4 border-gold-500/20">
                     <AvatarImage src="" />
-                    <AvatarFallback className="bg-gray-800 text-gold-500 text-xl">
+                    <AvatarFallback className="bg-gradient-to-br from-gold-500 to-amber-400 text-black text-2xl font-light">
                       {getInitials(profileData?.name)}
                     </AvatarFallback>
                   </Avatar>
-                  <h3 className="text-lg font-medium">{profileData?.name || "کاربر"}</h3>
-                  <p className="text-sm text-gray-400">{user.email}</p>
+                  <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-green-500 rounded-full border-4 border-gray-950 flex items-center justify-center">
+                    <CheckCircle className="w-4 h-4 text-white" />
+                  </div>
                 </div>
                 
-                <Separator className="bg-gray-800" />
-                
                 <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-gray-400 text-sm">عضویت از</span>
-                    <span className="text-sm">{formatDate(user.created_at)}</span>
+                  <h2 className="text-2xl font-light text-white">
+                    {profileData?.name || "کاربر"}
+                  </h2>
+                  <p className="text-gray-400 flex items-center justify-center space-x-2 rtl:space-x-reverse">
+                    <Mail className="w-4 h-4" />
+                    <span>{user.email}</span>
+                  </p>
+                </div>
+              </div>
+
+              {/* User Stats */}
+              <div className="space-y-6">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="text-center p-4 bg-gray-800/30 rounded-2xl">
+                    <div className="text-2xl font-light text-gold-400">
+                      {profileData?.currentWeight || '--'}
+                    </div>
+                    <div className="text-sm text-gray-400">وزن فعلی</div>
+                  </div>
+                  <div className="text-center p-4 bg-gray-800/30 rounded-2xl">
+                    <div className="text-2xl font-light text-gold-400">
+                      {profileData?.targetWeight || '--'}
+                    </div>
+                    <div className="text-sm text-gray-400">وزن هدف</div>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between py-3 border-b border-gray-800/50">
+                    <div className="flex items-center space-x-3 rtl:space-x-reverse">
+                      <Calendar className="w-4 h-4 text-gray-400" />
+                      <span className="text-gray-400">عضویت از</span>
+                    </div>
+                    <span className="text-white font-light">{formatDate(user.created_at)}</span>
                   </div>
                   
-                  {profileData?.subscription_plan && (
-                    <div className="space-y-4">
-                      {/* Subscription Plan Header */}
-                      <div className="flex items-center justify-between p-3 bg-gradient-to-r from-gold-500/10 to-amber-400/10 rounded-lg border border-gold-500/20">
-                        <div className="flex items-center space-x-2 space-x-reverse">
-                          <Crown className="h-5 w-5 text-gold-500" />
-                          <div>
-                            <div className="text-sm font-medium text-gold-500">اشتراک {profileData.subscription_plan}</div>
-                            <div className="text-xs text-gray-400">
-                              {getSubscriptionStatus() === "فعال" ? "فعال و در حال استفاده" : getSubscriptionStatus()}
-                            </div>
-                          </div>
-                        </div>
-                        <Badge variant={getSubscriptionBadgeVariant()} className="px-2 py-1">
-                          {getSubscriptionStatus()}
-                        </Badge>
-                      </div>
-
-                      {/* Subscription Progress */}
-                      {getSubscriptionStatus() === "فعال" && (
-                        <div className="space-y-2">
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-400">پیشرفت اشتراک</span>
-                            <span className="text-gold-500 font-medium">{getSubscriptionProgress()}%</span>
-                          </div>
-                          <Progress 
-                            value={getSubscriptionProgress()} 
-                            className="h-2 bg-gray-800"
-                          />
-                          <div className="flex items-center justify-between text-xs text-gray-500">
-                            <span>شروع</span>
-                            <span className="flex items-center space-x-1 space-x-reverse">
-                              <Clock className="h-3 w-3" />
-                              <span>{getRemainingDays()} روز باقی‌مانده</span>
-                            </span>
-                            <span>پایان</span>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Subscription Dates */}
-                      <div className="grid grid-cols-1 gap-3">
-                        <div className="flex items-center justify-between p-2 bg-gray-800/30 rounded-md">
-                          <div className="flex items-center space-x-2 space-x-reverse">
-                            <Calendar className="h-4 w-4 text-green-500" />
-                            <span className="text-gray-400 text-sm">تاریخ شروع</span>
-                          </div>
-                          <div className="text-left">
-                            <div className="text-sm text-white">{formatDateWithTime(profileData.subscription_start_date).date}</div>
-                            <div className="text-xs text-gray-500">{formatDateWithTime(profileData.subscription_start_date).relative}</div>
-                          </div>
-                        </div>
-
-                        <div className="flex items-center justify-between p-2 bg-gray-800/30 rounded-md">
-                          <div className="flex items-center space-x-2 space-x-reverse">
-                            <Calendar className={`h-4 w-4 ${getSubscriptionStatus() === "فعال" ? "text-blue-500" : "text-red-500"}`} />
-                            <span className="text-gray-400 text-sm">تاریخ پایان</span>
-                          </div>
-                          <div className="text-left">
-                            <div className="text-sm text-white">{formatDateWithTime(profileData.subscription_end_date).date}</div>
-                            <div className={`text-xs ${getSubscriptionStatus() === "فعال" ? "text-blue-400" : "text-red-400"}`}>
-                              {formatDateWithTime(profileData.subscription_end_date).relative}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Subscription Status Alert */}
-                      {getSubscriptionStatus() === "منقضی شده" && (
-                        <div className="flex items-center space-x-2 space-x-reverse p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
-                          <AlertCircle className="h-4 w-4 text-red-500 flex-shrink-0" />
-                          <div className="text-sm text-red-400">
-                            اشتراک شما منقضی شده است. برای ادامه استفاده از خدمات، اشتراک خود را تمدید کنید.
-                          </div>
-                        </div>
-                      )}
-
-                      {getSubscriptionStatus() === "فعال" && getRemainingDays() <= 7 && (
-                        <div className="flex items-center space-x-2 space-x-reverse p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg">
-                          <AlertCircle className="h-4 w-4 text-amber-500 flex-shrink-0" />
-                          <div className="text-sm text-amber-400">
-                            اشتراک شما به زودی منقضی می‌شود. برای جلوگیری از قطع خدمات، اشتراک خود را تمدید کنید.
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                  
                   {profileData?.is_coach && (
-                    <div className="flex justify-between">
-                      <span className="text-gray-400 text-sm">وضعیت</span>
-                      <Badge variant="outline" className="bg-gold-500/10 text-gold-500 border-gold-500/20">مربی</Badge>
+                    <div className="flex items-center justify-between py-3 border-b border-gray-800/50">
+                      <div className="flex items-center space-x-3 rtl:space-x-reverse">
+                        <Crown className="w-4 h-4 text-gold-400" />
+                        <span className="text-gray-400">وضعیت</span>
+                      </div>
+                      <Badge className="bg-gold-500/10 text-gold-400 border-gold-500/20">مربی</Badge>
                     </div>
                   )}
                   
                   {profileData?.is_admin && (
-                    <div className="flex justify-between">
-                      <span className="text-gray-400 text-sm">دسترسی</span>
-                      <Badge variant="outline" className="bg-blue-500/10 text-blue-500 border-blue-500/20">ادمین</Badge>
+                    <div className="flex items-center justify-between py-3 border-b border-gray-800/50">
+                      <div className="flex items-center space-x-3 rtl:space-x-reverse">
+                        <CheckCircle className="w-4 h-4 text-blue-400" />
+                        <span className="text-gray-400">دسترسی</span>
+                      </div>
+                      <Badge className="bg-blue-500/10 text-blue-400 border-blue-500/20">ادمین</Badge>
                     </div>
                   )}
                 </div>
-              </CardContent>
-            </Card>
+
+                {/* Subscription Section */}
+                {profileData?.subscription_plan && (
+                  <div className="bg-gradient-to-br from-gold-500/10 to-amber-400/5 rounded-2xl p-6 border border-gold-500/20">
+                    <div className="flex items-center space-x-3 mb-4 rtl:space-x-reverse">
+                      <Crown className="w-6 h-6 text-gold-400" />
+                      <div>
+                        <h3 className="text-lg font-light text-gold-400">
+                          اشتراک {profileData.subscription_plan}
+                        </h3>
+                        <p className="text-sm text-gray-400">
+                          {getSubscriptionStatus() === "فعال" ? "فعال و در حال استفاده" : getSubscriptionStatus()}
+                        </p>
+                      </div>
+                    </div>
+
+                    {getSubscriptionStatus() === "فعال" && (
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-gray-400">پیشرفت اشتراک</span>
+                          <span className="text-gold-400 font-light">{getSubscriptionProgress()}%</span>
+                        </div>
+                        <Progress 
+                          value={getSubscriptionProgress()} 
+                          className="h-2 bg-gray-800/50"
+                        />
+                        <div className="flex items-center justify-center text-sm text-gold-400">
+                          <Clock className="w-4 h-4 ml-2" />
+                          <span>{getRemainingDays()} روز باقی‌مانده</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Alerts */}
+                    {getSubscriptionStatus() === "منقضی شده" && (
+                      <div className="mt-4 p-3 bg-red-500/10 border border-red-500/20 rounded-xl">
+                        <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                          <AlertCircle className="w-4 h-4 text-red-400" />
+                          <span className="text-sm text-red-400">
+                            اشتراک منقضی شده - تمدید کنید
+                          </span>
+                        </div>
+                      </div>
+                    )}
+
+                    {getSubscriptionStatus() === "فعال" && getRemainingDays() <= 7 && (
+                      <div className="mt-4 p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl">
+                        <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                          <AlertCircle className="w-4 h-4 text-amber-400" />
+                          <span className="text-sm text-amber-400">
+                            اشتراک به زودی منقضی می‌شود
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
 
-          {/* Profile Edit Tabs */}
-          <div className="md:col-span-2">
-            <Card className="bg-gray-900/90 border-gray-800 text-white shadow-xl">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-xl">ویرایش پروفایل</CardTitle>
-                <CardDescription className="text-gray-400">اطلاعات پروفایل خود را به‌روزرسانی کنید</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Tabs defaultValue="personal" className="w-full">
-                  <TabsList className="grid w-full grid-cols-2 bg-gray-800/50 p-1 rounded-lg mb-6">
-                    <TabsTrigger value="personal" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-gold-500 data-[state=active]:to-amber-400 data-[state=active]:text-black data-[state=active]:font-medium rounded-md transition-all duration-300">
-                      اطلاعات شخصی
-                    </TabsTrigger>
-                    <TabsTrigger value="fitness" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-gold-500 data-[state=active]:to-amber-400 data-[state=active]:text-black data-[state=active]:font-medium rounded-md transition-all duration-300">
-                      اطلاعات تناسب اندام
-                    </TabsTrigger>
-                  </TabsList>
-                  
-                  <TabsContent value="personal" className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="name">نام و نام خانوادگی</Label>
-                        <Input
-                          id="name"
-                          name="name"
-                          value={formData.name}
-                          onChange={handleInputChange}
-                          className="bg-gray-800 border-gray-700 text-white"
-                        />
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="phoneNumber">شماره تلفن</Label>
-                        <Input
-                          id="phoneNumber"
-                          name="phoneNumber"
-                          value={formData.phoneNumber}
-                          onChange={handleInputChange}
-                          className="bg-gray-800 border-gray-700 text-white"
-                        />
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="age">سن</Label>
-                        <Input
-                          id="age"
-                          name="age"
-                          type="number"
-                          value={formData.age}
-                          onChange={handleInputChange}
-                          className="bg-gray-800 border-gray-700 text-white"
-                        />
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="gender">جنسیت</Label>
-                        <Select
-                          value={formData.gender}
-                          onValueChange={(value) => handleSelectChange("gender", value)}
-                        >
-                          <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
-                            <SelectValue placeholder="انتخاب جنسیت" />
-                          </SelectTrigger>
-                          <SelectContent className="bg-gray-800 border-gray-700 text-white">
-                            <SelectItem value="male">مرد</SelectItem>
-                            <SelectItem value="female">زن</SelectItem>
-                            <SelectItem value="other">سایر</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
+          {/* Profile Edit Form */}
+          <div className="lg:col-span-2">
+            <div className="bg-gray-900/30 backdrop-blur-sm rounded-3xl border border-gray-800/50 p-8 space-y-8">
+              <div className="space-y-2">
+                <h2 className="text-3xl font-light text-white">ویرایش پروفایل</h2>
+                <p className="text-gray-400">اطلاعات پروفایل خود را به‌روزرسانی کنید</p>
+              </div>
+
+              <Tabs defaultValue="personal" className="w-full">
+                <TabsList className="grid w-full grid-cols-2 bg-gray-800/30 p-2 rounded-2xl mb-8 border border-gray-700/50">
+                  <TabsTrigger 
+                    value="personal" 
+                    className="data-[state=active]:bg-gold-500 data-[state=active]:text-black data-[state=active]:shadow-lg rounded-xl transition-all duration-300 font-light"
+                  >
+                    <User className="w-4 h-4 ml-2" />
+                    اطلاعات شخصی
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="fitness" 
+                    className="data-[state=active]:bg-gold-500 data-[state=active]:text-black data-[state=active]:shadow-lg rounded-xl transition-all duration-300 font-light"
+                  >
+                    <Target className="w-4 h-4 ml-2" />
+                    اطلاعات تناسب اندام
+                  </TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="personal" className="space-y-8">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-3">
+                      <Label htmlFor="name" className="text-white font-light flex items-center space-x-2 rtl:space-x-reverse">
+                        <User className="w-4 h-4" />
+                        <span>نام و نام خانوادگی</span>
+                      </Label>
+                      <Input
+                        id="name"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleInputChange}
+                        className="bg-gray-800/50 border-gray-700/50 text-white rounded-xl h-12 focus:border-gold-500 transition-colors duration-300"
+                        placeholder="نام کامل خود را وارد کنید"
+                      />
                     </div>
-                  </TabsContent>
+                    
+                    <div className="space-y-3">
+                      <Label htmlFor="phoneNumber" className="text-white font-light flex items-center space-x-2 rtl:space-x-reverse">
+                        <Phone className="w-4 h-4" />
+                        <span>شماره تلفن</span>
+                      </Label>
+                      <Input
+                        id="phoneNumber"
+                        name="phoneNumber"
+                        value={formData.phoneNumber}
+                        onChange={handleInputChange}
+                        className="bg-gray-800/50 border-gray-700/50 text-white rounded-xl h-12 focus:border-gold-500 transition-colors duration-300"
+                        placeholder="09123456789"
+                      />
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <Label htmlFor="age" className="text-white font-light">سن</Label>
+                      <Input
+                        id="age"
+                        name="age"
+                        type="number"
+                        value={formData.age}
+                        onChange={handleInputChange}
+                        className="bg-gray-800/50 border-gray-700/50 text-white rounded-xl h-12 focus:border-gold-500 transition-colors duration-300"
+                        placeholder="25"
+                      />
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <Label htmlFor="gender" className="text-white font-light">جنسیت</Label>
+                      <Select
+                        value={formData.gender}
+                        onValueChange={(value) => handleSelectChange("gender", value)}
+                      >
+                        <SelectTrigger className="bg-gray-800/50 border-gray-700/50 text-white rounded-xl h-12 focus:border-gold-500">
+                          <SelectValue placeholder="انتخاب جنسیت" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-gray-800 border-gray-700 text-white rounded-xl">
+                          <SelectItem value="male">مرد</SelectItem>
+                          <SelectItem value="female">زن</SelectItem>
+                          <SelectItem value="other">سایر</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="fitness" className="space-y-8">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-3">
+                      <Label htmlFor="height" className="text-white font-light flex items-center space-x-2 rtl:space-x-reverse">
+                        <Ruler className="w-4 h-4" />
+                        <span>قد (سانتی‌متر)</span>
+                      </Label>
+                      <Input
+                        id="height"
+                        name="height"
+                        type="number"
+                        value={formData.height}
+                        onChange={handleInputChange}
+                        className="bg-gray-800/50 border-gray-700/50 text-white rounded-xl h-12 focus:border-gold-500 transition-colors duration-300"
+                        placeholder="175"
+                      />
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <Label htmlFor="currentWeight" className="text-white font-light flex items-center space-x-2 rtl:space-x-reverse">
+                        <Weight className="w-4 h-4" />
+                        <span>وزن فعلی (کیلوگرم)</span>
+                      </Label>
+                      <Input
+                        id="currentWeight"
+                        name="currentWeight"
+                        type="number"
+                        value={formData.currentWeight}
+                        onChange={handleInputChange}
+                        className="bg-gray-800/50 border-gray-700/50 text-white rounded-xl h-12 focus:border-gold-500 transition-colors duration-300"
+                        placeholder="70"
+                      />
+                    </div>
+                    
+                    <div className="space-y-3 md:col-span-2">
+                      <Label htmlFor="targetWeight" className="text-white font-light flex items-center space-x-2 rtl:space-x-reverse">
+                        <Target className="w-4 h-4" />
+                        <span>وزن هدف (کیلوگرم)</span>
+                      </Label>
+                      <Input
+                        id="targetWeight"
+                        name="targetWeight"
+                        type="number"
+                        value={formData.targetWeight}
+                        onChange={handleInputChange}
+                        className="bg-gray-800/50 border-gray-700/50 text-white rounded-xl h-12 focus:border-gold-500 transition-colors duration-300"
+                        placeholder="65"
+                      />
+                    </div>
+                  </div>
                   
-                  <TabsContent value="fitness" className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="height">قد (سانتی‌متر)</Label>
-                        <Input
-                          id="height"
-                          name="height"
-                          type="number"
-                          value={formData.height}
-                          onChange={handleInputChange}
-                          className="bg-gray-800 border-gray-700 text-white"
-                        />
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="currentWeight">وزن فعلی (کیلوگرم)</Label>
-                        <Input
-                          id="currentWeight"
-                          name="currentWeight"
-                          type="number"
-                          value={formData.currentWeight}
-                          onChange={handleInputChange}
-                          className="bg-gray-800 border-gray-700 text-white"
-                        />
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="targetWeight">وزن هدف (کیلوگرم)</Label>
-                        <Input
-                          id="targetWeight"
-                          name="targetWeight"
-                          type="number"
-                          value={formData.targetWeight}
-                          onChange={handleInputChange}
-                          className="bg-gray-800 border-gray-700 text-white"
-                        />
-                      </div>
-                      
-                      <div className="space-y-3 md:col-span-2">
-                        <Label htmlFor="goal" className="block mb-3 text-base">هدف تناسب اندام</Label>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                          {/* کاهش وزن */}
-                          <div 
-                            className={`relative rounded-xl p-4 cursor-pointer transition-all duration-300 border-2 ${
-                              formData.goal === "lose" 
-                                ? "border-gold-500 bg-gold-500/10" 
-                                : "border-gray-700 bg-gray-800/50 hover:border-gray-600 hover:bg-gray-800"
-                            }`}
-                            onClick={() => handleSelectChange("goal", "lose")}
-                          >
-                            <div className="flex flex-col items-center text-center">
-                              <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-3 ${
-                                formData.goal === "lose" 
-                                  ? "bg-gold-500 text-black" 
-                                  : "bg-gray-700 text-gray-300"
-                              }`}>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                  <path d="m19 14-7-7-7 7"/>
-                                  <path d="M12 21V7"/>
-                                </svg>
-                              </div>
-                              <h3 className={`font-bold text-base ${
-                                formData.goal === "lose" ? "text-gold-500" : "text-white"
-                              }`}>کاهش وزن</h3>
-                              <p className="text-xs mt-1 text-gray-400">Lose</p>
-                            </div>
-                            {formData.goal === "lose" && (
-                              <div className="absolute top-2 right-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gold-500">
-                                  <path d="M20 6 9 17l-5-5"/>
-                                </svg>
-                              </div>
-                            )}
+                  <div className="space-y-6">
+                    <Label className="text-white font-light text-lg">هدف تناسب اندام</Label>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      {/* کاهش وزن */}
+                      <div 
+                        className={`relative rounded-2xl p-6 cursor-pointer transition-all duration-500 border-2 group hover:scale-105 ${
+                          formData.goal === "lose" 
+                            ? "border-gold-500 bg-gold-500/10 shadow-lg shadow-gold-500/20" 
+                            : "border-gray-700/50 bg-gray-800/30 hover:border-gray-600 hover:bg-gray-800/50"
+                        }`}
+                        onClick={() => handleSelectChange("goal", "lose")}
+                      >
+                        <div className="flex flex-col items-center text-center space-y-4">
+                          <div className={`w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 ${
+                            formData.goal === "lose" 
+                              ? "bg-gold-500 text-black" 
+                              : "bg-gray-700 text-gray-300 group-hover:bg-gray-600"
+                          }`}>
+                            <TrendingUp className="w-8 h-8 rotate-180" />
                           </div>
-                          
-                          {/* افزایش عضله */}
-                          <div 
-                            className={`relative rounded-xl p-4 cursor-pointer transition-all duration-300 border-2 ${
-                              formData.goal === "gain" 
-                                ? "border-gold-500 bg-gold-500/10" 
-                                : "border-gray-700 bg-gray-800/50 hover:border-gray-600 hover:bg-gray-800"
-                            }`}
-                            onClick={() => handleSelectChange("goal", "gain")}
-                          >
-                            <div className="flex flex-col items-center text-center">
-                              <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-3 ${
-                                formData.goal === "gain" 
-                                  ? "bg-gold-500 text-black" 
-                                  : "bg-gray-700 text-gray-300"
-                              }`}>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                  <path d="M5 3v4"/>
-                                  <path d="M19 21v-4"/>
-                                  <path d="M5 7h14"/>
-                                  <path d="M5 17h14"/>
-                                </svg>
-                              </div>
-                              <h3 className={`font-bold text-base ${
-                                formData.goal === "gain" ? "text-gold-500" : "text-white"
-                              }`}>افزایش عضله</h3>
-                              <p className="text-xs mt-1 text-gray-400">Gain</p>
-                            </div>
-                            {formData.goal === "gain" && (
-                              <div className="absolute top-2 right-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gold-500">
-                                  <path d="M20 6 9 17l-5-5"/>
-                                </svg>
-                              </div>
-                            )}
-                          </div>
-                          
-                          {/* حفظ وضعیت */}
-                          <div 
-                            className={`relative rounded-xl p-4 cursor-pointer transition-all duration-300 border-2 ${
-                              formData.goal === "maintenance" 
-                                ? "border-gold-500 bg-gold-500/10" 
-                                : "border-gray-700 bg-gray-800/50 hover:border-gray-600 hover:bg-gray-800"
-                            }`}
-                            onClick={() => handleSelectChange("goal", "maintenance")}
-                          >
-                            <div className="flex flex-col items-center text-center">
-                              <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-3 ${
-                                formData.goal === "maintenance" 
-                                  ? "bg-gold-500 text-black" 
-                                  : "bg-gray-700 text-gray-300"
-                              }`}>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                  <path d="M8 3v3a2 2 0 0 1-2 2H3"/>
-                                  <path d="M16 3v3a2 2 0 0 0 2 2h3"/>
-                                  <path d="M8 21v-3a2 2 0 0 0-2-2H3"/>
-                                  <path d="M16 21v-3a2 2 0 0 1 2-2h3"/>
-                                </svg>
-                              </div>
-                              <h3 className={`font-bold text-base ${
-                                formData.goal === "maintenance" ? "text-gold-500" : "text-white"
-                              }`}>حفظ وضعیت</h3>
-                              <p className="text-xs mt-1 text-gray-400">Maintenance</p>
-                            </div>
-                            {formData.goal === "maintenance" && (
-                              <div className="absolute top-2 right-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gold-500">
-                                  <path d="M20 6 9 17l-5-5"/>
-                                </svg>
-                              </div>
-                            )}
+                          <div>
+                            <h3 className={`font-light text-lg ${
+                              formData.goal === "lose" ? "text-gold-400" : "text-white"
+                            }`}>کاهش وزن</h3>
+                            <p className="text-sm text-gray-400 mt-1">Weight Loss</p>
                           </div>
                         </div>
-                        <input type="hidden" name="goal" value={formData.goal} />
+                        {formData.goal === "lose" && (
+                          <div className="absolute top-4 right-4">
+                            <CheckCircle className="w-5 h-5 text-gold-400" />
+                          </div>
+                        )}
+                      </div>
+                      
+                      {/* افزایش عضله */}
+                      <div 
+                        className={`relative rounded-2xl p-6 cursor-pointer transition-all duration-500 border-2 group hover:scale-105 ${
+                          formData.goal === "gain" 
+                            ? "border-gold-500 bg-gold-500/10 shadow-lg shadow-gold-500/20" 
+                            : "border-gray-700/50 bg-gray-800/30 hover:border-gray-600 hover:bg-gray-800/50"
+                        }`}
+                        onClick={() => handleSelectChange("goal", "gain")}
+                      >
+                        <div className="flex flex-col items-center text-center space-y-4">
+                          <div className={`w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 ${
+                            formData.goal === "gain" 
+                              ? "bg-gold-500 text-black" 
+                              : "bg-gray-700 text-gray-300 group-hover:bg-gray-600"
+                          }`}>
+                            <TrendingUp className="w-8 h-8" />
+                          </div>
+                          <div>
+                            <h3 className={`font-light text-lg ${
+                              formData.goal === "gain" ? "text-gold-400" : "text-white"
+                            }`}>افزایش عضله</h3>
+                            <p className="text-sm text-gray-400 mt-1">Muscle Gain</p>
+                          </div>
+                        </div>
+                        {formData.goal === "gain" && (
+                          <div className="absolute top-4 right-4">
+                            <CheckCircle className="w-5 h-5 text-gold-400" />
+                          </div>
+                        )}
+                      </div>
+                      
+                      {/* حفظ وضعیت */}
+                      <div 
+                        className={`relative rounded-2xl p-6 cursor-pointer transition-all duration-500 border-2 group hover:scale-105 ${
+                          formData.goal === "maintenance" 
+                            ? "border-gold-500 bg-gold-500/10 shadow-lg shadow-gold-500/20" 
+                            : "border-gray-700/50 bg-gray-800/30 hover:border-gray-600 hover:bg-gray-800/50"
+                        }`}
+                        onClick={() => handleSelectChange("goal", "maintenance")}
+                      >
+                        <div className="flex flex-col items-center text-center space-y-4">
+                          <div className={`w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 ${
+                            formData.goal === "maintenance" 
+                              ? "bg-gold-500 text-black" 
+                              : "bg-gray-700 text-gray-300 group-hover:bg-gray-600"
+                          }`}>
+                            <Target className="w-8 h-8" />
+                          </div>
+                          <div>
+                            <h3 className={`font-light text-lg ${
+                              formData.goal === "maintenance" ? "text-gold-400" : "text-white"
+                            }`}>حفظ وضعیت</h3>
+                            <p className="text-sm text-gray-400 mt-1">Maintenance</p>
+                          </div>
+                        </div>
+                        {formData.goal === "maintenance" && (
+                          <div className="absolute top-4 right-4">
+                            <CheckCircle className="w-5 h-5 text-gold-400" />
+                          </div>
+                        )}
                       </div>
                     </div>
-                  </TabsContent>
-                </Tabs>
-              </CardContent>
-              <CardFooter className="flex justify-end">
+                  </div>
+                </TabsContent>
+              </Tabs>
+
+              {/* Save Button */}
+              <div className="flex justify-end pt-8">
                 <Button 
                   onClick={handleUpdateProfile}
                   disabled={updating}
-                  className="bg-gradient-to-r from-gold-500 to-amber-400 hover:from-gold-600 hover:to-amber-500 text-black font-medium"
+                  className="bg-gold-500 hover:bg-gold-400 text-black px-8 py-3 rounded-2xl font-light text-lg transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {updating ? "در حال به‌روزرسانی..." : "ذخیره تغییرات"}
+                  {updating ? (
+                    <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                      <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
+                      <span>در حال ذخیره...</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                      <Save className="w-5 h-5" />
+                      <span>ذخیره تغییرات</span>
+                    </div>
+                  )}
                 </Button>
-              </CardFooter>
-            </Card>
+              </div>
+            </div>
           </div>
         </div>
       </div>

@@ -447,20 +447,27 @@ const ProgramCard = ({ program }: { program: Program }) => {
       className="overflow-hidden bg-gray-900 border-gray-800 transition-all duration-300 hover:border-gold-500/50 hover:shadow-lg hover:shadow-gold-500/10 group cursor-pointer"
       onClick={handleCardClick}
     >
-      <div className="relative aspect-square w-full overflow-hidden">
+      <div className="relative w-full h-48 sm:h-56 md:h-64 lg:h-72 xl:h-80 overflow-hidden rounded-t-lg">
         {program.image_url ? (
           <img 
             src={program.image_url} 
             alt={program.title} 
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
           />
         ) : (
-          <div className="w-full h-full bg-gray-800 flex items-center justify-center">
-            <span className="text-gray-500">بدون تصویر</span>
+          <div className="w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center">
+            <div className="text-center space-y-2">
+              <div className="w-12 h-12 mx-auto rounded-full bg-gray-700 flex items-center justify-center">
+                <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <span className="text-gray-500 text-sm">بدون تصویر</span>
+            </div>
           </div>
         )}
         
-        <Badge className={`absolute top-2 right-2 ${getCategoryColor(program.category)}`}>
+        <Badge className={`absolute top-3 right-3 ${getCategoryColor(program.category)} backdrop-blur-sm`}>
           {program.category === 'training' && 'برنامه تمرینی'}
           {program.category === 'diet' && 'برنامه غذایی'}
           {program.category === 'supplement' && 'مکمل'}
