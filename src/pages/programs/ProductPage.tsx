@@ -44,6 +44,8 @@ const ProductPage = () => {
   const [program, setProgram] = useState<Program | null>(null);
   const [relatedPrograms, setRelatedPrograms] = useState<RelatedProgram[]>([]);
   const [loading, setLoading] = useState(true);
+  const [hasPurchased, setHasPurchased] = useState(false);
+  const [checkingPurchase, setCheckingPurchase] = useState(false);
 
   // Function to fetch program details
   const fetchProgramDetails = async () => {
@@ -93,6 +95,9 @@ const ProductPage = () => {
       
       setProgram(programData);
       
+      // Check if user has purchased this program
+      await checkUserPurchase(programData.id);
+      
       // Fetch related programs
       fetchRelatedPrograms(programData.category);
     } catch (error) {
@@ -123,6 +128,41 @@ const ProductPage = () => {
       setRelatedPrograms(data || []);
     } catch (error) {
       console.error("Error fetching related programs:", error);
+    }
+  };
+
+  // Function to check if user has purchased the program
+  const checkUserPurchase = async (programId: string) => {
+    try {
+      setCheckingPurchase(true);
+      
+      // Get current user session
+      const { data: sessionData } = await supabase.auth.getSession();
+      if (!sessionData.session) {
+        setHasPurchased(false);
+        return;
+      }
+
+      // Check if user has purchased this program
+      const { data: purchaseData, error: purchaseError } = await supabase
+        .from('user_purchases')
+        .select('id')
+        .eq('user_id', sessionData.session.user.id)
+        .eq('program_id', programId)
+        .eq('payment_status', 'completed');
+        
+      if (purchaseError) {
+        console.error("Error checking purchase status:", purchaseError);
+        setHasPurchased(false);
+      } else {
+        // If there are any purchases, the user has purchased the program
+        setHasPurchased(purchaseData !== null && Array.isArray(purchaseData) && purchaseData.length > 0);
+      }
+    } catch (error) {
+      console.error("Error checking user purchase:", error);
+      setHasPurchased(false);
+    } finally {
+      setCheckingPurchase(false);
     }
   };
   
@@ -162,6 +202,17 @@ const ProductPage = () => {
   // Handle buy button click
   const handleBuyClick = () => {
     if (!program) return;
+    
+    // If user has already purchased, redirect to program details
+    if (hasPurchased) {
+      const detailsUrl = program.program_url 
+        ? `/programs/${program.program_url}/details`
+        : `/programs/${program.id}/details`;
+      navigate(detailsUrl);
+      return;
+    }
+    
+    // Otherwise, proceed to payment
     navigate(`/payment?program=${program.id}`);
   };
   
@@ -475,6 +526,92 @@ const ProductPage = () => {
                   </div>
                 </div>
               </div>
+            </CardContent>
+          </Card>
+
+          {/* Purchase Section */}
+          <Card className="bg-gray-900 border-gray-800">
+            <CardContent className="p-6">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="text-center sm:text-right">
+                  <div className="text-3xl font-bold text-gold-500 mb-2">
+                    {formatPrice(program.price)}
+                  </div>
+                  <p className="text-gray-400 text-sm">
+                    {hasPurchased ? 'شما این محصول را خریداری کرده‌اید' : 'قیمت نهایی محصول'}
+                  </p>
+                </div>
+                
+                <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                  <Button
+                    onClick={handleBuyClick}
+                    disabled={checkingPurchase}
+                    className={`px-8 py-3 text-lg font-medium transition-all duration-300 ${
+                      hasPurchased 
+                        ? 'bg-green-600 hover:bg-green-700 text-white' 
+                        : 'bg-gold-500 hover:bg-gold-600 text-black'
+                    }`}
+                  >
+                    {checkingPurchase ? (
+                      <Loader2 className="ml-2 h-5 w-5 animate-spin" />
+                    ) : hasPurchased ? (
+                      <>
+                        <ArrowRight className="ml-2 h-5 w-5" />
+                        مشاهده جزئیات
+                      </>
+                    ) : (
+                      <>
+                        <ShoppingCart className="ml-2 h-5 w-5" />
+                        خرید محصول
+                      </>
+                    )}
+                  </Button>
+                  
+                  <Button
+                    variant="outline"
+                    className="border-gray-600 text-gray-300 hover:bg-gray-800"
+                    onClick={() => {
+                      // Share functionality
+                      if (navigator.share) {
+                        navigator.share({
+                          title: program.title,
+                          text: program.description,
+                          url: window.location.href,
+                        });
+                      } else {
+                        // Fallback: copy to clipboard
+                        navigator.clipboard.writeText(window.location.href);
+                        toast({
+                          title: "لینک کپی شد",
+                          description: "لینک محصول در کلیپ‌بورد کپی شد.",
+                        });
+                      }
+                    }}
+                  >
+                    <Share2 className="ml-2 h-4 w-4" />
+                    اشتراک‌گذاری
+                  </Button>
+                </div>
+              </div>
+              
+              {!hasPurchased && (
+                <div className="mt-4 p-4 bg-gray-800/50 rounded-lg border border-gray-700">
+                  <div className="flex items-center text-sm text-gray-400">
+                    <div className="flex items-center ml-4">
+                      <div className="w-2 h-2 bg-green-500 rounded-full ml-2"></div>
+                      <span>پرداخت امن</span>
+                    </div>
+                    <div className="flex items-center ml-4">
+                      <div className="w-2 h-2 bg-green-500 rounded-full ml-2"></div>
+                      <span>دانلود فوری</span>
+                    </div>
+                    <div className="flex items-center">
+                      <div className="w-2 h-2 bg-green-500 rounded-full ml-2"></div>
+                      <span>پشتیبانی ۳ ماهه</span>
+                    </div>
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>

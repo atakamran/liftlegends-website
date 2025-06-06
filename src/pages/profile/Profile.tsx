@@ -13,6 +13,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Calendar, Clock, TrendingUp, AlertCircle, CheckCircle, Crown } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
 
 interface UserProfile {
   id: string;
@@ -230,6 +232,65 @@ const Profile = () => {
     return new Date(dateString).toLocaleDateString('fa-IR');
   };
 
+  const formatDateWithTime = (dateString: string | null) => {
+    if (!dateString) return {
+      date: "تعیین نشده",
+      time: "تعیین نشده",
+      relative: "تعیین نشده"
+    };
+    const date = new Date(dateString);
+    return {
+      date: date.toLocaleDateString('fa-IR'),
+      time: date.toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' }),
+      relative: getRelativeTime(date)
+    };
+  };
+
+  const getRelativeTime = (date: Date) => {
+    const now = new Date();
+    const diffInDays = Math.floor((date.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+    
+    if (diffInDays > 0) {
+      if (diffInDays === 1) return "فردا";
+      if (diffInDays < 7) return `${diffInDays} روز دیگر`;
+      if (diffInDays < 30) return `${Math.floor(diffInDays / 7)} هفته دیگر`;
+      if (diffInDays < 365) return `${Math.floor(diffInDays / 30)} ماه دیگر`;
+      return `${Math.floor(diffInDays / 365)} سال دیگر`;
+    } else {
+      const absDays = Math.abs(diffInDays);
+      if (absDays === 0) return "امروز";
+      if (absDays === 1) return "دیروز";
+      if (absDays < 7) return `${absDays} روز پیش`;
+      if (absDays < 30) return `${Math.floor(absDays / 7)} هفته پیش`;
+      if (absDays < 365) return `${Math.floor(absDays / 30)} ماه پیش`;
+      return `${Math.floor(absDays / 365)} سال پیش`;
+    }
+  };
+
+  const getSubscriptionProgress = () => {
+    if (!profileData?.subscription_start_date || !profileData?.subscription_end_date) return 0;
+    
+    const startDate = new Date(profileData.subscription_start_date);
+    const endDate = new Date(profileData.subscription_end_date);
+    const now = new Date();
+    
+    const totalDuration = endDate.getTime() - startDate.getTime();
+    const elapsed = now.getTime() - startDate.getTime();
+    
+    const progress = Math.max(0, Math.min(100, (elapsed / totalDuration) * 100));
+    return Math.round(progress);
+  };
+
+  const getRemainingDays = () => {
+    if (!profileData?.subscription_end_date) return 0;
+    
+    const endDate = new Date(profileData.subscription_end_date);
+    const now = new Date();
+    const diffInDays = Math.ceil((endDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+    
+    return Math.max(0, diffInDays);
+  };
+
   const getSubscriptionStatus = () => {
     if (!profileData?.subscription_plan) return "بدون اشتراک";
     if (!profileData?.subscription_end_date) return "نامشخص";
@@ -289,22 +350,91 @@ const Profile = () => {
                   </div>
                   
                   {profileData?.subscription_plan && (
-                    <>
-                      <div className="flex justify-between">
-                        <span className="text-gray-400 text-sm">نوع اشتراک</span>
-                        <span className="text-sm">{profileData.subscription_plan}</span>
+                    <div className="space-y-4">
+                      {/* Subscription Plan Header */}
+                      <div className="flex items-center justify-between p-3 bg-gradient-to-r from-gold-500/10 to-amber-400/10 rounded-lg border border-gold-500/20">
+                        <div className="flex items-center space-x-2 space-x-reverse">
+                          <Crown className="h-5 w-5 text-gold-500" />
+                          <div>
+                            <div className="text-sm font-medium text-gold-500">اشتراک {profileData.subscription_plan}</div>
+                            <div className="text-xs text-gray-400">
+                              {getSubscriptionStatus() === "فعال" ? "فعال و در حال استفاده" : getSubscriptionStatus()}
+                            </div>
+                          </div>
+                        </div>
+                        <Badge variant={getSubscriptionBadgeVariant()} className="px-2 py-1">
+                          {getSubscriptionStatus()}
+                        </Badge>
                       </div>
-                      
-                      <div className="flex justify-between">
-                        <span className="text-gray-400 text-sm">تاریخ شروع</span>
-                        <span className="text-sm">{formatDate(profileData.subscription_start_date)}</span>
+
+                      {/* Subscription Progress */}
+                      {getSubscriptionStatus() === "فعال" && (
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-gray-400">پیشرفت اشتراک</span>
+                            <span className="text-gold-500 font-medium">{getSubscriptionProgress()}%</span>
+                          </div>
+                          <Progress 
+                            value={getSubscriptionProgress()} 
+                            className="h-2 bg-gray-800"
+                          />
+                          <div className="flex items-center justify-between text-xs text-gray-500">
+                            <span>شروع</span>
+                            <span className="flex items-center space-x-1 space-x-reverse">
+                              <Clock className="h-3 w-3" />
+                              <span>{getRemainingDays()} روز باقی‌مانده</span>
+                            </span>
+                            <span>پایان</span>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Subscription Dates */}
+                      <div className="grid grid-cols-1 gap-3">
+                        <div className="flex items-center justify-between p-2 bg-gray-800/30 rounded-md">
+                          <div className="flex items-center space-x-2 space-x-reverse">
+                            <Calendar className="h-4 w-4 text-green-500" />
+                            <span className="text-gray-400 text-sm">تاریخ شروع</span>
+                          </div>
+                          <div className="text-left">
+                            <div className="text-sm text-white">{formatDateWithTime(profileData.subscription_start_date).date}</div>
+                            <div className="text-xs text-gray-500">{formatDateWithTime(profileData.subscription_start_date).relative}</div>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-between p-2 bg-gray-800/30 rounded-md">
+                          <div className="flex items-center space-x-2 space-x-reverse">
+                            <Calendar className={`h-4 w-4 ${getSubscriptionStatus() === "فعال" ? "text-blue-500" : "text-red-500"}`} />
+                            <span className="text-gray-400 text-sm">تاریخ پایان</span>
+                          </div>
+                          <div className="text-left">
+                            <div className="text-sm text-white">{formatDateWithTime(profileData.subscription_end_date).date}</div>
+                            <div className={`text-xs ${getSubscriptionStatus() === "فعال" ? "text-blue-400" : "text-red-400"}`}>
+                              {formatDateWithTime(profileData.subscription_end_date).relative}
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                      
-                      <div className="flex justify-between">
-                        <span className="text-gray-400 text-sm">تاریخ پایان</span>
-                        <span className="text-sm">{formatDate(profileData.subscription_end_date)}</span>
-                      </div>
-                    </>
+
+                      {/* Subscription Status Alert */}
+                      {getSubscriptionStatus() === "منقضی شده" && (
+                        <div className="flex items-center space-x-2 space-x-reverse p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
+                          <AlertCircle className="h-4 w-4 text-red-500 flex-shrink-0" />
+                          <div className="text-sm text-red-400">
+                            اشتراک شما منقضی شده است. برای ادامه استفاده از خدمات، اشتراک خود را تمدید کنید.
+                          </div>
+                        </div>
+                      )}
+
+                      {getSubscriptionStatus() === "فعال" && getRemainingDays() <= 7 && (
+                        <div className="flex items-center space-x-2 space-x-reverse p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg">
+                          <AlertCircle className="h-4 w-4 text-amber-500 flex-shrink-0" />
+                          <div className="text-sm text-amber-400">
+                            اشتراک شما به زودی منقضی می‌شود. برای جلوگیری از قطع خدمات، اشتراک خود را تمدید کنید.
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   )}
                   
                   {profileData?.is_coach && (

@@ -76,7 +76,7 @@ const HeroSection = () => {
                 <Star key={i} size={16} className="text-gold-500 fill-gold-500" />
               ))}
             </div>
-            <span className="text-white/70 text-sm">+۱۰ کاربر راضی</span>
+            {/* <span className="text-white/70 text-sm">+۱۰ کاربر راضی</span> */}
           </div>
           
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold">

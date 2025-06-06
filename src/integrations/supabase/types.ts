@@ -482,6 +482,42 @@ export type Database = {
         }
         Relationships: []
       }
+      program_details: {
+        Row: {
+          id: string
+          program_id: string
+          title: string
+          description: string
+          details: Json
+          workouts: Json
+          weeks: Json
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          program_id: string
+          title: string
+          description: string
+          details: Json
+          workouts?: Json
+          weeks?: Json
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          program_id?: string
+          title?: string
+          description?: string
+          details?: Json
+          workouts?: Json
+          weeks?: Json
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

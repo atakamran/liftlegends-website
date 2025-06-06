@@ -299,7 +299,7 @@ const ProgramDetails = () => {
         }
         
         // Transform data if needed
-        let transformedProgramDetails = { ...programDetails };
+        const transformedProgramDetails = { ...programDetails };
         
         // Always use the workouts directly from the data provided
         if (programDetails.weeks && Array.isArray(programDetails.weeks)) {

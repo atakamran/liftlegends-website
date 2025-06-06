@@ -146,6 +146,17 @@ interface Program {
   program_url: string | null;
 }
 
+interface ProgramDetail {
+  id: string;
+  program_id: string;
+  title: string;
+  description: string;
+  details: any | null;
+  weeks: any | null;
+  created_at: string;
+  updated_at: string;
+}
+
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -295,6 +306,19 @@ const Dashboard = () => {
   const [isEditingProduct, setIsEditingProduct] = useState(false);
   const [currentProductId, setCurrentProductId] = useState<string | null>(null);
 
+  // Program details management state
+  const [programDetails, setProgramDetails] = useState<ProgramDetail[]>([]);
+  const [programDetailsLoading, setProgramDetailsLoading] = useState(false);
+  const [selectedProgramDetail, setSelectedProgramDetail] = useState<ProgramDetail | null>(null);
+  const [programDetailFormData, setProgramDetailFormData] = useState<Partial<ProgramDetail>>({
+    title: "",
+    description: "",
+    details: null,
+    weeks: null
+  });
+  const [isEditingProgramDetail, setIsEditingProgramDetail] = useState(false);
+  const [currentProgramDetailId, setCurrentProgramDetailId] = useState<string | null>(null);
+
   // Function to fetch products
   const fetchProducts = async () => {
     try {
@@ -359,7 +383,7 @@ const Dashboard = () => {
       setProductLoading(true);
       
       // Create new product
-      const { data, error } = await supabase
+      const { data: productData, error: productError } = await supabase
         .from("programs_sale")
         .insert({
           title: productFormData.title || "",
@@ -374,7 +398,25 @@ const Dashboard = () => {
         .select()
         .single();
         
-      if (error) throw error;
+      if (productError) throw productError;
+      
+      // Create corresponding program details
+      const { error: detailsError } = await supabase
+        .from("program_details")
+        .insert({
+          program_id: productData.id,
+          title: productFormData.title || "",
+          description: productFormData.description || "",
+          details: null,
+          weeks: null,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        });
+        
+      if (detailsError) {
+        console.error("Error creating program details:", detailsError);
+        // Don't throw error here, just log it as the main product was created successfully
+      }
       
       // Refresh products
       fetchProducts();
@@ -391,7 +433,7 @@ const Dashboard = () => {
       
       toast({
         title: "محصول جدید ایجاد شد",
-        description: "محصول جدید با موفقیت ایجاد شد.",
+        description: "محصول جدید و جزئیات برنامه با موفقیت ایجاد شد.",
       });
     } catch (error) {
       console.error("Error creating product:", error);
@@ -448,7 +490,8 @@ const Dashboard = () => {
         description: "",
         price: 0,
         category: "training",
-        image_url: ""
+        image_url: "",
+        program_url: ""
       });
       setIsEditingProduct(false);
       setCurrentProductId(null);
@@ -522,10 +565,125 @@ const Dashboard = () => {
       description: "",
       price: 0,
       category: "training",
-      image_url: ""
+      image_url: "",
+      program_url: ""
     });
     setIsEditingProduct(false);
     setCurrentProductId(null);
+  };
+
+  // Function to fetch program details
+  const fetchProgramDetails = async () => {
+    try {
+      setProgramDetailsLoading(true);
+      
+      const { data, error } = await supabase
+        .from("program_details")
+        .select(`
+          *,
+          programs_sale!inner(title, category)
+        `)
+        .order("created_at", { ascending: false });
+        
+      if (error) throw error;
+      
+      setProgramDetails(data || []);
+      console.log("Program details fetched:", data?.length || 0);
+    } catch (error) {
+      console.error("Error fetching program details:", error);
+      toast({
+        variant: "destructive",
+        title: "خطا در بارگذاری جزئیات برنامه‌ها",
+        description: "مشکلی در دریافت لیست جزئیات برنامه‌ها رخ داد. لطفاً دوباره تلاش کنید.",
+      });
+    } finally {
+      setProgramDetailsLoading(false);
+    }
+  };
+
+  // Function to update program details
+  const updateProgramDetail = async () => {
+    try {
+      if (!currentProgramDetailId) return;
+      
+      // Validate form data
+      if (!programDetailFormData.title || !programDetailFormData.description) {
+        toast({
+          variant: "destructive",
+          title: "خطا در بروزرسانی جزئیات برنامه",
+          description: "لطفاً عنوان و توضیحات برنامه را وارد کنید.",
+        });
+        return;
+      }
+      
+      setProgramDetailsLoading(true);
+      
+      // Update program details
+      const { data, error } = await supabase
+        .from("program_details")
+        .update({
+          title: programDetailFormData.title,
+          description: programDetailFormData.description,
+          details: programDetailFormData.details,
+          weeks: programDetailFormData.weeks,
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", currentProgramDetailId)
+        .select();
+        
+      if (error) throw error;
+      
+      // Refresh program details
+      fetchProgramDetails();
+      
+      // Reset form
+      setProgramDetailFormData({
+        title: "",
+        description: "",
+        details: null,
+        weeks: null
+      });
+      setIsEditingProgramDetail(false);
+      setCurrentProgramDetailId(null);
+      
+      toast({
+        title: "جزئیات برنامه بروزرسانی شد",
+        description: "جزئیات برنامه با موفقیت بروزرسانی شد.",
+      });
+    } catch (error) {
+      console.error("Error updating program detail:", error);
+      toast({
+        variant: "destructive",
+        title: "خطا در بروزرسانی جزئیات برنامه",
+        description: "مشکلی در بروزرسانی جزئیات برنامه رخ داد. لطفاً دوباره تلاش کنید.",
+      });
+    } finally {
+      setProgramDetailsLoading(false);
+    }
+  };
+
+  // Function to edit program details
+  const editProgramDetail = (programDetail: ProgramDetail) => {
+    setProgramDetailFormData({
+      title: programDetail.title,
+      description: programDetail.description,
+      details: programDetail.details,
+      weeks: programDetail.weeks
+    });
+    setCurrentProgramDetailId(programDetail.id);
+    setIsEditingProgramDetail(true);
+  };
+
+  // Function to cancel edit program details
+  const cancelEditProgramDetail = () => {
+    setProgramDetailFormData({
+      title: "",
+      description: "",
+      details: null,
+      weeks: null
+    });
+    setCurrentProgramDetailId(null);
+    setIsEditingProgramDetail(false);
   };
 
   // Function to fetch blog posts
@@ -1446,6 +1604,11 @@ const Dashboard = () => {
     if (activeTab === "payments" && user) {
       fetchUserPurchases();
     }
+    
+    // Load program details when program management tab is active and user is admin
+    if (activeTab === "program-management" && user?.profile?.is_admin) {
+      fetchProgramDetails();
+    }
   }, [activeTab, user?.profile?.is_admin, user]);
   
   // Fetch blog categories when component mounts
@@ -1674,6 +1837,27 @@ const Dashboard = () => {
                           <Edit size={18} className="text-gold-500" />
                         </div>
                         <span>مدیریت بلاگ</span>
+                      </div>
+                    </TabsTrigger>
+                    
+                    <TabsTrigger 
+                      value="program-management" 
+                      className="group w-full justify-start px-4 py-3 text-right rounded-lg transition-all duration-300
+                        data-[state=active]:bg-gradient-to-r data-[state=active]:from-gold-500/20 data-[state=active]:to-transparent 
+                        data-[state=active]:border-r-4 data-[state=active]:border-gold-500 data-[state=active]:text-white
+                        hover:bg-gray-700/30"
+                    >
+                      <div className="flex items-center">
+                        <div className="w-8 h-8 rounded-md bg-gradient-to-br from-gold-500/10 to-amber-600/10 flex items-center justify-center mr-3 ml-3 group-data-[state=active]:bg-gradient-to-br group-data-[state=active]:from-gold-500/20 group-data-[state=active]:to-amber-600/20">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gold-500">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14,2 14,8 20,8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10,9 9,9 8,9"></polyline>
+                          </svg>
+                        </div>
+                        <span>مدیریت برنامه‌ها</span>
                       </div>
                     </TabsTrigger>
                   </>
@@ -2439,6 +2623,165 @@ const Dashboard = () => {
                                             </DialogContent>
                                           </Dialog>
                                         </div>
+                                      </TableCell>
+                                    </TableRow>
+                                  ))
+                                )}
+                              </TableBody>
+                            </Table>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            )}
+            
+            {/* Program Management Tab - Only visible to admins */}
+            {user?.profile?.is_admin && (
+              <TabsContent value="program-management" className="space-y-6 animate-in fade-in-50 duration-300">
+                <Card className="bg-gray-800/50 border-gray-700">
+                  <CardHeader>
+                    <CardTitle className="text-xl text-gold-500">مدیریت برنامه‌ها</CardTitle>
+                    <CardDescription>
+                      در این بخش می‌توانید جزئیات برنامه‌ها را مدیریت کنید.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-6">
+                      {/* Program Detail Form */}
+                      {isEditingProgramDetail && (
+                        <div className="bg-gray-900/50 p-4 rounded-lg border border-gray-700">
+                          <h3 className="text-lg font-medium mb-4">ویرایش جزئیات برنامه</h3>
+                          <div className="space-y-4">
+                            <div className="space-y-2">
+                              <Label htmlFor="program-detail-title">عنوان برنامه</Label>
+                              <Input
+                                id="program-detail-title"
+                                value={programDetailFormData.title}
+                                onChange={(e) => setProgramDetailFormData({...programDetailFormData, title: e.target.value})}
+                                placeholder="عنوان برنامه را وارد کنید"
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor="program-detail-description">توضیحات برنامه</Label>
+                              <Textarea
+                                id="program-detail-description"
+                                value={programDetailFormData.description}
+                                onChange={(e) => setProgramDetailFormData({...programDetailFormData, description: e.target.value})}
+                                placeholder="توضیحات برنامه را وارد کنید"
+                                rows={4}
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor="program-detail-details">جزئیات برنامه (JSON)</Label>
+                              <Textarea
+                                id="program-detail-details"
+                                value={programDetailFormData.details ? JSON.stringify(programDetailFormData.details, null, 2) : ""}
+                                onChange={(e) => {
+                                  try {
+                                    const parsed = e.target.value ? JSON.parse(e.target.value) : null;
+                                    setProgramDetailFormData({...programDetailFormData, details: parsed});
+                                  } catch (error) {
+                                    // Invalid JSON, keep the string value for editing
+                                    setProgramDetailFormData({...programDetailFormData, details: e.target.value});
+                                  }
+                                }}
+                                placeholder='{"exercises": [], "instructions": ""}'
+                                rows={6}
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor="program-detail-weeks">هفته‌های برنامه (JSON)</Label>
+                              <Textarea
+                                id="program-detail-weeks"
+                                value={programDetailFormData.weeks ? JSON.stringify(programDetailFormData.weeks, null, 2) : ""}
+                                onChange={(e) => {
+                                  try {
+                                    const parsed = e.target.value ? JSON.parse(e.target.value) : null;
+                                    setProgramDetailFormData({...programDetailFormData, weeks: parsed});
+                                  } catch (error) {
+                                    // Invalid JSON, keep the string value for editing
+                                    setProgramDetailFormData({...programDetailFormData, weeks: e.target.value});
+                                  }
+                                }}
+                                placeholder='{"week1": {}, "week2": {}}'
+                                rows={6}
+                              />
+                            </div>
+                          </div>
+                          <div className="flex justify-end space-x-2 space-x-reverse mt-4">
+                            <Button
+                              variant="outline"
+                              onClick={cancelEditProgramDetail}
+                              disabled={programDetailsLoading}
+                            >
+                              انصراف
+                            </Button>
+                            <Button
+                              onClick={updateProgramDetail}
+                              disabled={programDetailsLoading}
+                            >
+                              {programDetailsLoading ? (
+                                <>
+                                  <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                                  در حال بروزرسانی...
+                                </>
+                              ) : (
+                                "بروزرسانی برنامه"
+                              )}
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Program Details List */}
+                      <div>
+                        <h3 className="text-lg font-medium mb-4">لیست برنامه‌ها</h3>
+                        {programDetailsLoading && programDetails.length === 0 ? (
+                          <div className="flex justify-center items-center py-8">
+                            <Loader2 className="h-8 w-8 animate-spin text-gold-500" />
+                          </div>
+                        ) : (
+                          <div className="overflow-x-auto">
+                            <Table>
+                              <TableCaption>لیست جزئیات برنامه‌های موجود</TableCaption>
+                              <TableHeader>
+                                <TableRow>
+                                  <TableHead>عنوان برنامه</TableHead>
+                                  <TableHead>محصول مرتبط</TableHead>
+                                  <TableHead>دسته‌بندی</TableHead>
+                                  <TableHead>تاریخ ایجاد</TableHead>
+                                  <TableHead>عملیات</TableHead>
+                                </TableRow>
+                              </TableHeader>
+                              <TableBody>
+                                {programDetails.length === 0 ? (
+                                  <TableRow>
+                                    <TableCell colSpan={5} className="text-center py-8">
+                                      برنامه‌ای یافت نشد
+                                    </TableCell>
+                                  </TableRow>
+                                ) : (
+                                  programDetails.map((programDetail: any) => (
+                                    <TableRow key={programDetail.id}>
+                                      <TableCell className="font-medium">{programDetail.title}</TableCell>
+                                      <TableCell>{programDetail.programs_sale?.title || "نامشخص"}</TableCell>
+                                      <TableCell>
+                                        {programDetail.programs_sale?.category === 'training' && 'برنامه تمرینی'}
+                                        {programDetail.programs_sale?.category === 'diet' && 'برنامه غذایی'}
+                                        {programDetail.programs_sale?.category === 'supplement' && 'مکمل'}
+                                      </TableCell>
+                                      <TableCell>{new Date(programDetail.created_at).toLocaleDateString('fa-IR')}</TableCell>
+                                      <TableCell>
+                                        <Button
+                                          variant="outline"
+                                          size="sm"
+                                          onClick={() => editProgramDetail(programDetail)}
+                                        >
+                                          <Edit className="h-4 w-4" />
+                                        </Button>
                                       </TableCell>
                                     </TableRow>
                                   ))
