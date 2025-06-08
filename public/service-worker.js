@@ -1,5 +1,5 @@
 // LiftLegends Service Worker
-const CACHE_NAME = 'liftlegends-cache-v1';
+const CACHE_NAME = 'liftlegends-cache-v2';
 const OFFLINE_URL = '/offline.html';
 
 // Assets to cache
@@ -13,7 +13,10 @@ const ASSETS_TO_CACHE = [
   '/favicon/favicon-32x32.png',
   '/favicon/favicon-16x16.png',
   'https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends//white%20logo.png',
-  '/blog'
+  '/blog',
+  '/programs',
+  '/about-us',
+  '/download'
 ];
 
 // Install event
@@ -62,6 +65,35 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // Use network-first strategy for navigation requests to prevent stale pages
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request)
+        .then(response => {
+          // Clone the response to store in cache
+          const responseToCache = response.clone();
+          caches.open(CACHE_NAME)
+            .then(cache => {
+              cache.put(event.request, responseToCache);
+            });
+          return response;
+        })
+        .catch(() => {
+          // If network fails, try to get from cache
+          return caches.match(event.request)
+            .then(cachedResponse => {
+              if (cachedResponse) {
+                return cachedResponse;
+              }
+              // If there's no cached version, return the offline page
+              return caches.match(OFFLINE_URL);
+            });
+        })
+    );
+    return;
+  }
+
+  // For non-navigation requests, use cache-first strategy
   event.respondWith(
     caches.match(event.request)
       .then((response) => {
@@ -87,10 +119,11 @@ self.addEventListener('fetch', (event) => {
             return response;
           })
           .catch(() => {
-            // If the request is for a page, return the offline page
-            if (event.request.mode === 'navigate') {
-              return caches.match(OFFLINE_URL);
-            }
+            // For assets, just fail
+            return new Response('Network error occurred', {
+              status: 408,
+              headers: { 'Content-Type': 'text/plain' }
+            });
           });
       })
   );

@@ -71,11 +71,11 @@ const HeroSection = () => {
         {/* Text content - enhanced with better typography and animations */}
         <div className={`text-center md:text-right space-y-6 sm:space-y-8 order-2 md:order-1 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
           <div className="flex items-center justify-center md:justify-start gap-2 mb-4">
-            <div className="flex">
+            {/* <div className="flex">
               {[1, 2, 3, 4, 5].map((i) => (
                 <Star key={i} size={16} className="text-gold-500 fill-gold-500" />
               ))}
-            </div>
+            </div> */}
             {/* <span className="text-white/70 text-sm">+۱۰ کاربر راضی</span> */}
           </div>
           

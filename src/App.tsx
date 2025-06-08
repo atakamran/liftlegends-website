@@ -17,7 +17,7 @@ import UpdatePassword from "./pages/profile/UpdatePassword";
 import Blog from "./pages/blog/Blog";
 import BlogPost from "./pages/blog/BlogPost";
 import CoachApplication from "./pages/coach/CoachApplication";
-import Download from "./pages/app/Download";
+import Download from "./pages/download/Download";
 import Profile from "./pages/profile/Profile";
 import Dashboard from "./pages/profile/Dashboard";
 import PaymentCallback from "./pages/payment/PaymentCallback";

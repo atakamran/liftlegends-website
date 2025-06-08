@@ -284,16 +284,16 @@ const FooterSection = () => {
             <a 
               referrerPolicy="origin" 
               target="_blank" 
-              href="https://trustseal.enamad.ir/?id=610487&Code=biPgIL29KpupPGTfmx6ATaHLhmIS9EnB"
+              href="https://trustseal.enamad.ir/?id=619281&Code=Bnf4npnTaje3SM8kkwaBEcwa4VBHb5ch"
               className="hover:opacity-90 transition-opacity"
               rel="noopener noreferrer"
             >
               <img 
                 referrerPolicy="origin" 
-                src="https://trustseal.enamad.ir/logo.aspx?id=610487&Code=biPgIL29KpupPGTfmx6ATaHLhmIS9EnB" 
+                src="https://trustseal.enamad.ir/logo.aspx?id=619281&Code=Bnf4npnTaje3SM8kkwaBEcwa4VBHb5ch" 
                 alt="نماد اعتماد الکترونیکی" 
                 style={{cursor: 'pointer'}} 
-                data-code="biPgIL29KpupPGTfmx6ATaHLhmIS9EnB"
+                data-code="Bnf4npnTaje3SM8kkwaBEcwa4VBHb5ch"
                 width="70"
                 height="70"
               />
