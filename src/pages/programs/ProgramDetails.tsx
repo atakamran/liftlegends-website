@@ -92,9 +92,8 @@ interface Food {
 interface Meal {
   meal_type: string;
   time: string;
-  title: string;
+  calories: string;
   foods: Food[];
-  total_calories: number;
   notes?: string;
 }
 
@@ -102,14 +101,38 @@ interface NutritionWeek {
   week_number: number;
   description: string;
   meals: Meal[];
-  daily_calories: number;
-  daily_protein: string;
-  daily_carbs: string;
-  daily_fat: string;
+  water_intake?: string;
+  exercise_notes?: string;
 }
 
 // Define interfaces for supplement program
 interface Supplement {
+  supplement_type: string;
+  timing: string;
+  dosage: string;
+  instructions: string;
+  benefits: string;
+  notes?: string;
+  brand_suggestions: string[];
+}
+
+interface SupplementWeek {
+  week_number: number;
+  description: string;
+  supplements: Supplement[];
+  meal_timing?: string;
+  water_intake?: string;
+  training_notes?: string;
+}
+
+// Legacy interfaces for backward compatibility
+interface LegacySupplementCategory {
+  category: string;
+  time: string;
+  items: LegacySupplement[];
+}
+
+interface LegacySupplement {
   name: string;
   dosage: string;
   timing: string;
@@ -122,20 +145,6 @@ interface Supplement {
   notes?: string;
 }
 
-interface SupplementCategory {
-  category: string;
-  time: string;
-  items: Supplement[];
-}
-
-interface SupplementWeek {
-  week_number: number;
-  description: string;
-  supplements: SupplementCategory[];
-  total_monthly_cost: string;
-  safety_reminders: string[];
-}
-
 interface ProgramDetails {
   id: string;
   program_id: string;
@@ -143,23 +152,19 @@ interface ProgramDetails {
   description: string;
   details: {
     language: string;
-    difficulty_level: string;
+    difficulty_level?: string;
     target_audience: string;
     equipment_needed?: string[];
     estimated_duration: string;
     calories_burned?: string;
     // Nutrition specific
     calories_per_day?: string;
-    meal_count?: number;
-    macros_ratio?: string;
+    weight_loss_goal?: string;
     // Supplement specific
-    goal?: string;
-    budget_range?: string;
-    safety_notes?: string;
+    target_goal?: string;
+    expected_results?: string;
   };
   workouts?: DayWorkout[];
-  meals?: Meal[];
-  supplements?: SupplementCategory[];
   weeks?: (WeekProgram | NutritionWeek | SupplementWeek | PersianWeekProgram)[];
   created_at?: string;
   updated_at?: string;
@@ -716,16 +721,13 @@ const ProgramDetails = () => {
           <div key={index} className="rounded-lg border border-gray-700/30 bg-gray-800/30 p-4 transition-all duration-300 hover:border-gold-500/30">
             <div className="flex justify-between items-start mb-3">
               <div>
-                <h4 className="font-medium text-white text-lg">{meal.title}</h4>
+                <h4 className="font-medium text-white text-lg">{meal.meal_type}</h4>
                 <div className="flex items-center gap-2 mt-1">
-                  <Badge variant="outline" className="bg-green-900/20 border-green-500/30 text-green-400">
-                    {meal.meal_type}
-                  </Badge>
                   <Badge variant="outline" className="bg-blue-900/20 border-blue-500/30 text-blue-400">
                     {meal.time}
                   </Badge>
                   <Badge variant="outline" className="bg-orange-900/20 border-orange-500/30 text-orange-400">
-                    {meal.total_calories} کالری
+                    {meal.calories}
                   </Badge>
                 </div>
               </div>
@@ -733,7 +735,7 @@ const ProgramDetails = () => {
             
             <div className="space-y-2">
               {meal.foods.map((food, foodIndex) => (
-                <div key={foodIndex} className="flex justify-between items-center p-2 rounded bg-gray-900/50">
+                <div key={foodIndex} className="flex justify-between items-center p-3 rounded bg-gray-900/50 hover:bg-gray-900/70 transition-colors">
                   <div>
                     <span className="text-white font-medium">{food.name}</span>
                     <span className="text-gray-400 text-sm mr-2">({food.amount})</span>
@@ -749,8 +751,9 @@ const ProgramDetails = () => {
             </div>
             
             {meal.notes && (
-              <div className="text-sm mt-3 p-2 rounded-md bg-gray-800 text-gray-400">
-                <strong className="text-gold-500">نکته:</strong> {meal.notes}
+              <div className="text-sm mt-3 p-3 rounded-lg bg-gold-900/20 border border-gold-500/30">
+                <span className="text-gold-400 font-medium">💡 نکته:</span>
+                <p className="text-gray-300 mt-1">{meal.notes}</p>
               </div>
             )}
           </div>
@@ -760,80 +763,52 @@ const ProgramDetails = () => {
   };
 
   // Function to render supplements for supplement programs
-  const renderSupplements = (supplements: SupplementCategory[]) => {
+  const renderSupplements = (supplements: Supplement[]) => {
     return (
-      <div className="space-y-6">
-        {supplements.map((category, index) => (
+      <div className="space-y-4">
+        {supplements.map((supplement, index) => (
           <div key={index} className="rounded-lg border border-gray-700/30 bg-gray-800/30 p-4">
-            <div className="flex justify-between items-center mb-4">
-              <h4 className="font-bold text-white text-lg">{category.category}</h4>
-              <Badge variant="outline" className="bg-purple-900/20 border-purple-500/30 text-purple-400">
-                {category.time}
+            <div className="flex justify-between items-start mb-3">
+              <h4 className="font-bold text-white text-lg">{supplement.supplement_type}</h4>
+              <Badge className="bg-gold-500/20 text-gold-400 border-gold-500/30">
+                {supplement.dosage}
               </Badge>
             </div>
             
-            <div className="space-y-4">
-              {category.items.map((supplement, suppIndex) => (
-                <div key={suppIndex} className="border border-gray-600/30 rounded-lg p-3 bg-gray-900/30">
-                  <div className="flex justify-between items-start mb-2">
-                    <h5 className="font-medium text-white">{supplement.name}</h5>
-                    <Badge className="bg-gold-500/20 text-gold-400 border-gold-500/30">
-                      {supplement.dosage}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm mb-3">
+              <div>
+                <span className="text-gray-400">زمان مصرف:</span>
+                <span className="text-white mr-2">{supplement.timing}</span>
+              </div>
+              <div>
+                <span className="text-gray-400">نحوه مصرف:</span>
+                <span className="text-white mr-2">{supplement.instructions}</span>
+              </div>
+            </div>
+            
+            <div className="space-y-3">
+              <div>
+                <span className="text-green-400 font-medium">فواید:</span>
+                <p className="text-gray-300 text-sm mt-1">{supplement.benefits}</p>
+              </div>
+              
+              <div>
+                <span className="text-blue-400 font-medium">برندهای پیشنهادی:</span>
+                <div className="flex flex-wrap gap-1 mt-1">
+                  {supplement.brand_suggestions.map((brand, brandIndex) => (
+                    <Badge key={brandIndex} variant="outline" className="text-xs bg-blue-900/20 border-blue-500/30 text-blue-400">
+                      {brand}
                     </Badge>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                    <div>
-                      <span className="text-gray-400">زمان مصرف:</span>
-                      <span className="text-white mr-2">{supplement.timing}</span>
-                    </div>
-                    <div>
-                      <span className="text-gray-400">تناوب:</span>
-                      <span className="text-white mr-2">{supplement.frequency}</span>
-                    </div>
-                    <div>
-                      <span className="text-gray-400">مدت:</span>
-                      <span className="text-white mr-2">{supplement.duration}</span>
-                    </div>
-                    <div>
-                      <span className="text-gray-400">قیمت:</span>
-                      <span className="text-green-400 mr-2">{supplement.price_range}</span>
-                    </div>
-                  </div>
-                  
-                  <div className="mt-3 space-y-2">
-                    <div>
-                      <span className="text-green-400 font-medium">فواید:</span>
-                      <p className="text-gray-300 text-sm mt-1">{supplement.benefits}</p>
-                    </div>
-                    
-                    {supplement.side_effects && (
-                      <div>
-                        <span className="text-red-400 font-medium">عوارض جانبی:</span>
-                        <p className="text-gray-300 text-sm mt-1">{supplement.side_effects}</p>
-                      </div>
-                    )}
-                    
-                    <div>
-                      <span className="text-blue-400 font-medium">برندهای پیشنهادی:</span>
-                      <div className="flex flex-wrap gap-1 mt-1">
-                        {supplement.brands.map((brand, brandIndex) => (
-                          <Badge key={brandIndex} variant="outline" className="text-xs">
-                            {brand}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                    
-                    {supplement.notes && (
-                      <div className="bg-gray-800/50 p-2 rounded text-sm">
-                        <span className="text-gold-500 font-medium">نکته:</span>
-                        <span className="text-gray-300 mr-2">{supplement.notes}</span>
-                      </div>
-                    )}
-                  </div>
+                  ))}
                 </div>
-              ))}
+              </div>
+              
+              {supplement.notes && (
+                <div className="bg-gray-800/50 p-3 rounded-lg">
+                  <span className="text-gold-500 font-medium">نکته مهم:</span>
+                  <p className="text-gray-300 text-sm mt-1">{supplement.notes}</p>
+                </div>
+              )}
             </div>
           </div>
         ))}
@@ -970,13 +945,15 @@ const ProgramDetails = () => {
         </CardHeader>
         <CardContent className="space-y-4 text-gray-300">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="flex items-start gap-3 p-3 rounded-lg bg-gray-800/30 hover:bg-gray-800/50 transition-colors">
-              <Dumbbell className="h-5 w-5 text-gold-500 mt-0.5" />
-              <div>
-                <h3 className="font-medium text-white">سطح دشواری</h3>
-                <p>{programData.details.difficulty_level}</p>
+            {programData.details.difficulty_level && (
+              <div className="flex items-start gap-3 p-3 rounded-lg bg-gray-800/30 hover:bg-gray-800/50 transition-colors">
+                <Dumbbell className="h-5 w-5 text-gold-500 mt-0.5" />
+                <div>
+                  <h3 className="font-medium text-white">سطح دشواری</h3>
+                  <p>{programData.details.difficulty_level}</p>
+                </div>
               </div>
-            </div>
+            )}
             <div className="flex items-start gap-3 p-3 rounded-lg bg-gray-800/30 hover:bg-gray-800/50 transition-colors">
               <Info className="h-5 w-5 text-gold-500 mt-0.5" />
               <div>
@@ -1028,21 +1005,12 @@ const ProgramDetails = () => {
                     </div>
                   </div>
                 )}
-                {programData.details.meal_count && (
+                {programData.details.weight_loss_goal && (
                   <div className="flex items-start gap-3 p-3 rounded-lg bg-gray-800/30 hover:bg-gray-800/50 transition-colors">
-                    <Clock className="h-5 w-5 text-gold-500 mt-0.5" />
+                    <Award className="h-5 w-5 text-gold-500 mt-0.5" />
                     <div>
-                      <h3 className="font-medium text-white">تعداد وعده</h3>
-                      <p>{programData.details.meal_count} وعده در روز</p>
-                    </div>
-                  </div>
-                )}
-                {programData.details.macros_ratio && (
-                  <div className="flex items-start gap-3 p-3 rounded-lg bg-gray-800/30 hover:bg-gray-800/50 transition-colors md:col-span-2">
-                    <BarChart className="h-5 w-5 text-gold-500 mt-0.5" />
-                    <div>
-                      <h3 className="font-medium text-white">نسبت ماکروها</h3>
-                      <p>{programData.details.macros_ratio}</p>
+                      <h3 className="font-medium text-white">هدف کاهش وزن</h3>
+                      <p>{programData.details.weight_loss_goal}</p>
                     </div>
                   </div>
                 )}
@@ -1052,30 +1020,21 @@ const ProgramDetails = () => {
             {/* Supplement specific details */}
             {getProgramType(programData) === 'supplement' && (
               <>
-                {programData.details.goal && (
+                {programData.details.target_goal && (
                   <div className="flex items-start gap-3 p-3 rounded-lg bg-gray-800/30 hover:bg-gray-800/50 transition-colors">
                     <Award className="h-5 w-5 text-gold-500 mt-0.5" />
                     <div>
-                      <h3 className="font-medium text-white">هدف</h3>
-                      <p>{programData.details.goal}</p>
+                      <h3 className="font-medium text-white">هدف برنامه</h3>
+                      <p>{programData.details.target_goal}</p>
                     </div>
                   </div>
                 )}
-                {programData.details.budget_range && (
+                {programData.details.expected_results && (
                   <div className="flex items-start gap-3 p-3 rounded-lg bg-gray-800/30 hover:bg-gray-800/50 transition-colors">
-                    <ShoppingCart className="h-5 w-5 text-gold-500 mt-0.5" />
+                    <BarChart className="h-5 w-5 text-gold-500 mt-0.5" />
                     <div>
-                      <h3 className="font-medium text-white">بودجه مورد نیاز</h3>
-                      <p>{programData.details.budget_range}</p>
-                    </div>
-                  </div>
-                )}
-                {programData.details.safety_notes && (
-                  <div className="flex items-start gap-3 p-3 rounded-lg bg-red-900/20 border border-red-500/20 hover:bg-red-900/30 transition-colors md:col-span-2">
-                    <Info className="h-5 w-5 text-red-400 mt-0.5" />
-                    <div>
-                      <h3 className="font-medium text-red-400">نکات ایمنی</h3>
-                      <p className="text-red-300">{programData.details.safety_notes}</p>
+                      <h3 className="font-medium text-white">نتایج مورد انتظار</h3>
+                      <p>{programData.details.expected_results}</p>
                     </div>
                   </div>
                 )}
