@@ -140,7 +140,7 @@ interface ProgramDetails {
   workouts?: DayWorkout[];
   meals?: Meal[];
   supplements?: SupplementCategory[];
-  weeks?: any[];
+  weeks?: (WeekProgram | NutritionWeek | SupplementWeek)[];
   created_at?: string;
   updated_at?: string;
 }
@@ -224,19 +224,21 @@ const ProgramDetails = () => {
       };
       
       // Initialize progress structure based on program data
-      programData.workouts.forEach(workout => {
-        newProgress.workouts[workout.day_number] = {
-          completed: false,
-          exercises: {},
-          timestamp: 0
-        };
-        
-        workout.exercises.forEach((_, index) => {
-          newProgress.workouts[workout.day_number].exercises[index] = {
-            completed: false
+      if (programData.workouts && Array.isArray(programData.workouts)) {
+        programData.workouts.forEach(workout => {
+          newProgress.workouts[workout.day_number] = {
+            completed: false,
+            exercises: {},
+            timestamp: 0
           };
+          
+          workout.exercises.forEach((_, index) => {
+            newProgress.workouts[workout.day_number].exercises[index] = {
+              completed: false
+            };
+          });
         });
-      });
+      }
       
       return newProgress;
     } catch (error) {
@@ -302,10 +304,11 @@ const ProgramDetails = () => {
   // Function to determine program type
   const getProgramType = (data: ProgramDetails): 'workout' | 'nutrition' | 'supplement' => {
     if (data.weeks && Array.isArray(data.weeks)) {
-      const firstWeek = data.weeks[0];
-      if (firstWeek?.workouts) return 'workout';
-      if (firstWeek?.meals) return 'nutrition';
-      if (firstWeek?.supplements) return 'supplement';
+      const firstWeek = data.weeks[0] as (WeekProgram | NutritionWeek | SupplementWeek);
+      // Use type guards to check properties
+      if ('workouts' in firstWeek && firstWeek.workouts) return 'workout';
+      if ('meals' in firstWeek && firstWeek.meals) return 'nutrition';
+      if ('supplements' in firstWeek && firstWeek.supplements) return 'supplement';
     }
     if (data.workouts && Array.isArray(data.workouts)) return 'workout';
     if (data.meals && Array.isArray(data.meals)) return 'nutrition';
@@ -314,20 +317,27 @@ const ProgramDetails = () => {
   };
 
   // Function to validate if data conforms to ProgramDetails interface
-  const validateProgramDetails = (data: any): data is ProgramDetails => {
+  const validateProgramDetails = (data: unknown): data is ProgramDetails => {
     try {
+      // Type assertion to allow property access checks
+      const record = data as Record<string, unknown>;
+      
+      // Additional type assertion for the details property
+      const details = record.details as Record<string, unknown>;
+      
       return (
-        data &&
-        typeof data.id === 'string' &&
-        typeof data.program_id === 'string' &&
-        typeof data.title === 'string' &&
-        typeof data.description === 'string' &&
-        data.details &&
-        typeof data.details.language === 'string' &&
-        typeof data.details.difficulty_level === 'string' &&
-        typeof data.details.target_audience === 'string' &&
-        typeof data.details.estimated_duration === 'string' &&
-        (Array.isArray(data.workouts) || Array.isArray(data.meals) || Array.isArray(data.supplements) || Array.isArray(data.weeks)) // Accept different program types
+        data !== null &&
+        typeof data === 'object' &&
+        typeof record.id === 'string' &&
+        typeof record.program_id === 'string' &&
+        typeof record.title === 'string' &&
+        typeof record.description === 'string' &&
+        record.details &&
+        typeof details.language === 'string' &&
+        typeof details.difficulty_level === 'string' &&
+        typeof details.target_audience === 'string' &&
+        typeof details.estimated_duration === 'string' &&
+        (Array.isArray(record.workouts) || Array.isArray(record.meals) || Array.isArray(record.supplements) || Array.isArray(record.weeks)) // Accept different program types
       );
     } catch (error) {
       console.error("Error validating program details:", error);
@@ -346,7 +356,7 @@ const ProgramDetails = () => {
         const user = data.user;
         
         // Fetch program details
-        const { data: programDetails, error: programError } = await supabase
+        const { data: rawProgramDetails, error: programError } = await supabase
           .from('program_details')
           .select('*')
           .eq('program_id', programId)
@@ -356,6 +366,9 @@ const ProgramDetails = () => {
           console.error("Error fetching program details:", programError);
           return;
         }
+        
+        // Parse the data to ensure it has the correct type
+        const programDetails = rawProgramDetails as unknown as ProgramDetails;
         
         // Fetch program info from programs_sale table
         const { data: programSaleInfo, error: saleError } = await supabase
@@ -384,20 +397,22 @@ const ProgramDetails = () => {
         
         // Handle different program types
         if (programDetails.weeks && Array.isArray(programDetails.weeks)) {
-          const firstWeek = programDetails.weeks[0];
+          const firstWeek = programDetails.weeks[0] as (WeekProgram | NutritionWeek | SupplementWeek);
           
           // Workout program
-          if (firstWeek?.workouts) {
-            const allWorkouts = programDetails.weeks.flatMap(week => week.workouts);
+          if ('workouts' in firstWeek && firstWeek.workouts) {
+            const allWorkouts = programDetails.weeks
+              .map(week => (week as WeekProgram).workouts)
+              .flat();
             transformedProgramDetails.workouts = allWorkouts;
           }
           // Nutrition program
-          else if (firstWeek?.meals) {
+          else if ('meals' in firstWeek && firstWeek.meals) {
             // Keep weeks structure for nutrition programs
             transformedProgramDetails.weeks = programDetails.weeks;
           }
           // Supplement program
-          else if (firstWeek?.supplements) {
+          else if ('supplements' in firstWeek && firstWeek.supplements) {
             // Keep weeks structure for supplement programs
             transformedProgramDetails.weeks = programDetails.weeks;
           }
@@ -1011,7 +1026,7 @@ const ProgramDetails = () => {
               </CardHeader>
               <CardContent>
                 {/* Workout Program Content */}
-                {getProgramType(programData) === 'workout' && programData.workouts && (
+                {getProgramType(programData) === 'workout' && programData.workouts && Array.isArray(programData.workouts) && (
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mb-4">
                     {programData.workouts.map((workout, index) => {
                       const isWorkoutCompleted = progress?.workouts[workout.day_number]?.completed || false;
