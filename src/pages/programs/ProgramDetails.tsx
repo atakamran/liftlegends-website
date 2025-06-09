@@ -58,6 +58,26 @@ interface WeekProgram {
   workouts: DayWorkout[];
 }
 
+// Define interfaces for Persian workout program format
+interface PersianExercise {
+  name: string;
+  sets: number;
+  reps: string;
+}
+
+interface PersianDay {
+  day: string;
+  focus: string;
+  exercises?: PersianExercise[];
+  activities?: string[];
+}
+
+interface PersianWeekProgram {
+  week_number: number;
+  description: string;
+  days: PersianDay[];
+}
+
 // Define interfaces for nutrition program
 interface Food {
   name: string;
@@ -140,7 +160,7 @@ interface ProgramDetails {
   workouts?: DayWorkout[];
   meals?: Meal[];
   supplements?: SupplementCategory[];
-  weeks?: (WeekProgram | NutritionWeek | SupplementWeek)[];
+  weeks?: (WeekProgram | NutritionWeek | SupplementWeek | PersianWeekProgram)[];
   created_at?: string;
   updated_at?: string;
 }
@@ -240,6 +260,31 @@ const ProgramDetails = () => {
         });
       }
       
+      // Handle Persian workout format
+      if (getProgramType(programData) === 'persian_workout' && programData.weeks) {
+        const persianWeeks = programData.weeks as PersianWeekProgram[];
+        
+        persianWeeks.forEach((week, weekIndex) => {
+          week.days.forEach((day, dayIndex) => {
+            const dayNumber = weekIndex * 10 + dayIndex; // Generate unique day number
+            
+            if (day.exercises && day.exercises.length > 0) {
+              newProgress.workouts[dayNumber] = {
+                completed: false,
+                exercises: {},
+                timestamp: 0
+              };
+              
+              day.exercises.forEach((_, index) => {
+                newProgress.workouts[dayNumber].exercises[index] = {
+                  completed: false
+                };
+              });
+            }
+          });
+        });
+      }
+      
       return newProgress;
     } catch (error) {
       console.error("Error initializing progress:", error);
@@ -302,13 +347,14 @@ const ProgramDetails = () => {
   };
   
   // Function to determine program type
-  const getProgramType = (data: ProgramDetails): 'workout' | 'nutrition' | 'supplement' => {
+  const getProgramType = (data: ProgramDetails): 'workout' | 'nutrition' | 'supplement' | 'persian_workout' => {
     if (data.weeks && Array.isArray(data.weeks)) {
-      const firstWeek = data.weeks[0] as (WeekProgram | NutritionWeek | SupplementWeek);
+      const firstWeek = data.weeks[0] as (WeekProgram | NutritionWeek | SupplementWeek | PersianWeekProgram);
       // Use type guards to check properties
       if ('workouts' in firstWeek && firstWeek.workouts) return 'workout';
       if ('meals' in firstWeek && firstWeek.meals) return 'nutrition';
       if ('supplements' in firstWeek && firstWeek.supplements) return 'supplement';
+      if ('days' in firstWeek && firstWeek.days) return 'persian_workout';
     }
     if (data.workouts && Array.isArray(data.workouts)) return 'workout';
     if (data.meals && Array.isArray(data.meals)) return 'nutrition';
@@ -586,6 +632,78 @@ const ProgramDetails = () => {
             </div>
           );
         })}
+      </div>
+    );
+  };
+  
+  // Function to render Persian exercise format
+  const renderPersianExercises = (exercises: PersianExercise[], dayIndex: number) => {
+    if (!exercises || exercises.length === 0) {
+      return null;
+    }
+
+    return (
+      <div className="space-y-3">
+        {exercises.map((exercise, index) => {
+          const isCompleted = progress?.workouts[dayIndex]?.exercises[index]?.completed || false;
+          
+          return (
+            <div 
+              key={index}
+              className={`rounded-lg border ${isCompleted ? 'border-green-500/20 bg-green-900/5' : 'border-gray-700/30 bg-gray-800/30'} 
+                p-3 transition-all duration-300 cursor-pointer hover:border-gold-500/30 hover:shadow-md hover:shadow-black/20`}
+              onClick={() => hasPurchased && toggleExerciseCompletion(dayIndex, index)}
+            >
+              <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+                <div className="flex items-center gap-2">
+                  {hasPurchased && (
+                    <div
+                      className={`w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center transition-all ${
+                        isCompleted 
+                          ? 'bg-green-500 text-black' 
+                          : 'bg-gray-700 text-gray-300'
+                      }`}
+                    >
+                      <CheckCircle className={`h-5 w-5 ${isCompleted ? '' : ''}`} />
+                    </div>
+                  )}
+                  <h4 className={`font-medium ${isCompleted ? 'text-green-400' : 'text-white'}`}>
+                    {exercise.name}
+                  </h4>
+                </div>
+                
+                <div className="flex items-center gap-2 flex-wrap">
+                  <div className={`px-2 py-1 rounded-md text-xs ${isCompleted ? 'bg-green-900/20 text-green-300' : 'bg-gray-700 text-gray-300'}`}>
+                    <span className="font-bold">{exercise.sets}</span> ست
+                  </div>
+                  <div className={`px-2 py-1 rounded-md text-xs ${isCompleted ? 'bg-green-900/20 text-green-300' : 'bg-gray-700 text-gray-300'}`}>
+                    <span className="font-bold">{exercise.reps}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+  
+  // Function to render Persian activities
+  const renderPersianActivities = (activities: string[]) => {
+    if (!activities || activities.length === 0) {
+      return null;
+    }
+
+    return (
+      <div className="bg-blue-900/10 p-4 rounded-lg border border-blue-500/20">
+        <h4 className="text-blue-300 font-medium mb-3">فعالیت های پیشنهادی:</h4>
+        <div className="flex flex-wrap gap-2">
+          {activities.map((activity, index) => (
+            <Badge key={index} className="bg-blue-900/20 text-blue-400 border-blue-500/30 py-1.5 px-3">
+              {activity}
+            </Badge>
+          ))}
+        </div>
       </div>
     );
   };
@@ -1114,6 +1232,101 @@ const ProgramDetails = () => {
                         );
                       })}
                     </div>
+                )}
+                
+                {/* Persian Workout Program Content */}
+                {getProgramType(programData) === 'persian_workout' && programData.weeks && Array.isArray(programData.weeks) && (
+                  <div className="space-y-6">
+                    {programData.weeks.map((week: PersianWeekProgram, weekIndex: number) => (
+                      <div key={weekIndex} className="border border-gray-700/50 rounded-lg p-4 bg-gray-800/20">
+                        <h3 className="text-xl font-bold text-white mb-4">هفته {week.week_number}</h3>
+                        <p className="text-gray-400 mb-6">{week.description}</p>
+                        
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                          {week.days.map((day, dayIndex) => {
+                            const isRestDay = !day.exercises || day.exercises.length === 0;
+                            const dayId = `persian-day-${weekIndex}-${dayIndex}`;
+                            
+                            return (
+                              <div 
+                                key={dayIndex}
+                                className={`relative overflow-hidden rounded-xl border border-gray-700/50 
+                                  ${isRestDay ? 'bg-blue-900/5' : 'bg-gray-800/30'} 
+                                  transition-all duration-300 hover:shadow-lg hover:shadow-gold-900/10 group cursor-pointer`}
+                                onClick={(e) => {
+                                  // Get the current state of the accordion
+                                  const accordionTrigger = document.querySelector(`[data-state][data-accordion-trigger="${dayId}"]`);
+                                  const isOpen = accordionTrigger?.getAttribute('data-state') === 'open';
+                                  
+                                  // Only open if it's currently closed
+                                  if (!isOpen && accordionTrigger) {
+                                    (accordionTrigger as HTMLElement).click();
+                                  }
+                                }}
+                              >
+                                {/* Day badge */}
+                                <div className="absolute top-3 right-3 z-10">
+                                  <div className="flex items-center justify-center rounded-full 
+                                    bg-gold-500/20 text-gold-300 px-3 py-1
+                                    font-bold text-sm transition-all duration-300">
+                                    {day.day}
+                                  </div>
+                                </div>
+                                
+                                {/* Card content */}
+                                <Accordion 
+                                  type="single" 
+                                  collapsible 
+                                  className="w-full"
+                                >
+                                  <AccordionItem 
+                                    value={dayId}
+                                    className="border-0"
+                                  >
+                                    <div className="pt-12 px-4 pb-4">
+                                      <div className="flex flex-col">
+                                        <h3 className="font-bold text-lg mb-2 text-white">
+                                          {day.focus}
+                                        </h3>
+                                        {day.exercises && (
+                                          <Badge variant="outline" className="bg-gray-800/80 border-gray-700 text-gold-300 w-fit">
+                                            {day.exercises.length} تمرین
+                                          </Badge>
+                                        )}
+                                      </div>
+                                      
+                                      {/* Expandable button */}
+                                      <AccordionTrigger data-accordion-trigger={dayId} className="py-2 px-4 mt-3 rounded-lg bg-gray-800/80 hover:bg-gray-700/80 transition-all duration-200 w-full flex justify-between items-center">
+                                        <span className="text-sm font-medium" data-state-text="true">مشاهده جزئیات</span>
+                                      </AccordionTrigger>
+                                    </div>
+                                    
+                                    <AccordionContent className="px-4 pb-4">
+                                      {isRestDay ? (
+                                        day.activities ? renderPersianActivities(day.activities) : (
+                                          <div className="flex flex-col items-center gap-3 p-4 text-center">
+                                            <div className="bg-blue-900/30 p-3 rounded-full border border-blue-500/20">
+                                              <Clock className="h-6 w-6 text-blue-400" />
+                                            </div>
+                                            <p className="text-blue-300 font-medium">روز استراحت</p>
+                                          </div>
+                                        )
+                                      ) : (
+                                        day.exercises && renderPersianExercises(day.exercises, dayIndex)
+                                      )}
+                                    </AccordionContent>
+                                  </AccordionItem>
+                                </Accordion>
+                                
+                                {/* Hover effect overlay */}
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 )}
                 
                 {/* Nutrition Program Content */}

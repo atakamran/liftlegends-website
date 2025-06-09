@@ -12,6 +12,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
+import { FcGoogle } from "react-icons/fc";
 
 const Login = () => {
   const [loading, setLoading] = useState(false);
@@ -22,16 +23,73 @@ const Login = () => {
   });
   const navigate = useNavigate();
 
-  // Check if user is already logged in
+  // Check if user is already logged in and handle OAuth redirects
   useEffect(() => {
     const checkLoginState = async () => {
       const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-      if (isLoggedIn) {
-        const { data } = await supabase.auth.getSession();
-        if (data.session) {
-          // User is already logged in, redirect to dashboard
-          navigate('/');
+      
+      // Get the current session
+      const { data } = await supabase.auth.getSession();
+      
+      if (data.session) {
+        const { user } = data.session;
+        
+        // User is logged in
+        localStorage.setItem('isLoggedIn', 'true');
+        
+        // Handle Google OAuth sign-in (both first-time and returning users)
+        if (user?.app_metadata?.provider === 'google') {
+          // Get user's information from the Google profile
+          const name = user.user_metadata?.full_name || null;
+          const email = user.email;
+          
+          // Check if user already has a profile
+          const { data: profileData, error: profileError } = await supabase
+            .from("user_profiles")
+            .select("*")
+            .eq("user_id", user.id)
+            .single();
+            
+          if (profileError && !profileData) {
+            // No profile exists, create a new one with Google info
+            const { error: createProfileError } = await supabase
+              .from("user_profiles")
+              .insert({
+                user_id: user.id,
+                name: name,  // Set the display name from Google
+                email: email, // Set the email from Google
+              });
+              
+            if (createProfileError) {
+              console.error("Error creating user profile:", createProfileError);
+            }
+          } else if (profileData) {
+            // Profile exists, update it with the latest Google info
+            // This ensures profile data stays in sync with Google account changes
+            const { error: updateProfileError } = await supabase
+              .from("user_profiles")
+              .update({
+                name: name,  // Update name from Google
+                email: email, // Update email from Google
+              })
+              .eq("user_id", user.id);
+              
+            if (updateProfileError) {
+              console.error("Error updating user profile:", updateProfileError);
+            }
+          }
         }
+        
+        // Dispatch a custom event to notify header component
+        window.dispatchEvent(new CustomEvent('userLoggedIn', { 
+          detail: { user: user }
+        }));
+        
+        // Redirect to dashboard
+        navigate('/');
+      } else if (isLoggedIn) {
+        // Session expired but localStorage still shows logged in
+        localStorage.removeItem('isLoggedIn');
       }
     };
     
@@ -136,6 +194,35 @@ const Login = () => {
       setLoading(false);
     }
   };
+  
+  const handleGoogleSignIn = async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
+        },
+      });
+      
+      if (error) throw error;
+      
+      // The redirect will happen automatically, but we need to handle the redirect 
+      // back from Google in a useEffect hook
+      
+    } catch (error: unknown) {
+      toast({
+        variant: "destructive",
+        title: "خطا در ورود با گوگل",
+        description: error instanceof Error ? error.message : "مشکلی در ورود با حساب گوگل رخ داد.",
+      });
+      setLoading(false);
+    }
+  };
 
   return (
       <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center py-8 px-3 sm:px-6 lg:px-8 bg-gradient-to-b from-gray-900 to-black dir-rtl">
@@ -168,6 +255,25 @@ const Login = () => {
             
             <TabsContent value="login" className="space-y-4">
               <div className="space-y-4">
+                {/* Google Sign-in Button at the top */}
+                <Button
+                  className="w-full bg-white hover:bg-gray-100 text-gray-900 font-medium rounded-lg py-5 shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2"
+                  onClick={handleGoogleSignIn}
+                  disabled={loading}
+                >
+                  <FcGoogle className="text-xl" />
+                  ورود با گوگل
+                </Button>
+                
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t border-gray-700" />
+                  </div>
+                  <div className="relative flex justify-center text-sm">
+                    <span className="px-2 bg-gray-900 text-gray-400">یا</span>
+                  </div>
+                </div>
+                
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-white">ایمیل</label>
                   <Input
@@ -190,30 +296,47 @@ const Login = () => {
                     onChange={handleInputChange}
                   />
                 </div>
-                <div className="space-y-4">
-                  <Button
-                    className="w-full bg-gradient-to-r from-gold-500 to-amber-400 hover:from-gold-600 hover:to-amber-500 text-black font-medium rounded-lg py-5 shadow-md hover:shadow-lg transition-all duration-300"
-                    onClick={handleLogin}
-                    disabled={loading}
+                <Button
+                  className="w-full bg-gradient-to-r from-gold-500 to-amber-400 hover:from-gold-600 hover:to-amber-500 text-black font-medium rounded-lg py-5 shadow-md hover:shadow-lg transition-all duration-300"
+                  onClick={handleLogin}
+                  disabled={loading}
+                >
+                  {loading ? "در حال ورود..." : "ورود"}
+                </Button>
+                
+                <div className="text-center">
+                  <Button 
+                    variant="link" 
+                    className="text-sm text-gray-400 hover:text-gold-500"
+                    onClick={() => navigate('/reset-password')}
                   >
-                    {loading ? "در حال ورود..." : "ورود"}
+                    رمز عبور خود را فراموش کرده‌اید؟
                   </Button>
-                  
-                  <div className="text-center mt-4">
-                    <Button 
-                      variant="link" 
-                      className="text-sm text-gray-400 hover:text-gold-500"
-                      onClick={() => navigate('/reset-password')}
-                    >
-                      رمز عبور خود را فراموش کرده‌اید؟
-                    </Button>
-                  </div>
                 </div>
               </div>
             </TabsContent>
             
             <TabsContent value="register" className="space-y-4">
               <div className="space-y-4">
+                {/* Google Sign-in Button at the top */}
+                <Button
+                  className="w-full bg-white hover:bg-gray-100 text-gray-900 font-medium rounded-lg py-5 shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2"
+                  onClick={handleGoogleSignIn}
+                  disabled={loading}
+                >
+                  <FcGoogle className="text-xl" />
+                  ثبت‌نام با گوگل
+                </Button>
+                
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t border-gray-700" />
+                  </div>
+                  <div className="relative flex justify-center text-sm">
+                    <span className="px-2 bg-gray-900 text-gray-400">یا</span>
+                  </div>
+                </div>
+                
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-white">ایمیل</label>
                   <Input
