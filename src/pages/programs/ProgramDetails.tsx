@@ -123,6 +123,7 @@ interface SupplementWeek {
   meal_timing?: string;
   water_intake?: string;
   training_notes?: string;
+  total_monthly_cost?: string;
 }
 
 // Legacy interfaces for backward compatibility
