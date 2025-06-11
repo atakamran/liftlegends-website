@@ -200,7 +200,7 @@ const Programs = () => {
   };
 
   return (
-    <div className="container mx-auto py-8 px-4 md:px-6 lg:py-12">
+    <div className="container mx-auto py-8 px-4 md:px-6 lg:py-12 pb-16 md:pb-8">
       <Helmet>
         <title>{getCategoryName()} | لیفت لجندز</title>
         <meta name="description" content={getMetaDescription()} />

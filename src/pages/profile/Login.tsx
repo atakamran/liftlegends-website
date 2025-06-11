@@ -103,6 +103,17 @@ const Login = () => {
     });
   };
 
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (authMode === 'login') {
+        handleLogin();
+      } else {
+        handleRegister();
+      }
+    }
+  };
+
   const handleLogin = async () => {
     setLoading(true);
     try {
@@ -201,7 +212,7 @@ const Login = () => {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/`,
+          redirectTo: `${window.location.origin}/login`,
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
@@ -283,6 +294,7 @@ const Login = () => {
                     className="bg-gray-800 border-gray-700 text-white"
                     value={formData.email}
                     onChange={handleInputChange}
+                    onKeyPress={handleKeyPress}
                   />
                 </div>
                 <div className="space-y-2">
@@ -294,6 +306,7 @@ const Login = () => {
                     className="bg-gray-800 border-gray-700 text-white"
                     value={formData.password}
                     onChange={handleInputChange}
+                    onKeyPress={handleKeyPress}
                   />
                 </div>
                 <Button
@@ -346,6 +359,7 @@ const Login = () => {
                     className="bg-gray-800 border-gray-700 text-white"
                     value={formData.email}
                     onChange={handleInputChange}
+                    onKeyPress={handleKeyPress}
                   />
                 </div>
                 <div className="space-y-2">
@@ -357,6 +371,7 @@ const Login = () => {
                     className="bg-gray-800 border-gray-700 text-white"
                     value={formData.password}
                     onChange={handleInputChange}
+                    onKeyPress={handleKeyPress}
                   />
                 </div>
                 <Button

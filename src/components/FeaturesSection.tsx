@@ -120,10 +120,10 @@ const FeaturesSection = () => {
             ویژگی‌های منحصر به فرد
           </span>
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-8 bg-clip-text text-transparent bg-gradient-to-r from-gold-400 via-amber-300 to-gold-500 animate-gradient-x">
-            ویژگی‌های برتر LiftLegends
+            ویژگی‌های برتر Lift Legends
           </h2>
           <p className="text-white/70 max-w-3xl mx-auto text-lg leading-relaxed">
-            با LiftLegends به قدرت خود دست یابید و اهداف بدنسازی خود را با <span className="text-gold-400 font-medium">برنامه هوشمند تمرینی</span> محقق کنید. 
+            با Lift Legends به قدرت خود دست یابید و اهداف بدنسازی خود را با <span className="text-gold-400 font-medium">برنامه هوشمند تمرینی</span> محقق کنید. 
             اپلیکیشنی که با استفاده از <span className="text-gold-400 font-medium">هوش مصنوعی</span> به شما کمک می‌کند به بهترین فرم بدنی خود برسید.
           </p>
         </div>
@@ -180,7 +180,7 @@ const FeaturesSection = () => {
             </span>
             <h2 className="text-3xl md:text-4xl font-bold mb-6 text-white">تجربه کاربری فوق‌العاده</h2>
             <p className="text-white/70 max-w-2xl mx-auto">
-              طراحی مدرن و کاربرپسند اپلیکیشن LiftLegends برای تجربه‌ای لذت‌بخش
+              طراحی مدرن و کاربرپسند اپلیکیشن Lift Legends برای تجربه‌ای لذت‌بخش
             </p>
           </div>
           
@@ -221,7 +221,7 @@ const FeaturesSection = () => {
         <div className="mt-24">
           <h3 className="text-3xl font-bold text-center mb-6 text-white">امکانات بیشتر</h3>
           <p className="text-white/70 text-center max-w-2xl mx-auto mb-16 leading-relaxed">
-            علاوه بر ویژگی‌های اصلی، LiftLegends امکانات متنوع دیگری نیز برای کمک به شما در مسیر بدنسازی ارائه می‌دهد
+            علاوه بر ویژگی‌های اصلی، Lift Legends امکانات متنوع دیگری نیز برای کمک به شما در مسیر بدنسازی ارائه می‌دهد
           </p>
           
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
@@ -254,7 +254,7 @@ const FeaturesSection = () => {
                 آماده <span className="text-gradient">تغییر بدن</span> خود هستید؟
               </h3>
               <p className="text-white/70 max-w-xl leading-relaxed">
-                همین امروز اپلیکیشن LiftLegends را دانلود کنید و سفر خود را به سمت بدنی قوی‌تر و سالم‌تر آغاز کنید.
+                همین امروز اپلیکیشن Lift Legends را دانلود کنید و سفر خود را به سمت بدنی قوی‌تر و سالم‌تر آغاز کنید.
               </p>
             </div>
             

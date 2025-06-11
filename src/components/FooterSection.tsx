@@ -60,13 +60,13 @@ const FooterSection = () => {
                     <Star key={i} size={16} className="text-gold-500 fill-gold-500" />
                   ))}
                 </div>
-                <span className="text-white/70 text-sm">+۱۰۰۰ کاربر راضی</span>
+
               </div>
               <h3 className="text-3xl md:text-4xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-gold-400 via-amber-300 to-gold-500 animate-gradient-x">
-                LiftLegends را همین امروز دانلود کنید
+                Lift Legends را همین امروز دانلود کنید
               </h3>
               <p className="text-white/70 max-w-xl text-lg leading-relaxed">
-                با LiftLegends، سفر خود را به سمت بدنی قوی‌تر و سالم‌تر آغاز کنید. <span className="text-gold-400 font-medium">برنامه تمرینی هوشمند</span> و <span className="text-gold-400 font-medium">برنامه مکمل و استرویید</span> شما همیشه همراهتان است.
+                با Lift Legends، سفر خود را به سمت بدنی قوی‌تر و سالم‌تر آغاز کنید. <span className="text-gold-400 font-medium">برنامه تمرینی هوشمند</span> و <span className="text-gold-400 font-medium">برنامه مکمل و استرویید</span> شما همیشه همراهتان است.
               </p>
               
               {/* Enhanced feature badges */}
@@ -112,7 +112,7 @@ const FooterSection = () => {
               <div className="bg-gradient-to-br from-gold-400 to-gold-600 p-2 rounded-lg shadow-[0_0_10px_rgba(255,215,0,0.3)]">
                 <Dumbbell size={24} className="text-black" />
               </div>
-              <h3 className="text-2xl font-bold text-gradient">LiftLegends</h3>
+              <h3 className="text-2xl font-bold text-gradient">Lift Legends</h3>
             </div>
             <p className="text-white/70 leading-relaxed mb-6">
               مربی بدنسازی هوشمند شما برای رسیدن به اهداف تناسب اندام و بدنسازی. با استفاده از <span className="text-gold-400">هوش مصنوعی</span> پیشرفته، <span className="text-gold-400">برنامه تمرینی</span> و <span className="text-gold-400">رژیم غذایی</span> شخصی‌سازی شده دریافت کنید.
@@ -280,7 +280,7 @@ const FooterSection = () => {
         {/* Copyright and legal */}
         <div className={`mt-16 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 transform transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`} style={{ transitionDelay: "600ms" }}>
           <div className="flex flex-col md:flex-row items-center gap-4">
-            <p className="text-white/60 text-sm">© ۱۴۰۴ LiftLegends. تمامی حقوق محفوظ است.</p>
+            <p className="text-white/60 text-sm">© ۱۴۰۴ Lift Legends. تمامی حقوق محفوظ است.</p>
             <a 
               referrerPolicy="origin" 
               target="_blank" 

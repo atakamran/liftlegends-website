@@ -569,12 +569,12 @@ const AuthHeader = () => {
           <Link 
             to="/" 
             className="flex items-center"
-            aria-label="صفحه اصلی LiftLegends"
+            aria-label="صفحه اصلی Lift Legends"
             title="بازگشت به صفحه اصلی"
           >
             <img 
               src="https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends//white%20logo.png" 
-              alt="LiftLegends Logo" 
+              alt="Lift Legends Logo" 
               className="h-10 w-auto"
               loading="eager"
               width="80"
@@ -593,8 +593,7 @@ const AuthHeader = () => {
             <Link to="/programs" className="text-white/90 hover:text-gold-500 font-medium text-sm transition-colors duration-200 relative after:content-[''] after:absolute after:right-0 after:left-0 after:bottom-0 after:h-0.5 after:bg-gold-500 after:scale-x-0 after:origin-right hover:after:scale-x-100 after:transition-transform after:duration-300">
               برنامه‌ها
             </Link>
-            <Link to="/subscription" className="text-white/90 hover:text-gold-500 font-medium text-sm transition-colors duration-200 relative after:content-[''] after:absolute after:right-0 after:left-0 after:bottom-0 after:h-0.5 after:bg-gold-500 after:scale-x-0 after:origin-right hover:after:scale-x-100 after:transition-transform after:duration-300">
-اشتراک ها            </Link>
+
             <Link to="/blog" className="text-white/90 hover:text-gold-500 font-medium text-sm transition-colors duration-200 relative after:content-[''] after:absolute after:right-0 after:left-0 after:bottom-0 after:h-0.5 after:bg-gold-500 after:scale-x-0 after:origin-right hover:after:scale-x-100 after:transition-transform after:duration-300">
               بلاگ
             </Link>
@@ -657,20 +656,7 @@ const AuthHeader = () => {
                         </div>
                       </Link>
                       
-                      <Link 
-                        to="/subscription" 
-                        className="flex items-center px-4 py-2 text-sm text-white/90 hover:text-gold-500 hover:bg-gray-700/30 text-right transition-all duration-150 mx-1 rounded-md group"
-                        title="اشتراک‌های LiftLegends"
-                        aria-label="اشتراک‌ها"
-                      >
-                        <div className="flex items-center">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-2 text-gold-500/70 group-hover:text-gold-500 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <rect x="2" y="4" width="20" height="16" rx="2" />
-                            <line x1="2" y1="10" x2="22" y2="10" />
-                          </svg>
-                          <span className="group-hover:translate-x-0.5 transition-transform duration-150">اشتراک‌ها</span>
-                        </div>
-                      </Link>
+
                     </div>
                     
                     <div className="px-3 pt-1 pb-2 border-t border-gray-700/30 mt-1">
@@ -769,22 +755,7 @@ const AuthHeader = () => {
                 <span className="group-hover:translate-x-0.5 transition-transform duration-150">برنامه‌ها</span>
               </Link>
               
-              <Link 
-                to="/subscription" 
-                className="text-white/90 hover:text-gold-500 transition-all duration-200 py-2 px-3 rounded-lg hover:bg-gray-700/30 flex items-center group"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <div className="w-8 h-8 rounded-lg bg-gray-700/50 flex items-center justify-center ml-3 group-hover:bg-gray-700 transition-colors">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gold-500/80 group-hover:text-gold-500 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
-                    <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
-                    <line x1="6" y1="1" x2="6" y2="4"></line>
-                    <line x1="10" y1="1" x2="10" y2="4"></line>
-                    <line x1="14" y1="1" x2="14" y2="4"></line>
-                  </svg>
-                </div>
-                <span className="group-hover:translate-x-0.5 transition-transform duration-150">اشتراک ها</span>
-              </Link>
+
               
               <Link 
                 to="/blog" 
@@ -846,19 +817,7 @@ const AuthHeader = () => {
                     <span className="text-sm font-medium group-hover:translate-x-0.5 transition-transform duration-200">داشبورد</span>
                   </Link>
                   
-                  <Link 
-                    to="/subscription" 
-                    className="text-white/90 hover:text-gold-500 transition-all duration-200 py-2 px-3 rounded-lg hover:bg-gray-700/30 flex items-center group"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    <div className="w-8 h-8 rounded-lg bg-gray-700/50 flex items-center justify-center ml-3 group-hover:bg-gray-700 transition-colors">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gold-500/80 group-hover:text-gold-500 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <rect x="2" y="4" width="20" height="16" rx="2" />
-                        <line x1="2" y1="10" x2="22" y2="10" />
-                      </svg>
-                    </div>
-                    <span className="text-sm font-medium group-hover:translate-x-0.5 transition-transform duration-200">اشتراک‌ها</span>
-                  </Link>
+
                   
                   <button 
                     onClick={() => {

@@ -17,35 +17,8 @@ const HeroSection = () => {
     };
   }, []);
 
-  // SEO structured data
-  useEffect(() => {
-    // Add structured data for SEO
-    const script = document.createElement('script');
-    script.type = 'application/ld+json';
-    script.innerHTML = JSON.stringify({
-      "@context": "https://schema.org",
-      "@type": "MobileApplication",
-      "name": "LiftLegends",
-      "applicationCategory": "HealthApplication",
-      "operatingSystem": "Android",
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "IRR"
-      },
-      "description": "مربی بدنسازی هوشمند با هوش مصنوعی پیشرفته، برنامه تمرینی و رژیم غذایی شخصی‌سازی شده",
-      "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": "4.8",
-        "ratingCount": "1"
-      }
-    });
-    document.head.appendChild(script);
-
-    return () => {
-      document.head.removeChild(script);
-    };
-  }, []);
+  // Animation trigger
+  // Note: Main SEO structured data is handled in Index.tsx to avoid duplicates
 
   return (
     <section className="min-h-screen flex flex-col items-center justify-center px-4 py-12 sm:py-20 relative overflow-hidden">
@@ -80,7 +53,7 @@ const HeroSection = () => {
           </div>
           
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold">
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-gold-400 via-amber-300 to-gold-500 animate-gradient-x">LiftLegends</span>
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-gold-400 via-amber-300 to-gold-500 animate-gradient-x">Lift Legends</span>
           </h1>
           
           <h2 className="text-lg sm:text-xl md:text-2xl text-white/90 font-light">
@@ -171,7 +144,7 @@ const HeroSection = () => {
                     <div className="w-full flex justify-center items-center mt-2 sm:mt-3 mb-2 sm:mb-3">
                       <img 
                         src="https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends//white%20logo.png" 
-                        alt="LiftLegends Logo" 
+                        alt="Lift Legends Logo" 
                         className="w-16 sm:w-20 h-auto"
                         loading="eager"
                         width="80"
