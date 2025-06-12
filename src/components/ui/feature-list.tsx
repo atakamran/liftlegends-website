@@ -48,11 +48,6 @@ const FeatureList: React.FC<FeatureListProps> = ({
       text: 'پشتیبانی ۲۴/۷',
       color: 'text-cyan-400'
     },
-    {
-      icon: <CheckCircle className="w-5 h-5" />,
-      text: 'تضمین بازگشت وجه',
-      color: 'text-emerald-400'
-    }
   ];
 
   const gridClasses = layout === 'grid' 

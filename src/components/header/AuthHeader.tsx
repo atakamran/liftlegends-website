@@ -641,6 +641,22 @@ const AuthHeader = () => {
                       </Link>
                       
                       <Link 
+                        to="/subscription" 
+                        className="flex items-center px-4 py-2 text-sm text-white/90 hover:text-gold-500 hover:bg-gray-700/30 text-right transition-all duration-150 mx-1 rounded-md group"
+                        title="مشاهده و خرید اشتراک‌ها"
+                        aria-label="اشتراک‌ها"
+                      >
+                        <div className="flex items-center">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-2 text-gold-500/70 group-hover:text-gold-500 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                          </svg>
+                          <span className="group-hover:translate-x-0.5 transition-transform duration-150">اشتراک‌ها</span>
+                        </div>
+                      </Link>
+                     
+                      
+                      <Link 
                         to="/dashboard" 
                         className="flex items-center px-4 py-2 text-sm text-white/90 hover:text-gold-500 hover:bg-gray-700/30 text-right transition-all duration-150 mx-1 rounded-md group"
                         title="مشاهده داشبورد کاربری"
@@ -788,6 +804,8 @@ const AuthHeader = () => {
               
               {user ? (
                 <div className="mt-2 pt-2 border-t border-gray-700/30">
+                  
+                  
                   <Link 
                     to="/profile" 
                     className="text-white/90 hover:text-gold-500 transition-all duration-200 py-2 px-3 rounded-lg hover:bg-gray-700/30 flex items-center group"
@@ -800,6 +818,20 @@ const AuthHeader = () => {
                       </svg>
                     </div>
                     <span className="text-sm font-medium group-hover:translate-x-0.5 transition-transform duration-200">پروفایل</span>
+                  </Link>
+                  
+                  <Link 
+                    to="/subscription" 
+                    className="text-white/90 hover:text-gold-500 transition-all duration-200 py-2 px-3 rounded-lg hover:bg-gray-700/30 flex items-center group"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-gray-700/50 flex items-center justify-center ml-3 group-hover:bg-gray-700 transition-colors">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gold-500/80 group-hover:text-gold-500 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                      </svg>
+                    </div>
+                    <span className="text-sm font-medium group-hover:translate-x-0.5 transition-transform duration-200">اشتراک‌ها</span>
                   </Link>
                   
                   <Link 

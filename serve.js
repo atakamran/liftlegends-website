@@ -187,48 +187,47 @@ app.post("/api/zarinpal/verify", async (req, res) => {
   }
 });
 
-// Serve static files from the dist directory
-app.use(express.static(DIST_DIR));
+// Serve static files from the dist directory with proper MIME types
+app.use(express.static(DIST_DIR, {
+  setHeaders: (res, path) => {
+    const ext = extname(path);
+    if (MIME_TYPES[ext]) {
+      res.setHeader('Content-Type', MIME_TYPES[ext]);
+    }
+    // Set proper cache headers for static assets
+    if (['.js', '.css', '.png', '.jpg', '.jpeg', '.gif', '.ico', '.svg', '.woff', '.woff2'].includes(ext)) {
+      res.setHeader('Cache-Control', 'public, max-age=31536000');
+    }
+  }
+}));
 
-// Handle SPA routing - serve index.html for all non-file requests
+// Handle SPA routing - serve index.html for all non-static-file requests
 app.get("*", (req, res) => {
   console.log(`GET ${req.url}`);
 
-  // Try to serve the requested file
-  const filePath = join(DIST_DIR, req.url === "/" ? "index.html" : req.url);
-
-  readFile(filePath, (err, data) => {
+  const ext = extname(req.url);
+  
+  // If it's a request for a static file that wasn't found by express.static
+  if (ext && MIME_TYPES[ext]) {
+    // Return 404 for missing static files
+    res.status(404).send("File not found");
+    return;
+  }
+  
+  // For SPA routes (no extension or not a known static file type), serve index.html
+  const indexPath = join(DIST_DIR, "index.html");
+  readFile(indexPath, (err, data) => {
     if (err) {
-      // If file not found, serve index.html for SPA routing
-      if (err.code === "ENOENT") {
-        const indexPath = join(DIST_DIR, "index.html");
-        readFile(indexPath, (err, data) => {
-          if (err) {
-            res.status(500).send("Error loading index.html");
-            return;
-          }
-
-          res.setHeader("Content-Type", "text/html");
-          res.send(data);
-        });
-        return;
-      }
-
-      // For other errors
-      res.status(500).send(`Server Error: ${err.code}`);
+      console.error("Error loading index.html:", err);
+      res.status(500).send("Error loading application");
       return;
     }
 
-    // Determine the file's MIME type
-    const ext = extname(filePath);
-    let contentType = MIME_TYPES[ext] || "application/octet-stream";
-
-    // Special handling for JavaScript modules
-    if (ext === ".js" && req.url.includes("type=module")) {
-      contentType = "application/javascript";
-    }
-
-    res.setHeader("Content-Type", contentType);
+    res.setHeader("Content-Type", "text/html; charset=utf-8");
+    // Prevent caching of the SPA entry point
+    res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+    res.setHeader("Pragma", "no-cache");
+    res.setHeader("Expires", "0");
     res.send(data);
   });
 });

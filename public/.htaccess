@@ -13,7 +13,13 @@ RewriteRule ^(.*)/$ /$1 [L,R=301]
 RewriteCond %{QUERY_STRING} ^category=([^&]+)$
 RewriteRule ^blog$ /blog/category/%1? [L,R=301]
 
-# Handle 404 errors
+# Handle SPA routing - redirect all non-file requests to index.html
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_URI} !^/api/
+RewriteRule . /index.html [L]
+
+# Handle 404 errors for actual missing files
 ErrorDocument 404 /index.html
 
 # Enable compression

@@ -5,7 +5,19 @@ import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
-  base: './', // Use relative paths
+  base: '/', // Use absolute paths for proper module loading
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          router: ['react-router-dom'],
+        },
+      },
+    },
+    // Ensure assets use absolute paths
+    assetsDir: 'assets',
+  },
   server: {
     host: "::",
     port: 8080,
