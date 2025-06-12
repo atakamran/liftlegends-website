@@ -485,10 +485,10 @@ const ProgramCard = ({ program }: { program: Program }) => {
         <p className="text-lg font-bold text-white">{formatPrice(program.price)}</p>
       </CardContent>
       
-      <CardFooter className="p-4 pt-0">
+      <CardFooter className="p-6 pt-0">
         <Button 
           variant="default" 
-          className="w-full bg-gold-500 hover:bg-gold-600 text-black"
+          className="w-full bg-gradient-to-r from-gold-500 to-gold-400 hover:from-gold-600 hover:to-gold-500 text-black font-medium rounded-xl h-12 shadow-lg shadow-gold-500/25 transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-gold-500/30"
           onClick={(e) => {
             e.stopPropagation(); // Prevent the card click event from firing
             // Use program_url as the slug if available, otherwise fall back to ID-based URL
@@ -499,7 +499,7 @@ const ProgramCard = ({ program }: { program: Program }) => {
             }
           }}
         >
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-2"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path><path d="M11 8v6"></path><path d="M8 11h6"></path></svg>
+          <ShoppingCart className="ml-2 h-4 w-4" />
           مشاهده محصول
         </Button>
       </CardFooter>

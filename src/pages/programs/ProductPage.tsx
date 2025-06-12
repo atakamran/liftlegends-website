@@ -20,7 +20,7 @@ import PriceDisplay from "@/components/ui/price-display";
 import CategoryBadge from "@/components/ui/category-badge";
 import FeatureList from "@/components/ui/feature-list";
 import ProductSpecs from "@/components/ui/product-specs";
-import { Loader2, ArrowRight, ShoppingCart, Share2, CheckCircle, Clock, Shield, Download } from "lucide-react";
+import { Loader2, ArrowRight, ShoppingCart, Share2, CheckCircle, Clock, Shield, Download, Heart } from "lucide-react";
 
 // Define interfaces
 interface Program {
@@ -105,7 +105,7 @@ const ProductPage = () => {
       await checkUserPurchase(programData.id);
       
       // Fetch related programs
-      fetchRelatedPrograms(programData.category);
+      fetchRelatedPrograms(programData.category, programData.id);
     } catch (error) {
       console.error("Error fetching program details:", error);
       toast({
@@ -120,17 +120,23 @@ const ProductPage = () => {
   };
   
   // Function to fetch related programs
-  const fetchRelatedPrograms = async (category: 'training' | 'diet' | 'supplement') => {
+  const fetchRelatedPrograms = async (category: 'training' | 'diet' | 'supplement', currentProgramId: string) => {
     try {
+      console.log("Fetching related programs for category:", category, "excluding ID:", currentProgramId);
+      
       const { data, error } = await supabase
         .from("programs_sale")
         .select("id, title, price, category, image_url")
         .eq("category", category)
-        .neq("id", id)
+        .neq("id", currentProgramId)
         .limit(4);
         
-      if (error) throw error;
+      if (error) {
+        console.error("Supabase error:", error);
+        throw error;
+      }
       
+      console.log("Related programs fetched:", data);
       setRelatedPrograms(data || []);
     } catch (error) {
       console.error("Error fetching related programs:", error);
@@ -356,9 +362,9 @@ const ProductPage = () => {
 
         {/* Main Product Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 mb-32">
-          {/* Product Image - Minimalist Design */}
+          {/* Product Image - Enhanced Design */}
           <div className="relative group">
-            <div className="w-full h-64 sm:h-80 md:h-96 lg:h-[500px] xl:h-[600px] rounded-3xl overflow-hidden bg-gray-900/50 backdrop-blur-sm border border-gray-800/50">
+            <div className="relative w-full h-64 sm:h-80 md:h-96 lg:h-[500px] xl:h-[600px] rounded-3xl overflow-hidden bg-gradient-to-br from-gray-900/60 via-gray-900/40 to-gray-800/60 backdrop-blur-sm border border-gray-800/50 hover:border-gold-500/30 transition-all duration-700 hover:shadow-2xl hover:shadow-gold-500/10">
               {program.image_url ? (
                 <OptimizedImage
                   src={program.image_url}
@@ -369,19 +375,27 @@ const ProductPage = () => {
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
                   <div className="text-center text-gray-500">
-                    <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-800 flex items-center justify-center">
-                      <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-gray-800 to-gray-900 backdrop-blur-sm flex items-center justify-center group-hover:bg-gold-500/20 transition-all duration-500">
+                      <svg className="w-8 h-8 group-hover:text-gold-400 transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
                     </div>
-                    <p>بدون تصویر</p>
+                    <p className="group-hover:text-gray-400 transition-colors duration-300">بدون تصویر</p>
                   </div>
                 </div>
               )}
               
-              {/* Category Badge */}
-              <div className="absolute top-6 right-6">
+              {/* Category Badge - Enhanced */}
+              <div className="absolute top-6 right-6 transform group-hover:scale-110 transition-transform duration-300">
                 <CategoryBadge category={program.category} size="md" />
+              </div>
+              
+              {/* Subtle overlay on hover */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+              
+              {/* Glow effect */}
+              <div className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none">
+                <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-gold-500/10 via-transparent to-gold-500/10"></div>
               </div>
             </div>
           </div>
@@ -410,87 +424,110 @@ const ProductPage = () => {
               </p>
             </div>
 
-            {/* Features */}
-            <FeatureList layout="grid" />
+          
 
-            {/* Action Buttons */}
-            <div className="space-y-4">
-              <Button
-                onClick={handleBuyClick}
-                disabled={checkingPurchase}
-                className="w-full h-14 bg-gold-500 hover:bg-gold-400 text-black text-lg font-medium rounded-2xl transition-all duration-300 hover:scale-105"
-              >
-                {checkingPurchase ? (
-                  <Loader2 className="w-5 h-5 animate-spin ml-2" />
-                ) : hasPurchased ? (
-                  <>
-                    <ArrowRight className="w-5 h-5 ml-2" />
-                    مشاهده محصول
-                  </>
-                ) : (
-                  <>
-                    <ShoppingCart className="w-5 h-5 ml-2" />
-                    خرید محصول
-                  </>
-                )}
-              </Button>
-              
-              <Button
-                variant="outline"
-                className="w-full h-12 border-gray-700 text-gray-300 hover:bg-gray-800/50 rounded-2xl transition-all duration-300"
-                onClick={() => {
-                  if (navigator.share) {
-                    navigator.share({
-                      title: program.title,
-                      text: program.description,
-                      url: window.location.href,
-                    });
-                  } else {
-                    navigator.clipboard.writeText(window.location.href);
-                    toast({
-                      title: "لینک کپی شد",
-                      description: "لینک محصول در کلیپ‌بورد کپی شد.",
-                    });
-                  }
-                }}
-              >
-                <Share2 className="w-4 h-4 ml-2" />
-                اشتراک‌گذاری
-              </Button>
+            {/* Action Buttons - Enhanced */}
+            <div className="space-y-6">
+              <div className="space-y-4">
+                <Button
+                  onClick={handleBuyClick}
+                  disabled={checkingPurchase}
+                  className="group relative w-full h-16 bg-gradient-to-r from-gold-500 to-gold-400 hover:from-gold-400 hover:to-gold-300 text-black text-lg font-medium rounded-2xl transition-all duration-500 hover:scale-105 hover:shadow-xl hover:shadow-gold-500/25 overflow-hidden"
+                >
+                  {/* Button background animation */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-gold-400 to-gold-300 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  
+                  <div className="relative flex items-center justify-center">
+                    {checkingPurchase ? (
+                      <Loader2 className="w-6 h-6 animate-spin ml-2" />
+                    ) : hasPurchased ? (
+                      <>
+                        <ArrowRight className="w-6 h-6 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
+                        مشاهده محصول
+                      </>
+                    ) : (
+                      <>
+                        <ShoppingCart className="w-6 h-6 ml-2 group-hover:scale-110 transition-transform duration-300" />
+                        خرید محصول
+                      </>
+                    )}
+                  </div>
+                </Button>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <Button
+                    variant="outline"
+                    className="h-12 border-gray-700/50 text-gray-300 hover:bg-gray-800/50 hover:border-gold-500/30 rounded-2xl transition-all duration-300 hover:scale-105 backdrop-blur-sm"
+                    onClick={() => {
+                      if (navigator.share) {
+                        navigator.share({
+                          title: program.title,
+                          text: program.description,
+                          url: window.location.href,
+                        });
+                      } else {
+                        navigator.clipboard.writeText(window.location.href);
+                        toast({
+                          title: "لینک کپی شد",
+                          description: "لینک محصول در کلیپ‌بورد کپی شد.",
+                        });
+                      }
+                    }}
+                  >
+                    <Share2 className="w-4 h-4 ml-2" />
+                    اشتراک‌گذاری
+                  </Button>
+                  
+                  <Button
+                    variant="outline"
+                    className="h-12 border-gray-700/50 text-gray-300 hover:bg-red-500/10 hover:border-red-500/30 hover:text-red-400 rounded-2xl transition-all duration-300 hover:scale-105 backdrop-blur-sm"
+                  >
+                    <Heart className="w-4 h-4 ml-2" />
+                    علاقه‌مندی
+                  </Button>
+                </div>
+              </div>
+
+              {/* Features */}
+              <div className="bg-gradient-to-br from-gray-900/30 to-gray-800/30 backdrop-blur-sm rounded-2xl p-6 border border-gray-800/50">
+                <FeatureList layout="grid" />
+              </div>
             </div>
           </div>
         </div>
-        {/* Product Specifications */}
+        {/* Product Specifications - Enhanced */}
         <div className="mb-32">
-          <h2 className="text-3xl font-light text-white mb-16 text-center">مشخصات محصول</h2>
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-light text-white mb-4">مشخصات محصول</h2>
+            <div className="w-24 h-1 bg-gradient-to-r from-gold-500 to-gold-400 mx-auto rounded-full"></div>
+          </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-            <ProductSpecs
-              title="اطلاعات کلی"
-              specs={[
-                { label: 'نوع محصول', value: getCategoryLabel(program.category) },
-                { label: 'تاریخ انتشار', value: new Date(program.created_at).toLocaleDateString('fa-IR') },
-                { label: 'آخرین بروزرسانی', value: new Date(program.updated_at).toLocaleDateString('fa-IR') },
-                { label: 'شناسه محصول', value: program.id.substring(0, 8) }
-              ]}
-            />
-            
-            <ProductSpecs
-              title="مشخصات فنی"
-              specs={[
-                { label: 'فرمت تحویل', value: 'PDF + ویدیو آموزشی' },
-                { label: 'نحوه دسترسی', value: 'دانلود مستقیم' },
-                { label: 'مدت پشتیبانی', value: '۳ ماه رایگان' },
-                { label: 'قابلیت بروزرسانی', value: 'مادام‌العمر' }
-              ]}
-            />
+          <div className="max-w-2xl mx-auto">
+            <div className="bg-gradient-to-br from-gray-900/40 via-gray-900/30 to-gray-800/40 backdrop-blur-sm rounded-3xl p-8 border border-gray-800/50 hover:border-gold-500/30 transition-all duration-500 hover:shadow-xl hover:shadow-gold-500/10">
+              <ProductSpecs
+                title="اطلاعات کلی"
+                specs={[
+                  { label: 'نوع محصول', value: getCategoryLabel(program.category) },
+                  { label: 'تاریخ انتشار', value: new Date(program.created_at).toLocaleDateString('fa-IR') },
+                  { label: 'آخرین بروزرسانی', value: new Date(program.updated_at).toLocaleDateString('fa-IR') },
+                  { label: 'شناسه محصول', value: program.id.substring(0, 8) }
+                ]}
+              />
+            </div>
           </div>
         </div>
 
-        {/* Related Products */}
-        {relatedPrograms.length > 0 && (
-          <div>
-            <h2 className="text-3xl font-light text-white mb-16 text-center">محصولات مرتبط</h2>
+        {/* Related Products - Enhanced */}
+        <div>
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-light text-white mb-4">محصولات مرتبط</h2>
+            <div className="flex items-center justify-center space-x-2 rtl:space-x-reverse">
+              <div className="w-16 h-1 bg-gradient-to-r from-gold-500 to-gold-400 rounded-full"></div>
+              <span className="text-gold-400 font-medium">({relatedPrograms.length})</span>
+              <div className="w-16 h-1 bg-gradient-to-l from-gold-500 to-gold-400 rounded-full"></div>
+            </div>
+          </div>
+          {relatedPrograms.length > 0 ? (
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {relatedPrograms.map((relatedProgram) => (
@@ -499,8 +536,12 @@ const ProductPage = () => {
                   className="group cursor-pointer"
                   onClick={() => navigate(`/product/${relatedProgram.id}`)}
                 >
-                  <div className="bg-gray-900/30 backdrop-blur-sm rounded-3xl overflow-hidden border border-gray-800/50 hover:border-gold-500/30 transition-all duration-500 hover:transform hover:scale-105">
-                    <div className="w-full h-48 sm:h-56 md:h-64 overflow-hidden">
+                  <div className="relative bg-gradient-to-br from-gray-900/40 via-gray-900/30 to-gray-800/40 backdrop-blur-sm rounded-3xl overflow-hidden border border-gray-800/50 hover:border-gold-500/50 transition-all duration-700 hover:transform hover:scale-[1.02] hover:shadow-2xl hover:shadow-gold-500/10">
+                    {/* Hover Overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10"></div>
+                    
+                    {/* Image Section */}
+                    <div className="relative w-full h-48 sm:h-56 md:h-64 overflow-hidden">
                       {relatedProgram.image_url ? (
                         <OptimizedImage
                           src={relatedProgram.image_url}
@@ -508,38 +549,70 @@ const ProductPage = () => {
                           className="w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-700"
                         />
                       ) : (
-                        <div className="w-full h-full bg-gray-800 flex items-center justify-center">
+                        <div className="w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center">
                           <div className="text-center text-gray-500">
-                            <div className="w-12 h-12 mx-auto mb-2 rounded-full bg-gray-700 flex items-center justify-center">
-                              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div className="w-12 h-12 mx-auto mb-2 rounded-full bg-gray-700/50 backdrop-blur-sm flex items-center justify-center group-hover:bg-gold-500/20 transition-colors duration-300">
+                              <svg className="w-6 h-6 group-hover:text-gold-400 transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                               </svg>
                             </div>
-                            <p className="text-sm">بدون تصویر</p>
+                            <p className="text-sm group-hover:text-gray-400 transition-colors duration-300">بدون تصویر</p>
                           </div>
                         </div>
                       )}
-                    </div>
-                    
-                    <div className="p-8 space-y-4">
-                      <div className="space-y-2">
-                        <h3 className="text-xl font-light text-white group-hover:text-gold-400 transition-colors duration-300">
-                          {relatedProgram.title}
-                        </h3>
+                      
+                      {/* Category Badge - Floating */}
+                      <div className="absolute top-4 right-4 transform group-hover:scale-110 transition-transform duration-300">
                         <CategoryBadge category={relatedProgram.category} size="sm" />
                       </div>
-                      
-                      <div className="flex items-center justify-between">
-                        <PriceDisplay price={relatedProgram.price} size="sm" />
-                        <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-gold-400 group-hover:translate-x-1 transition-all duration-300" />
+                    </div>
+                    
+                    {/* Content Section */}
+                    <div className="relative p-6 space-y-4 z-20">
+                      <div className="space-y-3">
+                        <h3 className="text-lg font-medium text-white group-hover:text-gold-400 transition-colors duration-300 line-clamp-2">
+                          {relatedProgram.title}
+                        </h3>
                       </div>
+                      
+                      {/* Price and Action - Hidden by default, shown on hover */}
+                      <div className="flex items-center justify-between opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500 delay-100">
+                        <div className="flex flex-col space-y-1">
+                          <PriceDisplay price={relatedProgram.price} size="sm" />
+                          <span className="text-xs text-gray-400">قیمت محصول</span>
+                        </div>
+                        
+                        <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                          <div className="w-10 h-10 rounded-full bg-gold-500/20 backdrop-blur-sm flex items-center justify-center group-hover:bg-gold-500 transition-all duration-300">
+                            <ArrowRight className="w-4 h-4 text-gold-400 group-hover:text-black transition-colors duration-300" />
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Quick Info - Always visible */}
+                      <div className="flex items-center justify-between pt-2 border-t border-gray-800/50 group-hover:border-gold-500/30 transition-colors duration-300">
+                        <span className="text-xs text-gray-500 group-hover:text-gray-400 transition-colors duration-300">
+                          {getCategoryLabel(relatedProgram.category)}
+                        </span>
+                        <div className="flex items-center space-x-1 rtl:space-x-reverse text-xs text-gray-500">
+                          <div className="w-1.5 h-1.5 rounded-full bg-green-400 group-hover:bg-gold-400 transition-colors duration-300"></div>
+                          <span className="group-hover:text-gray-400 transition-colors duration-300">موجود</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Subtle glow effect on hover */}
+                    <div className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none">
+                      <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-gold-500/5 via-transparent to-gold-500/5"></div>
                     </div>
                   </div>
                 </div>
               ))}
             </div>
-          </div>
-        )}
+          ) : (
+            <p className="text-gray-400 text-center">هیچ محصول مرتبطی یافت نشد</p>
+          )}
+        </div>
       </div>
     </div>
   );
