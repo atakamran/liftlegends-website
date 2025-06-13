@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advertisement Banner - No Gym No Excuses</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .banner-container {
+            width: 100%;
+            max-width: 1200px;
+            height: 400px;
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 25%, #000000 50%, #2a2a2a 75%, #000000 100%);
+            border-radius: 25px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            padding: 40px 60px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: bannerEntrance 1s ease-out;
+        }
+
+        @keyframes bannerEntrance {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Background Effects */
+        .bg-effect-1 {
+            position: absolute;
+            top: -100px;
+            right: -100px;
+            width: 400px;
+            height: 400px;
+            background: linear-gradient(45deg, #D4AF37, #FFD700);
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.15;
+            animation: rotate 20s linear infinite;
+        }
+
+        .bg-effect-2 {
+            position: absolute;
+            bottom: -150px;
+            left: -150px;
+            width: 500px;
+            height: 500px;
+            background: linear-gradient(45deg, #8B4513, #D4AF37);
+            border-radius: 50%;
+            filter: blur(140px);
+            opacity: 0.1;
+            animation: rotate 25s linear infinite reverse;
+        }
+
+        .bg-effect-3 {
+            position: absolute;
+            top: 20%;
+            right: 30%;
+            width: 200px;
+            height: 200px;
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.08;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-30px);
+            }
+        }
+
+        /* Content Container */
+        .content-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            z-index: 10;
+        }
+
+        /* Left Content */
+        .left-content {
+            flex: 1;
+            max-width: 60%;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            animation: slideInRight 1s ease-out 0.2s both;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .logo-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #D4AF37, #FFD700);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.4);
+            animation: logoGlow 3s ease-in-out infinite;
+            padding: 10px;
+        }
+
+        .logo-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: brightness(0) invert(1);
+        }
+
+        @keyframes logoGlow {
+
+            0%,
+            100% {
+                box-shadow: 0 10px 30px rgba(212, 175, 55, 0.4);
+                transform: scale(1);
+            }
+
+            50% {
+                box-shadow: 0 15px 40px rgba(212, 175, 55, 0.6);
+                transform: scale(1.05);
+            }
+        }
+
+        .logo-text {
+            color: #FFD700;
+            font-size: 28px;
+            font-weight: 800;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .main-title {
+            font-size: 48px;
+            font-weight: 900;
+            color: #FFFFFF;
+            margin-bottom: 20px;
+            line-height: 1.2;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.7);
+            animation: slideInRight 1s ease-out 0.4s both;
+        }
+
+        .emoji-large {
+            font-size: 60px;
+            display: inline-block;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            20%,
+            50%,
+            80%,
+            100% {
+                transform: translateY(0);
+            }
+
+            40% {
+                transform: translateY(-15px);
+            }
+
+            60% {
+                transform: translateY(-8px);
+            }
+        }
+
+        .highlight {
+            background: linear-gradient(45deg, #D4AF37, #FFD700, #D4AF37);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 3s ease-in-out infinite;
+        }
+
+        @keyframes gradientShift {
+
+            0%,
+            100% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        .subtitle {
+            font-size: 20px;
+            color: #CCCCCC;
+            margin-bottom: 30px;
+            line-height: 1.5;
+            animation: slideInRight 1s ease-out 0.6s both;
+        }
+
+        .features-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            animation: slideInRight 1s ease-out 0.8s both;
+        }
+
+        .feature-badge {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 20px;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .feature-badge:hover {
+            border-color: rgba(212, 175, 55, 0.6);
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-3px);
+        }
+
+        .feature-icon {
+            font-size: 18px;
+        }
+
+        .feature-text {
+            color: #FFFFFF;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .price-cta {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            animation: slideInRight 1s ease-out 1s both;
+        }
+
+        .price-box {
+            background: linear-gradient(135deg, #D4AF37, #FFD700);
+            border-radius: 20px;
+            padding: 20px 30px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.4);
+            animation: priceGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes priceGlow {
+
+            0%,
+            100% {
+                box-shadow: 0 10px 30px rgba(212, 175, 55, 0.4);
+                transform: scale(1);
+            }
+
+            50% {
+                box-shadow: 0 15px 40px rgba(212, 175, 55, 0.6);
+                transform: scale(1.05);
+            }
+        }
+
+        .price-label {
+            color: #000000;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .price-amount {
+            color: #000000;
+            font-size: 24px;
+            font-weight: 900;
+        }
+
+        .cta-button {
+            background: linear-gradient(135deg, #D4AF37, #FFD700);
+            color: #000000;
+            font-size: 18px;
+            font-weight: 800;
+            padding: 20px 40px;
+            border-radius: 25px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 8px 25px rgba(212, 175, 55, 0.4);
+            transition: all 0.3s ease;
+            animation: ctaPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes ctaPulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.08);
+            }
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 12px 35px rgba(212, 175, 55, 0.6);
+        }
+
+        /* Right Content */
+        .right-content {
+            flex: 0 0 35%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            animation: slideInLeft 1s ease-out 0.5s both;
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .workout-illustration {
+            width: 200px;
+            height: 200px;
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(255, 215, 0, 0.1));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            position: relative;
+            border: 3px solid rgba(212, 175, 55, 0.3);
+            animation: workoutGlow 4s ease-in-out infinite;
+        }
+
+        @keyframes workoutGlow {
+
+            0%,
+            100% {
+                border-color: rgba(212, 175, 55, 0.3);
+                box-shadow: 0 0 30px rgba(212, 175, 55, 0.2);
+            }
+
+            50% {
+                border-color: rgba(212, 175, 55, 0.6);
+                box-shadow: 0 0 50px rgba(212, 175, 55, 0.4);
+            }
+        }
+
+        .workout-emoji {
+            font-size: 80px;
+            animation: workoutMove 3s ease-in-out infinite;
+        }
+
+        @keyframes workoutMove {
+
+            0%,
+            100% {
+                transform: scale(1) rotate(0deg);
+            }
+
+            25% {
+                transform: scale(1.1) rotate(-5deg);
+            }
+
+            75% {
+                transform: scale(1.1) rotate(5deg);
+            }
+        }
+
+        .website-link {
+            color: #D4AF37;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 25px;
+            border: 2px solid rgba(212, 175, 55, 0.3);
+            border-radius: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .website-link:hover {
+            border-color: rgba(212, 175, 55, 0.8);
+            background: rgba(212, 175, 55, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .arrow {
+            font-size: 18px;
+            animation: arrowMove 1.5s ease-in-out infinite;
+        }
+
+        @keyframes arrowMove {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            50% {
+                transform: translateX(8px);
+            }
+        }
+
+        /* Decorative Elements */
+        .decorative-stars {
+            position: absolute;
+            top: 50px;
+            left: 100px;
+            font-size: 20px;
+            color: #D4AF37;
+            opacity: 0.6;
+            animation: twinkle 2s ease-in-out infinite;
+        }
+
+        @keyframes twinkle {
+
+            0%,
+            100% {
+                opacity: 0.6;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.2);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .banner-container {
+                height: auto;
+                min-height: 300px;
+                padding: 30px;
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .content-container {
+                flex-direction: column;
+                gap: 30px;
+            }
+
+            .left-content {
+                max-width: 100%;
+            }
+
+            .main-title {
+                font-size: 36px;
+            }
+
+            .features-row {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .price-cta {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .right-content {
+                flex: none;
+            }
+
+            .workout-illustration {
+                width: 150px;
+                height: 150px;
+            }
+
+            .workout-emoji {
+                font-size: 60px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="banner-container">
+        <!-- Background Effects -->
+        <div class="bg-effect-1"></div>
+        <div class="bg-effect-2"></div>
+        <div class="bg-effect-3"></div>
+        <div class="decorative-stars">✨</div>
+
+        <div class="content-container">
+            <!-- Left Content -->
+            <div class="left-content">
+                <div class="logo-section">
+                    <div class="logo-icon">
+                        <img src="https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends//white%20logo.png"
+                            alt="Lift Legends Logo" class="logo-image">
+                    </div>
+                    <div class="logo-text">Lift Legends</div>
+                </div>
+
+                <h1 class="main-title">
+                    <span class="emoji-large">🚫</span><br>
+                    <span class="highlight">No Gym No Excuses!</span>
+                </h1>
+
+                <p class="subtitle">
+                    برنامه تمرینی حرفه‌ای بدون تجهیزات<br>
+                    فقط با وزن بدن، به بدن رویایی‌ات برس!
+                </p>
+
+                <div class="features-row">
+                    <div class="feature-badge">
+                        <span class="feature-icon">🏠</span>
+                        <span class="feature-text">تمرین در خانه</span>
+                    </div>
+                    <div class="feature-badge">
+                        <span class="feature-icon">💪</span>
+                        <span class="feature-text">عضله‌سازی</span>
+                    </div>
+                    <div class="feature-badge">
+                        <span class="feature-icon">🔥</span>
+                        <span class="feature-text">چربی‌سوزی</span>
+                    </div>
+                </div>
+
+                <div class="price-cta">
+                    <div class="price-box">
+                        <div class="price-label">تنها</div>
+                        <div class="price-amount">۹۹ هزار تومان</div>
+                    </div>
+                    <a href="#" class="cta-button">
+                        <span>همین الان دانلود کن!</span>
+                        <span style="font-size: 20px;">⚡</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Right Content -->
+            <div class="right-content">
+                <div class="workout-illustration">
+                    <span class="workout-emoji">🤸‍♂️</span>
+                </div>
+                <a href="#" class="website-link">
+                    liftlegends.ir/programs/no-gym-no-excuses
+                    <span class="arrow">←</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

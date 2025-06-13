@@ -1980,13 +1980,13 @@ const Dashboard = () => {
             {/* Training Programs Tab */}
             <TabsContent value="training" className="space-y-6 animate-in fade-in-50 duration-300">
               <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-white">برنامه‌های تمرینی</h2>
+                <h2 className="text-2xl font-bold text-white">برنامه‌های تمرینی خریداری شده</h2>
                 <Button 
                   className="bg-gold-500 hover:bg-gold-600 text-black"
                   onClick={() => navigate('/programs')}
                 >
                   <Plus size={16} className="ml-2" />
-                  برنامه جدید
+                  خرید برنامه جدید
                 </Button>
               </div>
 
@@ -1998,8 +1998,8 @@ const Dashboard = () => {
                     <Loader2 className="h-8 w-8 animate-spin text-gold-500" />
                     <span className="mr-2 text-gray-400">در حال بارگذاری برنامه‌ها...</span>
                   </div>
-                ) : trainingPrograms.length > 0 ? (
-                  trainingPrograms.map((program) => (
+                ) : trainingPrograms.filter(program => hasPurchasedProgram(program.id) || user?.profile?.is_admin).length > 0 ? (
+                  trainingPrograms.filter(program => hasPurchasedProgram(program.id) || user?.profile?.is_admin).map((program) => (
                     <Card key={program.id} className="bg-gray-800/50 border-gray-700 hover:border-gold-500/50 transition-all duration-300 overflow-hidden">
                       <div className="h-40 bg-gradient-to-br from-gold-500/20 to-amber-500/20 relative">
                         <div className="absolute inset-0 flex items-center justify-center">
@@ -2056,7 +2056,7 @@ const Dashboard = () => {
                   ))
                 ) : (
                   <div className="col-span-3 text-center py-12">
-                    <p className="text-gray-400">هیچ برنامه تمرینی یافت نشد.</p>
+                    <p className="text-gray-400">شما هنوز هیچ برنامه تمرینی خریداری نکرده‌اید.</p>
                   </div>
                 )}
               </div>
@@ -2065,13 +2065,13 @@ const Dashboard = () => {
             {/* Meal Plans Tab */}
             <TabsContent value="meals" className="space-y-6 animate-in fade-in-50 duration-300">
               <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-white">برنامه‌های غذایی</h2>
+                <h2 className="text-2xl font-bold text-white">برنامه‌های غذایی خریداری شده</h2>
                 <Button 
                   className="bg-green-500 hover:bg-green-600 text-white"
                   onClick={() => navigate('/programs')}
                 >
                   <Plus size={16} className="ml-2" />
-                  برنامه جدید
+                  خرید برنامه جدید
                 </Button>
               </div>
 
@@ -2083,8 +2083,8 @@ const Dashboard = () => {
                     <Loader2 className="h-8 w-8 animate-spin text-green-500" />
                     <span className="mr-2 text-gray-400">در حال بارگذاری برنامه‌ها...</span>
                   </div>
-                ) : dietPrograms.length > 0 ? (
-                  dietPrograms.map((program) => (
+                ) : dietPrograms.filter(program => hasPurchasedProgram(program.id) || user?.profile?.is_admin).length > 0 ? (
+                  dietPrograms.filter(program => hasPurchasedProgram(program.id) || user?.profile?.is_admin).map((program) => (
                     <Card key={program.id} className="bg-gray-800/50 border-gray-700 hover:border-green-500/50 transition-all duration-300 overflow-hidden">
                       <div className="h-40 bg-gradient-to-br from-green-500/20 to-teal-500/20 relative">
                         <div className="absolute inset-0 flex items-center justify-center">
@@ -2141,7 +2141,7 @@ const Dashboard = () => {
                   ))
                 ) : (
                   <div className="col-span-3 text-center py-12">
-                    <p className="text-gray-400">هیچ برنامه غذایی یافت نشد.</p>
+                    <p className="text-gray-400">شما هنوز هیچ برنامه غذایی خریداری نکرده‌اید.</p>
                   </div>
                 )}
               </div>
@@ -2150,7 +2150,7 @@ const Dashboard = () => {
             {/* Supplement Plans Tab */}
             <TabsContent value="supplements" className="space-y-6 animate-in fade-in-50 duration-300">
               <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-white">برنامه‌های مکمل</h2>
+                <h2 className="text-2xl font-bold text-white">برنامه‌های مکمل خریداری شده</h2>
                 <Button 
                   className="bg-purple-500 hover:bg-purple-600 text-white"
                   onClick={() => navigate('/programs')}
@@ -2168,8 +2168,8 @@ const Dashboard = () => {
                     <Loader2 className="h-8 w-8 animate-spin text-purple-500" />
                     <span className="mr-2 text-gray-400">در حال بارگذاری برنامه‌ها...</span>
                   </div>
-                ) : supplementPrograms.length > 0 ? (
-                  supplementPrograms.map((program) => (
+                ) : supplementPrograms.filter(program => hasPurchasedProgram(program.id) || user?.profile?.is_admin).length > 0 ? (
+                  supplementPrograms.filter(program => hasPurchasedProgram(program.id) || user?.profile?.is_admin).map((program) => (
                     <Card key={program.id} className="bg-gray-800/50 border-gray-700 hover:border-purple-500/50 transition-all duration-300 overflow-hidden">
                       <div className="h-40 bg-gradient-to-br from-purple-500/20 to-blue-500/20 relative">
                         <div className="absolute inset-0 flex items-center justify-center">
@@ -2226,7 +2226,7 @@ const Dashboard = () => {
                   ))
                 ) : (
                   <div className="col-span-3 text-center py-12">
-                    <p className="text-gray-400">هیچ برنامه مکملی یافت نشد.</p>
+                    <p className="text-gray-400">شما هنوز هیچ برنامه مکملی خریداری نکرده‌اید.</p>
                   </div>
                 )}
               </div>

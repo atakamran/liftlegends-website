@@ -20,8 +20,47 @@ const Login = () => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
+    confirmPassword: "",
   });
+  
+  const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
   const navigate = useNavigate();
+  
+  // Clear password errors when switching between login and register
+  const handleAuthModeChange = (mode: "login" | "register") => {
+    setAuthMode(mode);
+    setPasswordErrors([]);
+    setFormData({
+      email: "",
+      password: "",
+      confirmPassword: "",
+    });
+  };
+
+  // Password validation function
+  const validatePassword = (password: string): string[] => {
+    const errors: string[] = [];
+    
+    if (password.length < 8) {
+      errors.push("رمز عبور باید حداقل 8 کاراکتر باشد");
+    }
+    
+    if (!/[A-Z]/.test(password)) {
+      errors.push("رمز عبور باید حداقل یک حرف بزرگ انگلیسی داشته باشد");
+    }
+    
+    if (!/[a-z]/.test(password)) {
+      errors.push("رمز عبور باید حداقل یک حرف کوچک انگلیسی داشته باشد");
+    }
+    
+    if (!/[0-9]/.test(password)) {
+      errors.push("رمز عبور باید حداقل یک عدد داشته باشد");
+    }
+    
+   
+    
+    return errors;
+  };
 
   // Check if user is already logged in and handle OAuth redirects
   useEffect(() => {
@@ -97,10 +136,17 @@ const Login = () => {
   }, [navigate]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: value,
     });
+    
+    // Validate password in real-time for register mode
+    if (name === 'password' && authMode === 'register') {
+      const errors = validatePassword(value);
+      setPasswordErrors(errors);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -109,7 +155,13 @@ const Login = () => {
       if (authMode === 'login') {
         handleLogin();
       } else {
-        handleRegister();
+        // Only allow register if validation passes
+        const passwordValidationErrors = validatePassword(formData.password);
+        const passwordsMatch = formData.password === formData.confirmPassword;
+        
+        if (passwordValidationErrors.length === 0 && passwordsMatch && formData.confirmPassword.length > 0) {
+          handleRegister();
+        }
       }
     }
   };
@@ -153,6 +205,30 @@ const Login = () => {
   const handleRegister = async () => {
     setLoading(true);
     try {
+      // Validate password
+      const passwordValidationErrors = validatePassword(formData.password);
+      if (passwordValidationErrors.length > 0) {
+        setPasswordErrors(passwordValidationErrors);
+        toast({
+          variant: "destructive",
+          title: "خطا در اعتبارسنجی رمز عبور",
+          description: "لطفاً شرایط رمز عبور را رعایت کنید.",
+        });
+        setLoading(false);
+        return;
+      }
+      
+      // Check if passwords match
+      if (formData.password !== formData.confirmPassword) {
+        toast({
+          variant: "destructive",
+          title: "خطا در تایید رمز عبور",
+          description: "رمز عبور و تایید آن باید یکسان باشند.",
+        });
+        setLoading(false);
+        return;
+      }
+      
       // Register the user
       const { data, error } = await supabase.auth.signUp({
         email: formData.email,
@@ -362,22 +438,68 @@ const Login = () => {
                     onKeyPress={handleKeyPress}
                   />
                 </div>
+                
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-white">رمز عبور</label>
                   <Input
                     type="password"
                     name="password"
                     placeholder="رمز عبور خود را وارد کنید"
-                    className="bg-gray-800 border-gray-700 text-white"
+                    className={`bg-gray-800 border-gray-700 text-white ${passwordErrors.length > 0 ? 'border-red-500' : ''}`}
                     value={formData.password}
                     onChange={handleInputChange}
                     onKeyPress={handleKeyPress}
                   />
+                  {/* Password requirements */}
+                  <div className="text-xs text-gray-400 space-y-1">
+                    <p>شرایط رمز عبور:</p>
+                    <ul className="list-disc list-inside space-y-0.5 text-xs">
+                      <li className={formData.password.length >= 8 ? 'text-green-400' : 'text-gray-400'}>
+                        حداقل 8 کاراکتر
+                      </li>
+                      <li className={/[A-Z]/.test(formData.password) ? 'text-green-400' : 'text-gray-400'}>
+                        حداقل یک حرف بزرگ انگلیسی
+                      </li>
+                      <li className={/[a-z]/.test(formData.password) ? 'text-green-400' : 'text-gray-400'}>
+                        حداقل یک حرف کوچک انگلیسی
+                      </li>
+                      <li className={/[0-9]/.test(formData.password) ? 'text-green-400' : 'text-gray-400'}>
+                        حداقل یک عدد
+                      </li>
+                    </ul>
+                  </div>
+                  {passwordErrors.length > 0 && (
+                    <div className="text-xs text-red-400 space-y-1">
+                      {passwordErrors.map((error, index) => (
+                        <p key={index}>• {error}</p>
+                      ))}
+                    </div>
+                  )}
                 </div>
+                
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-white">تایید رمز عبور</label>
+                  <Input
+                    type="password"
+                    name="confirmPassword"
+                    placeholder="رمز عبور خود را دوباره وارد کنید"
+                    className={`bg-gray-800 border-gray-700 text-white ${formData.confirmPassword && formData.password !== formData.confirmPassword ? 'border-red-500' : ''}`}
+                    value={formData.confirmPassword}
+                    onChange={handleInputChange}
+                    onKeyPress={handleKeyPress}
+                  />
+                  {formData.confirmPassword && formData.password !== formData.confirmPassword && (
+                    <p className="text-xs text-red-400">رمز عبور و تایید آن باید یکسان باشند</p>
+                  )}
+                  {formData.confirmPassword && formData.password === formData.confirmPassword && formData.confirmPassword.length > 0 && (
+                    <p className="text-xs text-green-400">✓ رمز عبور تایید شد</p>
+                  )}
+                </div>
+                
                 <Button
                   className="w-full bg-gradient-to-r from-gold-500 to-amber-400 hover:from-gold-600 hover:to-amber-500 text-black font-medium rounded-lg py-5 shadow-md hover:shadow-lg transition-all duration-300"
                   onClick={handleRegister}
-                  disabled={loading}
+                  disabled={loading || passwordErrors.length > 0 || (formData.password !== formData.confirmPassword && formData.confirmPassword.length > 0)}
                 >
                   {loading ? "در حال ثبت‌نام..." : "ثبت‌نام"}
                 </Button>

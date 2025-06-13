@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instagram Story - No Gym No Excuses</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            overflow: hidden;
+        }
+        
+        .story-container {
+            width: 375px;
+            height: 667px;
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 40%, #000000 100%);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 40px 30px;
+        }
+        
+        /* Background Effects */
+        .bg-effect-1 {
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 200px;
+            height: 200px;
+            background: linear-gradient(45deg, #D4AF37, #FFD700);
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.15;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .bg-effect-2 {
+            position: absolute;
+            bottom: -80px;
+            left: -80px;
+            width: 300px;
+            height: 300px;
+            background: linear-gradient(45deg, #8B4513, #D4AF37);
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.1;
+            animation: float 8s ease-in-out infinite reverse;
+        }
+        
+        .bg-effect-3 {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 150px;
+            height: 150px;
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.08;
+            animation: pulse 4s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.2); }
+        }
+        
+        /* Logo Section */
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            z-index: 10;
+        }
+        
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #D4AF37, #FFD700);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 25px rgba(212, 175, 55, 0.3);
+            animation: logoGlow 3s ease-in-out infinite;
+            padding: 8px;
+        }
+        
+        .logo-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: brightness(0) invert(1);
+        }
+        
+        @keyframes logoGlow {
+            0%, 100% { box-shadow: 0 8px 25px rgba(212, 175, 55, 0.3); }
+            50% { box-shadow: 0 12px 35px rgba(212, 175, 55, 0.5); }
+        }
+        
+        .logo-text {
+            color: #FFD700;
+            font-size: 24px;
+            font-weight: 800;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        
+        /* Main Content */
+        .main-content {
+            text-align: center;
+            z-index: 10;
+            padding: 20px 0;
+        }
+        
+        .emoji-header {
+            font-size: 60px;
+            margin-bottom: 20px;
+            animation: bounce 2s ease-in-out infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+        
+        .main-title {
+            font-size: 28px;
+            font-weight: 900;
+            color: #FFFFFF;
+            margin-bottom: 15px;
+            line-height: 1.3;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+        }
+        
+        .highlight {
+            background: linear-gradient(45deg, #D4AF37, #FFD700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 3s ease-in-out infinite;
+        }
+        
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        .subtitle {
+            font-size: 16px;
+            color: #CCCCCC;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+        
+        .features {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+        
+        .feature-item {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 15px;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s ease;
+            animation: slideUp 0.6s ease-out forwards;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        
+        .feature-item:nth-child(1) { animation-delay: 0.2s; }
+        .feature-item:nth-child(2) { animation-delay: 0.4s; }
+        .feature-item:nth-child(3) { animation-delay: 0.6s; }
+        
+        @keyframes slideUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .feature-icon {
+            font-size: 20px;
+        }
+        
+        .feature-text {
+            color: #FFFFFF;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .price-section {
+            background: linear-gradient(135deg, #D4AF37, #FFD700);
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.4);
+            animation: priceGlow 2s ease-in-out infinite;
+        }
+        
+        @keyframes priceGlow {
+            0%, 100% { box-shadow: 0 10px 30px rgba(212, 175, 55, 0.4); }
+            50% { box-shadow: 0 15px 40px rgba(212, 175, 55, 0.6); }
+        }
+        
+        .price-text {
+            color: #000000;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .price-amount {
+            color: #000000;
+            font-size: 24px;
+            font-weight: 900;
+        }
+        
+        /* Bottom Section */
+        .bottom-section {
+            z-index: 10;
+        }
+        
+        .cta-button {
+            background: linear-gradient(135deg, #D4AF37, #FFD700);
+            color: #000000;
+            font-size: 18px;
+            font-weight: 800;
+            padding: 18px 30px;
+            border-radius: 25px;
+            text-decoration: none;
+            display: block;
+            text-align: center;
+            margin-bottom: 15px;
+            box-shadow: 0 8px 25px rgba(212, 175, 55, 0.4);
+            transition: all 0.3s ease;
+            animation: ctaPulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes ctaPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .website-link {
+            text-align: center;
+            color: #D4AF37;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .arrow {
+            font-size: 16px;
+            animation: arrowMove 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes arrowMove {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(5px); }
+        }
+        
+        /* Decorative Elements */
+        .decorative-dots {
+            position: absolute;
+            top: 30%;
+            right: 20px;
+            width: 4px;
+            height: 4px;
+            background: #D4AF37;
+            border-radius: 50%;
+            opacity: 0.6;
+        }
+        
+        .decorative-dots::before,
+        .decorative-dots::after {
+            content: '';
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #D4AF37;
+            border-radius: 50%;
+        }
+        
+        .decorative-dots::before {
+            top: -15px;
+            opacity: 0.4;
+        }
+        
+        .decorative-dots::after {
+            top: 15px;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="story-container">
+        <!-- Background Effects -->
+        <div class="bg-effect-1"></div>
+        <div class="bg-effect-2"></div>
+        <div class="bg-effect-3"></div>
+        <div class="decorative-dots"></div>
+        
+        <!-- Logo Section -->
+        <div class="logo-section">
+            <div class="logo-icon">
+                <img src="https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends//white%20logo.png" alt="Lift Legends Logo" class="logo-image">
+            </div>
+            <div class="logo-text">Lift Legends</div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="emoji-header">🚫</div>
+            <h1 class="main-title">
+                <span class="highlight">No Gym</span><br>
+                <span class="highlight">No Excuses!</span>
+            </h1>
+            <p class="subtitle">برنامه تمرینی بدون تجهیزات<br>فقط با وزن بدن خودت!</p>
+            
+            <div class="features">
+                <div class="feature-item">
+                    <span class="feature-icon">🏠</span>
+                    <span class="feature-text">تمرین در خانه، پارک، هرجا</span>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">💪</span>
+                    <span class="feature-text">عضله‌سازی حرفه‌ای</span>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">🔥</span>
+                    <span class="feature-text">چربی‌سوزی قدرتمند</span>
+                </div>
+            </div>
+            
+            <div class="price-section">
+                <div class="price-text">تنها</div>
+                <div class="price-amount">۹۹ هزار تومان</div>
+            </div>
+        </div>
+        
+        <!-- Bottom Section -->
+        <div class="bottom-section">
+            <a href="#" class="cta-button">همین الان دانلود کن!</a>
+            <a href="#" class="website-link">
+                liftlegends.ir
+                <span class="arrow">←</span>
+            </a>
+        </div>
+    </div>
+</body>
+</html>
