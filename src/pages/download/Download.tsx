@@ -91,15 +91,15 @@ const DownloadPage = () => {
                   <div className="absolute -inset-4 bg-gradient-to-r from-gold-500/50 to-gold-400/50 rounded-3xl blur-2xl opacity-75 animate-pulse"></div>
                   <Button 
                     className="relative bg-gradient-to-r from-gold-500 to-gold-400 hover:from-gold-400 hover:to-gold-300 text-black text-xl font-medium px-12 py-6 rounded-3xl shadow-2xl hover:shadow-gold-500/50 transition-all duration-300 hover:scale-105 min-w-[280px]"
-                    onClick={() => window.open("http://cafebazaar.ir/app/?id=com.liftlegends.app&ref=share", "_blank")}
+                    onClick={() => window.open("https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends//Lift%20Legends%20v1.5.apk", "_blank")}
                   >
                     <Download className="w-6 h-6 ml-3" />
-                    بزودی در دسترس
+                    دانلود مستقیم
                   </Button>
                 </div>
 
                 <p className="text-gray-400 text-lg">
-                  اپلیکیشن به زودی در کافه بازار منتشر خواهد شد
+                  دانلود مستقیم اپلیکیشن اندروید
                 </p>
               </div>
 
@@ -330,13 +330,13 @@ const DownloadPage = () => {
                   <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-black/20 rounded-3xl"></div>
                   <div className="relative z-10">
                     <h3 className="text-2xl lg:text-3xl font-light text-white mb-4">
-                      بزودی در دسترس
+                      دانلود مستقیم
                     </h3>
                     <p className="text-gray-300 text-lg mb-6">
-                      برای اطلاع از زمان انتشار، ما را در شبکه‌های اجتماعی دنبال کنید
+                      اپلیکیشن LiftLegends را مستقیماً دانلود و نصب کنید
                     </p>
                     <div className="text-gold-400 text-lg font-medium">
-                      🚀 بزودی در دسترس
+                      📱 آماده دانلود
                     </div>
                   </div>
                 </div>
