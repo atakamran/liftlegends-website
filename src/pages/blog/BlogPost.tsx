@@ -260,9 +260,14 @@ const BlogPostPage = () => {
               بازگشت به بلاگ
             </Link>
             
-            <Badge variant="outline" className="text-yellow-400 border-yellow-400 bg-yellow-400/10 mb-3 sm:mb-4 text-xs sm:text-sm">
-              {getCategoryIcon(post.category)} {getCategoryName(post.category)}
-            </Badge>
+            <Link to={`/blog?category=${post.category}`}>
+              <Badge 
+                variant="outline" 
+                className="text-yellow-400 border-yellow-400 bg-yellow-400/10 mb-3 sm:mb-4 text-xs sm:text-sm hover:bg-yellow-400/20 cursor-pointer transition-colors"
+              >
+                {getCategoryIcon(post.category)} {getCategoryName(post.category)}
+              </Badge>
+            </Link>
             
             <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold mb-3 sm:mb-4">
               {post.title}
@@ -386,7 +391,7 @@ const BlogPostPage = () => {
                 <h3 className="text-lg font-bold mb-3">دسته‌بندی‌ها</h3>
                 <div className="flex flex-wrap gap-2">
                   <Link 
-                    to="/blog/category/workout" 
+                    to="/blog?category=workout" 
                     title="مقالات تمرین و برنامه‌ریزی"
                     aria-label="مشاهده مقالات دسته تمرین و برنامه‌ریزی"
                   >
@@ -396,7 +401,7 @@ const BlogPostPage = () => {
                     </Badge>
                   </Link>
                   <Link 
-                    to="/blog/category/nutrition" 
+                    to="/blog?category=nutrition" 
                     title="مقالات تغذیه و رژیم"
                     aria-label="مشاهده مقالات دسته تغذیه و رژیم"
                   >
@@ -406,7 +411,7 @@ const BlogPostPage = () => {
                     </Badge>
                   </Link>
                   <Link 
-                    to="/blog/category/supplements" 
+                    to="/blog?category=supplements" 
                     title="مقالات مکمل‌ها"
                     aria-label="مشاهده مقالات دسته مکمل‌ها"
                   >
@@ -416,7 +421,7 @@ const BlogPostPage = () => {
                     </Badge>
                   </Link>
                   <Link 
-                    to="/blog/category/motivation" 
+                    to="/blog?category=motivation" 
                     title="مقالات انگیزش و روانشناسی"
                     aria-label="مشاهده مقالات دسته انگیزش و روانشناسی"
                   >
@@ -473,9 +478,17 @@ const BlogPostPage = () => {
                       </div>
                       <CardContent className="md:w-2/3 p-4 flex flex-col justify-between">
                         <div>
-                          <Badge variant="outline" className="text-yellow-400 border-yellow-400 bg-yellow-400/10 mb-2">
-                            {getCategoryIcon(relatedPost.category)} {getCategoryName(relatedPost.category)}
-                          </Badge>
+                          <Link 
+                            to={`/blog?category=${relatedPost.category}`}
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <Badge 
+                              variant="outline" 
+                              className="text-yellow-400 border-yellow-400 bg-yellow-400/10 mb-2 hover:bg-yellow-400/20 cursor-pointer transition-colors"
+                            >
+                              {getCategoryIcon(relatedPost.category)} {getCategoryName(relatedPost.category)}
+                            </Badge>
+                          </Link>
                           <h4 className="text-lg font-bold mb-2 line-clamp-2 hover:text-yellow-400 transition-colors">
                             {relatedPost.title}
                           </h4>
