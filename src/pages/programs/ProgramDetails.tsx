@@ -31,7 +31,9 @@ import {
   CheckCircle, 
   Eye, 
   Award,
-  BarChart
+  BarChart,
+  ChevronDown,
+  ChevronUp
 } from "lucide-react";
 
 // Define interfaces for exercise and workout data
@@ -103,6 +105,8 @@ interface NutritionWeek {
   meals: Meal[];
   water_intake?: string;
   exercise_notes?: string;
+  daily_protein?: string;
+  daily_calories?: string;
 }
 
 // Define interfaces for supplement program
@@ -124,6 +128,7 @@ interface SupplementWeek {
   water_intake?: string;
   training_notes?: string;
   total_monthly_cost?: string;
+  safety_reminders?: string[];
 }
 
 // Legacy interfaces for backward compatibility
@@ -166,6 +171,8 @@ interface ProgramDetails {
     expected_results?: string;
   };
   workouts?: DayWorkout[];
+  meals?: Meal[];
+  supplements?: Supplement[];
   weeks?: (WeekProgram | NutritionWeek | SupplementWeek | PersianWeekProgram)[];
   created_at?: string;
   updated_at?: string;
@@ -714,107 +721,334 @@ const ProgramDetails = () => {
     );
   };
 
-  // Function to render meals for nutrition programs
-  const renderMeals = (meals: Meal[]) => {
+  // Custom hook for meal rendering functionality
+  const useMealsRenderer = () => {
+    const [completedFoods, setCompletedFoods] = useState<Record<string, boolean>>({});
+    
+    const toggleFoodCompletion = (mealIndex: number, foodIndex: number) => {
+      const foodKey = `meal-${mealIndex}-food-${foodIndex}`;
+      setCompletedFoods(prev => ({
+        ...prev,
+        [foodKey]: !prev[foodKey]
+      }));
+    };
+    
+    // Function to render meals for nutrition programs - Instagram/Meta style for Mobile
+    const renderMeals = (meals: Meal[]) => {
+    
     return (
       <div className="space-y-4">
-        {meals.map((meal, index) => (
-          <div key={index} className="rounded-lg border border-gray-700/30 bg-gray-800/30 p-4 transition-all duration-300 hover:border-gold-500/30">
-            <div className="flex justify-between items-start mb-3">
-              <div>
-                <h4 className="font-medium text-white text-lg">{meal.meal_type}</h4>
-                <div className="flex items-center gap-2 mt-1">
-                  <Badge variant="outline" className="bg-blue-900/20 border-blue-500/30 text-blue-400">
-                    {meal.time}
-                  </Badge>
-                  <Badge variant="outline" className="bg-orange-900/20 border-orange-500/30 text-orange-400">
-                    {meal.calories}
-                  </Badge>
+        {meals.map((meal, mealIndex) => {
+          // Generate a unique ID for this meal
+          const mealId = `meal-${mealIndex}`;
+          
+          // Count completed foods in this meal
+          const totalFoods = meal.foods.length;
+          const completedCount = meal.foods.filter((_, foodIndex) => 
+            completedFoods[`meal-${mealIndex}-food-${foodIndex}`]
+          ).length;
+          
+          // Calculate progress percentage
+          const progressPercentage = totalFoods > 0 ? (completedCount / totalFoods) * 100 : 0;
+          
+          return (
+            <div 
+              key={mealIndex} 
+              className="rounded-2xl border border-gray-700/30 bg-gray-800/30 overflow-hidden transition-all duration-300 shadow-lg"
+            >
+              <div className="p-4">
+                <div className="flex justify-between items-center mb-3">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center 
+                      ${progressPercentage === 100 
+                        ? 'bg-green-500 text-black' 
+                        : 'bg-gradient-to-br from-orange-500/30 to-red-500/30 text-orange-400'}`}>
+                      {progressPercentage === 100 
+                        ? <CheckCircle className="h-6 w-6" /> 
+                        : <span className="text-lg font-bold">{mealIndex + 1}</span>}
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-white text-lg">{meal.meal_type}</h4>
+                      <div className="flex items-center gap-2 mt-1">
+                        <Badge variant="outline" className="bg-blue-900/20 border-blue-500/30 text-blue-400">
+                          <Clock className="h-3.5 w-3.5 mr-1" />
+                          {meal.time}
+                        </Badge>
+                        <Badge variant="outline" className="bg-orange-900/20 border-orange-500/30 text-orange-400">
+                          <Flame className="h-3.5 w-3.5 mr-1" />
+                          {meal.calories}
+                        </Badge>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <Accordion type="single" collapsible className="w-auto">
+                    <AccordionItem value={mealId} className="border-0">
+                      <AccordionTrigger 
+                        data-accordion-trigger={mealId} 
+                        className="py-2 px-3 rounded-full bg-gray-700/50 hover:bg-gray-700/80 transition-all duration-200"
+                      >
+                        <span className="sr-only">Toggle</span>
+                      </AccordionTrigger>
+                      <AccordionContent className="pt-4">
+                        <div className="space-y-3">
+                          {meal.foods.map((food, foodIndex) => {
+                            const foodKey = `meal-${mealIndex}-food-${foodIndex}`;
+                            const isCompleted = completedFoods[foodKey] || false;
+                            
+                            return (
+                              <div 
+                                key={foodIndex} 
+                                className={`flex items-center gap-3 p-3 rounded-xl ${
+                                  isCompleted 
+                                    ? 'bg-green-900/10 border border-green-500/20' 
+                                    : 'bg-gray-900/50 hover:bg-gray-900/70'
+                                } transition-all duration-300`}
+                                onClick={() => toggleFoodCompletion(mealIndex, foodIndex)}
+                              >
+                                <div className={`w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center transition-all duration-300 ${
+                                  isCompleted 
+                                    ? 'bg-green-500 text-black' 
+                                    : 'bg-gray-700 text-gray-300'
+                                }`}>
+                                  <CheckCircle className={`h-5 w-5 ${isCompleted ? 'opacity-100' : 'opacity-70'}`} />
+                                </div>
+                                
+                                <div className="flex-1">
+                                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+                                    <span className={`font-medium ${isCompleted ? 'text-green-400' : 'text-white'}`}>
+                                      {food.name}
+                                      <span className="text-gray-400 text-sm mr-2">({food.amount})</span>
+                                    </span>
+                                    
+                                    <div className="flex flex-wrap gap-2 text-xs">
+                                      <span className={`px-2 py-1 rounded-md ${
+                                        isCompleted ? 'bg-green-900/20 text-green-300' : 'bg-red-900/20 text-red-400'
+                                      }`}>
+                                        {food.calories} کال
+                                      </span>
+                                      <span className={`px-2 py-1 rounded-md ${
+                                        isCompleted ? 'bg-green-900/20 text-green-300' : 'bg-blue-900/20 text-blue-400'
+                                      }`}>
+                                        پ: {food.protein}
+                                      </span>
+                                      <span className={`px-2 py-1 rounded-md ${
+                                        isCompleted ? 'bg-green-900/20 text-green-300' : 'bg-yellow-900/20 text-yellow-400'
+                                      }`}>
+                                        ک: {food.carbs}
+                                      </span>
+                                      <span className={`px-2 py-1 rounded-md ${
+                                        isCompleted ? 'bg-green-900/20 text-green-300' : 'bg-green-900/20 text-green-400'
+                                      }`}>
+                                        چ: {food.fat}
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })}
+                          
+                          {meal.notes && (
+                            <div className="text-sm mt-3 p-4 rounded-xl bg-gold-900/10 border border-gold-500/20">
+                              <span className="text-gold-400 font-medium flex items-center gap-2">
+                                <Info className="h-4 w-4" />
+                                نکته:
+                              </span>
+                              <p className="text-gray-300 mt-2">{meal.notes}</p>
+                            </div>
+                          )}
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
+                </div>
+                
+                {/* Progress bar */}
+                <div className="mt-2">
+                  <div className="flex justify-between items-center mb-1 text-xs">
+                    <span className="text-gray-400">{completedCount} از {totalFoods}</span>
+                    <span className="text-gray-400">{Math.round(progressPercentage)}%</span>
+                  </div>
+                  <div className="h-1.5 w-full bg-gray-700 rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-gradient-to-r from-green-500 to-green-400 transition-all duration-500 ease-out"
+                      style={{ width: `${progressPercentage}%` }}
+                    ></div>
+                  </div>
                 </div>
               </div>
             </div>
-            
-            <div className="space-y-2">
-              {meal.foods.map((food, foodIndex) => (
-                <div key={foodIndex} className="flex justify-between items-center p-3 rounded bg-gray-900/50 hover:bg-gray-900/70 transition-colors">
-                  <div>
-                    <span className="text-white font-medium">{food.name}</span>
-                    <span className="text-gray-400 text-sm mr-2">({food.amount})</span>
-                  </div>
-                  <div className="flex gap-2 text-xs">
-                    <span className="bg-red-900/20 text-red-400 px-2 py-1 rounded">{food.calories} کال</span>
-                    <span className="bg-blue-900/20 text-blue-400 px-2 py-1 rounded">پ: {food.protein}</span>
-                    <span className="bg-yellow-900/20 text-yellow-400 px-2 py-1 rounded">ک: {food.carbs}</span>
-                    <span className="bg-green-900/20 text-green-400 px-2 py-1 rounded">چ: {food.fat}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-            
-            {meal.notes && (
-              <div className="text-sm mt-3 p-3 rounded-lg bg-gold-900/20 border border-gold-500/30">
-                <span className="text-gold-400 font-medium">💡 نکته:</span>
-                <p className="text-gray-300 mt-1">{meal.notes}</p>
-              </div>
-            )}
-          </div>
-        ))}
+          );
+        })}
       </div>
     );
   };
+  
+  return { renderMeals, toggleFoodCompletion, completedFoods };
+};
 
-  // Function to render supplements for supplement programs
-  const renderSupplements = (supplements: Supplement[]) => {
-    return (
-      <div className="space-y-4">
-        {supplements.map((supplement, index) => (
-          <div key={index} className="rounded-lg border border-gray-700/30 bg-gray-800/30 p-4">
-            <div className="flex justify-between items-start mb-3">
-              <h4 className="font-bold text-white text-lg">{supplement.supplement_type}</h4>
-              <Badge className="bg-gold-500/20 text-gold-400 border-gold-500/30">
-                {supplement.dosage}
-              </Badge>
-            </div>
+  // Custom hook for supplement rendering functionality
+  const useSupplementsRenderer = () => {
+    const [completedSupplements, setCompletedSupplements] = useState<Record<string, boolean>>({});
+    const [expandedSupplements, setExpandedSupplements] = useState<Record<string, boolean>>({});
+    
+    const toggleSupplementCompletion = (index: number) => {
+      const key = `supplement-${index}`;
+      setCompletedSupplements(prev => ({
+        ...prev,
+        [key]: !prev[key]
+      }));
+    };
+    
+    const toggleSupplementExpansion = (index: number) => {
+      const key = `supplement-${index}`;
+      setExpandedSupplements(prev => ({
+        ...prev,
+        [key]: !prev[key]
+      }));
+    };
+    
+    // Function to render supplements for supplement programs - Instagram/Meta style for Mobile
+    const renderSupplements = (supplements: Supplement[]) => {
+      return (
+        <div className="space-y-5">
+          {supplements.map((supplement, index) => {
+            const supplementKey = `supplement-${index}`;
+            const isCompleted = completedSupplements[supplementKey] || false;
+            const isExpanded = expandedSupplements[supplementKey] || false;
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm mb-3">
-              <div>
-                <span className="text-gray-400">زمان مصرف:</span>
-                <span className="text-white mr-2">{supplement.timing}</span>
-              </div>
-              <div>
-                <span className="text-gray-400">نحوه مصرف:</span>
-                <span className="text-white mr-2">{supplement.instructions}</span>
-              </div>
-            </div>
-            
-            <div className="space-y-3">
-              <div>
-                <span className="text-green-400 font-medium">فواید:</span>
-                <p className="text-gray-300 text-sm mt-1">{supplement.benefits}</p>
-              </div>
-              
-              <div>
-                <span className="text-blue-400 font-medium">برندهای پیشنهادی:</span>
-                <div className="flex flex-wrap gap-1 mt-1">
-                  {supplement.brand_suggestions.map((brand, brandIndex) => (
-                    <Badge key={brandIndex} variant="outline" className="text-xs bg-blue-900/20 border-blue-500/30 text-blue-400">
-                      {brand}
-                    </Badge>
-                  ))}
+            return (
+              <div 
+                key={index} 
+                className={`rounded-2xl border ${
+                  isCompleted 
+                    ? 'border-green-500/30 bg-gradient-to-br from-gray-800/30 to-green-900/10' 
+                    : 'border-gray-700/30 bg-gradient-to-br from-gray-800/30 to-purple-900/10'
+                } p-4 transition-all duration-300 shadow-lg`}
+              >
+                <div className="flex items-center gap-3 mb-3">
+                  <div 
+                    className={`w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center transition-all duration-300 ${
+                      isCompleted 
+                        ? 'bg-green-500 text-black' 
+                        : 'bg-gradient-to-br from-purple-500/30 to-blue-500/30 text-purple-400'
+                    }`}
+                    onClick={() => toggleSupplementCompletion(index)}
+                  >
+                    <CheckCircle className={`h-6 w-6 ${isCompleted ? 'opacity-100' : 'opacity-70'}`} />
+                  </div>
+                  
+                  <div className="flex-1 flex justify-between items-center">
+                    <h4 className={`font-bold text-lg ${isCompleted ? 'text-green-400' : 'text-white'}`}>
+                      {supplement.supplement_type}
+                    </h4>
+                    
+                    <div className="flex items-center gap-2">
+                      <Badge className={`${
+                        isCompleted 
+                          ? 'bg-green-500/20 text-green-400 border-green-500/30' 
+                          : 'bg-gold-500/20 text-gold-400 border-gold-500/30'
+                      } py-1.5 px-3`}>
+                        {supplement.dosage}
+                      </Badge>
+                      
+                      <button 
+                        onClick={() => toggleSupplementExpansion(index)}
+                        className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                          isExpanded 
+                            ? 'bg-blue-500/20 text-blue-400' 
+                            : 'bg-gray-700/50 text-gray-300'
+                        } transition-all duration-200`}
+                      >
+                        {isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                      </button>
+                    </div>
+                  </div>
                 </div>
-              </div>
-              
-              {supplement.notes && (
-                <div className="bg-gray-800/50 p-3 rounded-lg">
-                  <span className="text-gold-500 font-medium">نکته مهم:</span>
-                  <p className="text-gray-300 text-sm mt-1">{supplement.notes}</p>
+                
+                {/* Basic info always visible */}
+                <div className={`grid grid-cols-1 md:grid-cols-2 gap-3 text-sm p-3 rounded-xl ${
+                  isCompleted ? 'bg-green-900/10 border border-green-500/10' : 'bg-gray-900/30'
+                } mb-3`}>
+                  <div className="flex items-center gap-2">
+                    <Clock className={`h-4 w-4 ${isCompleted ? 'text-green-400' : 'text-blue-400'}`} />
+                    <span className="text-gray-400">زمان مصرف:</span>
+                    <span className={isCompleted ? 'text-green-300' : 'text-white'}>{supplement.timing}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Info className={`h-4 w-4 ${isCompleted ? 'text-green-400' : 'text-blue-400'}`} />
+                    <span className="text-gray-400">نحوه مصرف:</span>
+                    <span className={isCompleted ? 'text-green-300' : 'text-white'}>{supplement.instructions}</span>
+                  </div>
                 </div>
-              )}
-            </div>
-          </div>
-        ))}
-      </div>
-    );
+                
+                {/* Expandable content */}
+                {isExpanded && (
+                  <div className="space-y-4 mt-4 animate-fadeIn">
+                    <div className={`p-4 rounded-xl ${
+                      isCompleted ? 'bg-green-900/10 border border-green-500/20' : 'bg-green-900/10 border border-green-500/20'
+                    }`}>
+                      <span className={`font-medium flex items-center gap-2 ${
+                        isCompleted ? 'text-green-400' : 'text-green-400'
+                      }`}>
+                        <Award className="h-4 w-4" />
+                        فواید:
+                      </span>
+                      <p className={`text-sm mt-2 ${isCompleted ? 'text-green-300' : 'text-gray-300'}`}>
+                        {supplement.benefits}
+                      </p>
+                    </div>
+                    
+                    <div>
+                      <span className={`font-medium flex items-center gap-2 ${
+                        isCompleted ? 'text-green-400' : 'text-blue-400'
+                      }`}>
+                        <ShoppingCart className="h-4 w-4" />
+                        برندهای پیشنهادی:
+                      </span>
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {supplement.brand_suggestions.map((brand, brandIndex) => (
+                          <Badge 
+                            key={brandIndex} 
+                            variant="outline" 
+                            className={`text-sm py-1.5 px-3 ${
+                              isCompleted 
+                                ? 'bg-green-900/20 border-green-500/30 text-green-400' 
+                                : 'bg-blue-900/20 border-blue-500/30 text-blue-400'
+                            }`}
+                          >
+                            {brand}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    {supplement.notes && (
+                      <div className={`p-4 rounded-xl ${
+                        isCompleted ? 'bg-green-900/10 border border-green-500/20' : 'bg-gold-900/10 border border-gold-500/20'
+                      }`}>
+                        <span className={`font-medium flex items-center gap-2 ${
+                          isCompleted ? 'text-green-400' : 'text-gold-500'
+                        }`}>
+                          <Info className="h-4 w-4" />
+                          نکته مهم:
+                        </span>
+                        <p className={`text-sm mt-2 ${isCompleted ? 'text-green-300' : 'text-gray-300'}`}>
+                          {supplement.notes}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      );
+    };
+    
+    return { renderSupplements, toggleSupplementCompletion, toggleSupplementExpansion };
   };
 
   if (isLoading) {
@@ -1289,55 +1523,242 @@ const ProgramDetails = () => {
                   </div>
                 )}
                 
-                {/* Nutrition Program Content */}
+                {/* Nutrition Program Content - Modernized for Mobile */}
                 {getProgramType(programData) === 'nutrition' && programData.weeks && (
                   <div className="space-y-6">
                     {programData.weeks.map((week: NutritionWeek, weekIndex: number) => (
-                      <div key={weekIndex} className="border border-gray-700/50 rounded-lg p-4 bg-gray-800/20">
-                        <div className="flex justify-between items-center mb-4">
-                          <h3 className="text-xl font-bold text-white">هفته {week.week_number}</h3>
-                          <div className="flex gap-2">
-                            <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
+                      <div key={weekIndex} className="border border-gray-700/50 rounded-xl p-4 bg-gradient-to-br from-gray-800/30 to-gray-900/40 shadow-lg">
+                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
+                          <div className="flex items-center gap-2">
+                            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gold-500/20 text-gold-300 font-bold">
+                              {week.week_number}
+                            </div>
+                            <h3 className="text-xl font-bold text-white">هفته {week.week_number}</h3>
+                          </div>
+                          <div className="flex flex-wrap gap-2">
+                            <Badge className="bg-green-500/20 text-green-400 border-green-500/30 py-1.5 px-3">
+                              <Flame className="h-3.5 w-3.5 mr-1" />
                               {week.daily_calories} کالری
                             </Badge>
-                            <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30">
+                            <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30 py-1.5 px-3">
+                              <BarChart className="h-3.5 w-3.5 mr-1" />
                               پروتئین: {week.daily_protein}
                             </Badge>
                           </div>
                         </div>
-                        <p className="text-gray-400 mb-4">{week.description}</p>
-                        {renderMeals(week.meals)}
+                        <div className="bg-gray-800/50 p-3 rounded-lg mb-4">
+                          <p className="text-gray-300">{week.description}</p>
+                        </div>
+                        <div className="space-y-4">
+                          {week.meals.map((meal, index) => {
+                            // Generate a unique ID for this meal
+                            const mealId = `meal-${weekIndex}-${index}`;
+                            return (
+                              <Accordion 
+                                key={index} 
+                                type="single" 
+                                collapsible 
+                                className="w-full"
+                              >
+                                <AccordionItem 
+                                  value={mealId}
+                                  className="border-0"
+                                >
+                                  <div className="rounded-xl border border-gray-700/30 bg-gray-800/30 overflow-hidden transition-all duration-300 hover:border-gold-500/30 hover:shadow-md">
+                                    <div className="p-4">
+                                      <div className="flex justify-between items-center">
+                                        <div>
+                                          <h4 className="font-medium text-white text-lg">{meal.meal_type}</h4>
+                                          <div className="flex items-center gap-2 mt-1">
+                                            <Badge variant="outline" className="bg-blue-900/20 border-blue-500/30 text-blue-400">
+                                              <Clock className="h-3.5 w-3.5 mr-1" />
+                                              {meal.time}
+                                            </Badge>
+                                            <Badge variant="outline" className="bg-orange-900/20 border-orange-500/30 text-orange-400">
+                                              <Flame className="h-3.5 w-3.5 mr-1" />
+                                              {meal.calories}
+                                            </Badge>
+                                          </div>
+                                        </div>
+                                        <AccordionTrigger data-accordion-trigger={mealId} className="py-2 px-3 rounded-lg bg-gray-700/50 hover:bg-gray-700/80 transition-all duration-200">
+                                          <span className="text-sm font-medium" data-state-text="true">مشاهده</span>
+                                        </AccordionTrigger>
+                                      </div>
+                                    </div>
+                                    
+                                    <AccordionContent className="px-4 pb-4">
+                                      <div className="space-y-2">
+                                        {meal.foods.map((food, foodIndex) => (
+                                          <div key={foodIndex} className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 p-3 rounded-lg bg-gray-900/50 hover:bg-gray-900/70 transition-colors">
+                                            <div className="flex items-center gap-2">
+                                              <div className="w-6 h-6 rounded-full flex-shrink-0 flex items-center justify-center bg-green-500/20 text-green-400">
+                                                <CheckCircle className="h-4 w-4" />
+                                              </div>
+                                              <div>
+                                                <span className="text-white font-medium">{food.name}</span>
+                                                <span className="text-gray-400 text-sm mr-2">({food.amount})</span>
+                                              </div>
+                                            </div>
+                                            <div className="flex flex-wrap gap-2 text-xs mt-2 sm:mt-0">
+                                              <span className="bg-red-900/20 text-red-400 px-2 py-1 rounded-md">{food.calories} کال</span>
+                                              <span className="bg-blue-900/20 text-blue-400 px-2 py-1 rounded-md">پ: {food.protein}</span>
+                                              <span className="bg-yellow-900/20 text-yellow-400 px-2 py-1 rounded-md">ک: {food.carbs}</span>
+                                              <span className="bg-green-900/20 text-green-400 px-2 py-1 rounded-md">چ: {food.fat}</span>
+                                            </div>
+                                          </div>
+                                        ))}
+                                      </div>
+                                      
+                                      {meal.notes && (
+                                        <div className="text-sm mt-3 p-3 rounded-lg bg-gold-900/20 border border-gold-500/30">
+                                          <span className="text-gold-400 font-medium">💡 نکته:</span>
+                                          <p className="text-gray-300 mt-1">{meal.notes}</p>
+                                        </div>
+                                      )}
+                                    </AccordionContent>
+                                  </div>
+                                </AccordionItem>
+                              </Accordion>
+                            );
+                          })}
+                        </div>
                       </div>
                     ))}
                   </div>
                 )}
                 
-                {/* Supplement Program Content */}
+                {/* Supplement Program Content - Modernized for Mobile */}
                 {getProgramType(programData) === 'supplement' && programData.weeks && (
                   <div className="space-y-6">
                     {programData.weeks.map((week: SupplementWeek, weekIndex: number) => (
-                      <div key={weekIndex} className="border border-gray-700/50 rounded-lg p-4 bg-gray-800/20">
-                        <div className="flex justify-between items-center mb-4">
-                          <h3 className="text-xl font-bold text-white">هفته {week.week_number}</h3>
-                          <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30">
+                      <div key={weekIndex} className="border border-gray-700/50 rounded-xl p-4 bg-gradient-to-br from-gray-800/30 to-gray-900/40 shadow-lg">
+                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
+                          <div className="flex items-center gap-2">
+                            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-purple-500/20 text-purple-300 font-bold">
+                              {week.week_number}
+                            </div>
+                            <h3 className="text-xl font-bold text-white">هفته {week.week_number}</h3>
+                          </div>
+                          <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30 py-1.5 px-3 w-fit">
+                            <ShoppingCart className="h-3.5 w-3.5 mr-1" />
                             {week.total_monthly_cost}
                           </Badge>
                         </div>
-                        <p className="text-gray-400 mb-4">{week.description}</p>
+                        
+                        <div className="bg-gray-800/50 p-3 rounded-lg mb-4">
+                          <p className="text-gray-300">{week.description}</p>
+                        </div>
                         
                         {/* Safety reminders */}
                         {week.safety_reminders && week.safety_reminders.length > 0 && (
                           <div className="mb-6 p-4 bg-red-900/20 border border-red-500/20 rounded-lg">
-                            <h4 className="text-red-400 font-medium mb-2">⚠️ نکات ایمنی مهم:</h4>
-                            <ul className="space-y-1">
+                            <h4 className="text-red-400 font-medium mb-2 flex items-center">
+                              <div className="w-6 h-6 rounded-full flex-shrink-0 flex items-center justify-center bg-red-500/20 text-red-400 mr-2">
+                                <Info className="h-4 w-4" />
+                              </div>
+                              نکات ایمنی مهم:
+                            </h4>
+                            <ul className="space-y-2">
                               {week.safety_reminders.map((reminder, index) => (
-                                <li key={index} className="text-red-300 text-sm">• {reminder}</li>
+                                <li key={index} className="text-red-300 text-sm flex items-start">
+                                  <span className="text-red-400 mr-2">•</span>
+                                  <span>{reminder}</span>
+                                </li>
                               ))}
                             </ul>
                           </div>
                         )}
                         
-                        {renderSupplements(week.supplements)}
+                        {/* Supplements */}
+                        <div className="space-y-4">
+                          {week.supplements.map((supplement, index) => {
+                            // Generate a unique ID for this supplement
+                            const supplementId = `supplement-${weekIndex}-${index}`;
+                            return (
+                              <Accordion 
+                                key={index} 
+                                type="single" 
+                                collapsible 
+                                className="w-full"
+                              >
+                                <AccordionItem 
+                                  value={supplementId}
+                                  className="border-0"
+                                >
+                                  <div className="rounded-xl border border-gray-700/30 bg-gray-800/30 overflow-hidden transition-all duration-300 hover:border-purple-500/30 hover:shadow-md">
+                                    <div className="p-4">
+                                      <div className="flex justify-between items-center">
+                                        <div className="flex items-center gap-2">
+                                          <div className="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center bg-purple-500/20 text-purple-400">
+                                            <CheckCircle className="h-5 w-5" />
+                                          </div>
+                                          <h4 className="font-bold text-white">{supplement.supplement_type}</h4>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                          <Badge className="bg-gold-500/20 text-gold-400 border-gold-500/30">
+                                            {supplement.dosage}
+                                          </Badge>
+                                          <AccordionTrigger data-accordion-trigger={supplementId} className="py-2 px-3 rounded-lg bg-gray-700/50 hover:bg-gray-700/80 transition-all duration-200">
+                                            <span className="text-sm font-medium" data-state-text="true">مشاهده</span>
+                                          </AccordionTrigger>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    
+                                    <AccordionContent className="px-4 pb-4">
+                                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm mb-3 bg-gray-900/30 p-3 rounded-lg">
+                                        <div className="flex items-center gap-2">
+                                          <Clock className="h-4 w-4 text-blue-400" />
+                                          <span className="text-gray-400">زمان مصرف:</span>
+                                          <span className="text-white">{supplement.timing}</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                          <Info className="h-4 w-4 text-blue-400" />
+                                          <span className="text-gray-400">نحوه مصرف:</span>
+                                          <span className="text-white">{supplement.instructions}</span>
+                                        </div>
+                                      </div>
+                                      
+                                      <div className="space-y-3">
+                                        <div className="bg-green-900/10 p-3 rounded-lg border border-green-500/20">
+                                          <span className="text-green-400 font-medium flex items-center gap-2">
+                                            <Award className="h-4 w-4" />
+                                            فواید:
+                                          </span>
+                                          <p className="text-gray-300 text-sm mt-1">{supplement.benefits}</p>
+                                        </div>
+                                        
+                                        <div>
+                                          <span className="text-blue-400 font-medium flex items-center gap-2">
+                                            <ShoppingCart className="h-4 w-4" />
+                                            برندهای پیشنهادی:
+                                          </span>
+                                          <div className="flex flex-wrap gap-2 mt-2">
+                                            {supplement.brand_suggestions.map((brand, brandIndex) => (
+                                              <Badge key={brandIndex} variant="outline" className="text-sm bg-blue-900/20 border-blue-500/30 text-blue-400 py-1.5 px-3">
+                                                {brand}
+                                              </Badge>
+                                            ))}
+                                          </div>
+                                        </div>
+                                        
+                                        {supplement.notes && (
+                                          <div className="bg-gold-900/10 p-3 rounded-lg border border-gold-500/20">
+                                            <span className="text-gold-500 font-medium flex items-center gap-2">
+                                              <Info className="h-4 w-4" />
+                                              نکته مهم:
+                                            </span>
+                                            <p className="text-gray-300 text-sm mt-1">{supplement.notes}</p>
+                                          </div>
+                                        )}
+                                      </div>
+                                    </AccordionContent>
+                                  </div>
+                                </AccordionItem>
+                              </Accordion>
+                            );
+                          })}
+                        </div>
                       </div>
                     ))}
                   </div>
