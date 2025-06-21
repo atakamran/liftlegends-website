@@ -49,7 +49,7 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
-import { Loader2, Plus, Edit, Trash2, Check, X, Calendar, CreditCard, Shield, Zap, LogOut, Menu } from "lucide-react";
+import { Loader2, Plus, Edit, Trash2, Check, X, Calendar, CreditCard, Shield, Zap, LogOut, Menu, Award } from "lucide-react";
 import SubscriptionPlans from "@/components/SubscriptionPlans";
 
 // Define interfaces
@@ -152,9 +152,14 @@ interface ProgramDetail {
   title: string;
   description: string;
   details: any | null;
+  workouts?: any | null; // Added workouts field
   weeks: any | null;
   created_at: string;
   updated_at: string;
+  programs_sale?: {
+    title: string;
+    category: 'training' | 'diet' | 'supplement';
+  };
 }
 
 
@@ -587,8 +592,25 @@ const Dashboard = () => {
         
       if (error) throw error;
       
-      setProgramDetails(data || []);
-      console.log("Program details fetched:", data?.length || 0);
+      // Transform the data to match the ProgramDetail interface
+      const transformedData = data ? data.map(item => ({
+        id: item.id,
+        program_id: item.program_id,
+        title: item.title,
+        description: item.description,
+        details: item.details,
+        workouts: item.workouts,
+        weeks: item.weeks,
+        created_at: item.created_at,
+        updated_at: item.updated_at,
+        programs_sale: item.programs_sale && typeof item.programs_sale === 'object' ? {
+          title: item.programs_sale?.title ?? '',
+          category: (item.programs_sale?.category as 'training' | 'diet' | 'supplement') ?? 'training'
+        } : undefined
+      })) : [];
+      
+      setProgramDetails(transformedData);
+      console.log("Program details fetched:", transformedData.length);
     } catch (error) {
       console.error("Error fetching program details:", error);
       toast({
@@ -2782,7 +2804,7 @@ const Dashboard = () => {
                                     </TableCell>
                                   </TableRow>
                                 ) : (
-                                  programDetails.map((programDetail: any) => (
+                                  programDetails.map((programDetail: ProgramDetail) => (
                                     <TableRow key={programDetail.id}>
                                       <TableCell className="font-medium">{programDetail.title}</TableCell>
                                       <TableCell>{programDetail.programs_sale?.title || "نامشخص"}</TableCell>
@@ -3286,6 +3308,63 @@ const Dashboard = () => {
                         </div>
                       </div>
                     )}
+                    
+                    {/* Show what programs the user has access to based on subscription */}
+                    <div className="mt-4 pt-4 border-t border-gray-700">
+                      <h4 className="text-white font-medium mb-3">دسترسی‌های اشتراک شما</h4>
+                      
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-gray-400">برنامه‌های تمرینی</span>
+                          <span className={`text-xs font-medium px-2 py-1 rounded-full ${
+                            user?.profile?.subscription_plan === "pro" || user?.profile?.subscription_plan === "ultimate"
+                              ? "bg-green-500/20 text-green-400"
+                              : "bg-gray-700/50 text-gray-400"
+                          }`}>
+                            {user?.profile?.subscription_plan === "pro" || user?.profile?.subscription_plan === "ultimate"
+                              ? "دسترسی کامل"
+                              : "نیاز به خرید جداگانه"}
+                          </span>
+                        </div>
+                        
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-gray-400">برنامه‌های غذایی</span>
+                          <span className={`text-xs font-medium px-2 py-1 rounded-full ${
+                            user?.profile?.subscription_plan === "ultimate"
+                              ? "bg-green-500/20 text-green-400"
+                              : "bg-gray-700/50 text-gray-400"
+                          }`}>
+                            {user?.profile?.subscription_plan === "ultimate"
+                              ? "دسترسی کامل"
+                              : "نیاز به خرید جداگانه"}
+                          </span>
+                        </div>
+                        
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-gray-400">برنامه‌های مکمل</span>
+                          <span className={`text-xs font-medium px-2 py-1 rounded-full ${
+                            user?.profile?.subscription_plan === "ultimate"
+                              ? "bg-green-500/20 text-green-400"
+                              : "bg-gray-700/50 text-gray-400"
+                          }`}>
+                            {user?.profile?.subscription_plan === "ultimate"
+                              ? "دسترسی کامل"
+                              : "نیاز به خرید جداگانه"}
+                          </span>
+                        </div>
+                      </div>
+                      
+                      {user?.profile?.subscription_plan !== "ultimate" && (
+                        <Button
+                          variant="outline"
+                          className="w-full mt-4 border-gold-500/30 text-gold-400 hover:bg-gold-500/10"
+                          onClick={() => navigate('/subscription')}
+                        >
+                          <Award className="h-4 w-4 mr-2" />
+                          ارتقا به اشتراک بالاتر
+                        </Button>
+                      )}
+                    </div>
                   </CardContent>
                 </Card>
                 

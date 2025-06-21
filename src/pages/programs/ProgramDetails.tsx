@@ -33,7 +33,8 @@ import {
   Award,
   BarChart,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Shield,
 } from "lucide-react";
 
 // Define interfaces for exercise and workout data
@@ -404,7 +405,7 @@ const ProgramDetails = () => {
     }
   };
 
-  // Check if user has purchased the program and fetch program data
+  // Check if user has purchased the program or has appropriate subscription and fetch program data
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -498,7 +499,45 @@ const ProgramDetails = () => {
           return;
         }
         
-        // Check if user has purchased this program
+        // Get the program type to determine subscription requirements
+        const programType = getProgramType(transformedProgramDetails);
+        
+        // Fetch user profile to check subscription status
+        const { data: userProfile, error: profileError } = await supabase
+          .from('user_profiles')
+          .select('subscription_plan, subscription_end_date')
+          .eq('user_id', user.id)
+          .single();
+          
+        if (profileError) {
+          console.error("Error fetching user profile:", profileError);
+          setHasPurchased(false);
+          setIsLoading(false);
+          return;
+        }
+        
+        // Check if subscription is active (not expired)
+        const isSubscriptionActive = userProfile?.subscription_end_date 
+          ? new Date(userProfile.subscription_end_date) > new Date() 
+          : false;
+        
+        // Check if user has appropriate subscription for this program type
+        let hasSubscriptionAccess = false;
+        
+        if (isSubscriptionActive && userProfile?.subscription_plan) {
+          const subscriptionPlan = userProfile.subscription_plan as 'basic' | 'pro' | 'ultimate';
+          
+          // Access rules:
+          // - Workout programs: Pro or Ultimate subscription
+          // - Nutrition/Supplement programs: Ultimate subscription only
+          if (programType === 'workout' && (subscriptionPlan === 'pro' || subscriptionPlan === 'ultimate')) {
+            hasSubscriptionAccess = true;
+          } else if ((programType === 'nutrition' || programType === 'supplement') && subscriptionPlan === 'ultimate') {
+            hasSubscriptionAccess = true;
+          }
+        }
+        
+        // Check if user has purchased this program directly
         const { data: purchaseData, error: purchaseError } = await supabase
           .from('user_purchases')
           .select('id')
@@ -508,10 +547,12 @@ const ProgramDetails = () => {
           
         if (purchaseError) {
           console.error("Error checking purchase status:", purchaseError);
-          setHasPurchased(false);
+          // Still check subscription access even if purchase check fails
+          setHasPurchased(hasSubscriptionAccess);
         } else {
-          // If there are any purchases, the user has purchased the program
-          setHasPurchased(purchaseData !== null && Array.isArray(purchaseData) && purchaseData.length > 0);
+          // User has access if they've purchased the program OR have appropriate subscription
+          const hasPurchased = purchaseData !== null && Array.isArray(purchaseData) && purchaseData.length > 0;
+          setHasPurchased(hasPurchased || hasSubscriptionAccess);
         }
       } catch (error) {
         console.error("Error in data fetch:", error);
@@ -1309,16 +1350,64 @@ const ProgramDetails = () => {
             <CardContent className="pt-6 text-center">
               <Lock className="h-12 w-12 mx-auto text-gray-600 mb-4" />
               <h3 className="text-xl font-medium text-white mb-2">محتوای قفل شده</h3>
-              <p className="text-gray-400 mb-4">
-                برای دسترسی به جزئیات کامل برنامه، لطفا آن را خریداری کنید.
-              </p>
-              <Button 
-                className="bg-gradient-to-r from-gold-600 to-gold-500 hover:from-gold-700 hover:to-gold-600 text-black shadow-lg shadow-gold-500/20"
-                onClick={() => navigate(`/product/${programId}`)}
-              >
-                <ShoppingCart className="h-4 w-4 mr-2" />
-                خرید این برنامه
-              </Button>
+              
+              {programData && (
+                <div className="mb-6">
+                  <p className="text-gray-400 mb-4">
+                    برای دسترسی به جزئیات کامل این برنامه، می‌توانید:
+                  </p>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto">
+                    <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700 text-right">
+                      <h4 className="font-bold text-white mb-2 flex items-center">
+                        <ShoppingCart className="h-5 w-5 ml-2 text-gold-400" />
+                        خرید جداگانه
+                      </h4>
+                      <p className="text-sm text-gray-300 mb-3">
+                        خرید این برنامه به صورت جداگانه و دسترسی دائمی به آن
+                      </p>
+                      <Button 
+                        className="w-full bg-gradient-to-r from-gold-600 to-gold-500 hover:from-gold-700 hover:to-gold-600 text-black shadow-lg shadow-gold-500/20"
+                        onClick={() => navigate(`/product/${programId}`)}
+                      >
+                        <ShoppingCart className="h-4 w-4 mr-2" />
+                        خرید این برنامه
+                      </Button>
+                    </div>
+                    
+                    <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700 text-right">
+                      <h4 className="font-bold text-white mb-2 flex items-center">
+                        {getProgramType(programData) === 'workout' ? (
+                          <Shield className="h-5 w-5 ml-2 text-gold-400" />
+                        ) : (
+                          <Award className="h-5 w-5 ml-2 text-purple-400" />
+                        )}
+                        اشتراک {getProgramType(programData) === 'workout' ? 'حرفه‌ای یا نامحدود' : 'نامحدود'}
+                      </h4>
+                      <p className="text-sm text-gray-300 mb-3">
+                        {getProgramType(programData) === 'workout' 
+                          ? 'با تهیه اشتراک حرفه‌ای یا نامحدود، به تمام برنامه‌های تمرینی دسترسی خواهید داشت'
+                          : 'با تهیه اشتراک نامحدود، به تمام برنامه‌های غذایی و مکمل دسترسی خواهید داشت'
+                        }
+                      </p>
+                      <Button 
+                        className={`w-full ${getProgramType(programData) === 'workout' 
+                          ? 'bg-gradient-to-r from-gold-600 to-amber-500 hover:from-gold-700 hover:to-amber-600 text-black' 
+                          : 'bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 text-white'
+                        } shadow-lg`}
+                        onClick={() => navigate('/subscription')}
+                      >
+                        {getProgramType(programData) === 'workout' ? (
+                          <Shield className="h-4 w-4 mr-2" />
+                        ) : (
+                          <Award className="h-4 w-4 mr-2" />
+                        )}
+                        مشاهده اشتراک‌ها
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
         ) : (

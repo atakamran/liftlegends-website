@@ -293,7 +293,7 @@ const FooterSection = () => {
                 src="https://trustseal.enamad.ir/logo.aspx?id=619281&Code=Bnf4npnTaje3SM8kkwaBEcwa4VBHb5ch" 
                 alt="نماد اعتماد الکترونیکی" 
                 style={{cursor: 'pointer'}} 
-                data-code="Bnf4npnTaje3SM8kkwaBEcwa4VBHb5ch"
+                code="Bnf4npnTaje3SM8kkwaBEcwa4VBHb5ch"
                 width="70"
                 height="70"
               />

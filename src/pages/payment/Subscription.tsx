@@ -176,9 +176,11 @@ const Subscription = () => {
       description: 'برای شروع تمرینات',
       price: SUBSCRIPTION_PLANS.basic.price,
       features: [
-        'برنامه تمرینی پایه',
         'دسترسی به کتابخانه تمرین‌های محدود',
-        'ثبت پیشرفت تمرینی پایه'
+        'ثبت پیشرفت تمرینی پایه',
+        'امکان خرید برنامه‌های تمرینی به صورت جداگانه',
+        'امکان خرید برنامه‌های غذایی به صورت جداگانه',
+        'امکان خرید برنامه‌های مکمل به صورت جداگانه'
       ],
       color: 'blue',
       icon: <Shield className="h-6 w-6 text-blue-400" />
@@ -190,9 +192,11 @@ const Subscription = () => {
       price: SUBSCRIPTION_PLANS.pro.price,
       features: [
         'تمام امکانات اشتراک پایه',
-        'برنامه غذایی پیشرفته',
-        'مشاوره مکمل',
-        'برنامه‌ریزی هفتگی پیشرفته'
+        'دسترسی نامحدود به تمام برنامه‌های تمرینی',
+        'برنامه‌ریزی هفتگی پیشرفته',
+        'ثبت پیشرفت تمرینی پیشرفته',
+        'امکان خرید برنامه‌های غذایی به صورت جداگانه',
+        'امکان خرید برنامه‌های مکمل به صورت جداگانه'
       ],
       popular: true,
       color: 'gold',
@@ -205,8 +209,10 @@ const Subscription = () => {
       price: SUBSCRIPTION_PLANS.ultimate.price,
       features: [
         'تمام امکانات اشتراک حرفه‌ای',
+        'دسترسی نامحدود به تمام برنامه‌های تمرینی',
+        'دسترسی نامحدود به تمام برنامه‌های غذایی',
+        'دسترسی نامحدود به تمام برنامه‌های مکمل',
         'مشاوره اختصاصی با مربی',
-        'برنامه تمرینی شخصی‌سازی شده',
         'پشتیبانی ویژه',
         'آنالیز پیشرفته عملکرد'
       ],
@@ -359,30 +365,119 @@ const Subscription = () => {
         
         {/* Features Section */}
         <div className="mt-20 text-center">
-          <h2 className="text-3xl font-bold mb-12">چرا LiftLegends را انتخاب کنید؟</h2>
+          <h2 className="text-3xl font-bold mb-12">مزایای اشتراک‌های LiftLegends</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="bg-gray-800/50 p-6 rounded-xl border border-gray-700">
-              <div className="bg-blue-500/10 p-3 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                <Shield className="h-8 w-8 text-blue-400" />
+              <div className="bg-gold-500/10 p-3 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                <Shield className="h-8 w-8 text-gold-400" />
               </div>
-              <h3 className="text-xl font-bold mb-3">برنامه‌های تمرینی حرفه‌ای</h3>
-              <p className="text-gray-400">برنامه‌های تمرینی طراحی شده توسط مربیان حرفه‌ای برای رسیدن به اهداف شما</p>
-            </div>
-            
-            <div className="bg-gray-800/50 p-6 rounded-xl border border-gray-700">
-              <div className="bg-amber-500/10 p-3 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                <Zap className="h-8 w-8 text-amber-400" />
+              <h3 className="text-xl font-bold mb-3">اشتراک حرفه‌ای (Pro)</h3>
+              <p className="text-gray-400 mb-4">دسترسی نامحدود به تمام برنامه‌های تمرینی بدون نیاز به خرید جداگانه</p>
+              <div className="bg-gray-900/50 p-3 rounded-lg">
+                <p className="text-sm text-gold-400 font-medium">مناسب برای:</p>
+                <p className="text-gray-300 text-sm mt-1">ورزشکارانی که تمرکز اصلی آنها بر روی تمرینات بدنسازی است</p>
               </div>
-              <h3 className="text-xl font-bold mb-3">برنامه‌های تغذیه اختصاصی</h3>
-              <p className="text-gray-400">برنامه‌های غذایی متناسب با اهداف و نیازهای شما برای دستیابی به نتایج بهتر</p>
             </div>
             
             <div className="bg-gray-800/50 p-6 rounded-xl border border-gray-700">
               <div className="bg-purple-500/10 p-3 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
                 <Award className="h-8 w-8 text-purple-400" />
               </div>
-              <h3 className="text-xl font-bold mb-3">پشتیبانی ویژه</h3>
-              <p className="text-gray-400">دسترسی به مربیان حرفه‌ای و پشتیبانی ۲۴/۷ برای پاسخگویی به سوالات شما</p>
+              <h3 className="text-xl font-bold mb-3">اشتراک نامحدود (Ultimate)</h3>
+              <p className="text-gray-400 mb-4">دسترسی به تمام برنامه‌های تمرینی، غذایی و مکمل بدون محدودیت</p>
+              <div className="bg-gray-900/50 p-3 rounded-lg">
+                <p className="text-sm text-purple-400 font-medium">مناسب برای:</p>
+                <p className="text-gray-300 text-sm mt-1">ورزشکاران حرفه‌ای که به دنبال یک برنامه جامع تمرینی، تغذیه و مکمل هستند</p>
+              </div>
+            </div>
+            
+            <div className="bg-gray-800/50 p-6 rounded-xl border border-gray-700">
+              <div className="bg-blue-500/10 p-3 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                <CreditCard className="h-8 w-8 text-blue-400" />
+              </div>
+              <h3 className="text-xl font-bold mb-3">خرید جداگانه</h3>
+              <p className="text-gray-400 mb-4">امکان خرید برنامه‌های مورد نیاز به صورت جداگانه بدون نیاز به اشتراک</p>
+              <div className="bg-gray-900/50 p-3 rounded-lg">
+                <p className="text-sm text-blue-400 font-medium">مناسب برای:</p>
+                <p className="text-gray-300 text-sm mt-1">افرادی که به دنبال برنامه‌های خاص هستند و نیاز به دسترسی به تمام برنامه‌ها ندارند</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="mt-12 bg-gradient-to-br from-gray-800/50 to-gray-900/70 p-6 rounded-xl border border-gray-700 max-w-3xl mx-auto">
+            <h3 className="text-2xl font-bold mb-4 text-gold-400">راهنمای دسترسی به برنامه‌ها</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-right">
+              <div className="p-4 bg-gray-900/50 rounded-lg">
+                <h4 className="font-bold text-white mb-2">برنامه‌های تمرینی</h4>
+                <ul className="space-y-2 text-sm">
+                  <li className="flex items-center">
+                    <span className="bg-green-500/20 p-1 rounded-full ml-2">
+                      <Check size={12} className="text-green-400" />
+                    </span>
+                    <span className="text-gray-300">اشتراک Pro</span>
+                  </li>
+                  <li className="flex items-center">
+                    <span className="bg-green-500/20 p-1 rounded-full ml-2">
+                      <Check size={12} className="text-green-400" />
+                    </span>
+                    <span className="text-gray-300">اشتراک Ultimate</span>
+                  </li>
+                  <li className="flex items-center">
+                    <span className="bg-green-500/20 p-1 rounded-full ml-2">
+                      <Check size={12} className="text-green-400" />
+                    </span>
+                    <span className="text-gray-300">خرید جداگانه</span>
+                  </li>
+                </ul>
+              </div>
+              
+              <div className="p-4 bg-gray-900/50 rounded-lg">
+                <h4 className="font-bold text-white mb-2">برنامه‌های غذایی</h4>
+                <ul className="space-y-2 text-sm">
+                  <li className="flex items-center">
+                    <span className="bg-red-500/20 p-1 rounded-full ml-2">
+                      <Check size={12} className="text-red-400" />
+                    </span>
+                    <span className="text-gray-300">اشتراک Pro (ندارد)</span>
+                  </li>
+                  <li className="flex items-center">
+                    <span className="bg-green-500/20 p-1 rounded-full ml-2">
+                      <Check size={12} className="text-green-400" />
+                    </span>
+                    <span className="text-gray-300">اشتراک Ultimate</span>
+                  </li>
+                  <li className="flex items-center">
+                    <span className="bg-green-500/20 p-1 rounded-full ml-2">
+                      <Check size={12} className="text-green-400" />
+                    </span>
+                    <span className="text-gray-300">خرید جداگانه</span>
+                  </li>
+                </ul>
+              </div>
+              
+              <div className="p-4 bg-gray-900/50 rounded-lg">
+                <h4 className="font-bold text-white mb-2">برنامه‌های مکمل</h4>
+                <ul className="space-y-2 text-sm">
+                  <li className="flex items-center">
+                    <span className="bg-red-500/20 p-1 rounded-full ml-2">
+                      <Check size={12} className="text-red-400" />
+                    </span>
+                    <span className="text-gray-300">اشتراک Pro (ندارد)</span>
+                  </li>
+                  <li className="flex items-center">
+                    <span className="bg-green-500/20 p-1 rounded-full ml-2">
+                      <Check size={12} className="text-green-400" />
+                    </span>
+                    <span className="text-gray-300">اشتراک Ultimate</span>
+                  </li>
+                  <li className="flex items-center">
+                    <span className="bg-green-500/20 p-1 rounded-full ml-2">
+                      <Check size={12} className="text-green-400" />
+                    </span>
+                    <span className="text-gray-300">خرید جداگانه</span>
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
         </div>
