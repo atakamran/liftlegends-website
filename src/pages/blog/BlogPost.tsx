@@ -153,6 +153,24 @@ const BlogPostPage = () => {
     }
   };
 
+  // Helper function to format content with proper line breaks and spacing
+  const formatContent = (content: string) => {
+    return content
+      .split('\n')
+      .map((line, index, array) => {
+        // If line is empty, create a paragraph break
+        if (line.trim() === '') {
+          return <div key={index} className="h-4"></div>;
+        }
+        
+        return (
+          <div key={index} className="mb-4 last:mb-0">
+            {line}
+          </div>
+        );
+      });
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-black text-white flex items-center justify-center">
@@ -293,7 +311,12 @@ const BlogPostPage = () => {
           {/* Main Content */}
           <div className="lg:col-span-8 lg:order-1 order-2">
             <article className={`prose prose-sm sm:prose-base md:prose-lg prose-invert max-w-none transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-              <div dangerouslySetInnerHTML={{ __html: post.content }} />
+              <div 
+                className="leading-relaxed text-gray-200"
+                style={{ lineHeight: '1.8', fontSize: '16px' }}
+              >
+                {formatContent(post.content)}
+              </div>
             </article>
             
             {/* Share Section */}
