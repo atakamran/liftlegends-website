@@ -1,5 +1,5 @@
 
-import { Instagram, MessageCircle, Twitter, Linkedin, Mail, MapPin, Phone, Download, ArrowUp, Dumbbell, Shield, Brain, Utensils, Star, ChevronRight, QrCode } from "lucide-react";
+import { Instagram, MessageCircle, Twitter, Linkedin, Mail, MapPin, Phone, Download, ArrowUp, Dumbbell, Shield, Brain, Utensils, Star, ChevronRight, QrCode, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 
@@ -122,6 +122,9 @@ const FooterSection = () => {
             <div className="flex items-center gap-4 mt-6">
               <a href="https://www.instagram.com/liftlegends.ir" target="_blank" rel="noopener noreferrer" className="bg-gray-800 hover:bg-gold-500 text-white hover:text-black p-2 rounded-full transition-all hover:scale-110 hover:shadow-[0_0_10px_rgba(255,215,0,0.3)]">
                 <Instagram size={18} />
+              </a>
+              <a href="https://t.me/liftlegends" target="_blank" rel="noopener noreferrer" className="bg-gray-800 hover:bg-blue-500 text-white hover:text-white p-2 rounded-full transition-all hover:scale-110 hover:shadow-[0_0_10px_rgba(59,130,246,0.3)]">
+                <Send size={18} />
               </a>
             </div>
           </div>

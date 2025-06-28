@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Download, Shield, Zap, Brain, Smartphone, Clock, Users, ArrowLeft } from "lucide-react";
+import { Download, Shield, Zap, Brain, Smartphone, Clock, Users, ArrowLeft, Bot } from "lucide-react";
 import { useEffect, useState } from "react";
 
 const DownloadPage = () => {
@@ -86,21 +86,41 @@ const DownloadPage = () => {
                   </div>
                 </div>
 
-                {/* Download Button */}
-                <div className="relative inline-block">
-                  <div className="absolute -inset-4 bg-gradient-to-r from-gold-500/50 to-gold-400/50 rounded-3xl blur-2xl opacity-75 animate-pulse"></div>
-                  <Button 
-                    className="relative bg-gradient-to-r from-gold-500 to-gold-400 hover:from-gold-400 hover:to-gold-300 text-black text-xl font-medium px-12 py-6 rounded-3xl shadow-2xl hover:shadow-gold-500/50 transition-all duration-300 hover:scale-105 min-w-[280px]"
-                    onClick={() => window.open("https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends//Lift%20Legends%20v1.5.apk", "_blank")}
-                  >
-                    <Download className="w-6 h-6 ml-3" />
-                    دانلود مستقیم
-                  </Button>
+                {/* Download Buttons */}
+                <div className="space-y-6">
+                  {/* App Download Button */}
+                  <div className="relative inline-block">
+                    <div className="absolute -inset-4 bg-gradient-to-r from-gold-500/50 to-gold-400/50 rounded-3xl blur-2xl opacity-75 animate-pulse"></div>
+                    <Button 
+                      className="relative bg-gradient-to-r from-gold-500 to-gold-400 hover:from-gold-400 hover:to-gold-300 text-black text-xl font-medium px-12 py-6 rounded-3xl shadow-2xl hover:shadow-gold-500/50 transition-all duration-300 hover:scale-105 min-w-[280px]"
+                      onClick={() => window.open("https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends//Lift%20Legends%20v1.5.apk", "_blank")}
+                    >
+                      <Download className="w-6 h-6 ml-3" />
+                      دانلود مستقیم
+                    </Button>
+                  </div>
+
+                  {/* Bot Button */}
+                  <div className="relative inline-block">
+                    <div className="absolute -inset-4 bg-gradient-to-r from-blue-500/50 to-purple-500/50 rounded-3xl blur-2xl opacity-75 animate-pulse"></div>
+                    <Button 
+                      className="relative bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-400 hover:to-purple-400 text-white text-xl font-medium px-12 py-6 rounded-3xl shadow-2xl hover:shadow-blue-500/50 transition-all duration-300 hover:scale-105 min-w-[280px]"
+                      onClick={() => window.open("https://t.me/LiftLegendsBot", "_blank")}
+                    >
+                      <Bot className="w-6 h-6 ml-3" />
+                      ربات تلگرام
+                    </Button>
+                  </div>
                 </div>
 
-                <p className="text-gray-400 text-lg">
-                  دانلود مستقیم اپلیکیشن اندروید
-                </p>
+                <div className="space-y-2 text-center">
+                  <p className="text-gray-400 text-lg">
+                    دانلود مستقیم اپلیکیشن اندروید
+                  </p>
+                  <p className="text-gray-400 text-lg">
+                    ربات هوشمند تلگرام @LiftLegendsBot
+                  </p>
+                </div>
               </div>
 
               {/* Right Side - Phone Mockup */}
