@@ -121,9 +121,10 @@ const Payment = () => {
     } catch (error) {
       console.error("Error fetching user data:", error);
       toast({
-        variant: "destructive",
-        title: "خطا در بارگذاری اطلاعات",
-        description: "مشکلی در دریافت اطلاعات کاربری رخ داد. لطفاً دوباره تلاش کنید.",
+        variant: "default",
+        title: "⚠️ مشکل در بارگذاری",
+        description: "لطفاً صفحه را رفرش کنید و دوباره تلاش کنید.",
+        className: "bg-yellow-500/10 border-yellow-500/30 text-yellow-500",
       });
     } finally {
       if (!programParam) {
@@ -146,9 +147,10 @@ const Payment = () => {
 
       if (!data) {
         toast({
-          variant: "destructive",
-          title: "خطا در بارگذاری",
-          description: "محصول مورد نظر یافت نشد.",
+          variant: "default",
+          title: "❓ محصول یافت نشد",
+          description: "محصول مورد نظر موجود نیست. به صفحه محصولات هدایت می‌شوید.",
+          className: "bg-yellow-500/10 border-yellow-500/30 text-yellow-500",
         });
         navigate("/programs");
         return;
@@ -204,9 +206,10 @@ const Payment = () => {
       // Check if discount is applicable to this program/plan
       if (program && data.program_id && data.program_id !== program.id) {
         toast({
-          variant: "destructive",
-          title: "کد تخفیف نامعتبر",
-          description: "این کد تخفیف برای محصول انتخابی شما قابل استفاده نیست.",
+          variant: "default",
+          title: "⚠️ کد تخفیف نامعتبر",
+          description: "این کد تخفیف برای محصول انتخابی شما قابل استفاده نیست. لطفاً کد صحیح را وارد کنید.",
+          className: "bg-yellow-500/10 border-yellow-500/30 text-yellow-500",
         });
         return;
       }
@@ -241,9 +244,10 @@ const Payment = () => {
     } catch (error) {
       console.error("Error applying discount:", error);
       toast({
-        variant: "destructive",
-        title: "خطا در اعمال کد تخفیف",
-        description: "مشکلی در بررسی کد تخفیف رخ داد. لطفاً دوباره تلاش کنید.",
+        variant: "default",
+        title: "⚠️ مشکلی پیش آمده",
+        description: "در حال حاضر امکان بررسی کد تخفیف وجود ندارد. لطفاً دوباره تلاش کنید.",
+        className: "bg-yellow-500/10 border-yellow-500/30 text-yellow-500",
       });
     }
   };
@@ -408,9 +412,10 @@ const Payment = () => {
     } catch (error) {
       console.error("Error processing payment:", error);
       toast({
-        variant: "destructive",
-        title: "خطا در پرداخت",
-        description: error instanceof Error ? error.message : "مشکلی در پردازش پرداخت رخ داد. لطفاً دوباره تلاش کنید.",
+        variant: "default",
+        title: "💳 مشکل در پرداخت",
+        description: "لطفاً چند دقیقه دیگر دوباره تلاش کنید. در صورت تکرار مشکل، با پشتیبانی تماس بگیرید.",
+        className: "bg-yellow-500/10 border-yellow-500/30 text-yellow-500",
       });
       setLoading(false);
     }

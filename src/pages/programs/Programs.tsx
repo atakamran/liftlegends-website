@@ -28,6 +28,8 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Search, Filter, ShoppingCart, Heart, ArrowUpDown } from "lucide-react";
+import LazyImage from "@/components/LazyImage";
+import Breadcrumb from "@/components/Breadcrumb";
 
 // Define interfaces
 interface Program {
@@ -47,12 +49,16 @@ const Programs = () => {
   const location = useLocation();
   const [programs, setPrograms] = useState<Program[]>([]);
   const [filteredPrograms, setFilteredPrograms] = useState<Program[]>([]);
+  const [displayedPrograms, setDisplayedPrograms] = useState<Program[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [activeTab, setActiveTab] = useState("training");
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOption, setSortOption] = useState("newest");
   const [showFilters, setShowFilters] = useState(false);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000000]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(8);
 
   // Parse URL query parameters
   useEffect(() => {
@@ -92,9 +98,10 @@ const Programs = () => {
     } catch (error) {
       console.error("Error fetching programs:", error);
       toast({
-        variant: "destructive",
-        title: "خطا در بارگذاری برنامه‌ها",
-        description: "مشکلی در دریافت لیست برنامه‌ها رخ داد. لطفاً دوباره تلاش کنید.",
+        variant: "default",
+        title: "⚠️ مشکلی پیش آمده",
+        description: "در حال حاضر امکان نمایش برنامه‌ها وجود ندارد. لطفاً صفحه را رفرش کنید یا چند لحظه دیگر دوباره تلاش کنید.",
+        className: "bg-yellow-500/10 border-yellow-500/30 text-yellow-500",
       });
     } finally {
       setLoading(false);
@@ -150,7 +157,29 @@ const Programs = () => {
     }
     
     setFilteredPrograms(result);
+    setCurrentPage(1); // Reset to first page when filters change
   }, [programs, activeTab, searchQuery, sortOption, priceRange]);
+
+  // Update displayed programs based on pagination
+  useEffect(() => {
+    const startIndex = 0;
+    const endIndex = currentPage * itemsPerPage;
+    setDisplayedPrograms(filteredPrograms.slice(startIndex, endIndex));
+  }, [filteredPrograms, currentPage, itemsPerPage]);
+
+  // Load more products function
+  const loadMoreProducts = async () => {
+    if (loadingMore || (currentPage * itemsPerPage) >= filteredPrograms.length) return;
+    
+    setLoadingMore(true);
+    // Simulate loading delay for better UX
+    await new Promise(resolve => setTimeout(resolve, 500));
+    setCurrentPage(prev => prev + 1);
+    setLoadingMore(false);
+  };
+
+  // Check if there are more products to load
+  const hasMoreProducts = (currentPage * itemsPerPage) < filteredPrograms.length;
 
   // Format price with Persian numerals and Toman
   const formatPrice = (price: number) => {
@@ -220,8 +249,88 @@ const Programs = () => {
         <meta property="twitter:title" content={`${getCategoryName()} | لیفت لجندز`} />
         <meta property="twitter:description" content={getMetaDescription()} />
         <meta property="twitter:image" content="https://liftlegends.ir/images/og-programs.jpg" />
+        
+        {/* Additional SEO Tags */}
+        <meta name="robots" content="index, follow" />
+        <meta name="author" content="لیفت لجندز" />
+        <meta name="language" content="fa-IR" />
+        
+        {/* JSON-LD Structured Data */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "CollectionPage",
+            "name": `${getCategoryName()} - لیفت لجندز`,
+            "description": getMetaDescription(),
+            "url": `https://liftlegends.ir/programs${activeTab !== "training" ? `?category=${activeTab}` : ""}`,
+            "mainEntity": {
+              "@type": "ItemList",
+              "numberOfItems": filteredPrograms.length,
+              "itemListElement": displayedPrograms.slice(0, 10).map((program, index) => ({
+                "@type": "ListItem",
+                "position": index + 1,
+                "item": {
+                  "@type": "Product",
+                  "name": program.title,
+                  "description": program.description,
+                  "image": program.image_url || "https://liftlegends.ir/images/default-program.jpg",
+                  "url": `https://liftlegends.ir/programs/${program.program_url || program.id}`,
+                  "offers": {
+                    "@type": "Offer",
+                    "price": program.price,
+                    "priceCurrency": "IRR",
+                    "availability": "https://schema.org/InStock",
+                    "seller": {
+                      "@type": "Organization",
+                      "name": "لیفت لجندز",
+                      "url": "https://liftlegends.ir"
+                    }
+                  },
+                  "brand": {
+                    "@type": "Brand",
+                    "name": "لیفت لجندز"
+                  },
+                  "category": program.category
+                }
+              }))
+            },
+            "breadcrumb": {
+              "@type": "BreadcrumbList",
+              "itemListElement": [
+                {
+                  "@type": "ListItem",
+                  "position": 1,
+                  "name": "خانه",
+                  "item": "https://liftlegends.ir"
+                },
+                {
+                  "@type": "ListItem",
+                  "position": 2,
+                  "name": "محصولات",
+                  "item": "https://liftlegends.ir/programs"
+                },
+                {
+                  "@type": "ListItem",
+                  "position": 3,
+                  "name": getCategoryName(),
+                  "item": `https://liftlegends.ir/programs${activeTab !== "training" ? `?category=${activeTab}` : ""}`
+                }
+              ]
+            }
+          })}
+        </script>
       </Helmet>
       
+      <div className="container mx-auto px-4">
+        <Breadcrumb 
+          items={[
+            { label: 'خانه', href: '/' },
+            { label: 'محصولات', href: '/programs' },
+            { label: getCategoryName() }
+          ]} 
+        />
+      </div>
+
       <div className="text-center mb-8 md:mb-12">
         <h1 className="text-3xl md:text-4xl font-bold text-gold-500 mb-4">برنامه‌های لیفت لجندز</h1>
         <p className="text-lg text-gray-300 max-w-3xl mx-auto">
@@ -339,8 +448,25 @@ const Programs = () => {
         )}
 
         {loading ? (
-          <div className="flex justify-center items-center py-20">
-            <Loader2 className="h-12 w-12 animate-spin text-gold-500" />
+          <div className="space-y-6">
+            <div className="flex justify-between items-center mb-4">
+              <div className="w-32 h-4 bg-gray-800 rounded animate-pulse"></div>
+              <div className="w-40 h-4 bg-gray-800 rounded animate-pulse"></div>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {Array.from({ length: 8 }).map((_, index) => (
+                <div key={index} className="bg-gray-900/50 border border-gray-800 rounded-lg overflow-hidden">
+                  <div className="w-full h-48 bg-gray-800/50 animate-pulse"></div>
+                  <div className="p-4 space-y-3">
+                    <div className="w-20 h-4 bg-gray-800/50 rounded animate-pulse"></div>
+                    <div className="w-full h-5 bg-gray-800/50 rounded animate-pulse"></div>
+                    <div className="w-3/4 h-4 bg-gray-800/50 rounded animate-pulse"></div>
+                    <div className="w-24 h-6 bg-gray-800/50 rounded animate-pulse"></div>
+                    <div className="w-full h-10 bg-gray-800/50 rounded animate-pulse"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         ) : (
           <>
@@ -363,44 +489,104 @@ const Programs = () => {
             
             <TabsContent value="training" className="mt-0">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {filteredPrograms.length > 0 ? (
-                  filteredPrograms.map((program) => (
+                {displayedPrograms.length > 0 ? (
+                  displayedPrograms.map((program) => (
                     <ProgramCard key={program.id} program={program} />
                   ))
-                ) : (
+                ) : filteredPrograms.length === 0 && !loading ? (
                   <div className="col-span-full text-center py-12">
                     <p className="text-gray-400 text-lg">در حال حاضر برنامه‌ای در این دسته وجود ندارد.</p>
                   </div>
-                )}
+                ) : null}
               </div>
+              
+              {/* Load More Button */}
+              {(currentPage * itemsPerPage) < filteredPrograms.length && (
+                <div className="text-center mt-8">
+                  <button
+                    onClick={loadMoreProducts}
+                    disabled={loadingMore}
+                    className="px-6 py-3 bg-gold-500/20 hover:bg-gold-500/30 text-gold-500 border border-gold-500/50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {loadingMore ? (
+                      <>
+                        <Loader2 className="w-4 h-4 ml-2 inline animate-spin" />
+                        در حال بارگذاری...
+                      </>
+                    ) : (
+                      'نمایش بیشتر'
+                    )}
+                  </button>
+                </div>
+              )}
             </TabsContent>
 
             <TabsContent value="diet" className="mt-0">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {filteredPrograms.length > 0 ? (
-                  filteredPrograms.map((program) => (
+                {displayedPrograms.length > 0 ? (
+                  displayedPrograms.map((program) => (
                     <ProgramCard key={program.id} program={program} />
                   ))
-                ) : (
+                ) : filteredPrograms.length === 0 && !loading ? (
                   <div className="col-span-full text-center py-12">
                     <p className="text-gray-400 text-lg">در حال حاضر برنامه‌ای در این دسته وجود ندارد.</p>
                   </div>
-                )}
+                ) : null}
               </div>
+              
+              {/* Load More Button */}
+              {(currentPage * itemsPerPage) < filteredPrograms.length && (
+                <div className="text-center mt-8">
+                  <button
+                    onClick={loadMoreProducts}
+                    disabled={loadingMore}
+                    className="px-6 py-3 bg-gold-500/20 hover:bg-gold-500/30 text-gold-500 border border-gold-500/50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {loadingMore ? (
+                      <>
+                        <Loader2 className="w-4 h-4 ml-2 inline animate-spin" />
+                        در حال بارگذاری...
+                      </>
+                    ) : (
+                      'نمایش بیشتر'
+                    )}
+                  </button>
+                </div>
+              )}
             </TabsContent>
 
             <TabsContent value="supplement" className="mt-0">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {filteredPrograms.length > 0 ? (
-                  filteredPrograms.map((program) => (
+                {displayedPrograms.length > 0 ? (
+                  displayedPrograms.map((program) => (
                     <ProgramCard key={program.id} program={program} />
                   ))
-                ) : (
+                ) : filteredPrograms.length === 0 && !loading ? (
                   <div className="col-span-full text-center py-12">
                     <p className="text-gray-400 text-lg">در حال حاضر برنامه‌ای در این دسته وجود ندارد.</p>
                   </div>
-                )}
+                ) : null}
               </div>
+              
+              {/* Load More Button */}
+              {(currentPage * itemsPerPage) < filteredPrograms.length && (
+                <div className="text-center mt-8">
+                  <button
+                    onClick={loadMoreProducts}
+                    disabled={loadingMore}
+                    className="px-6 py-3 bg-gold-500/20 hover:bg-gold-500/30 text-gold-500 border border-gold-500/50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {loadingMore ? (
+                      <>
+                        <Loader2 className="w-4 h-4 ml-2 inline animate-spin" />
+                        در حال بارگذاری...
+                      </>
+                    ) : (
+                      'نمایش بیشتر'
+                    )}
+                  </button>
+                </div>
+              )}
             </TabsContent>
           </>
         )}
@@ -449,10 +635,11 @@ const ProgramCard = ({ program }: { program: Program }) => {
     >
       <div className="relative w-full h-48 sm:h-56 md:h-64 lg:h-72 xl:h-80 overflow-hidden rounded-t-lg">
         {program.image_url ? (
-          <img 
-            src={program.image_url} 
-            alt={program.title} 
+          <LazyImage
+            src={program.image_url}
+            alt={program.title}
             className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
+            fallbackSrc="/images/program-placeholder.jpg"
           />
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center">

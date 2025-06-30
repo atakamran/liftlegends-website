@@ -228,22 +228,35 @@ const BlogPostPage = () => {
             "@context": "https://schema.org",
             "@type": "BlogPosting",
             "headline": post.title,
-            "image": post.cover_image,
+            "image": {
+              "@type": "ImageObject",
+              "url": post.cover_image || "https://liftlegends.ir/images/default-blog.jpg",
+              "width": 1200,
+              "height": 630
+            },
             "datePublished": post.created_at,
             "dateModified": post.updated_at || post.created_at,
             "author": {
-              "@type": "Person",
-              "name": "تیم لیفت لجندز"
+              "@type": "Organization",
+              "name": "لیفت لجندز",
+              "url": "https://liftlegends.ir"
             },
             "publisher": {
               "@type": "Organization",
-              "name": "LiftLegends",
+              "name": "لیفت لجندز",
+              "url": "https://liftlegends.ir",
               "logo": {
                 "@type": "ImageObject",
-                "url": "https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends//white%20logo.png"
+                "url": "https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends//white%20logo.png",
+                "width": 512,
+                "height": 512
               }
             },
             "description": post.excerpt || post.title,
+            "articleSection": getCategoryName(post.category),
+            "wordCount": post.content?.split(/\s+/).length || 0,
+            "inLanguage": "fa-IR",
+            "url": `https://liftlegends.ir/blog/${post.slug || post.id}`,
             "mainEntityOfPage": {
               "@type": "WebPage",
               "@id": `https://liftlegends.ir/blog/${post.slug || post.id}`

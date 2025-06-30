@@ -3,7 +3,7 @@ import { Helmet } from "react-helmet";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import FooterSection from "@/components/FooterSection";
-import { Dumbbell, Utensils, Pill, Brain } from "lucide-react";
+import { Dumbbell, Utensils, Pill, Brain, AlertCircle } from "lucide-react";
 import { BlogPost } from "@/types/blog";
 import BlogHero from "@/components/blog/BlogHero";
 import CategoryFilter from "@/components/blog/CategoryFilter";
@@ -272,8 +272,18 @@ const Blog = () => {
       {/* Error Message */}
       {error && (
         <div className="container mx-auto px-4 py-6 sm:py-8">
-          <div className="bg-red-500/10 border border-red-500/30 text-red-500 p-3 sm:p-4 rounded-lg text-center text-sm sm:text-base">
-            {error}
+          <div className="bg-yellow-500/10 border border-yellow-500/30 text-yellow-500 p-3 sm:p-4 rounded-lg text-center text-sm sm:text-base">
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <AlertCircle size={20} />
+              <span className="font-semibold">مشکلی پیش آمده</span>
+            </div>
+            <p>{error}</p>
+            <button 
+              onClick={() => window.location.reload()}
+              className="mt-3 px-4 py-2 bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-500 rounded-lg transition-colors text-sm"
+            >
+              🔄 صفحه را رفرش کنید
+            </button>
           </div>
         </div>
       )}
