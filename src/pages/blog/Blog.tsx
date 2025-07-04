@@ -110,6 +110,7 @@ const Blog = () => {
         .order("created_at", { ascending: false });
       
       if (activeCategory !== "all") {
+        // Filter by category
         query = query.eq("category", activeCategory);
       }
       
@@ -144,9 +145,8 @@ const Blog = () => {
     }
   };
 
-  const filteredPosts = activeCategory === "all" 
-    ? blogPosts 
-    : blogPosts.filter(post => post.categorySlug.toLowerCase() === activeCategory.toLowerCase());
+  // Posts are already filtered in fetchBlogPosts based on activeCategory
+  const filteredPosts = blogPosts;
 
   const featuredPost = blogPosts.find(post => post.featured);
 

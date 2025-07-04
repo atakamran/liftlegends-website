@@ -48,6 +48,25 @@ interface Program {
   image_url: string | null;
 }
 
+interface Bundle {
+  id: string;
+  title: string;
+  description: string;
+  price: number;
+  discount_percentage: number | null;
+  image_url: string | null;
+  is_active: boolean;
+  is_legend: boolean;
+  created_at: string | null;
+  updated_at: string | null;
+  bundle_items: {
+    program_id: string;
+    program_title: string;
+    program_category: 'training' | 'diet' | 'supplement';
+    program_price: number;
+  }[];
+}
+
 interface PaymentData {
   plan_id?: SubscriptionPlan;
   amount: number;
@@ -56,6 +75,7 @@ interface PaymentData {
   user_id: string;
   timestamp: string;
   program_id?: string; // For program purchases
+  bundle_id?: string; // For bundle purchases
 }
 
 const Payment = () => {
@@ -64,6 +84,7 @@ const Payment = () => {
   const location = useLocation();
   const [user, setUser] = useState<User | null>(null);
   const [program, setProgram] = useState<Program | null>(null);
+  const [bundle, setBundle] = useState<Bundle | null>(null);
   const [pageLoading, setPageLoading] = useState(true);
   const [loading, setLoading] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -78,6 +99,9 @@ const Payment = () => {
   
   // Get program ID from URL parameters (for program purchase)
   const programParam = searchParams.get('program');
+  
+  // Get bundle ID from URL parameters (for bundle purchase)
+  const bundleParam = searchParams.get('bundle');
 
   // Function to fetch user data
   const fetchUserData = async () => {
@@ -127,7 +151,9 @@ const Payment = () => {
         className: "bg-yellow-500/10 border-yellow-500/30 text-yellow-500",
       });
     } finally {
-      if (!programParam) {
+      // Only set loading to false if we're not fetching program or bundle details
+      // The program/bundle fetch functions will handle setting pageLoading to false
+      if (!programParam && !bundleParam) {
         setPageLoading(false);
       }
     }
@@ -181,9 +207,72 @@ const Payment = () => {
     }
   };
 
+  // Function to fetch bundle details
+  const fetchBundleDetails = async (bundleId: string) => {
+    console.log('Fetching bundle details for ID:', bundleId);
+    try {
+      // Fetch bundle details from Supabase using the bundle_details view
+      const { data, error } = await supabase
+        .from("bundle_details")
+        .select("*")
+        .eq("id", bundleId)
+        .eq("is_active", true)
+        .single();
+
+      if (error) {
+        console.error('Bundle fetch error:', error);
+        throw error;
+      }
+
+      console.log('Bundle data received:', data);
+
+      if (!data) {
+        console.log('No bundle data found');
+        toast({
+          variant: "default",
+          title: "⚠️ پک یافت نشد",
+          description: "پک مورد نظر یافت نشد یا غیرفعال است.",
+          className: "bg-yellow-500/10 border-yellow-500/30 text-yellow-500",
+        });
+        navigate("/legends");
+        return;
+      }
+
+      // Map bundle data
+      const bundleData: Bundle = {
+        id: data.id,
+        title: data.title,
+        description: data.description,
+        price: data.price,
+        discount_percentage: data.discount_percentage,
+        image_url: data.image_url,
+        is_active: data.is_active,
+        is_legend: data.is_legend,
+        created_at: data.created_at,
+        updated_at: data.updated_at,
+        bundle_items: data.bundle_items || [],
+      };
+      
+      console.log('Bundle data mapped:', bundleData);
+      setBundle(bundleData);
+      setFinalPrice(bundleData.price);
+      console.log('Bundle state set successfully');
+    } catch (error) {
+      console.error("Error fetching bundle details:", error);
+      toast({
+        variant: "destructive",
+        title: "خطا در بارگذاری",
+        description: "مشکلی در دریافت اطلاعات پک رخ داد.",
+      });
+      navigate("/legends");
+    } finally {
+      setPageLoading(false);
+    }
+  };
+
   // Function to apply discount code
   const applyDiscount = async () => {
-    if (!discount.trim() || (!program && !planParam)) return;
+    if (!discount.trim() || (!program && !bundle && !planParam)) return;
     
     try {
       // Check if discount code is valid
@@ -203,12 +292,22 @@ const Payment = () => {
         return;
       }
       
-      // Check if discount is applicable to this program/plan
+      // Check if discount is applicable to this program/bundle/plan
       if (program && data.program_id && data.program_id !== program.id) {
         toast({
           variant: "default",
           title: "⚠️ کد تخفیف نامعتبر",
           description: "این کد تخفیف برای محصول انتخابی شما قابل استفاده نیست. لطفاً کد صحیح را وارد کنید.",
+          className: "bg-yellow-500/10 border-yellow-500/30 text-yellow-500",
+        });
+        return;
+      }
+      
+      if (bundle && data.bundle_id && data.bundle_id !== bundle.id) {
+        toast({
+          variant: "default",
+          title: "⚠️ کد تخفیف نامعتبر",
+          description: "این کد تخفیف برای پک انتخابی شما قابل استفاده نیست. لطفاً کد صحیح را وارد کنید.",
           className: "bg-yellow-500/10 border-yellow-500/30 text-yellow-500",
         });
         return;
@@ -220,6 +319,8 @@ const Payment = () => {
       
       if (program) {
         originalPrice = program.price;
+      } else if (bundle) {
+        originalPrice = bundle.price;
       } else if (planParam && cycleParam) {
         originalPrice = cycleParam === 'monthly' 
           ? SUBSCRIPTION_PLANS[planParam].price.monthly 
@@ -254,11 +355,19 @@ const Payment = () => {
 
   // Initialize component
   useEffect(() => {
-    // Check if we have a program ID or subscription plan
+    console.log('Payment useEffect - Parameters:', { programParam, bundleParam, planParam, cycleParam });
+    
+    // Check if we have a program ID, bundle ID, or subscription plan
     if (programParam) {
       // Program purchase flow
+      console.log('Starting program fetch...');
       fetchUserData();
       fetchProgramDetails(programParam);
+    } else if (bundleParam) {
+      // Bundle purchase flow
+      console.log('Starting bundle fetch...');
+      fetchUserData();
+      fetchBundleDetails(bundleParam);
     } else if (planParam && cycleParam) {
       // Subscription purchase flow
       fetchUserData();
@@ -270,18 +379,26 @@ const Payment = () => {
       setFinalPrice(amount);
     } else {
       // Invalid parameters
+      console.log('Invalid payment parameters:', { programParam, bundleParam, planParam, cycleParam });
       toast({
         variant: "destructive",
         title: "خطا در پارامترهای صفحه",
         description: "اطلاعات پرداخت ناقص است. لطفاً دوباره تلاش کنید.",
       });
-      navigate('/subscription');
+      // Redirect based on what type of purchase was attempted
+      if (window.location.search.includes('bundle')) {
+        navigate('/legends');
+      } else if (window.location.search.includes('program')) {
+        navigate('/programs');
+      } else {
+        navigate('/subscription');
+      }
     }
-  }, [programParam, planParam, cycleParam]);
+  }, [programParam, bundleParam, planParam, cycleParam]);
 
   // Function to proceed to payment
   const proceedToPayment = async () => {
-    if ((!planParam && !program) || !user) {
+    if ((!planParam && !program && !bundle) || !user) {
       toast({
         variant: "destructive",
         title: "خطا در پرداخت",
@@ -290,8 +407,8 @@ const Payment = () => {
       return;
     }
     
-    // Validate phone number for program purchases
-    if (program && !phoneNumber.trim()) {
+    // Validate phone number for program and bundle purchases
+    if ((program || bundle) && !phoneNumber.trim()) {
       toast({
         variant: "destructive",
         title: "شماره تماس الزامی است",
@@ -337,6 +454,46 @@ const Payment = () => {
           .single();
         
         if (orderError) throw orderError;
+      } else if (bundle) {
+        // Bundle purchase flow
+        amount = finalPrice;
+        description = `خرید پک ${bundle.title} - LiftLegends`;
+        
+        // Create payment data for bundle purchase
+        paymentData = {
+          amount: amount,
+          payment_method: 'zarinpal',
+          user_id: user.id,
+          bundle_id: bundle.id,
+          timestamp: new Date().toISOString()
+        };
+        
+        // For bundle purchases, we'll store the order information differently
+        // since the orders table is designed for individual programs only
+        // We'll create a record in user_purchases table instead
+        const { data: purchaseData, error: purchaseError } = await supabase
+          .from("user_purchases")
+          .insert({
+            user_id: user.id,
+            amount: finalPrice,
+            payment_status: 'pending',
+            purchase_date: new Date().toISOString(),
+            // Note: program_id is optional in user_purchases, so we can leave it null for bundles
+            program_id: null
+          })
+          .select()
+          .single();
+
+        if (purchaseError) throw purchaseError;
+        
+        // Store bundle information in localStorage for payment verification
+        localStorage.setItem('bundle_purchase_info', JSON.stringify({
+          bundle_id: bundle.id,
+          purchase_id: purchaseData.id,
+          phone_number: phoneNumber,
+          discount_code: discountApplied ? discount : null,
+          discount_amount: discountAmount
+        }));
       } else {
         // Subscription purchase flow
         amount = finalPrice > 0 ? finalPrice : 
@@ -477,7 +634,7 @@ const Payment = () => {
   }
 
   // If parameters are missing, show error
-  if ((!planParam || !cycleParam) && !program) {
+  if ((!planParam || !cycleParam) && !program && !bundle) {
     return (
       <div className="min-h-screen bg-gray-900 text-white py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
         <Card className="bg-gradient-to-b from-gray-800/80 to-gray-900/90 border-gray-700 shadow-xl max-w-md w-full">
@@ -674,6 +831,208 @@ const Payment = () => {
                   <div>
                     <h4 className="text-blue-400 font-medium mb-1">اطلاعات پرداخت</h4>
                     <p className="text-gray-300 text-sm">پس از تکمیل پرداخت، دسترسی به محصول به صورت خودکار برای شما فعال خواهد شد و می‌توانید از طریق داشبورد خود به آن دسترسی داشته باشید.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Bundle purchase UI
+  if (bundle) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-950 text-white py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          {/* Header Section */}
+          <div className="text-center mb-12">
+            <h1 className="text-4xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-gold-400 via-amber-300 to-gold-500 mb-4">
+              تکمیل خرید پک
+            </h1>
+            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+              در حال خرید پک {bundle.title}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            {/* Bundle Details */}
+            <div className="space-y-8">
+              <Card className="bg-gradient-to-b from-gray-800/80 to-gray-900/90 border-gray-700 shadow-xl">
+                <CardHeader>
+                  <div className="flex items-center space-x-3 space-x-reverse">
+                    <ShoppingCart className="h-6 w-6 text-gold-500" />
+                    <CardTitle className="text-2xl font-bold">جزئیات پک</CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="flex items-center space-x-4 space-x-reverse">
+                    {bundle.image_url && (
+                      <img 
+                        src={bundle.image_url} 
+                        alt={bundle.title}
+                        className="w-16 h-16 rounded-lg object-cover"
+                      />
+                    )}
+                    <div className="flex-1">
+                      <h3 className="text-xl font-bold text-white">{bundle.title}</h3>
+                      <p className="text-gray-400 text-sm mt-1">{bundle.description}</p>
+                    </div>
+                  </div>
+
+                  {/* Bundle Items */}
+                  {bundle.bundle_items && bundle.bundle_items.length > 0 && (
+                    <div>
+                      <h4 className="text-lg font-semibold text-white mb-3">محصولات شامل:</h4>
+                      <div className="space-y-2">
+                        {bundle.bundle_items.map((item, index) => (
+                          <div key={index} className="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
+                            <div className="flex items-center space-x-3 space-x-reverse">
+                              <Check className="h-4 w-4 text-green-500" />
+                              <span className="text-white">{item.program_title}</span>
+                              <Badge variant="secondary" className="bg-gray-700 text-gray-300">
+                                {item.program_category === 'training' ? 'تمرین' : 
+                                 item.program_category === 'diet' ? 'رژیم' : 'مکمل'}
+                              </Badge>
+                            </div>
+                            <span className="text-gray-400 text-sm">
+                              {formatPrice(item.program_price)}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  <Separator className="bg-gray-700" />
+                  
+                  {/* Price Summary */}
+                  <div className="space-y-3">
+                    {bundle.discount_percentage && (
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-400">قیمت اصلی:</span>
+                        <span className="text-gray-400 line-through">
+                          {formatPrice(Math.round(bundle.price / (1 - bundle.discount_percentage / 100)))}
+                        </span>
+                      </div>
+                    )}
+                    
+                    {discountApplied && (
+                      <div className="flex justify-between items-center text-green-500">
+                        <span>تخفیف کد:</span>
+                        <span>-{formatPrice(discountAmount)}</span>
+                      </div>
+                    )}
+                    
+                    <div className="flex justify-between items-center text-xl font-bold">
+                      <span>مبلغ نهایی:</span>
+                      <span className="text-gold-500">{formatPrice(finalPrice)}</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Payment Form */}
+            <div className="space-y-8">
+              <Card className="bg-gradient-to-b from-gray-800/80 to-gray-900/90 border-gray-700 shadow-xl">
+                <CardHeader>
+                  <div className="flex items-center space-x-3 space-x-reverse">
+                    <CreditCard className="h-6 w-6 text-gold-500" />
+                    <CardTitle className="text-2xl font-bold">اطلاعات پرداخت</CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div>
+                    <label className="text-sm font-medium text-gray-300 block mb-2">
+                      ایمیل
+                    </label>
+                    <Input
+                      value={user?.email || ""}
+                      disabled
+                      className="bg-gray-800 border-gray-700 text-gray-300"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      این ایمیل برای ارسال اطلاعات پک استفاده خواهد شد.
+                    </p>
+                  </div>
+                  
+                  <div>
+                    <label className="text-sm font-medium text-gray-300 block mb-2">
+                      شماره تماس <span className="text-red-500">*</span>
+                    </label>
+                    <Input
+                      value={phoneNumber}
+                      onChange={(e) => setPhoneNumber(e.target.value)}
+                      placeholder="09123456789"
+                      className="bg-gray-800 border-gray-700 text-white"
+                      dir="ltr"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      شماره تماس برای پیگیری سفارش استفاده می‌شود.
+                    </p>
+                  </div>
+                  
+                  <div>
+                    <label className="text-sm font-medium text-gray-300 block mb-2">
+                      کد تخفیف
+                    </label>
+                    <div className="flex space-x-2 space-x-reverse">
+                      <Input
+                        value={discount}
+                        onChange={(e) => setDiscount(e.target.value)}
+                        placeholder="کد تخفیف خود را وارد کنید"
+                        className="bg-gray-800 border-gray-700 text-white"
+                        disabled={discountApplied}
+                      />
+                      <Button
+                        variant="outline"
+                        className="border-gray-700 hover:bg-gray-800 text-white"
+                        onClick={applyDiscount}
+                        disabled={discountApplied || !discount.trim()}
+                      >
+                        اعمال
+                      </Button>
+                    </div>
+                    {discountApplied && (
+                      <div className="flex items-center text-green-500 text-sm mt-2">
+                        <CheckCircle2 className="h-4 w-4 ml-1" />
+                        کد تخفیف با موفقیت اعمال شد
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+                <CardFooter>
+                  <Button
+                    onClick={proceedToPayment}
+                    disabled={loading}
+                    className="w-full bg-gradient-to-r from-gold-500 to-amber-600 hover:from-gold-600 hover:to-amber-700 text-black font-bold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105"
+                  >
+                    {loading ? (
+                      <>
+                        <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                        در حال پردازش...
+                      </>
+                    ) : (
+                      <>
+                        پرداخت {formatPrice(finalPrice)}
+                        <ArrowRight className="mr-2 h-4 w-4" />
+                      </>
+                    )}
+                  </Button>
+                </CardFooter>
+              </Card>
+
+              {/* Additional Info */}
+              <div className="bg-gradient-to-r from-blue-900/20 to-purple-900/20 border border-blue-800/30 rounded-lg p-6">
+                <div className="flex items-start space-x-4 space-x-reverse">
+                  <div className="flex-shrink-0">
+                    <AlertCircle className="h-6 w-6 text-blue-400" />
+                  </div>
+                  <div>
+                    <h4 className="text-blue-400 font-medium mb-1">اطلاعات پرداخت</h4>
+                    <p className="text-gray-300 text-sm">پس از تکمیل پرداخت، دسترسی به تمام محصولات پک به صورت خودکار برای شما فعال خواهد شد و می‌توانید از طریق داشبورد خود به آن‌ها دسترسی داشته باشید.</p>
                   </div>
                 </div>
               </div>

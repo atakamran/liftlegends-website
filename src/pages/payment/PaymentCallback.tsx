@@ -18,12 +18,13 @@ import {
 interface PaymentInfo {
   authority: string;
   amount: number;
-  plan_id: SubscriptionPlan;
+  plan_id?: SubscriptionPlan;
   plan_period?: 'monthly' | 'yearly';
   period?: 'monthly' | 'yearly'; // Support both field names for compatibility
   user_id: string;
   timestamp: string;
   program_id?: string; // Add program_id for program purchases
+  bundle_id?: string; // Add bundle_id for bundle purchases
 }
 
 const PaymentCallback = () => {
@@ -62,8 +63,8 @@ const PaymentCallback = () => {
           amount: paymentInfo.amount
         });
 
-        // Validate payment info for subscription purchases
-        if (!paymentInfo.program_id && !paymentInfo.plan_id) {
+        // Validate payment info for all purchase types
+        if (!paymentInfo.program_id && !paymentInfo.plan_id && !paymentInfo.bundle_id) {
           throw new Error("اطلاعات پرداخت ناقص است - نوع خرید مشخص نیست");
         }
 
@@ -101,13 +102,16 @@ const PaymentCallback = () => {
           setSuccess(true);
           const refId = response.data.data.ref_id;
           
-          // Check if this is a program purchase or subscription
+          // Check purchase type
           const programPurchase = paymentInfo.program_id ? true : false;
-          setIsProgramPurchase(programPurchase);
+          const bundlePurchase = paymentInfo.bundle_id ? true : false;
+          setIsProgramPurchase(programPurchase || bundlePurchase);
           
           // Set appropriate success message
           if (programPurchase) {
             setMessage(`خرید برنامه با موفقیت انجام شد. کد پیگیری: ${refId}`);
+          } else if (bundlePurchase) {
+            setMessage(`خرید پک با موفقیت انجام شد. کد پیگیری: ${refId}`);
           } else {
             setMessage(`خرید اشتراک با موفقیت انجام شد. کد پیگیری: ${refId}`);
           }
@@ -122,10 +126,11 @@ const PaymentCallback = () => {
             };
             localStorage.setItem('payment_info', JSON.stringify(updatedPaymentInfo));
             
-            // Check if this is a program purchase
+            // Check purchase type
             const programId = paymentInfo.program_id || null;
+            const bundleId = paymentInfo.bundle_id || null;
             
-            // Update user subscription or record program purchase in database
+            // Update user subscription or record purchase in database
             await updateUserSubscription(paymentInfo.plan_id, paymentInfo.user_id, period);
             
             // Show appropriate success toast based on purchase type
@@ -133,6 +138,11 @@ const PaymentCallback = () => {
               toast({
                 title: "خرید برنامه موفقیت‌آمیز بود",
                 description: "برنامه با موفقیت خریداری شد و از هم‌اکنون قابل استفاده است.",
+              });
+            } else if (bundleId) {
+              toast({
+                title: "خرید پک موفقیت‌آمیز بود",
+                description: "پک با موفقیت خریداری شد و از هم‌اکنون قابل استفاده است.",
               });
             } else {
               toast({
@@ -143,9 +153,10 @@ const PaymentCallback = () => {
           } catch (error) {
             console.error("Error processing payment:", error);
             
-            // Check if this is a program purchase
+            // Check purchase type
             const programId = paymentInfo.program_id || null;
-            setIsProgramPurchase(!!programId);
+            const bundleId = paymentInfo.bundle_id || null;
+            setIsProgramPurchase(!!(programId || bundleId));
             
             // Show appropriate error message based on purchase type
             if (programId) {
@@ -155,6 +166,14 @@ const PaymentCallback = () => {
                 variant: "destructive",
                 title: "خطا در ثبت خرید برنامه",
                 description: "پرداخت موفق بود اما در ثبت خرید برنامه مشکلی پیش آمد. لطفاً با پشتیبانی تماس بگیرید.",
+              });
+            } else if (bundleId) {
+              setMessage(`پرداخت با موفقیت انجام شد اما در ثبت خرید پک مشکلی پیش آمد. لطفاً با پشتیبانی تماس بگیرید. کد پیگیری: ${refId}`);
+              
+              toast({
+                variant: "destructive",
+                title: "خطا در ثبت خرید پک",
+                description: "پرداخت موفق بود اما در ثبت خرید پک مشکلی پیش آمد. لطفاً با پشتیبانی تماس بگیرید.",
               });
             } else {
               setMessage(`پرداخت با موفقیت انجام شد اما در فعال‌سازی اشتراک مشکلی پیش آمد. لطفاً با پشتیبانی تماس بگیرید. کد پیگیری: ${refId}`);
@@ -216,7 +235,11 @@ const PaymentCallback = () => {
       const refId = paymentInfo.ref_id || null;
       const programId = paymentInfo.program_id || null;
       
-      // Check if this is a program purchase or a subscription
+      // Get bundle info if this is a bundle purchase
+      const bundleInfo = localStorage.getItem('bundle_purchase_info');
+      const bundleId = paymentInfo.bundle_id || null;
+      
+      // Check purchase type and handle accordingly
       if (programId) {
         console.log(`This is a program purchase. Program ID: ${programId}`);
         
@@ -244,6 +267,36 @@ const PaymentCallback = () => {
         // Clear payment info from localStorage
         localStorage.removeItem("payment_info");
         console.log("Payment info cleared from localStorage after program purchase");
+        
+        return true;
+      } else if (bundleId && bundleInfo) {
+        console.log(`This is a bundle purchase. Bundle ID: ${bundleId}`);
+        
+        const bundleData = JSON.parse(bundleInfo);
+        
+        // Update the existing purchase record that was created during payment initiation
+        const { data: purchaseData, error: purchaseError } = await supabase
+          .from('user_purchases')
+          .update({
+            payment_id: refId || authority,
+            payment_status: 'completed'
+          })
+          .eq('id', bundleData.purchase_id)
+          .eq('user_id', userId)
+          .select();
+          
+        if (purchaseError) {
+          console.error("Error updating bundle purchase:", purchaseError);
+          console.error("Bundle purchase error details:", JSON.stringify(purchaseError));
+          throw new Error(`خطا در ثبت خرید پک: ${purchaseError.message}`);
+        }
+        
+        console.log("Bundle purchase updated successfully:", purchaseData);
+        
+        // Clear payment info from localStorage
+        localStorage.removeItem("payment_info");
+        localStorage.removeItem("bundle_purchase_info");
+        console.log("Payment info cleared from localStorage after bundle purchase");
         
         return true;
       } else {

@@ -457,6 +457,7 @@ export type Database = {
           discount_value: number
           is_active: boolean
           program_id: string | null
+          bundle_id: string | null
           created_at: string
           expires_at: string | null
         }
@@ -467,6 +468,7 @@ export type Database = {
           discount_value: number
           is_active: boolean
           program_id?: string | null
+          bundle_id?: string | null
           created_at?: string
           expires_at?: string | null
         }
@@ -477,10 +479,26 @@ export type Database = {
           discount_value?: number
           is_active?: boolean
           program_id?: string | null
+          bundle_id?: string | null
           created_at?: string
           expires_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "discount_codes_program_id_fkey"
+            columns: ["program_id"]
+            isOneToOne: false
+            referencedRelation: "programs_sale"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "discount_codes_bundle_id_fkey"
+            columns: ["bundle_id"]
+            isOneToOne: false
+            referencedRelation: "product_bundles"
+            referencedColumns: ["id"]
+          }
+        ]
       }
       program_details: {
         Row: {
@@ -518,9 +536,110 @@ export type Database = {
         }
         Relationships: []
       }
+      product_bundles: {
+        Row: {
+          id: string
+          title: string
+          description: string
+          price: number
+          discount_percentage: number | null
+          image_url: string | null
+          is_active: boolean
+          is_legend: boolean
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          title: string
+          description: string
+          price: number
+          discount_percentage?: number | null
+          image_url?: string | null
+          is_active?: boolean
+          is_legend?: boolean
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          title?: string
+          description?: string
+          price?: number
+          discount_percentage?: number | null
+          image_url?: string | null
+          is_active?: boolean
+          is_legend?: boolean
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      bundle_items: {
+        Row: {
+          id: string
+          bundle_id: string
+          program_id: string
+          created_at: string | null
+        }
+        Insert: {
+          id?: string
+          bundle_id: string
+          program_id: string
+          created_at?: string | null
+        }
+        Update: {
+          id?: string
+          bundle_id?: string
+          program_id?: string
+          created_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bundle_items_bundle_id_fkey"
+            columns: ["bundle_id"]
+            isOneToOne: false
+            referencedRelation: "product_bundles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bundle_items_program_id_fkey"
+            columns: ["program_id"]
+            isOneToOne: false
+            referencedRelation: "programs_sale"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
     }
     Views: {
-      [_ in never]: never
+      bundle_details: {
+        Row: {
+          id: string
+          title: string
+          description: string
+          price: number
+          discount_percentage: number | null
+          image_url: string | null
+          is_active: boolean
+          is_legend: boolean
+          created_at: string | null
+          updated_at: string | null
+          bundle_items: {
+            program_id: string
+            program_title: string
+            program_category: 'training' | 'diet' | 'supplement'
+            program_price: number
+          }[]
+        }
+        Insert: {
+          [_ in never]: never
+        }
+        Update: {
+          [_ in never]: never
+        }
+        Relationships: []
+      }
     }
     Functions: {
       is_admin: {

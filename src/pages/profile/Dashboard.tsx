@@ -324,6 +324,22 @@ const Dashboard = () => {
   const [isEditingProgramDetail, setIsEditingProgramDetail] = useState(false);
   const [currentProgramDetailId, setCurrentProgramDetailId] = useState<string | null>(null);
 
+  // Bundle management state
+  const [bundles, setBundles] = useState<any[]>([]);
+  const [bundleLoading, setBundleLoading] = useState(false);
+  const [bundleFormData, setBundleFormData] = useState({
+    title: "",
+    description: "",
+    price: 0,
+    discount_percentage: 0,
+    image_url: "",
+    is_active: true,
+    is_legend: false,
+    selected_programs: [] as string[]
+  });
+  const [isEditingBundle, setIsEditingBundle] = useState(false);
+  const [currentBundleId, setCurrentBundleId] = useState<string | null>(null);
+
   // Function to fetch products
   const fetchProducts = async () => {
     try {
@@ -1098,6 +1114,258 @@ const Dashboard = () => {
   
   // State for subscription loading
   const [loading, setLoading] = useState<string | null>(null);
+
+  // Bundle management functions
+  const fetchBundles = async () => {
+    try {
+      setBundleLoading(true);
+      
+      const { data, error } = await supabase
+        .from("product_bundles")
+        .select(`
+          *,
+          bundle_items (
+            program_id,
+            programs_sale (
+              title,
+              category
+            )
+          )
+        `)
+        .order("created_at", { ascending: false });
+        
+      if (error) throw error;
+      
+      setBundles(data || []);
+    } catch (error) {
+      console.error("Error fetching bundles:", error);
+      toast({
+        variant: "destructive",
+        title: "خطا در بارگذاری پک‌ها",
+        description: "مشکلی در دریافت لیست پک‌ها رخ داد. لطفاً دوباره تلاش کنید.",
+      });
+    } finally {
+      setBundleLoading(false);
+    }
+  };
+
+  const createBundle = async () => {
+    try {
+      if (!bundleFormData.title || !bundleFormData.description || bundleFormData.price <= 0) {
+        toast({
+          variant: "destructive",
+          title: "خطا در ثبت پک",
+          description: "لطفاً عنوان، توضیحات و قیمت پک را وارد کنید.",
+        });
+        return;
+      }
+
+      if (bundleFormData.selected_programs.length === 0) {
+        toast({
+          variant: "destructive",
+          title: "خطا در ثبت پک",
+          description: "لطفاً حداقل یک برنامه برای پک انتخاب کنید.",
+        });
+        return;
+      }
+      
+      setBundleLoading(true);
+      
+      // Create bundle
+      const { data: bundleData, error: bundleError } = await supabase
+        .from("product_bundles")
+        .insert({
+          title: bundleFormData.title,
+          description: bundleFormData.description,
+          price: bundleFormData.price,
+          discount_percentage: bundleFormData.discount_percentage || null,
+          image_url: bundleFormData.image_url || null,
+          is_active: bundleFormData.is_active,
+          is_legend: bundleFormData.is_legend,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .select()
+        .single();
+        
+      if (bundleError) throw bundleError;
+      
+      // Create bundle items
+      const bundleItems = bundleFormData.selected_programs.map(programId => ({
+        bundle_id: bundleData.id,
+        program_id: programId,
+        created_at: new Date().toISOString()
+      }));
+      
+      const { error: itemsError } = await supabase
+        .from("bundle_items")
+        .insert(bundleItems);
+        
+      if (itemsError) throw itemsError;
+      
+      // Refresh bundles
+      fetchBundles();
+      
+      // Reset form
+      setBundleFormData({
+        title: "",
+        description: "",
+        price: 0,
+        discount_percentage: 0,
+        image_url: "",
+        is_active: true,
+        is_legend: false,
+        selected_programs: []
+      });
+      
+      toast({
+        title: "پک جدید ایجاد شد",
+        description: "پک جدید با موفقیت ایجاد شد.",
+      });
+    } catch (error) {
+      console.error("Error creating bundle:", error);
+      toast({
+        variant: "destructive",
+        title: "خطا در ایجاد پک",
+        description: "مشکلی در ایجاد پک جدید رخ داد. لطفاً دوباره تلاش کنید.",
+      });
+    } finally {
+      setBundleLoading(false);
+    }
+  };
+
+  const updateBundle = async () => {
+    try {
+      if (!currentBundleId) return;
+      
+      setBundleLoading(true);
+      
+      // Update bundle
+      const { error: bundleError } = await supabase
+        .from("product_bundles")
+        .update({
+          title: bundleFormData.title,
+          description: bundleFormData.description,
+          price: bundleFormData.price,
+          discount_percentage: bundleFormData.discount_percentage || null,
+          image_url: bundleFormData.image_url || null,
+          is_active: bundleFormData.is_active,
+          is_legend: bundleFormData.is_legend,
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", currentBundleId);
+        
+      if (bundleError) throw bundleError;
+      
+      // Delete existing bundle items
+      const { error: deleteError } = await supabase
+        .from("bundle_items")
+        .delete()
+        .eq("bundle_id", currentBundleId);
+        
+      if (deleteError) throw deleteError;
+      
+      // Create new bundle items
+      if (bundleFormData.selected_programs.length > 0) {
+        const bundleItems = bundleFormData.selected_programs.map(programId => ({
+          bundle_id: currentBundleId,
+          program_id: programId,
+          created_at: new Date().toISOString()
+        }));
+        
+        const { error: itemsError } = await supabase
+          .from("bundle_items")
+          .insert(bundleItems);
+          
+        if (itemsError) throw itemsError;
+      }
+      
+      // Refresh bundles
+      fetchBundles();
+      
+      // Reset form
+      setBundleFormData({
+        title: "",
+        description: "",
+        price: 0,
+        discount_percentage: 0,
+        image_url: "",
+        is_active: true,
+        is_legend: false,
+        selected_programs: []
+      });
+      setIsEditingBundle(false);
+      setCurrentBundleId(null);
+      
+      toast({
+        title: "پک بروزرسانی شد",
+        description: "پک با موفقیت بروزرسانی شد.",
+      });
+    } catch (error) {
+      console.error("Error updating bundle:", error);
+      toast({
+        variant: "destructive",
+        title: "خطا در بروزرسانی پک",
+        description: "مشکلی در بروزرسانی پک رخ داد. لطفاً دوباره تلاش کنید.",
+      });
+    } finally {
+      setBundleLoading(false);
+    }
+  };
+
+  const deleteBundle = async (id: string) => {
+    try {
+      setBundleLoading(true);
+      
+      // Delete bundle items first
+      const { error: itemsError } = await supabase
+        .from("bundle_items")
+        .delete()
+        .eq("bundle_id", id);
+        
+      if (itemsError) throw itemsError;
+      
+      // Delete bundle
+      const { error: bundleError } = await supabase
+        .from("product_bundles")
+        .delete()
+        .eq("id", id);
+        
+      if (bundleError) throw bundleError;
+      
+      // Refresh bundles
+      fetchBundles();
+      
+      toast({
+        title: "پک حذف شد",
+        description: "پک با موفقیت حذف شد.",
+      });
+    } catch (error) {
+      console.error("Error deleting bundle:", error);
+      toast({
+        variant: "destructive",
+        title: "خطا در حذف پک",
+        description: "مشکلی در حذف پک رخ داد. لطفاً دوباره تلاش کنید.",
+      });
+    } finally {
+      setBundleLoading(false);
+    }
+  };
+
+  const editBundle = (bundle: any) => {
+    setBundleFormData({
+      title: bundle.title,
+      description: bundle.description,
+      price: bundle.price,
+      discount_percentage: bundle.discount_percentage || 0,
+      image_url: bundle.image_url || "",
+      is_active: bundle.is_active,
+      is_legend: bundle.is_legend,
+      selected_programs: bundle.bundle_items?.map((item: any) => item.program_id) || []
+    });
+    setIsEditingBundle(true);
+    setCurrentBundleId(bundle.id);
+  };
   
   // Function to calculate remaining days of subscription
   const calculateRemainingDays = (endDateStr: string | null): number | null => {
@@ -1631,6 +1899,11 @@ const Dashboard = () => {
     if (activeTab === "program-management" && user?.profile?.is_admin) {
       fetchProgramDetails();
     }
+    
+    // Load bundles when bundles tab is active and user is admin
+    if (activeTab === "bundles" && user?.profile?.is_admin) {
+      fetchBundles();
+    }
   }, [activeTab, user?.profile?.is_admin, user]);
   
   // Fetch blog categories when component mounts
@@ -1880,6 +2153,21 @@ const Dashboard = () => {
                           </svg>
                         </div>
                         <span>مدیریت برنامه‌ها</span>
+                      </div>
+                    </TabsTrigger>
+                    
+                    <TabsTrigger 
+                      value="bundles" 
+                      className="group w-full justify-start px-4 py-3 text-right rounded-lg transition-all duration-300
+                        data-[state=active]:bg-gradient-to-r data-[state=active]:from-gold-500/20 data-[state=active]:to-transparent 
+                        data-[state=active]:border-r-4 data-[state=active]:border-gold-500 data-[state=active]:text-white
+                        hover:bg-gray-700/30"
+                    >
+                      <div className="flex items-center">
+                        <div className="w-8 h-8 rounded-md bg-gradient-to-br from-gold-500/10 to-amber-600/10 flex items-center justify-center mr-3 ml-3 group-data-[state=active]:bg-gradient-to-br group-data-[state=active]:from-gold-500/20 group-data-[state=active]:to-amber-600/20">
+                          <Award size={18} className="text-gold-500" />
+                        </div>
+                        <span>مدیریت پک‌ها</span>
                       </div>
                     </TabsTrigger>
                   </>
@@ -3400,6 +3688,276 @@ const Dashboard = () => {
                 </Card>
               </div>
             </TabsContent>
+            
+            {/* Bundle Management Tab - Only visible to admins */}
+            {user?.profile?.is_admin && (
+              <TabsContent value="bundles" className="space-y-6 animate-in fade-in-50 duration-300">
+                <Card className="bg-gray-800/50 border-gray-700">
+                  <CardHeader>
+                    <CardTitle className="text-xl text-gold-500">مدیریت پک‌ها</CardTitle>
+                    <CardDescription>
+                      در این بخش می‌توانید پک‌های محصولات را مدیریت کنید.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-6">
+                      {/* Bundle Form */}
+                      <div className="bg-gray-700/30 rounded-lg p-4 border border-gray-700">
+                        <h3 className="text-lg font-medium mb-4">
+                          {isEditingBundle ? "ویرایش پک" : "ایجاد پک جدید"}
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="bundle_title">عنوان پک</Label>
+                            <Input
+                              id="bundle_title"
+                              placeholder="عنوان پک را وارد کنید"
+                              value={bundleFormData.title}
+                              onChange={(e) => setBundleFormData({...bundleFormData, title: e.target.value})}
+                              className="bg-gray-800 border-gray-600"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="bundle_price">قیمت (تومان)</Label>
+                            <Input
+                              id="bundle_price"
+                              type="number"
+                              placeholder="قیمت پک"
+                              value={bundleFormData.price}
+                              onChange={(e) => setBundleFormData({...bundleFormData, price: parseInt(e.target.value) || 0})}
+                              className="bg-gray-800 border-gray-600"
+                            />
+                          </div>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="bundle_discount">درصد تخفیف</Label>
+                            <Input
+                              id="bundle_discount"
+                              type="number"
+                              placeholder="درصد تخفیف (اختیاری)"
+                              value={bundleFormData.discount_percentage}
+                              onChange={(e) => setBundleFormData({...bundleFormData, discount_percentage: parseInt(e.target.value) || 0})}
+                              className="bg-gray-800 border-gray-600"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="bundle_image">تصویر پک</Label>
+                            <Input
+                              id="bundle_image"
+                              placeholder="لینک تصویر پک"
+                              value={bundleFormData.image_url}
+                              onChange={(e) => setBundleFormData({...bundleFormData, image_url: e.target.value})}
+                              className="bg-gray-800 border-gray-600"
+                            />
+                          </div>
+                        </div>
+                        
+                        <div className="space-y-2 mb-4">
+                          <Label htmlFor="bundle_description">توضیحات پک</Label>
+                          <Textarea
+                            id="bundle_description"
+                            placeholder="توضیحات پک را وارد کنید"
+                            value={bundleFormData.description}
+                            onChange={(e) => setBundleFormData({...bundleFormData, description: e.target.value})}
+                            className="bg-gray-800 border-gray-600 min-h-[100px]"
+                          />
+                        </div>
+                        
+                        {/* Program Selection */}
+                        <div className="space-y-2 mb-4">
+                          <Label>انتخاب برنامه‌ها برای پک</Label>
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            {products.map((program) => (
+                              <div key={program.id} className="flex items-center space-x-2 space-x-reverse">
+                                <input
+                                  type="checkbox"
+                                  id={`program-${program.id}`}
+                                  checked={bundleFormData.selected_programs.includes(program.id)}
+                                  onChange={(e) => {
+                                    if (e.target.checked) {
+                                      setBundleFormData({
+                                        ...bundleFormData,
+                                        selected_programs: [...bundleFormData.selected_programs, program.id]
+                                      });
+                                    } else {
+                                      setBundleFormData({
+                                        ...bundleFormData,
+                                        selected_programs: bundleFormData.selected_programs.filter(id => id !== program.id)
+                                      });
+                                    }
+                                  }}
+                                  className="rounded border-gray-600 text-gold-500 focus:ring-gold-500"
+                                />
+                                <label htmlFor={`program-${program.id}`} className="text-sm text-white">
+                                  {program.title} ({program.category === 'training' ? 'تمرینی' : program.category === 'diet' ? 'غذایی' : 'مکمل'})
+                                </label>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                        
+                        {/* Bundle Options */}
+                        <div className="flex items-center space-x-4 space-x-reverse mb-4">
+                          <div className="flex items-center space-x-2 space-x-reverse">
+                            <Switch
+                              id="bundle_active"
+                              checked={bundleFormData.is_active}
+                              onCheckedChange={(checked) => setBundleFormData({...bundleFormData, is_active: checked})}
+                            />
+                            <Label htmlFor="bundle_active">فعال</Label>
+                          </div>
+                          <div className="flex items-center space-x-2 space-x-reverse">
+                            <Switch
+                              id="bundle_legend"
+                              checked={bundleFormData.is_legend}
+                              onCheckedChange={(checked) => setBundleFormData({...bundleFormData, is_legend: checked})}
+                            />
+                            <Label htmlFor="bundle_legend">پک افسانه‌ای</Label>
+                          </div>
+                        </div>
+                        
+                        <div className="flex gap-2">
+                          <Button 
+                            onClick={isEditingBundle ? updateBundle : createBundle}
+                            disabled={bundleLoading}
+                            className="bg-gold-500 hover:bg-gold-600 text-black"
+                          >
+                            {bundleLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            {isEditingBundle ? "بروزرسانی پک" : "ایجاد پک"}
+                          </Button>
+                          {isEditingBundle && (
+                            <Button 
+                              variant="outline"
+                              onClick={() => {
+                                setIsEditingBundle(false);
+                                setCurrentBundleId(null);
+                                setBundleFormData({
+                                  title: "",
+                                  description: "",
+                                  price: 0,
+                                  discount_percentage: 0,
+                                  image_url: "",
+                                  is_active: true,
+                                  is_legend: false,
+                                  selected_programs: []
+                                });
+                              }}
+                              className="border-gray-600 hover:bg-gray-700"
+                            >
+                              لغو
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                      
+                      {/* Bundles List */}
+                      <div className="bg-gray-700/30 rounded-lg p-4 border border-gray-700">
+                        <h3 className="text-lg font-medium mb-4">لیست پک‌ها</h3>
+                        {bundleLoading ? (
+                          <div className="flex items-center justify-center py-8">
+                            <Loader2 className="h-8 w-8 animate-spin text-gold-500" />
+                            <span className="mr-2 text-gray-400">در حال بارگذاری پک‌ها...</span>
+                          </div>
+                        ) : bundles.length > 0 ? (
+                          <div className="space-y-4">
+                            {bundles.map((bundle) => (
+                              <div key={bundle.id} className="bg-gray-800/50 rounded-lg p-4 border border-gray-600">
+                                <div className="flex items-start justify-between">
+                                  <div className="flex-1">
+                                    <div className="flex items-center gap-2 mb-2">
+                                      <h4 className="font-medium text-white">{bundle.title}</h4>
+                                      {bundle.is_legend && (
+                                        <span className="bg-gold-500/20 text-gold-400 text-xs font-medium px-2 py-1 rounded-full">
+                                          افسانه‌ای
+                                        </span>
+                                      )}
+                                      {!bundle.is_active && (
+                                        <span className="bg-red-500/20 text-red-400 text-xs font-medium px-2 py-1 rounded-full">
+                                          غیرفعال
+                                        </span>
+                                      )}
+                                    </div>
+                                    <p className="text-gray-400 text-sm mb-2">{bundle.description}</p>
+                                    <div className="flex items-center gap-4 text-sm text-gray-400">
+                                      <span>قیمت: {new Intl.NumberFormat('fa-IR').format(bundle.price)} تومان</span>
+                                      {bundle.discount_percentage && (
+                                        <span>تخفیف: {bundle.discount_percentage}%</span>
+                                      )}
+                                      <span>تعداد برنامه‌ها: {bundle.bundle_items?.length || 0}</span>
+                                    </div>
+                                    {bundle.bundle_items && bundle.bundle_items.length > 0 && (
+                                      <div className="mt-2">
+                                        <span className="text-xs text-gray-500">شامل: </span>
+                                        {bundle.bundle_items.map((item: any, index: number) => (
+                                          <span key={index} className="text-xs text-gray-400">
+                                            {item.programs_sale.title}
+                                            {index < bundle.bundle_items.length - 1 ? "، " : ""}
+                                          </span>
+                                        ))}
+                                      </div>
+                                    )}
+                                  </div>
+                                  <div className="flex gap-2">
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() => editBundle(bundle)}
+                                      className="border-gray-600 hover:bg-gray-700"
+                                    >
+                                      <Edit size={16} />
+                                    </Button>
+                                    <Dialog>
+                                      <DialogTrigger asChild>
+                                        <Button
+                                          size="sm"
+                                          variant="outline"
+                                          className="border-red-600 text-red-400 hover:bg-red-500/10"
+                                        >
+                                          <Trash2 size={16} />
+                                        </Button>
+                                      </DialogTrigger>
+                                      <DialogContent className="bg-gray-800 border-gray-700">
+                                        <DialogHeader>
+                                          <DialogTitle className="text-white">حذف پک</DialogTitle>
+                                          <DialogDescription className="text-gray-400">
+                                            آیا مطمئن هستید که می‌خواهید این پک را حذف کنید؟ این عمل قابل بازگشت نیست.
+                                          </DialogDescription>
+                                        </DialogHeader>
+                                        <DialogFooter>
+                                          <DialogClose asChild>
+                                            <Button variant="outline" className="border-gray-600">
+                                              لغو
+                                            </Button>
+                                          </DialogClose>
+                                          <DialogClose asChild>
+                                            <Button
+                                              variant="destructive"
+                                              onClick={() => deleteBundle(bundle.id)}
+                                            >
+                                              حذف
+                                            </Button>
+                                          </DialogClose>
+                                        </DialogFooter>
+                                      </DialogContent>
+                                    </Dialog>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="text-center py-8 text-gray-400">
+                            هیچ پکی یافت نشد. اولین پک خود را ایجاد کنید.
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            )}
           </Tabs>
         </div>
       </div>
@@ -3605,6 +4163,21 @@ const Dashboard = () => {
                       <polyline points="10,9 9,9 8,9"></polyline>
                     </svg>
                     <span className="text-xs font-medium mt-2">مدیریت برنامه‌ها</span>
+                  </button>
+                  
+                  <button 
+                    onClick={() => {
+                      setActiveTab("bundles");
+                      document.getElementById('mobile-more-menu')?.classList.add('hidden');
+                    }}
+                    className={`flex flex-col items-center justify-center p-3 rounded-lg transition-all duration-300 ${
+                      activeTab === "bundles" 
+                        ? "bg-gray-700/50 text-gold-500" 
+                        : "text-gray-400 hover:text-gray-300 hover:bg-gray-700/30"
+                    }`}
+                  >
+                    <Award size={24} className="text-gold-500" />
+                    <span className="text-xs font-medium mt-2">مدیریت پک‌ها</span>
                   </button>
                 </>
               )}

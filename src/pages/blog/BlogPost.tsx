@@ -89,14 +89,20 @@ const BlogPostPage = () => {
   
   const fetchRelatedPosts = async (category: string | null, currentPostId: string) => {
     try {
-      const { data } = await supabase
+      let query = supabase
         .from("blog_posts")
         .select("*")
         .eq("published", true)
-        .eq("category", category)
         .neq("id", currentPostId)
         .order("created_at", { ascending: false })
         .limit(2);
+
+      // Only filter by category if it exists and is not null
+      if (category && category.trim() !== '') {
+        query = query.eq("category", category);
+      }
+
+      const { data } = await query;
       
       if (data) {
         setRelatedPosts(data);
@@ -291,7 +297,7 @@ const BlogPostPage = () => {
               بازگشت به بلاگ
             </Link>
             
-            <Link to={`/blog?category=${post.category}`}>
+            <Link to={post.category ? `/blog?category=${post.category}` : '/blog'}>
               <Badge 
                 variant="outline" 
                 className="text-yellow-400 border-yellow-400 bg-yellow-400/10 mb-3 sm:mb-4 text-xs sm:text-sm hover:bg-yellow-400/20 cursor-pointer transition-colors"
