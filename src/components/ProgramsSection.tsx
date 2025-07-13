@@ -24,6 +24,70 @@ const ProgramsSection = () => {
   const [activeCategory, setActiveCategory] = useState<'training' | 'diet' | 'supplement'>('training');
   const [isVisible, setIsVisible] = useState(false);
 
+  // Sample programs data as fallback
+  const samplePrograms: Program[] = [
+    {
+      id: 'sample-1',
+      title: 'برنامه تمرینی FST-7',
+      description: 'برنامه تمرینی پیشرفته برای افزایش حجم عضلانی با تکنیک FST-7',
+      price: 299000,
+      category: 'training',
+      image_url: 'https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends/fst7-program.jpg',
+      program_url: 'fst7-program',
+      created_at: new Date().toISOString(),
+    },
+    {
+      id: 'sample-2',
+      title: 'رژیم غذایی کاهش وزن',
+      description: 'برنامه غذایی کامل برای کاهش وزن سالم و پایدار',
+      price: 199000,
+      category: 'diet',
+      image_url: 'https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends/diet-plan.jpg',
+      program_url: 'weight-loss-diet',
+      created_at: new Date().toISOString(),
+    },
+    {
+      id: 'sample-3',
+      title: 'برنامه تمرینی مبتدی',
+      description: 'برنامه تمرینی کامل برای شروع بدنسازی و تناسب اندام',
+      price: 149000,
+      category: 'training',
+      image_url: 'https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends/beginner-workout.jpg',
+      program_url: 'beginner-workout',
+      created_at: new Date().toISOString(),
+    },
+    {
+      id: 'sample-4',
+      title: 'مکمل کراتین مونوهیدرات',
+      description: 'کراتین با کیفیت بالا برای افزایش قدرت و حجم عضلانی',
+      price: 89000,
+      category: 'supplement',
+      image_url: 'https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends/creatine.jpg',
+      program_url: 'creatine-supplement',
+      created_at: new Date().toISOString(),
+    },
+    {
+      id: 'sample-5',
+      title: 'رژیم غذایی افزایش حجم',
+      description: 'برنامه غذایی تخصصی برای افزایش وزن و حجم عضلانی',
+      price: 249000,
+      category: 'diet',
+      image_url: 'https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends/bulk-diet.jpg',
+      program_url: 'bulking-diet',
+      created_at: new Date().toISOString(),
+    },
+    {
+      id: 'sample-6',
+      title: 'برنامه تمرینی پیش‌رفته',
+      description: 'برنامه تمرینی حرفه‌ای برای ورزشکاران با تجربه',
+      price: 399000,
+      category: 'training',
+      image_url: 'https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends/advanced-workout.jpg',
+      program_url: 'advanced-workout',
+      created_at: new Date().toISOString(),
+    }
+  ];
+
   // Fetch programs
   useEffect(() => {
     const fetchPrograms = async () => {
@@ -34,9 +98,14 @@ const ProgramsSection = () => {
           .from("programs_sale")
           .select("*")
           .order("created_at", { ascending: false })
-          .limit(6); // Limit to 6 programs for the section
+          .limit(12); // Increased limit to get more programs
 
-        if (error) throw error;
+        if (error) {
+          console.error("Database error:", error);
+          // Use sample data as fallback
+          setPrograms(samplePrograms);
+          return;
+        }
 
         // Map programs_sale data to Program interface
         const programsData = data ? data.map(program => ({
@@ -50,9 +119,29 @@ const ProgramsSection = () => {
           created_at: program.created_at || new Date().toISOString(),
         })) : [];
         
-        setPrograms(programsData);
+        // If no data from database, use sample data
+        if (programsData.length === 0) {
+          setPrograms(samplePrograms);
+        } else {
+          // Combine database data with sample data to ensure we have enough content
+          const combinedPrograms = [...programsData];
+          
+          // Add sample programs for categories that might be missing
+          const categories = ['training', 'diet', 'supplement'];
+          categories.forEach(category => {
+            const categoryCount = combinedPrograms.filter(p => p.category === category).length;
+            if (categoryCount < 2) {
+              const sampleForCategory = samplePrograms.filter(p => p.category === category);
+              combinedPrograms.push(...sampleForCategory.slice(0, 2 - categoryCount));
+            }
+          });
+          
+          setPrograms(combinedPrograms);
+        }
       } catch (error) {
         console.error("Error fetching programs:", error);
+        // Use sample data as fallback
+        setPrograms(samplePrograms);
       } finally {
         setLoading(false);
       }
