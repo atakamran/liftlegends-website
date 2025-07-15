@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Download, Shield, Zap, Brain, Smartphone, Clock, Users, ArrowLeft, Bot } from "lucide-react";
+import { Download, Shield, Zap, Brain, Smartphone, Clock, Users, ArrowLeft, Bot, Globe, Monitor, Tablet } from "lucide-react";
 import { useEffect, useState } from "react";
 
 const DownloadPage = () => {
@@ -55,48 +55,48 @@ const DownloadPage = () => {
                     </span>
                   </h1>
                   <p className="text-xl md:text-2xl text-gray-300 font-light leading-relaxed max-w-2xl mx-auto lg:mx-0">
-                    همراه هوشمند شما برای دستیابی به بدن ایده‌آل
+                    وب اپلیکیشن پیشرفته برای همه دستگاه‌ها
                   </p>
                 </div>
 
-                {/* Feature Highlights */}
+                {/* Device Compatibility Highlights */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl mx-auto lg:mx-0">
-                  <div className="group relative">
-                    <div className="absolute -inset-1 bg-gradient-to-r from-gold-500/30 to-gold-400/30 rounded-2xl blur opacity-0 group-hover:opacity-100 transition duration-300"></div>
-                    <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-4 text-center hover:bg-white/10 transition-all duration-300">
-                      <Brain className="w-8 h-8 text-gold-400 mx-auto mb-2" />
-                      <span className="text-white text-sm font-medium">هوش مصنوعی</span>
-                    </div>
-                  </div>
-                  
                   <div className="group relative">
                     <div className="absolute -inset-1 bg-gradient-to-r from-blue-500/30 to-blue-400/30 rounded-2xl blur opacity-0 group-hover:opacity-100 transition duration-300"></div>
                     <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-4 text-center hover:bg-white/10 transition-all duration-300">
-                      <Shield className="w-8 h-8 text-blue-400 mx-auto mb-2" />
-                      <span className="text-white text-sm font-medium">برنامه مکمل</span>
+                      <Smartphone className="w-8 h-8 text-blue-400 mx-auto mb-2" />
+                      <span className="text-white text-sm font-medium">موبایل</span>
                     </div>
                   </div>
                   
                   <div className="group relative">
                     <div className="absolute -inset-1 bg-gradient-to-r from-purple-500/30 to-purple-400/30 rounded-2xl blur opacity-0 group-hover:opacity-100 transition duration-300"></div>
                     <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-4 text-center hover:bg-white/10 transition-all duration-300">
-                      <Zap className="w-8 h-8 text-purple-400 mx-auto mb-2" />
-                      <span className="text-white text-sm font-medium">تمرین هوشمند</span>
+                      <Tablet className="w-8 h-8 text-purple-400 mx-auto mb-2" />
+                      <span className="text-white text-sm font-medium">تبلت</span>
+                    </div>
+                  </div>
+                  
+                  <div className="group relative">
+                    <div className="absolute -inset-1 bg-gradient-to-r from-green-500/30 to-green-400/30 rounded-2xl blur opacity-0 group-hover:opacity-100 transition duration-300"></div>
+                    <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-4 text-center hover:bg-white/10 transition-all duration-300">
+                      <Monitor className="w-8 h-8 text-green-400 mx-auto mb-2" />
+                      <span className="text-white text-sm font-medium">دسکتاپ</span>
                     </div>
                   </div>
                 </div>
 
-                {/* Download Buttons */}
+                {/* Access Buttons */}
                 <div className="space-y-6">
-                  {/* App Download Button */}
+                  {/* PWA Access Button */}
                   <div className="relative inline-block">
                     <div className="absolute -inset-4 bg-gradient-to-r from-gold-500/50 to-gold-400/50 rounded-3xl blur-2xl opacity-75 animate-pulse"></div>
                     <Button 
                       className="relative bg-gradient-to-r from-gold-500 to-gold-400 hover:from-gold-400 hover:to-gold-300 text-black text-xl font-medium px-12 py-6 rounded-3xl shadow-2xl hover:shadow-gold-500/50 transition-all duration-300 hover:scale-105 min-w-[280px]"
-                      onClick={() => window.open("https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends//Lift%20Legends.apk", "_blank")}
+                      onClick={() => window.open("https://liftlegendsapp.liara.run", "_blank")}
                     >
-                      <Download className="w-6 h-6 ml-3" />
-                      دانلود مستقیم
+                      <Globe className="w-6 h-6 ml-3" />
+                      ورود به وب اپ
                     </Button>
                   </div>
 
@@ -113,14 +113,6 @@ const DownloadPage = () => {
                   </div>
                 </div>
 
-                <div className="space-y-2 text-center">
-                  <p className="text-gray-400 text-lg">
-                    دانلود مستقیم اپلیکیشن اندروید
-                  </p>
-                  <p className="text-gray-400 text-lg">
-                    ربات هوشمند تلگرام @LiftLegendsBot
-                  </p>
-                </div>
               </div>
 
               {/* Right Side - Phone Mockup */}
@@ -200,6 +192,73 @@ const DownloadPage = () => {
                           <div className="w-full h-2 bg-gray-700 rounded-full overflow-hidden">
                             <div className="w-3/4 h-full bg-gradient-to-r from-gold-500 to-gold-400 rounded-full"></div>
                           </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* PWA Installation Guide */}
+            <div className="relative mb-20">
+              {/* Background Glow */}
+              <div className="absolute -inset-8 bg-gradient-to-r from-green-500/10 via-blue-500/10 to-purple-500/10 rounded-3xl blur-2xl opacity-60"></div>
+              
+              {/* Installation Guide Container */}
+              <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 lg:p-12 shadow-2xl">
+                <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-black/10 rounded-3xl"></div>
+                
+                <div className="relative z-10">
+                  <h2 className="text-3xl lg:text-4xl font-light text-white text-center mb-12">
+                    نحوه نصب وب اپ
+                  </h2>
+                  
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                    {/* Step 1 - Mobile */}
+                    <div className="group relative">
+                      <div className="absolute -inset-2 bg-gradient-to-r from-blue-500/20 to-blue-400/20 rounded-2xl blur opacity-0 group-hover:opacity-100 transition duration-300"></div>
+                      <div className="relative bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6 hover:bg-white/10 transition-all duration-300 text-center">
+                        <div className="w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                          <Smartphone className="w-8 h-8 text-blue-400" />
+                        </div>
+                        <h3 className="text-xl font-medium text-white mb-4">موبایل</h3>
+                        <div className="text-gray-300 text-sm space-y-2">
+                          <p>۱. لینک را در مرورگر باز کنید</p>
+                          <p>۲. منوی مرورگر را باز کنید</p>
+                          <p>۳. "افزودن به صفحه اصلی" را انتخاب کنید</p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Step 2 - Desktop */}
+                    <div className="group relative">
+                      <div className="absolute -inset-2 bg-gradient-to-r from-purple-500/20 to-purple-400/20 rounded-2xl blur opacity-0 group-hover:opacity-100 transition duration-300"></div>
+                      <div className="relative bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6 hover:bg-white/10 transition-all duration-300 text-center">
+                        <div className="w-16 h-16 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                          <Monitor className="w-8 h-8 text-purple-400" />
+                        </div>
+                        <h3 className="text-xl font-medium text-white mb-4">دسکتاپ</h3>
+                        <div className="text-gray-300 text-sm space-y-2">
+                          <p>۱. سایت را در کروم باز کنید</p>
+                          <p>۲. آیکون نصب در نوار آدرس</p>
+                          <p>۳. روی "نصب" کلیک کنید</p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Step 3 - Features */}
+                    <div className="group relative">
+                      <div className="absolute -inset-2 bg-gradient-to-r from-green-500/20 to-green-400/20 rounded-2xl blur opacity-0 group-hover:opacity-100 transition duration-300"></div>
+                      <div className="relative bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6 hover:bg-white/10 transition-all duration-300 text-center">
+                        <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                          <Download className="w-8 h-8 text-green-400" />
+                        </div>
+                        <h3 className="text-xl font-medium text-white mb-4">مزایا</h3>
+                        <div className="text-gray-300 text-sm space-y-2">
+                          <p>✓ بدون نیاز به استور</p>
+                          <p>✓ آپدیت خودکار</p>
+                          <p>✓ دسترسی آفلاین</p>
                         </div>
                       </div>
                     </div>
@@ -326,12 +385,12 @@ const DownloadPage = () => {
                       <div className="relative bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6 hover:bg-white/10 transition-all duration-300">
                         <div className="flex items-start gap-4">
                           <div className="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center flex-shrink-0">
-                            <Smartphone className="w-6 h-6 text-green-400" />
+                            <Globe className="w-6 h-6 text-green-400" />
                           </div>
                           <div>
-                            <h3 className="text-xl font-medium text-white mb-2">رابط کاربری مدرن</h3>
+                            <h3 className="text-xl font-medium text-white mb-2">دسترسی همه‌جا</h3>
                             <p className="text-gray-300 leading-relaxed">
-                              طراحی زیبا و کاربردی برای بهترین تجربه استفاده روزانه
+                              وب اپلیکیشن پیشرفته قابل دسترسی در همه دستگاه‌ها و مرورگرها
                             </p>
                           </div>
                         </div>
@@ -342,7 +401,7 @@ const DownloadPage = () => {
               </div>
             </div>
 
-            {/* Coming Soon Notice */}
+            {/* PWA Ready Notice */}
             <div className="text-center">
               <div className="relative inline-block">
                 <div className="absolute -inset-4 bg-gradient-to-r from-gold-500/30 to-gold-400/30 rounded-3xl blur-xl opacity-60 animate-pulse"></div>
@@ -350,13 +409,14 @@ const DownloadPage = () => {
                   <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-black/20 rounded-3xl"></div>
                   <div className="relative z-10">
                     <h3 className="text-2xl lg:text-3xl font-light text-white mb-4">
-                      دانلود مستقیم
+                      وب اپلیکیشن پیشرفته
                     </h3>
                     <p className="text-gray-300 text-lg mb-6">
-                      اپلیکیشن LiftLegends را مستقیماً دانلود و نصب کنید
+                      LiftLegends را در همه دستگاه‌ها بدون نیاز به نصب از استور استفاده کنید
                     </p>
-                    <div className="text-gold-400 text-lg font-medium">
-                      📱 آماده دانلود
+                    <div className="flex items-center justify-center gap-4 text-gold-400 text-lg font-medium">
+                      <Globe className="w-6 h-6" />
+                      <span>PWA آماده استفاده</span>
                     </div>
                   </div>
                 </div>
