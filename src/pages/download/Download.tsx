@@ -96,7 +96,7 @@ const DownloadPage = () => {
                     <div className="absolute -inset-4 bg-gradient-to-r from-gold-500/50 to-gold-400/50 rounded-3xl blur-2xl opacity-75 animate-pulse"></div>
                     <LaunchPWAButton 
                       className="relative bg-gradient-to-r from-gold-500 to-gold-400 hover:from-gold-400 hover:to-gold-300 text-black text-xl font-medium px-12 py-6 rounded-3xl shadow-2xl hover:shadow-gold-500/50 min-w-[280px]"
-                      webUrl="https://liftlegendsapp.liara.run/?utm_source=download_page&utm_medium=web&utm_campaign=pwa_launch"
+                      webUrl="https://pwa.liftlegends.ir/?utm_source=download_page&utm_medium=web&utm_campaign=pwa_launch"
                       showStatus={true}
                       size="lg"
                     />

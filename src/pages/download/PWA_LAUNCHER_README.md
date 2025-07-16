@@ -40,7 +40,7 @@ function MyComponent() {
       {/* Custom styling and URL */}
       <LaunchPWAButton
         className="my-custom-class"
-        webUrl="https://liftlegendsapp.liara.run/?utm_source=my_page"
+        webUrl="https://pwa.liftlegends.ir/?utm_source=my_page"
       >
         باز کردن لیفت لجندز
       </LaunchPWAButton>
@@ -75,7 +75,7 @@ Use `public/pwa-launcher.html` as a complete landing page. You can:
   // Create a button in specific container
   LiftLegendsPWA.createLaunchButton({
     container: "#my-button-container",
-    webUrl: "https://liftlegendsapp.liara.run/?utm_source=my_site",
+    webUrl: "https://pwa.liftlegends.ir/?utm_source=my_site",
   });
 
   // Or launch programmatically
@@ -97,7 +97,7 @@ async function handleLaunch() {
     window.location.href = "/";
   } else {
     // Redirect to web
-    window.open("https://liftlegendsapp.liara.run/", "_blank");
+    window.open("https://pwa.liftlegends.ir/", "_blank");
   }
 }
 ```
@@ -124,7 +124,7 @@ The system uses multiple detection methods for maximum compatibility:
 The default web URL is:
 
 ```
-https://liftlegendsapp.liara.run/?utm_source=download_page&utm_medium=web&utm_campaign=pwa_launch
+https://pwa.liftlegends.ir/?utm_source=download_page&utm_medium=web&utm_campaign=pwa_launch
 ```
 
 You can customize this URL in any implementation:
