@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لیفت لجندز - راه‌اندازی اپلیکیشن</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+        
+        .logo {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+        
+        .launch-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .launch-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .launch-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .status {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ffffff40;
+            border-top: 2px solid #ffffff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .icon {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">LL</div>
+        <h1>لیفت لجندز</h1>
+        <p class="subtitle">همراه شما در مسیر تناسب اندام</p>
+        
+        <button id="launchBtn" class="launch-btn">
+            <div class="spinner" id="spinner" style="display: none;"></div>
+            <svg id="appIcon" class="icon" viewBox="0 0 24 24" style="display: none;">
+                <path d="M17 2H7c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM7 4h10v16H7V4z"/>
+            </svg>
+            <svg id="webIcon" class="icon" viewBox="0 0 24 24" style="display: none;">
+                <path d="M19 19H5V5h7V3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/>
+            </svg>
+            <span id="btnText">بررسی وضعیت...</span>
+        </button>
+        
+        <div class="status" id="status">
+            در حال بررسی وضعیت نصب اپلیکیشن...
+        </div>
+    </div>
+
+    <script>
+        const WEB_URL = 'https://liftlegendsapp.liara.run/?utm_source=download_page&utm_medium=web&utm_campaign=pwa_launch';
+        
+        // PWA Detection Functions
+        function isPWAInstalled() {
+            return new Promise((resolve) => {
+                // Method 1: Check display mode
+                const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+                
+                // Method 2: Check for iOS standalone
+                const isIOSStandalone = window.navigator.standalone === true;
+                
+                // Method 3: Check for Android TWA or installed PWA
+                const isAndroidInstalled = document.referrer.includes('android-app://');
+                
+                if (isStandalone || isIOSStandalone || isAndroidInstalled) {
+                    resolve(true);
+                    return;
+                }
+
+                // Method 4: Try to use the newer getInstalledRelatedApps API if available
+                if ('getInstalledRelatedApps' in navigator) {
+                    navigator.getInstalledRelatedApps()
+                        .then(relatedApps => {
+                            resolve(relatedApps.length > 0);
+                        })
+                        .catch(() => {
+                            resolve(false);
+                        });
+                } else {
+                    resolve(false);
+                }
+            });
+        }
+        
+        // UI Elements
+        const launchBtn = document.getElementById('launchBtn');
+        const btnText = document.getElementById('btnText');
+        const status = document.getElementById('status');
+        const spinner = document.getElementById('spinner');
+        const appIcon = document.getElementById('appIcon');
+        const webIcon = document.getElementById('webIcon');
+        
+        // Update UI based on installation status
+        function updateUI(isInstalled, isLoading = false) {
+            if (isLoading) {
+                btnText.textContent = 'در حال بارگذاری...';
+                spinner.style.display = 'block';
+                appIcon.style.display = 'none';
+                webIcon.style.display = 'none';
+                launchBtn.disabled = true;
+                return;
+            }
+            
+            launchBtn.disabled = false;
+            spinner.style.display = 'none';
+            
+            if (isInstalled) {
+                btnText.textContent = 'باز کردن اپلیکیشن';
+                appIcon.style.display = 'block';
+                webIcon.style.display = 'none';
+                status.innerHTML = '✅ اپلیکیشن نصب شده است. با کلیک روی دکمه، اپلیکیشن باز می‌شود.';
+                status.style.background = '#d4edda';
+                status.style.color = '#155724';
+            } else {
+                btnText.textContent = 'مشاهده در وب';
+                appIcon.style.display = 'none';
+                webIcon.style.display = 'block';
+                status.innerHTML = 'ℹ️ اپلیکیشن نصب نشده است. با کلیک روی دکمه، نسخه وب باز می‌شود.';
+                status.style.background = '#d1ecf1';
+                status.style.color = '#0c5460';
+            }
+        }
+        
+        // Launch function
+        async function launchApp() {
+            updateUI(false, true);
+            
+            try {
+                const isInstalled = await isPWAInstalled();
+                
+                if (isInstalled) {
+                    // Launch PWA
+                    window.location.href = '/';
+                } else {
+                    // Open web version
+                    window.open(WEB_URL, '_blank');
+                }
+            } catch (error) {
+                console.error('Error launching app:', error);
+                // Fallback to web version
+                window.open(WEB_URL, '_blank');
+            }
+        }
+        
+        // Initialize
+        async function init() {
+            try {
+                const isInstalled = await isPWAInstalled();
+                updateUI(isInstalled);
+            } catch (error) {
+                console.error('Error checking installation:', error);
+                updateUI(false);
+            }
+        }
+        
+        // Event listeners
+        launchBtn.addEventListener('click', launchApp);
+        
+        // Initialize when page loads
+        init();
+    </script>
+</body>
+</html>

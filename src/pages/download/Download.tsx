@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
-import { Download, Shield, Zap, Brain, Smartphone, Clock, Users, ArrowLeft, Bot, Globe, Monitor, Tablet } from "lucide-react";
+import { Download, Shield, Zap, Brain, Smartphone, Clock, Users, ArrowLeft, Bot, Monitor, Tablet, Globe } from "lucide-react";
 import { useEffect, useState } from "react";
+import LaunchPWAButton from "@/components/LaunchPWAButton";
 
 const DownloadPage = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -13,6 +14,8 @@ const DownloadPage = () => {
     
     return () => clearTimeout(timer);
   }, []);
+
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-950 via-black to-gray-950 relative overflow-hidden">
@@ -91,13 +94,12 @@ const DownloadPage = () => {
                   {/* PWA Access Button */}
                   <div className="relative inline-block">
                     <div className="absolute -inset-4 bg-gradient-to-r from-gold-500/50 to-gold-400/50 rounded-3xl blur-2xl opacity-75 animate-pulse"></div>
-                    <Button 
-                      className="relative bg-gradient-to-r from-gold-500 to-gold-400 hover:from-gold-400 hover:to-gold-300 text-black text-xl font-medium px-12 py-6 rounded-3xl shadow-2xl hover:shadow-gold-500/50 transition-all duration-300 hover:scale-105 min-w-[280px]"
-                      onClick={() => window.open("https://liftlegendsapp.liara.run", "_blank")}
-                    >
-                      <Globe className="w-6 h-6 ml-3" />
-                      ورود به وب اپ
-                    </Button>
+                    <LaunchPWAButton 
+                      className="relative bg-gradient-to-r from-gold-500 to-gold-400 hover:from-gold-400 hover:to-gold-300 text-black text-xl font-medium px-12 py-6 rounded-3xl shadow-2xl hover:shadow-gold-500/50 min-w-[280px]"
+                      webUrl="https://liftlegendsapp.liara.run/?utm_source=download_page&utm_medium=web&utm_campaign=pwa_launch"
+                      showStatus={true}
+                      size="lg"
+                    />
                   </div>
 
                   {/* Bot Button */}
@@ -258,7 +260,6 @@ const DownloadPage = () => {
                         <div className="text-gray-300 text-sm space-y-2">
                           <p>✓ بدون نیاز به استور</p>
                           <p>✓ آپدیت خودکار</p>
-                          <p>✓ دسترسی آفلاین</p>
                         </div>
                       </div>
                     </div>
