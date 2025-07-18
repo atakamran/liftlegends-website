@@ -35,12 +35,16 @@ const Index = () => {
       "foundingDate": "2024",
       "industry": "Health & Fitness Technology",
       "knowsAbout": [
+        "برنامه تمرینی رایگان",
         "بدنسازی",
+        "برنامه بدنسازی",
+        "برنامه تمرینی",
         "تناسب اندام", 
         "هوش مصنوعی",
-        "برنامه تمرینی",
-        "رژیم غذایی",
-        "مکمل‌های ورزشی"
+        "رژیم غذایی بدنسازی",
+        "مکمل‌های ورزشی",
+        "تمرینات بدنسازی",
+        "برنامه ورزشی"
       ],
       "sameAs": [
         "https://liftlegends.ir/"
@@ -59,10 +63,10 @@ const Index = () => {
     websiteScript.innerHTML = JSON.stringify({
       "@context": "https://schema.org",
       "@type": "WebSite",
-      "name": "Lift Legends - بدنسازی هوشمند",
+      "name": "Lift Legends - برنامه تمرینی رایگان بدنسازی",
       "alternateName": "لیفت لجندز",
       "url": "https://liftlegends.ir/",
-      "description": "بهترین اپلیکیشن بدنسازی و تناسب اندام با هوش مصنوعی - برنامه تمرینی هوشمند، رژیم غذایی شخصی‌سازی شده و مشاوره تخصصی",
+      "description": "بهترین برنامه تمرینی رایگان بدنسازی با هوش مصنوعی - برنامه تمرینی شخصی‌سازی شده، رژیم غذایی بدنسازی و مشاوره تخصصی مکمل",
       "inLanguage": "fa-IR",
       "publisher": {
         "@type": "Organization",
@@ -91,7 +95,7 @@ const Index = () => {
       "@id": "https://liftlegends.ir/#mobileapp",
       "name": "Lift Legends",
       "alternateName": "لیفت لجندز",
-      "description": "اپلیکیشن بدنسازی هوشمند با هوش مصنوعی پیشرفته، برنامه تمرینی شخصی‌سازی شده، رژیم غذایی هوشمند و مشاوره مکمل و استرویید",
+      "description": "بهترین برنامه تمرینی رایگان بدنسازی با هوش مصنوعی پیشرفته، برنامه تمرینی شخصی‌سازی شده، رژیم غذایی بدنسازی هوشمند و مشاوره مکمل و استرویید",
       "applicationCategory": "HealthApplication",
       "applicationSubCategory": "Fitness",
       "operatingSystem": "Android",
@@ -114,13 +118,15 @@ const Index = () => {
         "https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends//white%20logo.png"
       ],
       "featureList": [
-        "برنامه تمرینی هوشمند با هوش مصنوعی",
-        "رژیم غذایی شخصی‌سازی شده",
+        "برنامه تمرینی رایگان شخصی‌سازی شده",
+        "برنامه بدنسازی هوشمند با هوش مصنوعی",
+        "رژیم غذایی بدنسازی شخصی‌سازی شده",
         "مشاوره مکمل و استرویید",
-        "پیگیری پیشرفت",
-        "مربی مجازی",
-        "کتابخانه تمرینات",
-        "محاسبه کالری",
+        "تمرینات بدنسازی کامل",
+        "پیگیری پیشرفت بدنسازی",
+        "مربی مجازی بدنسازی",
+        "کتابخانه تمرینات بدنسازی",
+        "محاسبه کالری و ماکروها",
         "برنامه‌ریزی وعده‌های غذایی"
       ],
       "offers": {
@@ -161,8 +167,8 @@ const Index = () => {
     serviceScript.innerHTML = JSON.stringify({
       "@context": "https://schema.org",
       "@type": "Service",
-      "name": "خدمات بدنسازی هوشمند Lift Legends",
-      "description": "ارائه برنامه تمرینی شخصی‌سازی شده، رژیم غذایی هوشمند و مشاوره مکمل با استفاده از هوش مصنوعی",
+      "name": "برنامه تمرینی رایگان بدنسازی Lift Legends",
+      "description": "ارائه برنامه تمرینی رایگان بدنسازی، برنامه بدنسازی شخصی‌سازی شده، رژیم غذایی بدنسازی هوشمند و مشاوره مکمل با استفاده از هوش مصنوعی",
       "provider": {
         "@type": "Organization",
         "name": "Lift Legends"
@@ -180,16 +186,16 @@ const Index = () => {
             "@type": "Offer",
             "itemOffered": {
               "@type": "Service",
-              "name": "برنامه تمرینی هوشمند",
-              "description": "برنامه تمرینی شخصی‌سازی شده با هوش مصنوعی"
+              "name": "برنامه تمرینی رایگان بدنسازی",
+              "description": "برنامه تمرینی رایگان بدنسازی شخصی‌سازی شده با هوش مصنوعی"
             }
           },
           {
             "@type": "Offer", 
             "itemOffered": {
               "@type": "Service",
-              "name": "رژیم غذایی هوشمند",
-              "description": "برنامه غذایی شخصی‌سازی شده بر اساس اهداف و نیازهای فردی"
+              "name": "رژیم غذایی بدنسازی",
+              "description": "برنامه غذایی بدنسازی شخصی‌سازی شده بر اساس اهداف و نیازهای فردی"
             }
           },
           {
@@ -222,18 +228,26 @@ const Index = () => {
         },
         {
           "@type": "Question",
-          "name": "چگونه برنامه تمرینی هوشمند کار می‌کند؟",
+          "name": "چگونه برنامه تمرینی رایگان بدنسازی کار می‌کند؟",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "برنامه تمرینی هوشمند Lift Legends با استفاده از هوش مصنوعی و بر اساس اطلاعات شما (سن، وزن، قد، سطح تجربه، اهداف) یک برنامه کاملاً شخصی‌سازی شده طراحی می‌کند."
+            "text": "برنامه تمرینی رایگان بدنسازی Lift Legends با استفاده از هوش مصنوعی و بر اساس اطلاعات شما (سن، وزن، قد، سطح تجربه، اهداف بدنسازی) یک برنامه بدنسازی کاملاً شخصی‌سازی شده طراحی می‌کند."
           }
         },
         {
           "@type": "Question",
-          "name": "آیا برای مبتدیان مناسب است؟",
+          "name": "آیا برنامه تمرینی رایگان برای مبتدیان بدنسازی مناسب است؟",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "بله، Lift Legends برای تمام سطوح از مبتدی تا حرفه‌ای طراحی شده است. برنامه‌های تمرینی بر اساس سطح تجربه شما تنظیم می‌شود."
+            "text": "بله، برنامه تمرینی رایگان بدنسازی Lift Legends برای تمام سطوح از مبتدی تا حرفه‌ای طراحی شده است. برنامه‌های بدنسازی بر اساس سطح تجربه شما تنظیم می‌شود."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "چه تمریناتی در برنامه بدنسازی رایگان موجود است؟",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "برنامه تمرینی رایگان بدنسازی شامل تمرینات کامل بدنسازی مانند تمرینات قدرتی، کارکردی، کارتیو و کششی است. همه تمرینات بدنسازی با راهنمایی تصویری و توضیحات کامل ارائه می‌شود."
           }
         }
       ]
@@ -272,10 +286,10 @@ const Index = () => {
     <>
       <Helmet>
         {/* Primary Meta Tags */}
-        <title>بدنسازی هوشمند با Lift Legends | برنامه تمرینی و رژیم غذایی شخصی‌سازی شده</title>
-        <meta name="title" content="بدنسازی هوشمند با Lift Legends | برنامه تمرینی و رژیم غذایی شخصی‌سازی شده" />
-        <meta name="description" content="بهترین اپلیکیشن بدنسازی و تناسب اندام با هوش مصنوعی - برنامه تمرینی هوشمند، رژیم غذایی شخصی‌سازی شده و مشاوره تخصصی مکمل و استرویید. دانلود رایگان Lift Legends." />
-        <meta name="keywords" content="بدنسازی، برنامه بدنسازی، تناسب اندام، مربی بدنسازی، برنامه تمرینی بدنسازی، رژیم غذایی بدنسازی، مکمل بدنسازی، استرویید، فیتنس، اپلیکیشن بدنسازی، هوش مصنوعی، AI fitness، personal trainer" />
+        <title>برنامه تمرینی رایگان بدنسازی | Lift Legends - برنامه بدنسازی هوشمند</title>
+        <meta name="title" content="برنامه تمرینی رایگان بدنسازی | Lift Legends - برنامه بدنسازی هوشمند" />
+        <meta name="description" content="دانلود رایگان بهترین برنامه تمرینی بدنسازی با هوش مصنوعی. برنامه تمرینی رایگان شخصی‌سازی شده، رژیم غذایی بدنسازی و مشاوره مکمل. Lift Legends - اپلیکیشن بدنسازی هوشمند." />
+        <meta name="keywords" content="برنامه تمرینی رایگان، بدنسازی، برنامه بدنسازی، برنامه تمرینی، تناسب اندام، مربی بدنسازی، برنامه تمرینی بدنسازی، رژیم غذایی بدنسازی، مکمل بدنسازی، استرویید، فیتنس، اپلیکیشن بدنسازی، هوش مصنوعی، برنامه ورزشی رایگان، تمرینات بدنسازی، AI fitness، personal trainer" />
         <meta name="author" content="Lift Legends" />
         <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
         <meta name="language" content="Persian" />
@@ -298,8 +312,8 @@ const Index = () => {
         {/* Open Graph / Facebook */}
         <meta property="og:type" content="website" />
         <meta property="og:site_name" content="Lift Legends" />
-        <meta property="og:title" content="بدنسازی هوشمند با Lift Legends | برنامه تمرینی و رژیم غذایی" />
-        <meta property="og:description" content="بهترین اپلیکیشن بدنسازی و تناسب اندام با هوش مصنوعی - برنامه تمرینی هوشمند، رژیم غذایی شخصی‌سازی شده و مشاوره تخصصی. دانلود رایگان!" />
+        <meta property="og:title" content="برنامه تمرینی رایگان بدنسازی | Lift Legends - برنامه بدنسازی هوشمند" />
+        <meta property="og:description" content="دانلود رایگان بهترین برنامه تمرینی بدنسازی با هوش مصنوعی. برنامه تمرینی رایگان شخصی‌سازی شده، رژیم غذایی بدنسازی و مشاوره مکمل." />
         <meta property="og:image" content="https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends//white%20logo.png" />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
@@ -311,8 +325,8 @@ const Index = () => {
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:site" content="@liftlegends" />
         <meta name="twitter:creator" content="@liftlegends" />
-        <meta name="twitter:title" content="بدنسازی هوشمند با Lift Legends | برنامه تمرینی و رژیم غذایی" />
-        <meta name="twitter:description" content="بهترین اپلیکیشن بدنسازی و تناسب اندام با هوش مصنوعی - برنامه تمرینی هوشمند، رژیم غذایی شخصی‌سازی شده و مشاوره تخصصی. دانلود رایگان!" />
+        <meta name="twitter:title" content="برنامه تمرینی رایگان بدنسازی | Lift Legends - برنامه بدنسازی هوشمند" />
+        <meta name="twitter:description" content="دانلود رایگان بهترین برنامه تمرینی بدنسازی با هوش مصنوعی. برنامه تمرینی رایگان شخصی‌سازی شده، رژیم غذایی بدنسازی و مشاوره مکمل." />
         <meta name="twitter:image" content="https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends//white%20logo.png" />
         <meta name="twitter:image:alt" content="Lift Legends - اپلیکیشن بدنسازی هوشمند" />
         

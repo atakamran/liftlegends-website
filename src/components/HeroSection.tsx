@@ -57,11 +57,11 @@ const HeroSection = () => {
           </h1>
           
           <h2 className="text-lg sm:text-xl md:text-2xl text-white/90 font-light">
-            مربی بدنسازی هوشمند شما
+            برنامه تمرینی رایگان بدنسازی با هوش مصنوعی
           </h2>
           
           <p className="text-white/70 text-base sm:text-lg max-w-md mx-auto md:mx-0 leading-relaxed px-2 sm:px-0">
-            با هوش مصنوعی پیشرفته، <span className="text-gold-400 font-medium">برنامه تمرینی</span> و <span className="text-gold-400 font-medium">رژیم غذایی</span> شخصی‌سازی شده دریافت کنید
+            بهترین <span className="text-gold-400 font-medium">برنامه تمرینی رایگان</span> برای <span className="text-gold-400 font-medium">بدنسازی</span> و تناسب اندام. برنامه‌های شخصی‌سازی شده با هوش مصنوعی
           </p>
           
           {/* Enhanced feature badges with better visual design */}

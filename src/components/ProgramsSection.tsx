@@ -85,6 +85,26 @@ const ProgramsSection = () => {
       image_url: 'https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends/advanced-workout.jpg',
       program_url: 'advanced-workout',
       created_at: new Date().toISOString(),
+    },
+    {
+      id: 'sample-7',
+      title: 'برنامه تمرینی رایگان مبتدی',
+      description: 'برنامه تمرینی کاملاً رایگان برای شروع بدنسازی',
+      price: 0,
+      category: 'training',
+      image_url: 'https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends/free-workout.jpg',
+      program_url: 'free-beginner-workout',
+      created_at: new Date().toISOString(),
+    },
+    {
+      id: 'sample-8',
+      title: 'راهنمای تغذیه رایگان',
+      description: 'راهنمای کامل و رایگان تغذیه سالم برای بدنسازان',
+      price: 0,
+      category: 'diet',
+      image_url: 'https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends/free-nutrition.jpg',
+      program_url: 'free-nutrition-guide',
+      created_at: new Date().toISOString(),
     }
   ];
 
@@ -306,7 +326,13 @@ const ProgramsSection = () => {
                   
                   <CardContent className="p-4 pt-0">
                     <p className="text-white/70 line-clamp-2 text-sm mb-3 h-10 group-hover:text-white/90 transition-colors">{program.description}</p>
-                    <p className="text-lg font-bold text-white">{formatPrice(program.price)}</p>
+                    <p className="text-lg font-bold text-white">
+                      {program.price === 0 ? (
+                        <span className="text-green-500">رایگان</span>
+                      ) : (
+                        formatPrice(program.price)
+                      )}
+                    </p>
                   </CardContent>
                   
                   <CardFooter className="p-4 pt-0">

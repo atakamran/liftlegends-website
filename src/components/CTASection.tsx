@@ -57,12 +57,8 @@ const CTASection = () => {
             </span>
           </h2>
 
-          <p className="text-xl md:text-2xl text-white/90 mb-4 max-w-4xl mx-auto leading-relaxed">
+          <p className="text-xl md:text-2xl text-white/90 mb-12 max-w-4xl mx-auto leading-relaxed">
             همین الان <span className="text-gold-400 font-semibold">Lift Legends</span> را دانلود کنید و تجربه بدنسازی هوشمند را آغاز کنید
-          </p>
-
-          <p className="text-lg text-white/70 mb-12 max-w-3xl mx-auto">
-            بیش از <span className="text-gold-400 font-medium">۱۰,۰۰۰ کاربر</span> قبل از شما این انتخاب را کرده‌اند
           </p>
 
           {/* CTA Buttons */}
@@ -85,32 +81,7 @@ const CTASection = () => {
             </Button>
           </div>
 
-          {/* Social proof */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-            <div className="flex flex-col items-center group">
-              <div className="bg-gray-800/50 backdrop-blur-sm p-4 rounded-full border border-gold-500/30 mb-4 group-hover:border-gold-500/50 transition-all">
-                <Users size={32} className="text-gold-500 group-hover:scale-110 transition-transform" />
-              </div>
-              <h3 className="text-2xl font-bold text-gold-400 mb-2">+۱۰,۰۰۰</h3>
-              <p className="text-white/70 group-hover:text-white/90 transition-colors">کاربر فعال</p>
-            </div>
 
-            <div className="flex flex-col items-center group">
-              <div className="bg-gray-800/50 backdrop-blur-sm p-4 rounded-full border border-gold-500/30 mb-4 group-hover:border-gold-500/50 transition-all">
-                <Star size={32} className="text-gold-500 group-hover:scale-110 transition-transform" />
-              </div>
-              <h3 className="text-2xl font-bold text-gold-400 mb-2">۴.۸/۵</h3>
-              <p className="text-white/70 group-hover:text-white/90 transition-colors">امتیاز کاربران</p>
-            </div>
-
-            <div className="flex flex-col items-center group">
-              <div className="bg-gray-800/50 backdrop-blur-sm p-4 rounded-full border border-gold-500/30 mb-4 group-hover:border-gold-500/50 transition-all">
-                <Zap size={32} className="text-gold-500 group-hover:scale-110 transition-transform" />
-              </div>
-              <h3 className="text-2xl font-bold text-gold-400 mb-2">۲۴/۷</h3>
-              <p className="text-white/70 group-hover:text-white/90 transition-colors">پشتیبانی هوشمند</p>
-            </div>
-          </div>
         </div>
 
         {/* Mobile app preview */}

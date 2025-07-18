@@ -180,6 +180,9 @@ const ProductPage = () => {
   
   // Format price with Persian numerals and Toman
   const formatPrice = (price: number) => {
+    if (price === 0) {
+      return 'رایگان';
+    }
     return new Intl.NumberFormat('fa-IR').format(price) + ' تومان';
   };
   
@@ -211,8 +214,71 @@ const ProductPage = () => {
     }
   };
   
+  // Handle free program purchase
+  const handleFreeProgram = async () => {
+    try {
+      // Check if user is logged in
+      const { data: sessionData } = await supabase.auth.getSession();
+      if (!sessionData.session) {
+        toast({
+          variant: "destructive",
+          title: "ورود به حساب کاربری",
+          description: "برای دریافت برنامه رایگان، ابتدا وارد حساب کاربری خود شوید.",
+        });
+        navigate('/login?redirect=' + encodeURIComponent(window.location.pathname));
+        return;
+      }
+
+      // Add free program to user purchases
+      const { error } = await supabase
+        .from('user_purchases')
+        .insert({
+          user_id: sessionData.session.user.id,
+          program_id: program!.id,
+          amount: 0,
+          payment_status: 'completed',
+          payment_id: 'free_' + Date.now(),
+          purchase_date: new Date().toISOString()
+        });
+
+      if (error) {
+        console.error("Error adding free program:", error);
+        toast({
+          variant: "destructive",
+          title: "خطا در دریافت برنامه رایگان",
+          description: "مشکلی در اضافه کردن برنامه رایگان رخ داد. لطفاً دوباره تلاش کنید.",
+        });
+        return;
+      }
+
+      // Update purchase status
+      setHasPurchased(true);
+      
+      toast({
+        title: "برنامه رایگان دریافت شد!",
+        description: "برنامه رایگان با موفقیت به حساب شما اضافه شد.",
+      });
+
+      // Redirect to program details after a short delay
+      setTimeout(() => {
+        const detailsUrl = program!.program_url 
+          ? `/programs/${program!.id}/details`
+          : `/programs/${program!.program_url}/details`;
+        navigate(detailsUrl);
+      }, 1500);
+
+    } catch (error) {
+      console.error("Error handling free program:", error);
+      toast({
+        variant: "destructive",
+        title: "خطا در دریافت برنامه رایگان",
+        description: "مشکلی در دریافت برنامه رایگان رخ داد. لطفاً دوباره تلاش کنید.",
+      });
+    }
+  };
+
   // Handle buy button click
-  const handleBuyClick = () => {
+  const handleBuyClick = async () => {
     if (!program) return;
     
     // If user has already purchased, redirect to program details
@@ -221,6 +287,12 @@ const ProductPage = () => {
         ? `/programs/${program.id}/details`
         : `/programs/${program.program_url}/details`;
       navigate(detailsUrl);
+      return;
+    }
+    
+    // If price is 0, add to user's purchased programs directly
+    if (program.price === 0) {
+      await handleFreeProgram();
       return;
     }
     
@@ -444,6 +516,11 @@ const ProductPage = () => {
                       <>
                         <ArrowRight className="w-6 h-6 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
                         مشاهده محصول
+                      </>
+                    ) : program?.price === 0 ? (
+                      <>
+                        <Download className="w-6 h-6 ml-2 group-hover:scale-110 transition-transform duration-300" />
+                        دریافت رایگان
                       </>
                     ) : (
                       <>

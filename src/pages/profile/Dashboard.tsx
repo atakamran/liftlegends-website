@@ -49,7 +49,7 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
-import { Loader2, Plus, Edit, Trash2, Check, X, Calendar, CreditCard, Shield, Zap, LogOut, Menu, Award } from "lucide-react";
+import { Loader2, Plus, Edit, Trash2, Check, X, Calendar, CreditCard, Shield, Zap, LogOut, Menu, Award, Search, Filter, SortAsc, SortDesc, Grid, List, ChevronLeft, ChevronRight, Eye, EyeOff } from "lucide-react";
 import SubscriptionPlans from "@/components/SubscriptionPlans";
 
 // Define interfaces
@@ -167,6 +167,11 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
   const [pageLoading, setPageLoading] = useState(true);
+
+  // Helper function to format price display
+  const formatPrice = (price: number): string => {
+    return price === 0 ? 'رایگان' : `${new Intl.NumberFormat('fa-IR').format(price)} تومان`;
+  };
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
   const [blogCategories, setBlogCategories] = useState<BlogCategory[]>([]);
   const [userPurchases, setUserPurchases] = useState<UserPurchase[]>([]);
@@ -311,6 +316,15 @@ const Dashboard = () => {
   const [isEditingProduct, setIsEditingProduct] = useState(false);
   const [currentProductId, setCurrentProductId] = useState<string | null>(null);
 
+  // Enhanced product management states
+  const [productSearchTerm, setProductSearchTerm] = useState("");
+  const [productCategoryFilter, setProductCategoryFilter] = useState<string>("all");
+  const [productSortBy, setProductSortBy] = useState<string>("created_at");
+  const [productSortOrder, setProductSortOrder] = useState<"asc" | "desc">("desc");
+  const [productsPerPage, setProductsPerPage] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [showProductForm, setShowProductForm] = useState(false);
+
   // Program details management state
   const [programDetails, setProgramDetails] = useState<ProgramDetail[]>([]);
   const [programDetailsLoading, setProgramDetailsLoading] = useState(false);
@@ -323,6 +337,11 @@ const Dashboard = () => {
   });
   const [isEditingProgramDetail, setIsEditingProgramDetail] = useState(false);
   const [currentProgramDetailId, setCurrentProgramDetailId] = useState<string | null>(null);
+
+  // Enhanced program details management states
+  const [programDetailSearchTerm, setProgramDetailSearchTerm] = useState("");
+  const [programDetailCategoryFilter, setProgramDetailCategoryFilter] = useState<string>("all");
+  const [showProgramDetailForm, setShowProgramDetailForm] = useState(false);
 
   // Bundle management state
   const [bundles, setBundles] = useState<any[]>([]);
@@ -339,6 +358,11 @@ const Dashboard = () => {
   });
   const [isEditingBundle, setIsEditingBundle] = useState(false);
   const [currentBundleId, setCurrentBundleId] = useState<string | null>(null);
+
+  // Enhanced bundle management states
+  const [bundleSearchTerm, setBundleSearchTerm] = useState("");
+  const [bundleStatusFilter, setBundleStatusFilter] = useState<string>("all");
+  const [showBundleForm, setShowBundleForm] = useState(false);
 
   // Function to fetch products
   const fetchProducts = async () => {
@@ -392,11 +416,11 @@ const Dashboard = () => {
   const createProduct = async () => {
     try {
       // Validate form data
-      if (!productFormData.title || !productFormData.description || productFormData.price <= 0) {
+      if (!productFormData.title || !productFormData.description || productFormData.price < 0) {
         toast({
           variant: "destructive",
           title: "خطا در ثبت محصول",
-          description: "لطفاً عنوان، توضیحات و قیمت محصول را وارد کنید.",
+          description: "لطفاً عنوان، توضیحات و قیمت معتبر محصول را وارد کنید. (قیمت صفر برای محصولات رایگان مجاز است)",
         });
         return;
       }
@@ -474,11 +498,11 @@ const Dashboard = () => {
       if (!currentProductId) return;
       
       // Validate form data
-      if (!productFormData.title || !productFormData.description || productFormData.price <= 0) {
+      if (!productFormData.title || !productFormData.description || productFormData.price < 0) {
         toast({
           variant: "destructive",
           title: "خطا در بروزرسانی محصول",
-          description: "لطفاً عنوان، توضیحات و قیمت محصول را وارد کنید.",
+          description: "لطفاً عنوان، توضیحات و قیمت معتبر محصول را وارد کنید. (قیمت صفر برای محصولات رایگان مجاز است)",
         });
         return;
       }
@@ -591,6 +615,75 @@ const Dashboard = () => {
     });
     setIsEditingProduct(false);
     setCurrentProductId(null);
+    setShowProductForm(false);
+  };
+
+  // Enhanced product filtering and sorting functions
+  const getFilteredAndSortedProducts = () => {
+    let filteredProducts = [...products];
+
+    // Apply search filter
+    if (productSearchTerm.trim()) {
+      filteredProducts = filteredProducts.filter(product =>
+        product.title.toLowerCase().includes(productSearchTerm.toLowerCase()) ||
+        product.description.toLowerCase().includes(productSearchTerm.toLowerCase())
+      );
+    }
+
+    // Apply category filter
+    if (productCategoryFilter !== "all") {
+      filteredProducts = filteredProducts.filter(product => product.category === productCategoryFilter);
+    }
+
+    // Apply sorting
+    filteredProducts.sort((a, b) => {
+      let aValue: any, bValue: any;
+      
+      switch (productSortBy) {
+        case "title":
+          aValue = a.title.toLowerCase();
+          bValue = b.title.toLowerCase();
+          break;
+        case "price":
+          aValue = a.price;
+          bValue = b.price;
+          break;
+        case "category":
+          aValue = a.category;
+          bValue = b.category;
+          break;
+        case "created_at":
+        default:
+          aValue = new Date(a.created_at);
+          bValue = new Date(b.created_at);
+          break;
+      }
+
+      if (productSortOrder === "asc") {
+        return aValue > bValue ? 1 : -1;
+      } else {
+        return aValue < bValue ? 1 : -1;
+      }
+    });
+
+    return filteredProducts;
+  };
+
+  // Get paginated products
+  const getPaginatedProducts = () => {
+    const filteredProducts = getFilteredAndSortedProducts();
+    const startIndex = (currentPage - 1) * productsPerPage;
+    const endIndex = startIndex + productsPerPage;
+    return {
+      products: filteredProducts.slice(startIndex, endIndex),
+      totalProducts: filteredProducts.length,
+      totalPages: Math.ceil(filteredProducts.length / productsPerPage)
+    };
+  };
+
+  // Reset pagination when filters change
+  const resetPagination = () => {
+    setCurrentPage(1);
   };
 
   // Function to fetch program details
@@ -722,6 +815,29 @@ const Dashboard = () => {
     });
     setCurrentProgramDetailId(null);
     setIsEditingProgramDetail(false);
+    setShowProgramDetailForm(false);
+  };
+
+  // Enhanced program details filtering functions
+  const getFilteredProgramDetails = () => {
+    let filteredDetails = [...programDetails];
+
+    // Apply search filter
+    if (programDetailSearchTerm.trim()) {
+      filteredDetails = filteredDetails.filter(detail =>
+        detail.title.toLowerCase().includes(programDetailSearchTerm.toLowerCase()) ||
+        detail.description.toLowerCase().includes(programDetailSearchTerm.toLowerCase())
+      );
+    }
+
+    // Apply category filter
+    if (programDetailCategoryFilter !== "all") {
+      filteredDetails = filteredDetails.filter(detail => 
+        detail.programs_sale?.category === programDetailCategoryFilter
+      );
+    }
+
+    return filteredDetails;
   };
 
   // Function to fetch blog posts
@@ -1151,11 +1267,11 @@ const Dashboard = () => {
 
   const createBundle = async () => {
     try {
-      if (!bundleFormData.title || !bundleFormData.description || bundleFormData.price <= 0) {
+      if (!bundleFormData.title || !bundleFormData.description || bundleFormData.price < 0) {
         toast({
           variant: "destructive",
           title: "خطا در ثبت پک",
-          description: "لطفاً عنوان، توضیحات و قیمت پک را وارد کنید.",
+          description: "لطفاً عنوان، توضیحات و قیمت معتبر پک را وارد کنید. (قیمت صفر برای پک‌های رایگان مجاز است)",
         });
         return;
       }
@@ -1365,6 +1481,50 @@ const Dashboard = () => {
     });
     setIsEditingBundle(true);
     setCurrentBundleId(bundle.id);
+    setShowBundleForm(true);
+  };
+
+  // Function to cancel edit bundle
+  const cancelEditBundle = () => {
+    setBundleFormData({
+      title: "",
+      description: "",
+      price: 0,
+      discount_percentage: 0,
+      image_url: "",
+      is_active: true,
+      is_legend: false,
+      selected_programs: []
+    });
+    setIsEditingBundle(false);
+    setCurrentBundleId(null);
+    setShowBundleForm(false);
+  };
+
+  // Enhanced bundle filtering functions
+  const getFilteredBundles = () => {
+    let filteredBundles = [...bundles];
+
+    // Apply search filter
+    if (bundleSearchTerm.trim()) {
+      filteredBundles = filteredBundles.filter(bundle =>
+        bundle.title.toLowerCase().includes(bundleSearchTerm.toLowerCase()) ||
+        bundle.description.toLowerCase().includes(bundleSearchTerm.toLowerCase())
+      );
+    }
+
+    // Apply status filter
+    if (bundleStatusFilter !== "all") {
+      if (bundleStatusFilter === "active") {
+        filteredBundles = filteredBundles.filter(bundle => bundle.is_active);
+      } else if (bundleStatusFilter === "inactive") {
+        filteredBundles = filteredBundles.filter(bundle => !bundle.is_active);
+      } else if (bundleStatusFilter === "legend") {
+        filteredBundles = filteredBundles.filter(bundle => bundle.is_legend);
+      }
+    }
+
+    return filteredBundles;
   };
   
   // Function to calculate remaining days of subscription
@@ -2343,7 +2503,7 @@ const Dashboard = () => {
                         <CardTitle className="text-lg">{program.title}</CardTitle>
                       </CardHeader>
                       <CardContent>
-                        <p className="text-sm text-gray-400">قیمت: {program.price.toLocaleString()} تومان</p>
+                        <p className="text-sm text-gray-400">قیمت: {formatPrice(program.price)}</p>
                       </CardContent>
                       <CardFooter>
                         <Button 
@@ -2428,7 +2588,7 @@ const Dashboard = () => {
                         <CardTitle className="text-lg">{program.title}</CardTitle>
                       </CardHeader>
                       <CardContent>
-                        <p className="text-sm text-gray-400">قیمت: {program.price.toLocaleString()} تومان</p>
+                        <p className="text-sm text-gray-400">قیمت: {formatPrice(program.price)}</p>
                       </CardContent>
                       <CardFooter>
                         <Button 
@@ -2513,7 +2673,7 @@ const Dashboard = () => {
                         <CardTitle className="text-lg">{program.title}</CardTitle>
                       </CardHeader>
                       <CardContent>
-                        <p className="text-sm text-gray-400">قیمت: {program.price.toLocaleString()} تومان</p>
+                        <p className="text-sm text-gray-400">قیمت: {formatPrice(program.price)}</p>
                       </CardContent>
                       <CardFooter>
                         <Button 
@@ -2592,7 +2752,7 @@ const Dashboard = () => {
                     <CardDescription className="text-gray-400">آخرین پرداخت</CardDescription>
                     <CardTitle className="text-2xl text-white">
                       {userPurchases.length > 0 
-                        ? new Intl.NumberFormat('fa-IR').format(userPurchases[0]?.amount || 0) + ' تومان'
+                        ? formatPrice(userPurchases[0]?.amount || 0)
                         : 'بدون پرداخت'}
                     </CardTitle>
                   </CardHeader>
@@ -2719,7 +2879,7 @@ const Dashboard = () => {
                               )}
                             </TableCell>
                             <TableCell>
-                              {new Intl.NumberFormat('fa-IR').format(purchase.amount)} تومان
+                              {formatPrice(purchase.amount)}
                             </TableCell>
                             <TableCell>
                               <span className={`${
@@ -2752,215 +2912,528 @@ const Dashboard = () => {
             {/* Products Management Tab - Only visible to admins */}
             {user?.profile?.is_admin && (
               <TabsContent value="products" className="space-y-6 animate-in fade-in-50 duration-300">
-                <Card className="bg-gray-800/50 border-gray-700">
-                  <CardHeader>
-                    <CardTitle className="text-xl text-gold-500">مدیریت محصولات</CardTitle>
-                    <CardDescription>
-                      در این بخش می‌توانید محصولات سایت را مدیریت کنید.
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-6">
-                      {/* Product Form */}
-                      <div className="bg-gray-900/50 p-4 rounded-lg border border-gray-700">
-                        <h3 className="text-lg font-medium mb-4">
-                          {isEditingProduct ? "ویرایش محصول" : "افزودن محصول جدید"}
-                        </h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                {/* Header Section */}
+                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
+                  <div>
+                    <h2 className="text-3xl font-bold text-white mb-2">مدیریت محصولات</h2>
+                    <p className="text-gray-400">مدیریت کامل محصولات، دسته‌بندی و قیمت‌گذاری</p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowProductForm(!showProductForm)}
+                      className="border-gray-600 hover:border-gold-500"
+                    >
+                      {showProductForm ? <EyeOff size={16} className="ml-2" /> : <Eye size={16} className="ml-2" />}
+                      {showProductForm ? "مخفی کردن فرم" : "نمایش فرم"}
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        setShowProductForm(true);
+                        setIsEditingProduct(false);
+                        setProductFormData({
+                          title: "",
+                          description: "",
+                          price: 0,
+                          category: "training",
+                          image_url: "",
+                          program_url: ""
+                        });
+                      }}
+                      className="bg-gradient-to-r from-gold-500 to-amber-600 hover:from-gold-600 hover:to-amber-700 text-black font-medium"
+                    >
+                      <Plus size={16} className="ml-2" />
+                      محصول جدید
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Product Form */}
+                {showProductForm && (
+                  <Card className="bg-gradient-to-br from-gray-800/80 to-gray-900/80 border-gray-700/50 backdrop-blur-sm">
+                    <CardHeader className="pb-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <CardTitle className="text-xl text-gold-500 flex items-center">
+                            {isEditingProduct ? <Edit size={20} className="ml-2" /> : <Plus size={20} className="ml-2" />}
+                            {isEditingProduct ? "ویرایش محصول" : "افزودن محصول جدید"}
+                          </CardTitle>
+                          <CardDescription className="mt-1">
+                            {isEditingProduct ? "اطلاعات محصول را ویرایش کنید" : "محصول جدید خود را اضافه کنید"}
+                          </CardDescription>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setShowProductForm(false)}
+                          className="text-gray-400 hover:text-white"
+                        >
+                          <X size={16} />
+                        </Button>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        {/* Left Column */}
+                        <div className="space-y-4">
                           <div className="space-y-2">
-                            <Label htmlFor="product-title">عنوان محصول</Label>
+                            <Label htmlFor="product-title" className="text-sm font-medium text-gray-300">عنوان محصول</Label>
                             <Input
                               id="product-title"
                               value={productFormData.title}
                               onChange={(e) => setProductFormData({...productFormData, title: e.target.value})}
                               placeholder="عنوان محصول را وارد کنید"
+                              className="bg-gray-900/50 border-gray-600 focus:border-gold-500 text-white"
                             />
                           </div>
-                          <div className="space-y-2">
-                            <Label htmlFor="product-price">قیمت (تومان)</Label>
-                            <Input
-                              id="product-price"
-                              type="number"
-                              value={productFormData.price}
-                              onChange={(e) => setProductFormData({...productFormData, price: parseInt(e.target.value) || 0})}
-                              placeholder="قیمت محصول را وارد کنید"
-                            />
+                          
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                              <Label htmlFor="product-price" className="text-sm font-medium text-gray-300">قیمت (تومان)</Label>
+                              <Input
+                                id="product-price"
+                                type="number"
+                                value={productFormData.price}
+                                onChange={(e) => setProductFormData({...productFormData, price: parseInt(e.target.value) || 0})}
+                                placeholder="0"
+                                className="bg-gray-900/50 border-gray-600 focus:border-gold-500 text-white"
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor="product-category" className="text-sm font-medium text-gray-300">دسته‌بندی</Label>
+                              <Select
+                                value={productFormData.category}
+                                onValueChange={(value) => setProductFormData({...productFormData, category: value as 'training' | 'diet' | 'supplement'})}
+                              >
+                                <SelectTrigger id="product-category" className="bg-gray-900/50 border-gray-600 focus:border-gold-500 text-white">
+                                  <SelectValue placeholder="انتخاب کنید" />
+                                </SelectTrigger>
+                                <SelectContent className="bg-gray-800 border-gray-600">
+                                  <SelectItem value="training">🏋️ برنامه تمرینی</SelectItem>
+                                  <SelectItem value="diet">🥗 برنامه غذایی</SelectItem>
+                                  <SelectItem value="supplement">💊 مکمل</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
                           </div>
+
                           <div className="space-y-2">
-                            <Label htmlFor="product-category">دسته‌بندی</Label>
-                            <Select
-                              value={productFormData.category}
-                              onValueChange={(value) => setProductFormData({...productFormData, category: value as 'training' | 'diet' | 'supplement'})}
-                            >
-                              <SelectTrigger id="product-category">
-                                <SelectValue placeholder="دسته‌بندی را انتخاب کنید" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="training">برنامه تمرینی</SelectItem>
-                                <SelectItem value="diet">برنامه غذایی</SelectItem>
-                                <SelectItem value="supplement">مکمل</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                          <div className="space-y-2">
-                            <Label htmlFor="product-image">آدرس تصویر</Label>
+                            <Label htmlFor="product-image" className="text-sm font-medium text-gray-300">آدرس تصویر</Label>
                             <Input
                               id="product-image"
                               value={productFormData.image_url || ""}
                               onChange={(e) => setProductFormData({...productFormData, image_url: e.target.value})}
-                              placeholder="آدرس تصویر محصول را وارد کنید"
+                              placeholder="https://example.com/image.jpg"
+                              className="bg-gray-900/50 border-gray-600 focus:border-gold-500 text-white"
                             />
                           </div>
+
                           <div className="space-y-2">
-                            <Label htmlFor="product-url">آدرس برنامه</Label>
+                            <Label htmlFor="product-url" className="text-sm font-medium text-gray-300">آدرس برنامه</Label>
                             <Input
                               id="product-url"
                               value={productFormData.program_url || ""}
                               onChange={(e) => setProductFormData({...productFormData, program_url: e.target.value})}
-                              placeholder="آدرس برنامه را وارد کنید"
+                              placeholder="https://example.com/program"
+                              className="bg-gray-900/50 border-gray-600 focus:border-gold-500 text-white"
                             />
                           </div>
                         </div>
-                        <div className="space-y-2 mb-4">
-                          <Label htmlFor="product-description">توضیحات محصول</Label>
-                          <Textarea
-                            id="product-description"
-                            value={productFormData.description}
-                            onChange={(e) => setProductFormData({...productFormData, description: e.target.value})}
-                            placeholder="توضیحات محصول را وارد کنید"
-                            rows={5}
-                          />
-                        </div>
-                        <div className="flex justify-end space-x-2 space-x-reverse">
-                          {isEditingProduct ? (
-                            <>
-                              <Button
-                                variant="outline"
-                                onClick={cancelEditProduct}
-                                disabled={productLoading}
-                              >
-                                انصراف
-                              </Button>
-                              <Button
-                                onClick={updateProduct}
-                                disabled={productLoading}
-                              >
-                                {productLoading ? (
-                                  <>
-                                    <Loader2 className="ml-2 h-4 w-4 animate-spin" />
-                                    در حال بروزرسانی...
-                                  </>
-                                ) : (
-                                  "بروزرسانی محصول"
-                                )}
-                              </Button>
-                            </>
-                          ) : (
-                            <Button
-                              onClick={createProduct}
-                              disabled={productLoading}
-                            >
-                              {productLoading ? (
-                                <>
-                                  <Loader2 className="ml-2 h-4 w-4 animate-spin" />
-                                  در حال ثبت...
-                                </>
-                              ) : (
-                                "افزودن محصول"
-                              )}
-                            </Button>
+
+                        {/* Right Column */}
+                        <div className="space-y-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="product-description" className="text-sm font-medium text-gray-300">توضیحات محصول</Label>
+                            <Textarea
+                              id="product-description"
+                              value={productFormData.description}
+                              onChange={(e) => setProductFormData({...productFormData, description: e.target.value})}
+                              placeholder="توضیحات کامل محصول را وارد کنید..."
+                              rows={8}
+                              className="bg-gray-900/50 border-gray-600 focus:border-gold-500 text-white resize-none"
+                            />
+                          </div>
+
+                          {/* Preview */}
+                          {productFormData.image_url && (
+                            <div className="space-y-2">
+                              <Label className="text-sm font-medium text-gray-300">پیش‌نمایش تصویر</Label>
+                              <div className="w-full h-32 bg-gray-900/50 rounded-lg border border-gray-600 overflow-hidden">
+                                <img 
+                                  src={productFormData.image_url} 
+                                  alt="Preview" 
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => {
+                                    e.currentTarget.style.display = 'none';
+                                  }}
+                                />
+                              </div>
+                            </div>
                           )}
                         </div>
                       </div>
 
-                      {/* Products List */}
-                      <div>
-                        <h3 className="text-lg font-medium mb-4">لیست محصولات</h3>
-                        {productLoading && products.length === 0 ? (
-                          <div className="flex justify-center items-center py-8">
-                            <Loader2 className="h-8 w-8 animate-spin text-gold-500" />
-                          </div>
+                      {/* Form Actions */}
+                      <div className="flex justify-end space-x-3 space-x-reverse mt-6 pt-4 border-t border-gray-700">
+                        <Button
+                          variant="outline"
+                          onClick={cancelEditProduct}
+                          disabled={productLoading}
+                          className="border-gray-600 hover:border-gray-500"
+                        >
+                          انصراف
+                        </Button>
+                        {isEditingProduct ? (
+                          <Button
+                            onClick={updateProduct}
+                            disabled={productLoading}
+                            className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700"
+                          >
+                            {productLoading ? (
+                              <>
+                                <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                                در حال بروزرسانی...
+                              </>
+                            ) : (
+                              <>
+                                <Check className="ml-2 h-4 w-4" />
+                                بروزرسانی محصول
+                              </>
+                            )}
+                          </Button>
                         ) : (
-                          <div className="overflow-x-auto">
-                            <Table>
-                              <TableCaption>لیست محصولات موجود</TableCaption>
-                              <TableHeader>
-                                <TableRow>
-                                  <TableHead>عنوان</TableHead>
-                                  <TableHead>دسته‌بندی</TableHead>
-                                  <TableHead>قیمت (تومان)</TableHead>
-                                  <TableHead>تاریخ ایجاد</TableHead>
-                                  <TableHead>عملیات</TableHead>
-                                </TableRow>
-                              </TableHeader>
-                              <TableBody>
-                                {products.length === 0 ? (
-                                  <TableRow>
-                                    <TableCell colSpan={5} className="text-center py-8">
-                                      محصولی یافت نشد
-                                    </TableCell>
-                                  </TableRow>
-                                ) : (
-                                  products.map((product) => (
-                                    <TableRow key={product.id}>
-                                      <TableCell className="font-medium">{product.title}</TableCell>
-                                      <TableCell>
-                                        {product.category === 'training' && 'برنامه تمرینی'}
-                                        {product.category === 'diet' && 'برنامه غذایی'}
-                                        {product.category === 'supplement' && 'مکمل'}
-                                      </TableCell>
-                                      <TableCell>{new Intl.NumberFormat('fa-IR').format(product.price)}</TableCell>
-                                      <TableCell>{new Date(product.created_at).toLocaleDateString('fa-IR')}</TableCell>
-                                      <TableCell>
-                                        <div className="flex space-x-2 space-x-reverse">
-                                          <Button
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={() => editProduct(product)}
-                                          >
-                                            <Edit className="h-4 w-4" />
-                                          </Button>
-                                          <Dialog>
-                                            <DialogTrigger asChild>
-                                              <Button
-                                                variant="destructive"
-                                                size="sm"
-                                              >
-                                                <Trash2 className="h-4 w-4" />
-                                              </Button>
-                                            </DialogTrigger>
-                                            <DialogContent>
-                                              <DialogHeader>
-                                                <DialogTitle>حذف محصول</DialogTitle>
-                                                <DialogDescription>
-                                                  آیا از حذف محصول "{product.title}" اطمینان دارید؟
-                                                  این عمل غیرقابل بازگشت است.
-                                                </DialogDescription>
-                                              </DialogHeader>
-                                              <DialogFooter>
-                                                <DialogClose asChild>
-                                                  <Button variant="outline">انصراف</Button>
-                                                </DialogClose>
-                                                <Button
-                                                  variant="destructive"
-                                                  onClick={() => deleteProduct(product.id)}
-                                                >
-                                                  حذف
-                                                </Button>
-                                              </DialogFooter>
-                                            </DialogContent>
-                                          </Dialog>
+                          <Button
+                            onClick={createProduct}
+                            disabled={productLoading}
+                            className="bg-gradient-to-r from-gold-500 to-amber-600 hover:from-gold-600 hover:to-amber-700 text-black"
+                          >
+                            {productLoading ? (
+                              <>
+                                <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                                در حال ثبت...
+                              </>
+                            ) : (
+                              <>
+                                <Plus className="ml-2 h-4 w-4" />
+                                افزودن محصول
+                              </>
+                            )}
+                          </Button>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Products List */}
+                <Card className="bg-gradient-to-br from-gray-800/80 to-gray-900/80 border-gray-700/50 backdrop-blur-sm">
+                  <CardHeader className="pb-4">
+                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                      <div>
+                        <CardTitle className="text-xl text-white flex items-center">
+                          <List size={20} className="ml-2 text-gold-500" />
+                          لیست محصولات
+                        </CardTitle>
+                        <CardDescription className="mt-1">
+                          مدیریت و نمایش تمام محصولات موجود
+                        </CardDescription>
+                      </div>
+                      
+                      {/* Search and Filters */}
+                      <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+                        {/* Search */}
+                        <div className="relative">
+                          <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+                          <Input
+                            placeholder="جستجو در محصولات..."
+                            value={productSearchTerm}
+                            onChange={(e) => {
+                              setProductSearchTerm(e.target.value);
+                              resetPagination();
+                            }}
+                            className="pr-10 bg-gray-900/50 border-gray-600 focus:border-gold-500 text-white w-full sm:w-64"
+                          />
+                        </div>
+
+                        {/* Category Filter */}
+                        <Select
+                          value={productCategoryFilter}
+                          onValueChange={(value) => {
+                            setProductCategoryFilter(value);
+                            resetPagination();
+                          }}
+                        >
+                          <SelectTrigger className="bg-gray-900/50 border-gray-600 focus:border-gold-500 text-white w-full sm:w-40">
+                            <Filter size={16} className="ml-2" />
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent className="bg-gray-800 border-gray-600">
+                            <SelectItem value="all">همه دسته‌ها</SelectItem>
+                            <SelectItem value="training">🏋️ تمرینی</SelectItem>
+                            <SelectItem value="diet">🥗 غذایی</SelectItem>
+                            <SelectItem value="supplement">💊 مکمل</SelectItem>
+                          </SelectContent>
+                        </Select>
+
+                        {/* Sort */}
+                        <Select
+                          value={`${productSortBy}-${productSortOrder}`}
+                          onValueChange={(value) => {
+                            const [sortBy, sortOrder] = value.split('-');
+                            setProductSortBy(sortBy);
+                            setProductSortOrder(sortOrder as "asc" | "desc");
+                          }}
+                        >
+                          <SelectTrigger className="bg-gray-900/50 border-gray-600 focus:border-gold-500 text-white w-full sm:w-44">
+                            {productSortOrder === "asc" ? <SortAsc size={16} className="ml-2" /> : <SortDesc size={16} className="ml-2" />}
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent className="bg-gray-800 border-gray-600">
+                            <SelectItem value="created_at-desc">جدیدترین</SelectItem>
+                            <SelectItem value="created_at-asc">قدیمی‌ترین</SelectItem>
+                            <SelectItem value="title-asc">نام (الف-ی)</SelectItem>
+                            <SelectItem value="title-desc">نام (ی-الف)</SelectItem>
+                            <SelectItem value="price-asc">قیمت (کم به زیاد)</SelectItem>
+                            <SelectItem value="price-desc">قیمت (زیاد به کم)</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  
+                  <CardContent>
+                    {productLoading && products.length === 0 ? (
+                      <div className="flex justify-center items-center py-12">
+                        <Loader2 className="h-8 w-8 animate-spin text-gold-500" />
+                        <span className="mr-3 text-gray-400">در حال بارگذاری محصولات...</span>
+                      </div>
+                    ) : (
+                      <>
+                        {/* Products Table */}
+                        <div className="overflow-x-auto rounded-lg border border-gray-700">
+                          <Table>
+                            <TableHeader>
+                              <TableRow className="bg-gray-900/50 border-gray-700 hover:bg-gray-900/70">
+                                <TableHead className="text-gray-300 font-medium">محصول</TableHead>
+                                <TableHead className="text-gray-300 font-medium">دسته‌بندی</TableHead>
+                                <TableHead className="text-gray-300 font-medium">قیمت</TableHead>
+                                <TableHead className="text-gray-300 font-medium">تاریخ ایجاد</TableHead>
+                                <TableHead className="text-gray-300 font-medium text-center">عملیات</TableHead>
+                              </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                              {(() => {
+                                const { products: paginatedProducts, totalProducts } = getPaginatedProducts();
+                                
+                                if (totalProducts === 0) {
+                                  return (
+                                    <TableRow>
+                                      <TableCell colSpan={5} className="text-center py-12">
+                                        <div className="flex flex-col items-center justify-center text-gray-400">
+                                          <Search size={48} className="mb-4 opacity-50" />
+                                          <p className="text-lg font-medium mb-2">محصولی یافت نشد</p>
+                                          <p className="text-sm">فیلترهای جستجو را تغییر دهید یا محصول جدید اضافه کنید</p>
                                         </div>
                                       </TableCell>
                                     </TableRow>
-                                  ))
-                                )}
-                              </TableBody>
-                            </Table>
-                          </div>
-                        )}
-                      </div>
-                    </div>
+                                  );
+                                }
+
+                                return paginatedProducts.map((product) => (
+                                  <TableRow key={product.id} className="border-gray-700 hover:bg-gray-800/30 transition-colors">
+                                    <TableCell>
+                                      <div className="flex items-center space-x-3 space-x-reverse">
+                                        <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center overflow-hidden">
+                                          {product.image_url ? (
+                                            <img 
+                                              src={product.image_url} 
+                                              alt={product.title}
+                                              className="w-full h-full object-cover"
+                                            />
+                                          ) : (
+                                            <div className="text-gray-400">
+                                              {product.category === 'training' && '🏋️'}
+                                              {product.category === 'diet' && '🥗'}
+                                              {product.category === 'supplement' && '💊'}
+                                            </div>
+                                          )}
+                                        </div>
+                                        <div>
+                                          <p className="font-medium text-white">{product.title}</p>
+                                          <p className="text-sm text-gray-400 truncate max-w-xs">
+                                            {product.description.length > 50 
+                                              ? product.description.substring(0, 50) + '...' 
+                                              : product.description
+                                            }
+                                          </p>
+                                        </div>
+                                      </div>
+                                    </TableCell>
+                                    <TableCell>
+                                      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
+                                        product.category === 'training' 
+                                          ? 'bg-gold-500/20 text-gold-300' 
+                                          : product.category === 'diet'
+                                          ? 'bg-green-500/20 text-green-300'
+                                          : 'bg-purple-500/20 text-purple-300'
+                                      }`}>
+                                        {product.category === 'training' && '🏋️ تمرینی'}
+                                        {product.category === 'diet' && '🥗 غذایی'}
+                                        {product.category === 'supplement' && '💊 مکمل'}
+                                      </span>
+                                    </TableCell>
+                                    <TableCell>
+                                      <span className="font-medium text-white">
+                                        {formatPrice(product.price)}
+                                      </span>
+                                    </TableCell>
+                                    <TableCell className="text-gray-400">
+                                      {new Date(product.created_at).toLocaleDateString('fa-IR')}
+                                    </TableCell>
+                                    <TableCell>
+                                      <div className="flex items-center justify-center space-x-2 space-x-reverse">
+                                        <Button
+                                          variant="outline"
+                                          size="sm"
+                                          onClick={() => {
+                                            editProduct(product);
+                                            setShowProductForm(true);
+                                          }}
+                                          className="border-gray-600 hover:border-blue-500 hover:bg-blue-500/10"
+                                        >
+                                          <Edit className="h-4 w-4" />
+                                        </Button>
+                                        <Dialog>
+                                          <DialogTrigger asChild>
+                                            <Button
+                                              variant="outline"
+                                              size="sm"
+                                              className="border-gray-600 hover:border-red-500 hover:bg-red-500/10 text-red-400"
+                                            >
+                                              <Trash2 className="h-4 w-4" />
+                                            </Button>
+                                          </DialogTrigger>
+                                          <DialogContent className="bg-gray-800 border-gray-700 text-white">
+                                            <DialogHeader>
+                                              <DialogTitle className="text-red-400">حذف محصول</DialogTitle>
+                                              <DialogDescription className="text-gray-300">
+                                                آیا از حذف محصول "<span className="font-medium text-white">{product.title}</span>" اطمینان دارید؟
+                                                <br />
+                                                <span className="text-red-400 text-sm">این عمل غیرقابل بازگشت است.</span>
+                                              </DialogDescription>
+                                            </DialogHeader>
+                                            <DialogFooter>
+                                              <DialogClose asChild>
+                                                <Button variant="outline" className="border-gray-600">انصراف</Button>
+                                              </DialogClose>
+                                              <Button
+                                                variant="destructive"
+                                                onClick={() => deleteProduct(product.id)}
+                                                className="bg-red-600 hover:bg-red-700"
+                                              >
+                                                <Trash2 className="h-4 w-4 ml-2" />
+                                                حذف محصول
+                                              </Button>
+                                            </DialogFooter>
+                                          </DialogContent>
+                                        </Dialog>
+                                      </div>
+                                    </TableCell>
+                                  </TableRow>
+                                ));
+                              })()}
+                            </TableBody>
+                          </Table>
+                        </div>
+
+                        {/* Pagination */}
+                        {(() => {
+                          const { totalProducts, totalPages } = getPaginatedProducts();
+                          
+                          if (totalPages > 1) {
+                            return (
+                              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6 pt-4 border-t border-gray-700">
+                                <div className="flex items-center gap-2 text-sm text-gray-400">
+                                  <span>نمایش</span>
+                                  <Select
+                                    value={productsPerPage.toString()}
+                                    onValueChange={(value) => {
+                                      setProductsPerPage(parseInt(value));
+                                      resetPagination();
+                                    }}
+                                  >
+                                    <SelectTrigger className="w-20 h-8 bg-gray-900/50 border-gray-600 text-white">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent className="bg-gray-800 border-gray-600">
+                                      <SelectItem value="5">5</SelectItem>
+                                      <SelectItem value="10">10</SelectItem>
+                                      <SelectItem value="20">20</SelectItem>
+                                      <SelectItem value="50">50</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                  <span>از {totalProducts} محصول</span>
+                                </div>
+
+                                <div className="flex items-center gap-2">
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                                    disabled={currentPage === 1}
+                                    className="border-gray-600 hover:border-gold-500"
+                                  >
+                                    <ChevronRight size={16} />
+                                  </Button>
+                                  
+                                  <div className="flex items-center gap-1">
+                                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                                      let pageNum;
+                                      if (totalPages <= 5) {
+                                        pageNum = i + 1;
+                                      } else if (currentPage <= 3) {
+                                        pageNum = i + 1;
+                                      } else if (currentPage >= totalPages - 2) {
+                                        pageNum = totalPages - 4 + i;
+                                      } else {
+                                        pageNum = currentPage - 2 + i;
+                                      }
+                                      
+                                      return (
+                                        <Button
+                                          key={pageNum}
+                                          variant={currentPage === pageNum ? "default" : "outline"}
+                                          size="sm"
+                                          onClick={() => setCurrentPage(pageNum)}
+                                          className={currentPage === pageNum 
+                                            ? "bg-gold-500 text-black hover:bg-gold-600" 
+                                            : "border-gray-600 hover:border-gold-500"
+                                          }
+                                        >
+                                          {pageNum}
+                                        </Button>
+                                      );
+                                    })}
+                                  </div>
+
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                                    disabled={currentPage === totalPages}
+                                    className="border-gray-600 hover:border-gold-500"
+                                  >
+                                    <ChevronLeft size={16} />
+                                  </Button>
+                                </div>
+                              </div>
+                            );
+                          }
+                          return null;
+                        })()}
+                      </>
+                    )}
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -2969,41 +3442,88 @@ const Dashboard = () => {
             {/* Program Management Tab - Only visible to admins */}
             {user?.profile?.is_admin && (
               <TabsContent value="program-management" className="space-y-6 animate-in fade-in-50 duration-300">
-                <Card className="bg-gray-800/50 border-gray-700">
-                  <CardHeader>
-                    <CardTitle className="text-xl text-gold-500">مدیریت برنامه‌ها</CardTitle>
-                    <CardDescription>
-                      در این بخش می‌توانید جزئیات برنامه‌ها را مدیریت کنید.
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-6">
-                      {/* Program Detail Form */}
-                      {isEditingProgramDetail && (
-                        <div className="bg-gray-900/50 p-4 rounded-lg border border-gray-700">
-                          <h3 className="text-lg font-medium mb-4">ویرایش جزئیات برنامه</h3>
+                {/* Header Section */}
+                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
+                  <div>
+                    <h2 className="text-3xl font-bold text-white mb-2">مدیریت جزئیات برنامه‌ها</h2>
+                    <p className="text-gray-400">مدیریت محتوا و جزئیات برنامه‌های آموزشی</p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowProgramDetailForm(!showProgramDetailForm)}
+                      className="border-gray-600 hover:border-gold-500"
+                    >
+                      {showProgramDetailForm ? <EyeOff size={16} className="ml-2" /> : <Eye size={16} className="ml-2" />}
+                      {showProgramDetailForm ? "مخفی کردن فرم" : "نمایش فرم"}
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Program Detail Form */}
+                {(showProgramDetailForm || isEditingProgramDetail) && (
+                  <Card className="bg-gradient-to-br from-gray-800/80 to-gray-900/80 border-gray-700/50 backdrop-blur-sm">
+                    <CardHeader className="pb-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <CardTitle className="text-xl text-gold-500 flex items-center">
+                            <Edit size={20} className="ml-2" />
+                            {isEditingProgramDetail ? "ویرایش جزئیات برنامه" : "مشاهده جزئیات برنامه"}
+                          </CardTitle>
+                          <CardDescription className="mt-1">
+                            {isEditingProgramDetail ? "اطلاعات برنامه را ویرایش کنید" : "جزئیات برنامه‌های موجود"}
+                          </CardDescription>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setShowProgramDetailForm(false);
+                            if (isEditingProgramDetail) {
+                              cancelEditProgramDetail();
+                            }
+                          }}
+                          className="text-gray-400 hover:text-white"
+                        >
+                          <X size={16} />
+                        </Button>
+                      </div>
+                    </CardHeader>
+                    
+                    {isEditingProgramDetail && (
+                      <CardContent>
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                          {/* Left Column */}
                           <div className="space-y-4">
                             <div className="space-y-2">
-                              <Label htmlFor="program-detail-title">عنوان برنامه</Label>
+                              <Label htmlFor="program-detail-title" className="text-sm font-medium text-gray-300">عنوان برنامه</Label>
                               <Input
                                 id="program-detail-title"
                                 value={programDetailFormData.title}
                                 onChange={(e) => setProgramDetailFormData({...programDetailFormData, title: e.target.value})}
                                 placeholder="عنوان برنامه را وارد کنید"
+                                className="bg-gray-900/50 border-gray-600 focus:border-gold-500 text-white"
                               />
                             </div>
+                            
                             <div className="space-y-2">
-                              <Label htmlFor="program-detail-description">توضیحات برنامه</Label>
+                              <Label htmlFor="program-detail-description" className="text-sm font-medium text-gray-300">توضیحات برنامه</Label>
                               <Textarea
                                 id="program-detail-description"
                                 value={programDetailFormData.description}
                                 onChange={(e) => setProgramDetailFormData({...programDetailFormData, description: e.target.value})}
-                                placeholder="توضیحات برنامه را وارد کنید"
-                                rows={4}
+                                placeholder="توضیحات کامل برنامه را وارد کنید..."
+                                rows={6}
+                                className="bg-gray-900/50 border-gray-600 focus:border-gold-500 text-white resize-none"
                               />
                             </div>
+                          </div>
+
+                          {/* Right Column */}
+                          <div className="space-y-4">
                             <div className="space-y-2">
-                              <Label htmlFor="program-detail-details">جزئیات برنامه (JSON)</Label>
+                              <Label htmlFor="program-detail-details" className="text-sm font-medium text-gray-300">جزئیات برنامه (JSON)</Label>
                               <Textarea
                                 id="program-detail-details"
                                 value={programDetailFormData.details ? JSON.stringify(programDetailFormData.details, null, 2) : ""}
@@ -3016,12 +3536,14 @@ const Dashboard = () => {
                                     setProgramDetailFormData({...programDetailFormData, details: e.target.value});
                                   }
                                 }}
-                                placeholder='{"exercises": [], "instructions": ""}'
+                                placeholder='{"exercises": [], "instructions": "", "duration": "8 weeks"}'
                                 rows={6}
+                                className="bg-gray-900/50 border-gray-600 focus:border-gold-500 text-white resize-none font-mono text-sm"
                               />
                             </div>
+                            
                             <div className="space-y-2">
-                              <Label htmlFor="program-detail-weeks">هفته‌های برنامه (JSON)</Label>
+                              <Label htmlFor="program-detail-weeks" className="text-sm font-medium text-gray-300">هفته‌های برنامه (JSON)</Label>
                               <Textarea
                                 id="program-detail-weeks"
                                 value={programDetailFormData.weeks ? JSON.stringify(programDetailFormData.weeks, null, 2) : ""}
@@ -3034,92 +3556,198 @@ const Dashboard = () => {
                                     setProgramDetailFormData({...programDetailFormData, weeks: e.target.value});
                                   }
                                 }}
-                                placeholder='{"week1": {}, "week2": {}}'
+                                placeholder='{"week1": {"day1": {}, "day2": {}}, "week2": {}}'
                                 rows={6}
+                                className="bg-gray-900/50 border-gray-600 focus:border-gold-500 text-white resize-none font-mono text-sm"
                               />
                             </div>
                           </div>
-                          <div className="flex justify-end space-x-2 space-x-reverse mt-4">
-                            <Button
-                              variant="outline"
-                              onClick={cancelEditProgramDetail}
-                              disabled={programDetailsLoading}
-                            >
-                              انصراف
-                            </Button>
-                            <Button
-                              onClick={updateProgramDetail}
-                              disabled={programDetailsLoading}
-                            >
-                              {programDetailsLoading ? (
-                                <>
-                                  <Loader2 className="ml-2 h-4 w-4 animate-spin" />
-                                  در حال بروزرسانی...
-                                </>
-                              ) : (
-                                "بروزرسانی برنامه"
-                              )}
-                            </Button>
-                          </div>
                         </div>
-                      )}
 
-                      {/* Program Details List */}
+                        {/* Form Actions */}
+                        <div className="flex justify-end space-x-3 space-x-reverse mt-6 pt-4 border-t border-gray-700">
+                          <Button
+                            variant="outline"
+                            onClick={cancelEditProgramDetail}
+                            disabled={programDetailsLoading}
+                            className="border-gray-600 hover:border-gray-500"
+                          >
+                            انصراف
+                          </Button>
+                          <Button
+                            onClick={updateProgramDetail}
+                            disabled={programDetailsLoading}
+                            className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700"
+                          >
+                            {programDetailsLoading ? (
+                              <>
+                                <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                                در حال بروزرسانی...
+                              </>
+                            ) : (
+                              <>
+                                <Check className="ml-2 h-4 w-4" />
+                                بروزرسانی برنامه
+                              </>
+                            )}
+                          </Button>
+                        </div>
+                      </CardContent>
+                    )}
+                  </Card>
+                )}
+
+                {/* Program Details List */}
+                <Card className="bg-gradient-to-br from-gray-800/80 to-gray-900/80 border-gray-700/50 backdrop-blur-sm">
+                  <CardHeader className="pb-4">
+                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                       <div>
-                        <h3 className="text-lg font-medium mb-4">لیست برنامه‌ها</h3>
-                        {programDetailsLoading && programDetails.length === 0 ? (
-                          <div className="flex justify-center items-center py-8">
-                            <Loader2 className="h-8 w-8 animate-spin text-gold-500" />
-                          </div>
-                        ) : (
-                          <div className="overflow-x-auto">
-                            <Table>
-                              <TableCaption>لیست جزئیات برنامه‌های موجود</TableCaption>
-                              <TableHeader>
-                                <TableRow>
-                                  <TableHead>عنوان برنامه</TableHead>
-                                  <TableHead>محصول مرتبط</TableHead>
-                                  <TableHead>دسته‌بندی</TableHead>
-                                  <TableHead>تاریخ ایجاد</TableHead>
-                                  <TableHead>عملیات</TableHead>
-                                </TableRow>
-                              </TableHeader>
-                              <TableBody>
-                                {programDetails.length === 0 ? (
-                                  <TableRow>
-                                    <TableCell colSpan={5} className="text-center py-8">
-                                      برنامه‌ای یافت نشد
-                                    </TableCell>
-                                  </TableRow>
-                                ) : (
-                                  programDetails.map((programDetail: ProgramDetail) => (
-                                    <TableRow key={programDetail.id}>
-                                      <TableCell className="font-medium">{programDetail.title}</TableCell>
-                                      <TableCell>{programDetail.programs_sale?.title || "نامشخص"}</TableCell>
-                                      <TableCell>
-                                        {programDetail.programs_sale?.category === 'training' && 'برنامه تمرینی'}
-                                        {programDetail.programs_sale?.category === 'diet' && 'برنامه غذایی'}
-                                        {programDetail.programs_sale?.category === 'supplement' && 'مکمل'}
+                        <CardTitle className="text-xl text-white flex items-center">
+                          <List size={20} className="ml-2 text-gold-500" />
+                          لیست جزئیات برنامه‌ها
+                        </CardTitle>
+                        <CardDescription className="mt-1">
+                          مدیریت و ویرایش جزئیات تمام برنامه‌های موجود
+                        </CardDescription>
+                      </div>
+                      
+                      {/* Search and Filters */}
+                      <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+                        {/* Search */}
+                        <div className="relative">
+                          <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+                          <Input
+                            placeholder="جستجو در برنامه‌ها..."
+                            value={programDetailSearchTerm}
+                            onChange={(e) => setProgramDetailSearchTerm(e.target.value)}
+                            className="pr-10 bg-gray-900/50 border-gray-600 focus:border-gold-500 text-white w-full sm:w-64"
+                          />
+                        </div>
+
+                        {/* Category Filter */}
+                        <Select
+                          value={programDetailCategoryFilter}
+                          onValueChange={setProgramDetailCategoryFilter}
+                        >
+                          <SelectTrigger className="bg-gray-900/50 border-gray-600 focus:border-gold-500 text-white w-full sm:w-40">
+                            <Filter size={16} className="ml-2" />
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent className="bg-gray-800 border-gray-600">
+                            <SelectItem value="all">همه دسته‌ها</SelectItem>
+                            <SelectItem value="training">🏋️ تمرینی</SelectItem>
+                            <SelectItem value="diet">🥗 غذایی</SelectItem>
+                            <SelectItem value="supplement">💊 مکمل</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  
+                  <CardContent>
+                    {programDetailsLoading && programDetails.length === 0 ? (
+                      <div className="flex justify-center items-center py-12">
+                        <Loader2 className="h-8 w-8 animate-spin text-gold-500" />
+                        <span className="mr-3 text-gray-400">در حال بارگذاری برنامه‌ها...</span>
+                      </div>
+                    ) : (
+                      <>
+                        {/* Program Details Table */}
+                        <div className="overflow-x-auto rounded-lg border border-gray-700">
+                          <Table>
+                            <TableHeader>
+                              <TableRow className="bg-gray-900/50 border-gray-700 hover:bg-gray-900/70">
+                                <TableHead className="text-gray-300 font-medium">برنامه</TableHead>
+                                <TableHead className="text-gray-300 font-medium">محصول مرتبط</TableHead>
+                                <TableHead className="text-gray-300 font-medium">دسته‌بندی</TableHead>
+                                <TableHead className="text-gray-300 font-medium">تاریخ ایجاد</TableHead>
+                                <TableHead className="text-gray-300 font-medium text-center">عملیات</TableHead>
+                              </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                              {(() => {
+                                const filteredDetails = getFilteredProgramDetails();
+                                
+                                if (filteredDetails.length === 0) {
+                                  return (
+                                    <TableRow>
+                                      <TableCell colSpan={5} className="text-center py-12">
+                                        <div className="flex flex-col items-center justify-center text-gray-400">
+                                          <Search size={48} className="mb-4 opacity-50" />
+                                          <p className="text-lg font-medium mb-2">برنامه‌ای یافت نشد</p>
+                                          <p className="text-sm">فیلترهای جستجو را تغییر دهید</p>
+                                        </div>
                                       </TableCell>
-                                      <TableCell>{new Date(programDetail.created_at).toLocaleDateString('fa-IR')}</TableCell>
-                                      <TableCell>
+                                    </TableRow>
+                                  );
+                                }
+
+                                return filteredDetails.map((programDetail: ProgramDetail) => (
+                                  <TableRow key={programDetail.id} className="border-gray-700 hover:bg-gray-800/30 transition-colors">
+                                    <TableCell>
+                                      <div className="flex items-center space-x-3 space-x-reverse">
+                                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center">
+                                          <div className="text-gray-400">
+                                            {programDetail.programs_sale?.category === 'training' && '🏋️'}
+                                            {programDetail.programs_sale?.category === 'diet' && '🥗'}
+                                            {programDetail.programs_sale?.category === 'supplement' && '💊'}
+                                          </div>
+                                        </div>
+                                        <div>
+                                          <p className="font-medium text-white">{programDetail.title}</p>
+                                          <p className="text-sm text-gray-400 truncate max-w-xs">
+                                            {programDetail.description.length > 50 
+                                              ? programDetail.description.substring(0, 50) + '...' 
+                                              : programDetail.description
+                                            }
+                                          </p>
+                                        </div>
+                                      </div>
+                                    </TableCell>
+                                    <TableCell>
+                                      <span className="text-white font-medium">
+                                        {programDetail.programs_sale?.title || "نامشخص"}
+                                      </span>
+                                    </TableCell>
+                                    <TableCell>
+                                      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
+                                        programDetail.programs_sale?.category === 'training' 
+                                          ? 'bg-gold-500/20 text-gold-300' 
+                                          : programDetail.programs_sale?.category === 'diet'
+                                          ? 'bg-green-500/20 text-green-300'
+                                          : 'bg-purple-500/20 text-purple-300'
+                                      }`}>
+                                        {programDetail.programs_sale?.category === 'training' && '🏋️ تمرینی'}
+                                        {programDetail.programs_sale?.category === 'diet' && '🥗 غذایی'}
+                                        {programDetail.programs_sale?.category === 'supplement' && '💊 مکمل'}
+                                      </span>
+                                    </TableCell>
+                                    <TableCell className="text-gray-400">
+                                      {new Date(programDetail.created_at).toLocaleDateString('fa-IR')}
+                                    </TableCell>
+                                    <TableCell>
+                                      <div className="flex items-center justify-center">
                                         <Button
                                           variant="outline"
                                           size="sm"
-                                          onClick={() => editProgramDetail(programDetail)}
+                                          onClick={() => {
+                                            editProgramDetail(programDetail);
+                                            setShowProgramDetailForm(true);
+                                          }}
+                                          className="border-gray-600 hover:border-blue-500 hover:bg-blue-500/10"
                                         >
                                           <Edit className="h-4 w-4" />
                                         </Button>
-                                      </TableCell>
-                                    </TableRow>
-                                  ))
-                                )}
-                              </TableBody>
-                            </Table>
-                          </div>
-                        )}
-                      </div>
-                    </div>
+                                      </div>
+                                    </TableCell>
+                                  </TableRow>
+                                ));
+                              })()}
+                            </TableBody>
+                          </Table>
+                        </div>
+                      </>
+                    )}
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -3692,268 +4320,483 @@ const Dashboard = () => {
             {/* Bundle Management Tab - Only visible to admins */}
             {user?.profile?.is_admin && (
               <TabsContent value="bundles" className="space-y-6 animate-in fade-in-50 duration-300">
-                <Card className="bg-gray-800/50 border-gray-700">
-                  <CardHeader>
-                    <CardTitle className="text-xl text-gold-500">مدیریت پک‌ها</CardTitle>
-                    <CardDescription>
-                      در این بخش می‌توانید پک‌های محصولات را مدیریت کنید.
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-6">
-                      {/* Bundle Form */}
-                      <div className="bg-gray-700/30 rounded-lg p-4 border border-gray-700">
-                        <h3 className="text-lg font-medium mb-4">
-                          {isEditingBundle ? "ویرایش پک" : "ایجاد پک جدید"}
-                        </h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                {/* Header Section */}
+                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
+                  <div>
+                    <h2 className="text-3xl font-bold text-white mb-2">مدیریت پک‌های محصولات</h2>
+                    <p className="text-gray-400">ایجاد و مدیریت پک‌های ترکیبی محصولات با تخفیف ویژه</p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowBundleForm(!showBundleForm)}
+                      className="border-gray-600 hover:border-gold-500"
+                    >
+                      {showBundleForm ? <EyeOff size={16} className="ml-2" /> : <Eye size={16} className="ml-2" />}
+                      {showBundleForm ? "مخفی کردن فرم" : "نمایش فرم"}
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        setShowBundleForm(true);
+                        setIsEditingBundle(false);
+                        setBundleFormData({
+                          title: "",
+                          description: "",
+                          price: 0,
+                          discount_percentage: 0,
+                          image_url: "",
+                          is_active: true,
+                          is_legend: false,
+                          selected_programs: []
+                        });
+                      }}
+                      className="bg-gradient-to-r from-gold-500 to-amber-600 hover:from-gold-600 hover:to-amber-700 text-black font-medium"
+                    >
+                      <Plus size={16} className="ml-2" />
+                      پک جدید
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Bundle Form */}
+                {showBundleForm && (
+                  <Card className="bg-gradient-to-br from-gray-800/80 to-gray-900/80 border-gray-700/50 backdrop-blur-sm">
+                    <CardHeader className="pb-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <CardTitle className="text-xl text-gold-500 flex items-center">
+                            {isEditingBundle ? <Edit size={20} className="ml-2" /> : <Plus size={20} className="ml-2" />}
+                            {isEditingBundle ? "ویرایش پک" : "ایجاد پک جدید"}
+                          </CardTitle>
+                          <CardDescription className="mt-1">
+                            {isEditingBundle ? "اطلاعات پک را ویرایش کنید" : "پک ترکیبی جدید خود را ایجاد کنید"}
+                          </CardDescription>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setShowBundleForm(false)}
+                          className="text-gray-400 hover:text-white"
+                        >
+                          <X size={16} />
+                        </Button>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        {/* Left Column */}
+                        <div className="space-y-4">
                           <div className="space-y-2">
-                            <Label htmlFor="bundle_title">عنوان پک</Label>
+                            <Label htmlFor="bundle_title" className="text-sm font-medium text-gray-300">عنوان پک</Label>
                             <Input
                               id="bundle_title"
                               placeholder="عنوان پک را وارد کنید"
                               value={bundleFormData.title}
                               onChange={(e) => setBundleFormData({...bundleFormData, title: e.target.value})}
-                              className="bg-gray-800 border-gray-600"
+                              className="bg-gray-900/50 border-gray-600 focus:border-gold-500 text-white"
                             />
                           </div>
-                          <div className="space-y-2">
-                            <Label htmlFor="bundle_price">قیمت (تومان)</Label>
-                            <Input
-                              id="bundle_price"
-                              type="number"
-                              placeholder="قیمت پک"
-                              value={bundleFormData.price}
-                              onChange={(e) => setBundleFormData({...bundleFormData, price: parseInt(e.target.value) || 0})}
-                              className="bg-gray-800 border-gray-600"
-                            />
+                          
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                              <Label htmlFor="bundle_price" className="text-sm font-medium text-gray-300">قیمت (تومان)</Label>
+                              <Input
+                                id="bundle_price"
+                                type="number"
+                                placeholder="0"
+                                value={bundleFormData.price}
+                                onChange={(e) => setBundleFormData({...bundleFormData, price: parseInt(e.target.value) || 0})}
+                                className="bg-gray-900/50 border-gray-600 focus:border-gold-500 text-white"
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor="bundle_discount" className="text-sm font-medium text-gray-300">درصد تخفیف</Label>
+                              <Input
+                                id="bundle_discount"
+                                type="number"
+                                placeholder="0"
+                                value={bundleFormData.discount_percentage}
+                                onChange={(e) => setBundleFormData({...bundleFormData, discount_percentage: parseInt(e.target.value) || 0})}
+                                className="bg-gray-900/50 border-gray-600 focus:border-gold-500 text-white"
+                              />
+                            </div>
+
                           </div>
-                        </div>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                           <div className="space-y-2">
-                            <Label htmlFor="bundle_discount">درصد تخفیف</Label>
-                            <Input
-                              id="bundle_discount"
-                              type="number"
-                              placeholder="درصد تخفیف (اختیاری)"
-                              value={bundleFormData.discount_percentage}
-                              onChange={(e) => setBundleFormData({...bundleFormData, discount_percentage: parseInt(e.target.value) || 0})}
-                              className="bg-gray-800 border-gray-600"
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <Label htmlFor="bundle_image">تصویر پک</Label>
+                            <Label htmlFor="bundle_image" className="text-sm font-medium text-gray-300">آدرس تصویر</Label>
                             <Input
                               id="bundle_image"
-                              placeholder="لینک تصویر پک"
+                              placeholder="https://example.com/image.jpg"
                               value={bundleFormData.image_url}
                               onChange={(e) => setBundleFormData({...bundleFormData, image_url: e.target.value})}
-                              className="bg-gray-800 border-gray-600"
+                              className="bg-gray-900/50 border-gray-600 focus:border-gold-500 text-white"
                             />
                           </div>
+
+                          <div className="space-y-2">
+                            <Label htmlFor="bundle_description" className="text-sm font-medium text-gray-300">توضیحات پک</Label>
+                            <Textarea
+                              id="bundle_description"
+                              placeholder="توضیحات کامل پک را وارد کنید..."
+                              value={bundleFormData.description}
+                              onChange={(e) => setBundleFormData({...bundleFormData, description: e.target.value})}
+                              rows={4}
+                              className="bg-gray-900/50 border-gray-600 focus:border-gold-500 text-white resize-none"
+                            />
+                          </div>
+
+                          {/* Bundle Options */}
+                          <div className="flex items-center space-x-6 space-x-reverse pt-2">
+                            <div className="flex items-center space-x-2 space-x-reverse">
+                              <Switch
+                                id="bundle_active"
+                                checked={bundleFormData.is_active}
+                                onCheckedChange={(checked) => setBundleFormData({...bundleFormData, is_active: checked})}
+                              />
+                              <Label htmlFor="bundle_active" className="text-sm text-gray-300">فعال</Label>
+                            </div>
+                            <div className="flex items-center space-x-2 space-x-reverse">
+                              <Switch
+                                id="bundle_legend"
+                                checked={bundleFormData.is_legend}
+                                onCheckedChange={(checked) => setBundleFormData({...bundleFormData, is_legend: checked})}
+                              />
+                              <Label htmlFor="bundle_legend" className="text-sm text-gray-300">پک افسانه‌ای</Label>
+                            </div>
+                          </div>
                         </div>
-                        
-                        <div className="space-y-2 mb-4">
-                          <Label htmlFor="bundle_description">توضیحات پک</Label>
-                          <Textarea
-                            id="bundle_description"
-                            placeholder="توضیحات پک را وارد کنید"
-                            value={bundleFormData.description}
-                            onChange={(e) => setBundleFormData({...bundleFormData, description: e.target.value})}
-                            className="bg-gray-800 border-gray-600 min-h-[100px]"
-                          />
-                        </div>
-                        
-                        {/* Program Selection */}
-                        <div className="space-y-2 mb-4">
-                          <Label>انتخاب برنامه‌ها برای پک</Label>
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            {products.map((program) => (
-                              <div key={program.id} className="flex items-center space-x-2 space-x-reverse">
-                                <input
-                                  type="checkbox"
-                                  id={`program-${program.id}`}
-                                  checked={bundleFormData.selected_programs.includes(program.id)}
-                                  onChange={(e) => {
-                                    if (e.target.checked) {
-                                      setBundleFormData({
-                                        ...bundleFormData,
-                                        selected_programs: [...bundleFormData.selected_programs, program.id]
-                                      });
-                                    } else {
-                                      setBundleFormData({
-                                        ...bundleFormData,
-                                        selected_programs: bundleFormData.selected_programs.filter(id => id !== program.id)
-                                      });
-                                    }
-                                  }}
-                                  className="rounded border-gray-600 text-gold-500 focus:ring-gold-500"
-                                />
-                                <label htmlFor={`program-${program.id}`} className="text-sm text-white">
-                                  {program.title} ({program.category === 'training' ? 'تمرینی' : program.category === 'diet' ? 'غذایی' : 'مکمل'})
-                                </label>
+
+                        {/* Right Column - Program Selection */}
+                        <div className="space-y-4">
+                          <div className="space-y-2">
+                            <Label className="text-sm font-medium text-gray-300">انتخاب برنامه‌ها برای پک</Label>
+                            <div className="bg-gray-900/30 rounded-lg border border-gray-600 p-4 max-h-80 overflow-y-auto">
+                              {products.length === 0 ? (
+                                <p className="text-gray-400 text-sm text-center py-4">هیچ محصولی یافت نشد</p>
+                              ) : (
+                                <div className="space-y-3">
+                                  {products.map((program) => (
+                                    <div key={program.id} className="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-gray-800/50 transition-colors">
+                                      <input
+                                        type="checkbox"
+                                        id={`program-${program.id}`}
+                                        checked={bundleFormData.selected_programs.includes(program.id)}
+                                        onChange={(e) => {
+                                          if (e.target.checked) {
+                                            setBundleFormData({
+                                              ...bundleFormData,
+                                              selected_programs: [...bundleFormData.selected_programs, program.id]
+                                            });
+                                          } else {
+                                            setBundleFormData({
+                                              ...bundleFormData,
+                                              selected_programs: bundleFormData.selected_programs.filter(id => id !== program.id)
+                                            });
+                                          }
+                                        }}
+                                        className="rounded border-gray-600 text-gold-500 focus:ring-gold-500 focus:ring-offset-0"
+                                      />
+                                      <div className="flex-1">
+                                        <label htmlFor={`program-${program.id}`} className="text-sm text-white font-medium cursor-pointer">
+                                          {program.title}
+                                        </label>
+                                        <div className="flex items-center gap-2 mt-1">
+                                          <span className={`text-xs px-2 py-1 rounded-full ${
+                                            program.category === 'training' 
+                                              ? 'bg-gold-500/20 text-gold-300' 
+                                              : program.category === 'diet'
+                                              ? 'bg-green-500/20 text-green-300'
+                                              : 'bg-purple-500/20 text-purple-300'
+                                          }`}>
+                                            {program.category === 'training' && '🏋️ تمرینی'}
+                                            {program.category === 'diet' && '🥗 غذایی'}
+                                            {program.category === 'supplement' && '💊 مکمل'}
+                                          </span>
+                                          <span className="text-xs text-gray-400">
+                                            {formatPrice(program.price)}
+                                          </span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Selected Programs Summary */}
+                          {bundleFormData.selected_programs.length > 0 && (
+                            <div className="bg-gray-900/30 rounded-lg border border-gray-600 p-4">
+                              <h4 className="text-sm font-medium text-gray-300 mb-2">خلاصه پک ({bundleFormData.selected_programs.length} محصول)</h4>
+                              <div className="space-y-1">
+                                {bundleFormData.selected_programs.map(programId => {
+                                  const program = products.find(p => p.id === programId);
+                                  return program ? (
+                                    <div key={programId} className="text-xs text-gray-400 flex justify-between">
+                                      <span>{program.title}</span>
+                                      <span>{formatPrice(program.price)}</span>
+                                    </div>
+                                  ) : null;
+                                })}
+                                <div className="border-t border-gray-600 pt-2 mt-2">
+                                  <div className="text-sm font-medium text-white flex justify-between">
+                                    <span>مجموع قیمت اصلی:</span>
+                                    <span>
+                                      {new Intl.NumberFormat('fa-IR').format(
+                                        bundleFormData.selected_programs.reduce((total, programId) => {
+                                          const program = products.find(p => p.id === programId);
+                                          return total + (program?.price || 0);
+                                        }, 0)
+                                      )} تومان
+                                    </span>
+                                  </div>
+                                  {bundleFormData.discount_percentage > 0 && (
+                                    <div className="text-sm text-green-400 flex justify-between">
+                                      <span>صرفه‌جویی:</span>
+                                      <span>
+                                        {new Intl.NumberFormat('fa-IR').format(
+                                          Math.round((bundleFormData.selected_programs.reduce((total, programId) => {
+                                            const program = products.find(p => p.id === programId);
+                                            return total + (program?.price || 0);
+                                          }, 0) * bundleFormData.discount_percentage) / 100)
+                                        )} تومان
+                                      </span>
+                                    </div>
+                                  )}
+                                </div>
                               </div>
-                            ))}
-                          </div>
-                        </div>
-                        
-                        {/* Bundle Options */}
-                        <div className="flex items-center space-x-4 space-x-reverse mb-4">
-                          <div className="flex items-center space-x-2 space-x-reverse">
-                            <Switch
-                              id="bundle_active"
-                              checked={bundleFormData.is_active}
-                              onCheckedChange={(checked) => setBundleFormData({...bundleFormData, is_active: checked})}
-                            />
-                            <Label htmlFor="bundle_active">فعال</Label>
-                          </div>
-                          <div className="flex items-center space-x-2 space-x-reverse">
-                            <Switch
-                              id="bundle_legend"
-                              checked={bundleFormData.is_legend}
-                              onCheckedChange={(checked) => setBundleFormData({...bundleFormData, is_legend: checked})}
-                            />
-                            <Label htmlFor="bundle_legend">پک افسانه‌ای</Label>
-                          </div>
-                        </div>
-                        
-                        <div className="flex gap-2">
-                          <Button 
-                            onClick={isEditingBundle ? updateBundle : createBundle}
-                            disabled={bundleLoading}
-                            className="bg-gold-500 hover:bg-gold-600 text-black"
-                          >
-                            {bundleLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                            {isEditingBundle ? "بروزرسانی پک" : "ایجاد پک"}
-                          </Button>
-                          {isEditingBundle && (
-                            <Button 
-                              variant="outline"
-                              onClick={() => {
-                                setIsEditingBundle(false);
-                                setCurrentBundleId(null);
-                                setBundleFormData({
-                                  title: "",
-                                  description: "",
-                                  price: 0,
-                                  discount_percentage: 0,
-                                  image_url: "",
-                                  is_active: true,
-                                  is_legend: false,
-                                  selected_programs: []
-                                });
-                              }}
-                              className="border-gray-600 hover:bg-gray-700"
-                            >
-                              لغو
-                            </Button>
+                            </div>
                           )}
                         </div>
                       </div>
+
+                      {/* Form Actions */}
+                      <div className="flex justify-end space-x-3 space-x-reverse mt-6 pt-4 border-t border-gray-700">
+                        <Button
+                          variant="outline"
+                          onClick={cancelEditBundle}
+                          disabled={bundleLoading}
+                          className="border-gray-600 hover:border-gray-500"
+                        >
+                          انصراف
+                        </Button>
+                        <Button
+                          onClick={isEditingBundle ? updateBundle : createBundle}
+                          disabled={bundleLoading || bundleFormData.selected_programs.length === 0}
+                          className={isEditingBundle 
+                            ? "bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700"
+                            : "bg-gradient-to-r from-gold-500 to-amber-600 hover:from-gold-600 hover:to-amber-700 text-black"
+                          }
+                        >
+                          {bundleLoading ? (
+                            <>
+                              <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                              {isEditingBundle ? "در حال بروزرسانی..." : "در حال ایجاد..."}
+                            </>
+                          ) : (
+                            <>
+                              {isEditingBundle ? <Check className="ml-2 h-4 w-4" /> : <Plus className="ml-2 h-4 w-4" />}
+                              {isEditingBundle ? "بروزرسانی پک" : "ایجاد پک"}
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Bundles List */}
+                <Card className="bg-gradient-to-br from-gray-800/80 to-gray-900/80 border-gray-700/50 backdrop-blur-sm">
+                  <CardHeader className="pb-4">
+                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                      <div>
+                        <CardTitle className="text-xl text-white flex items-center">
+                          <Award size={20} className="ml-2 text-gold-500" />
+                          لیست پک‌های محصولات
+                        </CardTitle>
+                        <CardDescription className="mt-1">
+                          مدیریت و نمایش تمام پک‌های ترکیبی موجود
+                        </CardDescription>
+                      </div>
                       
-                      {/* Bundles List */}
-                      <div className="bg-gray-700/30 rounded-lg p-4 border border-gray-700">
-                        <h3 className="text-lg font-medium mb-4">لیست پک‌ها</h3>
-                        {bundleLoading ? (
-                          <div className="flex items-center justify-center py-8">
-                            <Loader2 className="h-8 w-8 animate-spin text-gold-500" />
-                            <span className="mr-2 text-gray-400">در حال بارگذاری پک‌ها...</span>
-                          </div>
-                        ) : bundles.length > 0 ? (
-                          <div className="space-y-4">
-                            {bundles.map((bundle) => (
-                              <div key={bundle.id} className="bg-gray-800/50 rounded-lg p-4 border border-gray-600">
-                                <div className="flex items-start justify-between">
-                                  <div className="flex-1">
-                                    <div className="flex items-center gap-2 mb-2">
-                                      <h4 className="font-medium text-white">{bundle.title}</h4>
-                                      {bundle.is_legend && (
-                                        <span className="bg-gold-500/20 text-gold-400 text-xs font-medium px-2 py-1 rounded-full">
-                                          افسانه‌ای
-                                        </span>
-                                      )}
-                                      {!bundle.is_active && (
-                                        <span className="bg-red-500/20 text-red-400 text-xs font-medium px-2 py-1 rounded-full">
-                                          غیرفعال
-                                        </span>
-                                      )}
-                                    </div>
-                                    <p className="text-gray-400 text-sm mb-2">{bundle.description}</p>
-                                    <div className="flex items-center gap-4 text-sm text-gray-400">
-                                      <span>قیمت: {new Intl.NumberFormat('fa-IR').format(bundle.price)} تومان</span>
-                                      {bundle.discount_percentage && (
-                                        <span>تخفیف: {bundle.discount_percentage}%</span>
-                                      )}
-                                      <span>تعداد برنامه‌ها: {bundle.bundle_items?.length || 0}</span>
-                                    </div>
-                                    {bundle.bundle_items && bundle.bundle_items.length > 0 && (
-                                      <div className="mt-2">
-                                        <span className="text-xs text-gray-500">شامل: </span>
-                                        {bundle.bundle_items.map((item: any, index: number) => (
-                                          <span key={index} className="text-xs text-gray-400">
-                                            {item.programs_sale.title}
-                                            {index < bundle.bundle_items.length - 1 ? "، " : ""}
+                      {/* Search and Filters */}
+                      <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+                        {/* Search */}
+                        <div className="relative">
+                          <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+                          <Input
+                            placeholder="جستجو در پک‌ها..."
+                            value={bundleSearchTerm}
+                            onChange={(e) => setBundleSearchTerm(e.target.value)}
+                            className="pr-10 bg-gray-900/50 border-gray-600 focus:border-gold-500 text-white w-full sm:w-64"
+                          />
+                        </div>
+
+                        {/* Status Filter */}
+                        <Select
+                          value={bundleStatusFilter}
+                          onValueChange={setBundleStatusFilter}
+                        >
+                          <SelectTrigger className="bg-gray-900/50 border-gray-600 focus:border-gold-500 text-white w-full sm:w-40">
+                            <Filter size={16} className="ml-2" />
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent className="bg-gray-800 border-gray-600">
+                            <SelectItem value="all">همه پک‌ها</SelectItem>
+                            <SelectItem value="active">✅ فعال</SelectItem>
+                            <SelectItem value="inactive">❌ غیرفعال</SelectItem>
+                            <SelectItem value="legend">⭐ افسانه‌ای</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  
+                  <CardContent>
+                    {bundleLoading && bundles.length === 0 ? (
+                      <div className="flex justify-center items-center py-12">
+                        <Loader2 className="h-8 w-8 animate-spin text-gold-500" />
+                        <span className="mr-3 text-gray-400">در حال بارگذاری پک‌ها...</span>
+                      </div>
+                    ) : (
+                      <>
+                        {(() => {
+                          const filteredBundles = getFilteredBundles();
+                          
+                          if (filteredBundles.length === 0) {
+                            return (
+                              <div className="text-center py-12">
+                                <div className="flex flex-col items-center justify-center text-gray-400">
+                                  <Award size={48} className="mb-4 opacity-50" />
+                                  <p className="text-lg font-medium mb-2">هیچ پکی یافت نشد</p>
+                                  <p className="text-sm">اولین پک خود را ایجاد کنید یا فیلترهای جستجو را تغییر دهید</p>
+                                </div>
+                              </div>
+                            );
+                          }
+
+                          return (
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                              {filteredBundles.map((bundle) => (
+                                <div key={bundle.id} className="bg-gradient-to-br from-gray-900/50 to-gray-800/50 rounded-lg p-6 border border-gray-700/50 hover:border-gray-600/50 transition-all duration-300">
+                                  <div className="flex items-start justify-between mb-4">
+                                    <div className="flex-1">
+                                      <div className="flex items-center gap-2 mb-2">
+                                        <h4 className="font-semibold text-white text-lg">{bundle.title}</h4>
+                                        {bundle.is_legend && (
+                                          <span className="bg-gradient-to-r from-gold-500/20 to-amber-500/20 text-gold-400 text-xs font-medium px-2 py-1 rounded-full border border-gold-500/30">
+                                            ⭐ افسانه‌ای
                                           </span>
-                                        ))}
+                                        )}
+                                        {!bundle.is_active && (
+                                          <span className="bg-red-500/20 text-red-400 text-xs font-medium px-2 py-1 rounded-full border border-red-500/30">
+                                            ❌ غیرفعال
+                                          </span>
+                                        )}
                                       </div>
-                                    )}
+                                      <p className="text-gray-400 text-sm mb-3 leading-relaxed">{bundle.description}</p>
+                                      
+                                      <div className="grid grid-cols-2 gap-4 mb-3">
+                                        <div className="bg-gray-800/50 rounded-lg p-3">
+                                          <div className="text-xs text-gray-500 mb-1">قیمت پک</div>
+                                          <div className="text-white font-semibold">
+                                            {formatPrice(bundle.price)}
+                                          </div>
+                                        </div>
+                                        <div className="bg-gray-800/50 rounded-lg p-3">
+                                          <div className="text-xs text-gray-500 mb-1">تعداد محصولات</div>
+                                          <div className="text-white font-semibold">
+                                            {bundle.bundle_items?.length || 0} محصول
+                                          </div>
+                                        </div>
+                                      </div>
+
+                                      {bundle.discount_percentage > 0 && (
+                                        <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-3 mb-3">
+                                          <div className="text-green-400 text-sm font-medium">
+                                            💰 تخفیف {bundle.discount_percentage}% برای این پک
+                                          </div>
+                                        </div>
+                                      )}
+
+                                      {bundle.bundle_items && bundle.bundle_items.length > 0 && (
+                                        <div className="bg-gray-800/30 rounded-lg p-3">
+                                          <div className="text-xs text-gray-500 mb-2">محصولات شامل:</div>
+                                          <div className="space-y-1">
+                                            {bundle.bundle_items.map((item: any, index: number) => (
+                                              <div key={index} className="text-xs text-gray-300 flex items-center justify-between">
+                                                <span>• {item.programs_sale.title}</span>
+                                                <span className="text-gray-500">
+                                                  {formatPrice(item.programs_sale.price)}
+                                                </span>
+                                              </div>
+                                            ))}
+                                          </div>
+                                        </div>
+                                      )}
+                                    </div>
                                   </div>
-                                  <div className="flex gap-2">
-                                    <Button
-                                      size="sm"
-                                      variant="outline"
-                                      onClick={() => editBundle(bundle)}
-                                      className="border-gray-600 hover:bg-gray-700"
-                                    >
-                                      <Edit size={16} />
-                                    </Button>
-                                    <Dialog>
-                                      <DialogTrigger asChild>
-                                        <Button
-                                          size="sm"
-                                          variant="outline"
-                                          className="border-red-600 text-red-400 hover:bg-red-500/10"
-                                        >
-                                          <Trash2 size={16} />
-                                        </Button>
-                                      </DialogTrigger>
-                                      <DialogContent className="bg-gray-800 border-gray-700">
-                                        <DialogHeader>
-                                          <DialogTitle className="text-white">حذف پک</DialogTitle>
-                                          <DialogDescription className="text-gray-400">
-                                            آیا مطمئن هستید که می‌خواهید این پک را حذف کنید؟ این عمل قابل بازگشت نیست.
-                                          </DialogDescription>
-                                        </DialogHeader>
-                                        <DialogFooter>
-                                          <DialogClose asChild>
-                                            <Button variant="outline" className="border-gray-600">
-                                              لغو
-                                            </Button>
-                                          </DialogClose>
-                                          <DialogClose asChild>
+
+                                  <div className="flex items-center justify-between pt-4 border-t border-gray-700/50">
+                                    <div className="text-xs text-gray-500">
+                                      ایجاد شده: {new Date(bundle.created_at).toLocaleDateString('fa-IR')}
+                                    </div>
+                                    <div className="flex gap-2">
+                                      <Button
+                                        size="sm"
+                                        variant="outline"
+                                        onClick={() => {
+                                          editBundle(bundle);
+                                          setShowBundleForm(true);
+                                        }}
+                                        className="border-gray-600 hover:border-blue-500 hover:bg-blue-500/10"
+                                      >
+                                        <Edit size={14} />
+                                      </Button>
+                                      <Dialog>
+                                        <DialogTrigger asChild>
+                                          <Button
+                                            size="sm"
+                                            variant="outline"
+                                            className="border-gray-600 hover:border-red-500 hover:bg-red-500/10 text-red-400"
+                                          >
+                                            <Trash2 size={14} />
+                                          </Button>
+                                        </DialogTrigger>
+                                        <DialogContent className="bg-gray-800 border-gray-700 text-white">
+                                          <DialogHeader>
+                                            <DialogTitle className="text-red-400">حذف پک</DialogTitle>
+                                            <DialogDescription className="text-gray-300">
+                                              آیا از حذف پک "<span className="font-medium text-white">{bundle.title}</span>" اطمینان دارید؟
+                                              <br />
+                                              <span className="text-red-400 text-sm">این عمل غیرقابل بازگشت است.</span>
+                                            </DialogDescription>
+                                          </DialogHeader>
+                                          <DialogFooter>
+                                            <DialogClose asChild>
+                                              <Button variant="outline" className="border-gray-600">انصراف</Button>
+                                            </DialogClose>
                                             <Button
                                               variant="destructive"
                                               onClick={() => deleteBundle(bundle.id)}
+                                              className="bg-red-600 hover:bg-red-700"
                                             >
-                                              حذف
+                                              <Trash2 className="h-4 w-4 ml-2" />
+                                              حذف پک
                                             </Button>
-                                          </DialogClose>
-                                        </DialogFooter>
-                                      </DialogContent>
-                                    </Dialog>
+                                          </DialogFooter>
+                                        </DialogContent>
+                                      </Dialog>
+                                    </div>
                                   </div>
                                 </div>
-                              </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <div className="text-center py-8 text-gray-400">
-                            هیچ پکی یافت نشد. اولین پک خود را ایجاد کنید.
-                          </div>
-                        )}
-                      </div>
-                    </div>
+                              ))}
+                            </div>
+                          );
+                        })()}
+                      </>
+                    )}
                   </CardContent>
                 </Card>
               </TabsContent>

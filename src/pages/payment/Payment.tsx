@@ -396,6 +396,91 @@ const Payment = () => {
     }
   }, [programParam, bundleParam, planParam, cycleParam]);
 
+  // Function to handle free product
+  const handleFreeProduct = async () => {
+    if (!user) return;
+    
+    try {
+      setLoading(true);
+      
+      if (program) {
+        // Add free program to user's purchases
+        const { error: purchaseError } = await supabase
+          .from("user_purchases")
+          .insert({
+            user_id: user.id,
+            program_id: program.id,
+            amount: 0,
+            payment_status: 'completed',
+            purchase_date: new Date().toISOString(),
+          });
+        
+        if (purchaseError) throw purchaseError;
+        
+        // Create order record for tracking
+        const { error: orderError } = await supabase
+          .from("orders")
+          .insert({
+            user_id: user.id,
+            program_id: program.id,
+            amount: 0,
+            discount_amount: discountAmount,
+            status: 'completed',
+            phone_number: phoneNumber,
+            discount_code: discountApplied ? discount : null
+          });
+        
+        if (orderError) throw orderError;
+        
+        toast({
+          title: "✅ محصول رایگان اضافه شد",
+          description: "محصول با موفقیت به داشبورد شما اضافه شد.",
+        });
+        
+        // Redirect to dashboard
+        setTimeout(() => {
+          navigate('/profile?tab=purchases');
+        }, 2000);
+        
+      } else if (bundle) {
+        // Add free bundle to user's purchases
+        const { data: purchaseData, error: purchaseError } = await supabase
+          .from("user_purchases")
+          .insert({
+            user_id: user.id,
+            amount: 0,
+            payment_status: 'completed',
+            purchase_date: new Date().toISOString(),
+            program_id: null
+          })
+          .select()
+          .single();
+
+        if (purchaseError) throw purchaseError;
+        
+        toast({
+          title: "✅ پک رایگان اضافه شد",
+          description: "پک با موفقیت به داشبورد شما اضافه شد.",
+        });
+        
+        // Redirect to dashboard
+        setTimeout(() => {
+          navigate('/profile?tab=purchases');
+        }, 2000);
+      }
+      
+    } catch (error) {
+      console.error("Error adding free product:", error);
+      toast({
+        variant: "destructive",
+        title: "خطا در اضافه کردن محصول",
+        description: "مشکلی در اضافه کردن محصول رایگان رخ داد. لطفاً دوباره تلاش کنید.",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Function to proceed to payment
   const proceedToPayment = async () => {
     if ((!planParam && !program && !bundle) || !user) {
@@ -414,6 +499,12 @@ const Payment = () => {
         title: "شماره تماس الزامی است",
         description: "لطفاً شماره تماس خود را وارد کنید.",
       });
+      return;
+    }
+    
+    // Check if product is free
+    if ((program && finalPrice === 0) || (bundle && finalPrice === 0)) {
+      await handleFreeProduct();
       return;
     }
     
@@ -764,6 +855,11 @@ const Payment = () => {
                         <Loader2 className="ml-2 h-4 w-4 animate-spin" />
                         در حال پردازش...
                       </>
+                    ) : finalPrice === 0 ? (
+                      <>
+                        <CheckCircle className="ml-2 h-4 w-4" />
+                        دریافت رایگان
+                      </>
                     ) : (
                       <>
                         <ShoppingCart className="ml-2 h-4 w-4" />
@@ -1013,6 +1109,11 @@ const Payment = () => {
                       <>
                         <Loader2 className="ml-2 h-4 w-4 animate-spin" />
                         در حال پردازش...
+                      </>
+                    ) : finalPrice === 0 ? (
+                      <>
+                        <CheckCircle className="ml-2 h-4 w-4" />
+                        دریافت رایگان
                       </>
                     ) : (
                       <>
