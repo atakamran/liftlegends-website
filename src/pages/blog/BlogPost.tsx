@@ -159,7 +159,45 @@ const BlogPostPage = () => {
     }
   };
 
-  // Helper function to format content with proper line breaks and spacing
+  // Helper function to generate SEO-optimized title
+  const getOptimizedTitle = (post: BlogPost) => {
+    const currentYear = new Date().getFullYear();
+    const categoryName = getCategoryName(post.category);
+    
+    // If title already contains year or is already optimized, use as is
+    if (post.title.includes('2024') || post.title.includes('2025') || post.title.length > 50) {
+      return `${post.title} | لیفت لجندز`;
+    }
+    
+    // Add category and year for SEO optimization
+    return `${post.title} - راهنمای ${categoryName} (${currentYear}) | لیفت لجندز`;
+  };
+
+  // Helper function to generate SEO-optimized meta description
+  const getOptimizedMetaDescription = (post: BlogPost) => {
+    if (post.excerpt && post.excerpt.length > 0) {
+      // If excerpt exists, use it but ensure it ends with CTA
+      const excerpt = post.excerpt.length > 120 ? post.excerpt.substring(0, 120) + '...' : post.excerpt;
+      return `${excerpt} با اپ هوش مصنوعی Lift Legends – از همین امروز شروع کن.`;
+    }
+    
+    // Generate based on category
+    const categoryName = getCategoryName(post.category);
+    switch(post.category?.toLowerCase()) {
+      case 'workout':
+        return `راهنمای کامل ${categoryName} برای بدنسازی حرفه‌ای و افزایش حجم عضلات با اپ هوش مصنوعی Lift Legends – از همین امروز شروع کن.`;
+      case 'nutrition':
+        return `نکات تخصصی ${categoryName} برای بدنسازان و ورزشکاران با اپ هوش مصنوعی Lift Legends – از همین امروز شروع کن.`;
+      case 'supplements':
+        return `راهنمای جامع ${categoryName} برای بدنسازی و افزایش عملکرد ورزشی با اپ هوش مصنوعی Lift Legends – از همین امروز شروع کن.`;
+      case 'motivation':
+        return `تکنیک‌های ${categoryName} برای موفقیت در بدنسازی و تناسب اندام با اپ هوش مصنوعی Lift Legends – از همین امروز شروع کن.`;
+      default:
+        return `مقاله تخصصی بدنسازی و تناسب اندام با نکات کاربردی و علمی - اپ هوش مصنوعی Lift Legends – از همین امروز شروع کن.`;
+    }
+  };
+
+  // Helper function to format content with proper line breaks, headings and CTA
   const formatContent = (content: string) => {
     return content
       .split('\n')
@@ -167,6 +205,37 @@ const BlogPostPage = () => {
         // If line is empty, create a paragraph break
         if (line.trim() === '') {
           return <div key={index} className="h-4"></div>;
+        }
+        
+        // Check for headings (H2, H3)
+        if (line.startsWith('## ')) {
+          return (
+            <h2 key={index} className="text-2xl font-bold mt-8 mb-4 text-gold-400">
+              {line.replace('## ', '')}
+            </h2>
+          );
+        }
+        
+        if (line.startsWith('### ')) {
+          return (
+            <h3 key={index} className="text-xl font-semibold mt-6 mb-3 text-white">
+              {line.replace('### ', '')}
+            </h3>
+          );
+        }
+        
+        // Check for CTA patterns and convert to buttons
+        if (line.includes('برنامه تمرینی') && (line.includes('کلیک') || line.includes('دریافت'))) {
+          return (
+            <div key={index} className="my-8 p-6 bg-gradient-to-r from-gold-500/10 to-gold-400/10 border border-gold-500/30 rounded-lg text-center">
+              <p className="mb-4 text-lg">{line}</p>
+              <Link to="/programs">
+                <Button className="bg-gradient-to-r from-gold-500 to-gold-400 text-black font-semibold px-6 py-3 hover:from-gold-400 hover:to-gold-300 transition-all">
+                  مشاهده برنامه‌های تمرینی
+                </Button>
+              </Link>
+            </div>
+          );
         }
         
         return (
@@ -204,14 +273,14 @@ const BlogPostPage = () => {
   return (
     <div className="min-h-screen bg-black text-white">
       <Helmet>
-        <title>{post.title} | لیفت لجندز</title>
-        <meta name="description" content={post.excerpt || post.title} />
+        <title>{getOptimizedTitle(post)}</title>
+        <meta name="description" content={getOptimizedMetaDescription(post)} />
         <meta name="keywords" content={`${getCategoryName(post.category)}، بدنسازی، تناسب اندام، لیفت لجندز، ${post.title}`} />
         <link rel="canonical" href={`https://liftlegends.ir/blog/${post.slug || post.id}`} />
         
         {/* Open Graph Tags */}
-        <meta property="og:title" content={`${post.title} | لیفت لجندز`} />
-        <meta property="og:description" content={post.excerpt || post.title} />
+        <meta property="og:title" content={getOptimizedTitle(post)} />
+        <meta property="og:description" content={getOptimizedMetaDescription(post)} />
         <meta property="og:url" content={`https://liftlegends.ir/blog/${post.slug || post.id}`} />
         <meta property="og:image" content={post.cover_image || ""} />
         <meta property="og:type" content="article" />
@@ -224,7 +293,7 @@ const BlogPostPage = () => {
         {/* Twitter Tags */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={post.title} />
-        <meta name="twitter:description" content={post.excerpt || post.title} />
+        <meta name="twitter:description" content={getOptimizedMetaDescription(post)} />
         <meta name="twitter:image" content={post.cover_image || ""} />
         <meta name="twitter:site" content="@liftlegends" />
         
@@ -233,7 +302,7 @@ const BlogPostPage = () => {
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "BlogPosting",
-            "headline": post.title,
+            "headline": getOptimizedTitle(post),
             "image": {
               "@type": "ImageObject",
               "url": post.cover_image || "https://liftlegends.ir/images/default-blog.jpg",
@@ -258,7 +327,7 @@ const BlogPostPage = () => {
                 "height": 512
               }
             },
-            "description": post.excerpt || post.title,
+            "description": getOptimizedMetaDescription(post),
             "articleSection": getCategoryName(post.category),
             "wordCount": post.content?.split(/\s+/).length || 0,
             "inLanguage": "fa-IR",
@@ -268,6 +337,40 @@ const BlogPostPage = () => {
               "@id": `https://liftlegends.ir/blog/${post.slug || post.id}`
             },
             "keywords": `${getCategoryName(post.category)}، بدنسازی، تناسب اندام، لیفت لجندز، ${post.title}`
+          })}
+        </script>
+        
+        {/* FAQ Schema */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": `بهترین ${getCategoryName(post.category)} چیست؟`,
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": `برای دریافت بهترین ${getCategoryName(post.category)} و برنامه‌های شخصی‌سازی شده، از اپلیکیشن Lift Legends استفاده کنید.`
+                }
+              },
+              {
+                "@type": "Question", 
+                "name": "چگونه می‌توانم برنامه تمرینی شخصی‌سازی شده دریافت کنم؟",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "با نصب اپلیکیشن Lift Legends و ثبت‌نام، می‌توانید برنامه تمرینی و تغذیه‌ای کاملاً شخصی‌سازی شده دریافت کنید."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "آیا این برنامه‌ها برای مبتدیان مناسب است؟", 
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "بله، برنامه‌های Lift Legends برای تمام سطوح از مبتدی تا حرفه‌ای طراحی شده‌اند و با هوش مصنوعی متناسب با سطح شما تنظیم می‌شوند."
+                }
+              }
+            ]
           })}
         </script>
       </Helmet>
@@ -337,6 +440,27 @@ const BlogPostPage = () => {
                 {formatContent(post.content)}
               </div>
             </article>
+            
+            {/* CTA Section */}
+            <div className={`mt-12 p-8 bg-gradient-to-r from-gold-500/10 via-gold-400/5 to-gold-500/10 border border-gold-500/20 rounded-2xl text-center transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`} style={{ transitionDelay: "150ms" }}>
+              <h3 className="text-2xl font-bold mb-4 text-gold-400">آماده برای شروع سفر تناسب اندام؟</h3>
+              <p className="text-white/80 mb-6 text-lg leading-relaxed">
+                با اپلیکیشن هوش مصنوعی Lift Legends، برنامه تمرینی و تغذیه‌ای کاملاً شخصی‌سازی شده دریافت کنید و به اهدافتان برسید.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Link to="/programs">
+                  <Button className="bg-gradient-to-r from-gold-500 to-gold-400 text-black font-semibold px-8 py-3 hover:from-gold-400 hover:to-gold-300 transition-all text-lg">
+                    مشاهده برنامه‌های تمرینی
+                  </Button>
+                </Link>
+                <Link to="/download">
+                  <Button variant="outline" className="border-gold-500/50 text-gold-400 hover:bg-gold-500/10 px-8 py-3 text-lg">
+                    <Download size={20} className="ml-2" />
+                    دانلود اپلیکیشن
+                  </Button>
+                </Link>
+              </div>
+            </div>
             
             {/* Share Section */}
             <div className={`mt-12 border-t border-white/10 pt-8 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`} style={{ transitionDelay: "200ms" }}>
@@ -428,52 +552,24 @@ const BlogPostPage = () => {
                 </CardContent>
               </Card>
               
-              {/* Related Categories */}
-              <div className="mb-6">
-                <h3 className="text-lg font-bold mb-3">دسته‌بندی‌ها</h3>
-                <div className="flex flex-wrap gap-2">
-                  <Link 
-                    to="/blog?category=workout" 
-                    title="مقالات تمرین و برنامه‌ریزی"
-                    aria-label="مشاهده مقالات دسته تمرین و برنامه‌ریزی"
-                  >
-                    <Badge variant="outline" className="bg-zinc-800/50 hover:bg-zinc-700/50 transition-colors">
-                      <Dumbbell size={14} className="ml-1" />
-                      تمرین و برنامه‌ریزی
-                    </Badge>
-                  </Link>
-                  <Link 
-                    to="/blog?category=nutrition" 
-                    title="مقالات تغذیه و رژیم"
-                    aria-label="مشاهده مقالات دسته تغذیه و رژیم"
-                  >
-                    <Badge variant="outline" className="bg-zinc-800/50 hover:bg-zinc-700/50 transition-colors">
-                      <Utensils size={14} className="ml-1" />
-                      تغذیه و رژیم
-                    </Badge>
-                  </Link>
-                  <Link 
-                    to="/blog?category=supplements" 
-                    title="مقالات مکمل‌ها"
-                    aria-label="مشاهده مقالات دسته مکمل‌ها"
-                  >
-                    <Badge variant="outline" className="bg-zinc-800/50 hover:bg-zinc-700/50 transition-colors">
-                      <Pill size={14} className="ml-1" />
-                      مکمل‌ها
-                    </Badge>
-                  </Link>
-                  <Link 
-                    to="/blog?category=motivation" 
-                    title="مقالات انگیزش و روانشناسی"
-                    aria-label="مشاهده مقالات دسته انگیزش و روانشناسی"
-                  >
-                    <Badge variant="outline" className="bg-zinc-800/50 hover:bg-zinc-700/50 transition-colors">
-                      <Brain size={14} className="ml-1" />
-                      انگیزش و روانشناسی
-                    </Badge>
-                  </Link>
+              {/* Post Category */}
+              {post.category && (
+                <div className="mb-6">
+                  <h3 className="text-lg font-bold mb-3">دسته‌بندی</h3>
+                  <div className="flex flex-wrap gap-2">
+                    <Link 
+                      to={`/blog?category=${post.category}`} 
+                      title={`مقالات ${getCategoryName(post.category)}`}
+                      aria-label={`مشاهده مقالات دسته ${getCategoryName(post.category)}`}
+                    >
+                      <Badge variant="outline" className="bg-zinc-800/50 hover:bg-zinc-700/50 transition-colors">
+                        {getCategoryIcon(post.category)}
+                        <span className="mr-1">{getCategoryName(post.category)}</span>
+                      </Badge>
+                    </Link>
+                  </div>
                 </div>
-              </div>
+              )}
               
               {/* Newsletter Subscription */}
               {/* <Card className="bg-zinc-900 border-zinc-800">

@@ -15,7 +15,7 @@
     // Configuration
     config: {
       webUrl:
-        "https://pwa.liftlegends.ir/?utm_source=download_page&utm_medium=web&utm_campaign=pwa_launch",
+        "https://app.liftlegends.ir/?utm_source=download_page&utm_medium=web&utm_campaign=pwa_launch",
       appName: "لیفت لجندز",
       customProtocol: "web+liftlegends://launch",
     },

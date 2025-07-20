@@ -24,7 +24,7 @@ const PWALaunchExample: React.FC = () => {
       {/* Custom styled button */}
       <LaunchPWAButton 
         className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700"
-        webUrl="https://pwa.liftlegends.ir/?utm_source=custom_button&utm_medium=web&utm_campaign=pwa_launch"
+        webUrl="https://app.liftlegends.ir/?utm_source=custom_button&utm_medium=web&utm_campaign=pwa_launch"
       >
         <Smartphone size={20} />
         شروع تمرین

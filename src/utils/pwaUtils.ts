@@ -11,7 +11,7 @@ export interface PWALaunchOptions {
 /**
  * Default web URL for Lift Legends
  */
-export const DEFAULT_WEB_URL = "https://pwa.liftlegends.ir/?utm_source=download_page&utm_medium=web&utm_campaign=pwa_launch";
+export const DEFAULT_WEB_URL = "https://app.liftlegends.ir/?utm_source=download_page&utm_medium=web&utm_campaign=pwa_launch";
 
 /**
  * Check if PWA is installed using multiple detection methods
