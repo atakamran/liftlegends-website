@@ -183,7 +183,7 @@ const Programs = () => {
 
   // Format price with Persian numerals and Toman
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('fa-IR').format(price) + ' تومان';
+    return price === 0 ? 'رایگان' : new Intl.NumberFormat('fa-IR').format(price) + ' تومان';
   };
 
   // Get category badge color
@@ -601,7 +601,7 @@ const ProgramCard = ({ program }: { program: Program }) => {
   
   // Format price with Persian numerals and Toman
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('fa-IR').format(price) + ' تومان';
+    return price === 0 ? 'رایگان' : new Intl.NumberFormat('fa-IR').format(price) + ' تومان';
   };
 
   // Get category badge color

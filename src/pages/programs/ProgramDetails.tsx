@@ -230,6 +230,11 @@ const ProgramDetails = () => {
   const [progress, setProgress] = useState<ProgramProgress | null>(null);
   // No longer need tabs
   const [activeAccordion, setActiveAccordion] = useState<string | null>(null);
+
+  // Helper function to format price display
+  const formatPrice = (price: number): string => {
+    return price === 0 ? 'رایگان' : `${price.toLocaleString()} تومان`;
+  };
   
   // Initialize or get program progress from localStorage
   const initializeProgress = (programData: ProgramDetails): ProgramProgress => {
@@ -1325,7 +1330,7 @@ const ProgramDetails = () => {
               onClick={() => navigate(`/product/${programId}`)}
             >
               <ShoppingCart className="h-4 w-4 mr-2" />
-              خرید این برنامه - {programInfo.price.toLocaleString()} تومان
+              خرید این برنامه - {formatPrice(programInfo.price)}
             </Button>
           </CardFooter>
         )}
