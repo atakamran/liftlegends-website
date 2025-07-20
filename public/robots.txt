@@ -97,13 +97,14 @@ Disallow: /update-password
 Disallow: /payment
 Disallow: /payment-callback
 Disallow: /*.json$
-Disallow: /*.xml$
-Disallow: /*.txt$
 Disallow: /*.md$
 Disallow: /*.log$
 Disallow: /*.sql$
 Disallow: /*.env$
 Disallow: /*.config$
+# Allow sitemaps and important files
+Allow: /sitemap*.xml$
+Allow: /robots.txt$
 
 # Crawl delay for all bots
 Crawl-delay: 10

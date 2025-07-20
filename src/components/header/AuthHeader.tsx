@@ -573,7 +573,7 @@ const AuthHeader = () => {
             title="بازگشت به صفحه اصلی"
           >
             <img 
-              src="https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends//white%20logo.png" 
+              src="https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends//white%20logo.webp" 
               alt="Lift Legends Logo" 
               className="h-10 w-auto"
               loading="eager"

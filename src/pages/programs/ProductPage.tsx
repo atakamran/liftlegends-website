@@ -82,6 +82,13 @@ const ProductPage = () => {
       if (error) throw error;
       
       if (!data) {
+        // Set proper 404 status for SEO
+        if (typeof window !== 'undefined' && window.history) {
+          // For client-side routing, we can't set HTTP status, but we can show 404 content
+          setProgram(null);
+          setLoading(false);
+          return;
+        }
         navigate("/programs");
         return;
       }
@@ -314,6 +321,12 @@ const ProductPage = () => {
   if (!program) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-950 via-black to-gray-950 flex items-center justify-center">
+        <Helmet>
+          <title>محصول یافت نشد | لیفت لجندز</title>
+          <meta name="description" content="محصول مورد نظر شما یافت نشد. برنامه‌های تمرینی و تغذیه‌ای دیگر را در لیفت لجندز مشاهده کنید." />
+          <meta name="robots" content="noindex, follow" />
+          <link rel="canonical" href="https://liftlegends.ir/programs" />
+        </Helmet>
         <div className="text-center space-y-8 max-w-md mx-auto px-4">
           <div className="w-24 h-24 mx-auto rounded-full bg-red-500/10 flex items-center justify-center">
             <svg className="w-12 h-12 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -29,6 +29,7 @@ import Programs from "./pages/programs/Programs";
 import ProductPage from "./pages/programs/ProductPage";
 import ProgramDetails from "./pages/programs/ProgramDetails";
 import Legends from "./pages/legends/Legends";
+import Search from "./pages/Search";
 
 const queryClient = new QueryClient();
 
@@ -62,6 +63,7 @@ const App = () => (
             <Route path="/product/:id" element={<ProductPage />} />
             <Route path="/programs/:programId/details" element={<ProgramDetails />} />
             <Route path="/legends" element={<Legends />} />
+            <Route path="/search" element={<Search />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

@@ -83,46 +83,38 @@
     </news:news>
   </url>
 
-  <!-- مقالات بلاگ -->
+  <!-- مقالات بلاگ - فقط مقالات موجود در دیتابیس -->
   <url>
-    <loc>https://liftlegends.ir/blog/workout-plans-for-muscle-growth</loc>
-    <lastmod>2024-08-15</lastmod>
+    <loc>https://liftlegends.ir/blog/weekly-workout-plan-benefits-bodybuilding</loc>
+    <lastmod>2024-12-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
-    <image:image>
-      <image:loc>https://uploadkon.ir/uploads/4b3815_25بهترین-برنامه‌های-تمرینی-برای-افزایش-حجم-عضلات.jpg</image:loc>
-      <image:title>برنامه‌های تمرینی برای افزایش حجم عضلات</image:title>
-    </image:image>
     <news:news>
       <news:publication>
         <news:name>LiftLegends</news:name>
         <news:language>fa</news:language>
       </news:publication>
-      <news:publication_date>2024-08-15</news:publication_date>
-      <news:title>بهترین برنامه‌های تمرینی برای افزایش حجم عضلات</news:title>
+      <news:publication_date>2024-12-07</news:publication_date>
+      <news:title>فواید برنامه تمرینی هفتگی در بدنسازی</news:title>
     </news:news>
   </url>
   <url>
-    <loc>https://liftlegends.ir/blog/nutrition-for-muscle-gain</loc>
-    <lastmod>2024-08-10</lastmod>
+    <loc>https://liftlegends.ir/blog/sleep-and-muscle-growth</loc>
+    <lastmod>2024-12-04</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
-    <image:image>
-      <image:loc>https://uploadkon.ir/uploads/4b3815_25بهترین-برنامه‌های-تمرینی-برای-افزایش-حجم-عضلات.jpg</image:loc>
-      <image:title>تغذیه برای افزایش حجم عضلات</image:title>
-    </image:image>
     <news:news>
       <news:publication>
         <news:name>LiftLegends</news:name>
         <news:language>fa</news:language>
       </news:publication>
-      <news:publication_date>2024-08-10</news:publication_date>
-      <news:title>اصول تغذیه برای افزایش حجم عضلات</news:title>
+      <news:publication_date>2024-12-04</news:publication_date>
+      <news:title>خواب و رشد عضلات</news:title>
     </news:news>
   </url>
   <url>
-    <loc>https://liftlegends.ir/blog/supplements-guide</loc>
-    <lastmod>2024-08-05</lastmod>
+    <loc>https://liftlegends.ir/blog/6-nutrition-mistakes-hindering-muscle-growth</loc>
+    <lastmod>2024-12-04</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <news:news>
@@ -130,13 +122,13 @@
         <news:name>LiftLegends</news:name>
         <news:language>fa</news:language>
       </news:publication>
-      <news:publication_date>2024-08-05</news:publication_date>
-      <news:title>راهنمای جامع مکمل‌های بدنسازی</news:title>
+      <news:publication_date>2024-12-04</news:publication_date>
+      <news:title>۶ اشتباه تغذیه‌ای که مانع رشد عضلات می‌شود</news:title>
     </news:news>
   </url>
   <url>
-    <loc>https://liftlegends.ir/blog/motivation-tips</loc>
-    <lastmod>2024-08-01</lastmod>
+    <loc>https://liftlegends.ir/blog/muscle-confusion-benefits</loc>
+    <lastmod>2024-12-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <news:news>
@@ -144,13 +136,13 @@
         <news:name>LiftLegends</news:name>
         <news:language>fa</news:language>
       </news:publication>
-      <news:publication_date>2024-08-01</news:publication_date>
-      <news:title>نکات انگیزشی برای حفظ تداوم در تمرینات</news:title>
+      <news:publication_date>2024-12-03</news:publication_date>
+      <news:title>فواید سردرگمی عضلانی</news:title>
     </news:news>
   </url>
   <url>
-    <loc>https://liftlegends.ir/blog/training-frequency</loc>
-    <lastmod>2024-07-25</lastmod>
+    <loc>https://liftlegends.ir/blog/how-proper-nutrition-boosts-workout-results</loc>
+    <lastmod>2024-12-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <news:news>
@@ -158,8 +150,8 @@
         <news:name>LiftLegends</news:name>
         <news:language>fa</news:language>
       </news:publication>
-      <news:publication_date>2024-07-25</news:publication_date>
-      <news:title>تعداد جلسات تمرینی مناسب در هفته</news:title>
+      <news:publication_date>2024-12-03</news:publication_date>
+      <news:title>چگونه تغذیه صحیح نتایج تمرین را بهبود می‌بخشد</news:title>
     </news:news>
   </url>
 </urlset>
