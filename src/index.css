@@ -1,13 +1,14 @@
-
-@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700&display=swap&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700&display=swap&display=swap");
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /* Fix for scrolling issues */
-html, body {
-  overscroll-behavior: none; /* Prevents pull-to-refresh and overscrolling */
+html,
+body {
+  overscroll-behavior-x: none; /* Prevents horizontal overscrolling */
+  overscroll-behavior-y: contain; /* Allow vertical overscroll for pull-to-refresh */
   overflow-x: hidden;
   position: relative;
   height: 100%;
@@ -24,6 +25,12 @@ body {
   right: 0;
   bottom: 0;
   overflow-y: auto;
+}
+
+/* Pull to refresh styles */
+.pull-to-refresh-container {
+  touch-action: pan-y;
+  overscroll-behavior-y: contain;
 }
 
 /* Class added during touch events to prevent scroll reset */
@@ -46,9 +53,10 @@ a[href="#"] {
   .min-h-screen {
     min-height: calc(var(--vh, 1vh) * 100);
   }
-  
+
   /* Prevent horizontal scrolling on mobile */
-  body, html {
+  body,
+  html {
     max-width: 100vw;
     overflow-x: hidden;
     position: relative;
@@ -91,20 +99,22 @@ a[href="#"] {
   * {
     @apply border-border selection:bg-gold/20 selection:text-gold;
   }
-  
+
   /* Hide caret on all elements except inputs and textareas */
   * {
     caret-color: transparent !important;
     -webkit-tap-highlight-color: transparent !important;
   }
-  
+
   /* Only show cursor in these elements */
-  input, textarea, [contenteditable="true"] {
+  input,
+  textarea,
+  [contenteditable="true"] {
     caret-color: auto !important;
     -webkit-user-select: text !important;
     user-select: text !important;
   }
-  
+
   /* Prevent text selection on mobile */
   @media (max-width: 767px) {
     body {
@@ -114,49 +124,63 @@ a[href="#"] {
       user-select: none;
       -webkit-touch-callout: none;
     }
-    
+
     /* Override selection highlight */
     ::selection {
       background-color: transparent !important;
       color: inherit !important;
     }
-    
+
     /* Class to prevent cursor during touch */
-    .no-cursor, .no-cursor * {
+    .no-cursor,
+    .no-cursor * {
       caret-color: transparent !important;
       -webkit-user-select: none !important;
       -moz-user-select: none !important;
       -ms-user-select: none !important;
       user-select: none !important;
     }
-    
+
     /* Ensure text is not selectable */
-    p, h1, h2, h3, h4, h5, h6, span, div:not([contenteditable="true"]) {
+    p,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    span,
+    div:not([contenteditable="true"]) {
       -webkit-user-select: none !important;
       user-select: none !important;
       -webkit-touch-callout: none !important;
     }
-    
+
     /* Allow selection only in specific elements where it might be needed */
-    input, textarea, [contenteditable="true"] {
+    input,
+    textarea,
+    [contenteditable="true"] {
       -webkit-user-select: text;
       -moz-user-select: text;
       -ms-user-select: text;
       user-select: text;
     }
-    
+
     /* Prevent cursor on interactive elements */
-    a, button, [role="button"], .cursor-pointer {
+    a,
+    button,
+    [role="button"],
+    .cursor-pointer {
       -webkit-tap-highlight-color: transparent;
       cursor: pointer;
     }
-    
+
     /* Additional fix for iOS */
     body {
-      -webkit-tap-highlight-color: rgba(0,0,0,0) !important;
+      -webkit-tap-highlight-color: rgba(0, 0, 0, 0) !important;
     }
   }
-  
+
   body {
     @apply bg-background text-foreground antialiased font-['Vazirmatn'] touch-manipulation;
     -webkit-text-size-adjust: 100%;
@@ -167,11 +191,11 @@ a[href="#"] {
     position: relative;
     overflow-x: hidden;
     box-sizing: border-box;
-    
+
     /* RTL scrollbar hack */
     direction: ltr;
   }
-  
+
   /* Keep content RTL */
   #root {
     direction: rtl;
@@ -199,12 +223,12 @@ a[href="#"] {
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
-  
+
   .scrollbar-none::-webkit-scrollbar,
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
-  
+
   /* Custom scrollbar styles */
   ::-webkit-scrollbar {
     width: 8px;
@@ -213,39 +237,39 @@ a[href="#"] {
     left: 0;
     right: auto;
   }
-  
+
   ::-webkit-scrollbar-track {
     background: rgba(0, 0, 0, 0.1);
     border-radius: 4px;
   }
-  
+
   ::-webkit-scrollbar-thumb {
     background: rgba(255, 255, 255, 0.2);
     border-radius: 4px;
   }
-  
+
   ::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.3);
   }
-  
+
   /* Move scrollbar to right side */
   * {
     scrollbar-width: thin;
     scrollbar-color: rgba(255, 255, 255, 0.2) rgba(0, 0, 0, 0.1);
   }
-  
+
   /* Override default RTL scrollbar position */
   html {
     overflow-y: auto !important;
     overflow-x: hidden !important;
   }
-  
+
   /* Custom scrollbar container */
   .right-scrollbar {
     direction: ltr;
     overflow: auto;
   }
-  
+
   .right-scrollbar > * {
     direction: rtl;
   }
@@ -253,36 +277,36 @@ a[href="#"] {
   .glass-morphism {
     @apply backdrop-blur-xl bg-white/5 border border-white/10 shadow-[0_4px_12px_-2px_rgba(0,0,0,0.3)];
   }
-  
+
   .neo-blur {
     @apply backdrop-blur-2xl bg-black/40 border border-white/10;
   }
-  
+
   .text-gradient {
     @apply bg-gradient-to-r from-gold-300 via-gold-500 to-gold-400 bg-clip-text text-transparent;
   }
-  
+
   /* Mobile responsive utilities */
   .mobile-container {
     @apply w-full px-4 sm:px-6 md:px-8 max-w-full overflow-hidden;
     box-sizing: border-box;
   }
-  
+
   .mobile-safe-area {
     padding-left: env(safe-area-inset-left);
     padding-right: env(safe-area-inset-right);
     box-sizing: border-box;
     width: 100%;
   }
-  
+
   .mobile-safe-bottom {
     padding-bottom: env(safe-area-inset-bottom);
   }
-  
+
   .pb-safe {
     padding-bottom: env(safe-area-inset-bottom, 20px);
   }
-  
+
   /* Fix for iOS 100vh issue */
   .mobile-full-height {
     height: 100vh; /* Fallback */
@@ -291,7 +315,7 @@ a[href="#"] {
     height: stretch;
     overflow-x: hidden;
   }
-  
+
   /* Fix for form width on mobile */
   @media (max-width: 640px) {
     .form-container {
@@ -301,24 +325,26 @@ a[href="#"] {
       padding-right: 1rem !important;
       box-sizing: border-box !important;
     }
-    
-    input, select, textarea {
+
+    input,
+    select,
+    textarea {
       max-width: 100% !important;
       box-sizing: border-box !important;
     }
-    
+
     /* Add bottom padding for mobile */
     main {
       padding-bottom: 20px !important;
     }
-    
+
     /* Add extra bottom padding for iOS devices */
     @supports (-webkit-touch-callout: none) {
       main {
-        padding-bottom: calc(20px + env(safe-area-inset-bottom, 20px)) !important;
+        padding-bottom: calc(
+          20px + env(safe-area-inset-bottom, 20px)
+        ) !important;
       }
     }
   }
-  
-
 }
