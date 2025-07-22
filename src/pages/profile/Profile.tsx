@@ -1,19 +1,47 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { setRedirectUrl } from "@/utils/redirectUtils";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import ProfileSkeleton from "@/components/ui/profile-skeleton";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Calendar, Clock, TrendingUp, AlertCircle, CheckCircle, Crown, User, Mail, Phone, Target, Weight, Ruler, Save } from "lucide-react";
+import {
+  Calendar,
+  Clock,
+  TrendingUp,
+  AlertCircle,
+  CheckCircle,
+  Crown,
+  User,
+  Mail,
+  Phone,
+  Target,
+  Weight,
+  Ruler,
+  Save,
+} from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 
 interface UserProfile {
@@ -76,17 +104,19 @@ const Profile = () => {
       setLoading(true);
       try {
         // Check if user is logged in via localStorage
-        const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+        const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
         if (!isLoggedIn) {
-          navigate('/');
+          setRedirectUrl();
+          navigate("/login");
           return;
         }
 
         // Get current session
         const { data } = await supabase.auth.getSession();
         if (!data.session) {
-          localStorage.setItem('isLoggedIn', 'false');
-          navigate('/');
+          localStorage.setItem("isLoggedIn", "false");
+          setRedirectUrl();
+          navigate("/login");
           return;
         }
 
@@ -144,7 +174,7 @@ const Profile = () => {
 
   const handleUpdateProfile = async () => {
     if (!user) return;
-    
+
     setUpdating(true);
     try {
       const { error } = await supabase
@@ -154,8 +184,12 @@ const Profile = () => {
           age: formData.age ? parseInt(formData.age) : null,
           gender: formData.gender || null,
           height: formData.height ? parseFloat(formData.height) : null,
-          currentWeight: formData.currentWeight ? parseFloat(formData.currentWeight) : null,
-          targetWeight: formData.targetWeight ? parseFloat(formData.targetWeight) : null,
+          currentWeight: formData.currentWeight
+            ? parseFloat(formData.currentWeight)
+            : null,
+          targetWeight: formData.targetWeight
+            ? parseFloat(formData.targetWeight)
+            : null,
           goal: formData.goal || null,
           phoneNumber: formData.phoneNumber || null,
           updated_at: new Date().toISOString(),
@@ -172,8 +206,12 @@ const Profile = () => {
           age: formData.age ? parseInt(formData.age) : null,
           gender: formData.gender || null,
           height: formData.height ? parseFloat(formData.height) : null,
-          currentWeight: formData.currentWeight ? parseFloat(formData.currentWeight) : null,
-          targetWeight: formData.targetWeight ? parseFloat(formData.targetWeight) : null,
+          currentWeight: formData.currentWeight
+            ? parseFloat(formData.currentWeight)
+            : null,
+          targetWeight: formData.targetWeight
+            ? parseFloat(formData.targetWeight)
+            : null,
           goal: formData.goal || null,
           phoneNumber: formData.phoneNumber || null,
           updated_at: new Date().toISOString(),
@@ -188,7 +226,10 @@ const Profile = () => {
       toast({
         variant: "destructive",
         title: "خطا در به‌روزرسانی",
-        description: error instanceof Error ? error.message : "مشکلی در به‌روزرسانی پروفایل رخ داد.",
+        description:
+          error instanceof Error
+            ? error.message
+            : "مشکلی در به‌روزرسانی پروفایل رخ داد.",
       });
     } finally {
       setUpdating(false);
@@ -200,42 +241,49 @@ const Profile = () => {
   }
 
   if (!user) {
-    navigate('/');
+    setRedirectUrl();
+    navigate("/login");
     return null;
   }
 
   const getInitials = (name: string | null) => {
     if (!name) return user?.email?.substring(0, 2).toUpperCase() || "U";
     return name
-      .split(' ')
-      .map(part => part[0])
-      .join('')
+      .split(" ")
+      .map((part) => part[0])
+      .join("")
       .toUpperCase();
   };
 
   const formatDate = (dateString: string | null) => {
     if (!dateString) return "تعیین نشده";
-    return new Date(dateString).toLocaleDateString('fa-IR');
+    return new Date(dateString).toLocaleDateString("fa-IR");
   };
 
   const formatDateWithTime = (dateString: string | null) => {
-    if (!dateString) return {
-      date: "تعیین نشده",
-      time: "تعیین نشده",
-      relative: "تعیین نشده"
-    };
+    if (!dateString)
+      return {
+        date: "تعیین نشده",
+        time: "تعیین نشده",
+        relative: "تعیین نشده",
+      };
     const date = new Date(dateString);
     return {
-      date: date.toLocaleDateString('fa-IR'),
-      time: date.toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' }),
-      relative: getRelativeTime(date)
+      date: date.toLocaleDateString("fa-IR"),
+      time: date.toLocaleTimeString("fa-IR", {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+      relative: getRelativeTime(date),
     };
   };
 
   const getRelativeTime = (date: Date) => {
     const now = new Date();
-    const diffInDays = Math.floor((date.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-    
+    const diffInDays = Math.floor(
+      (date.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
+    );
+
     if (diffInDays > 0) {
       if (diffInDays === 1) return "فردا";
       if (diffInDays < 7) return `${diffInDays} روز دیگر`;
@@ -254,41 +302,54 @@ const Profile = () => {
   };
 
   const getSubscriptionProgress = () => {
-    if (!profileData?.subscription_start_date || !profileData?.subscription_end_date) return 0;
-    
+    if (
+      !profileData?.subscription_start_date ||
+      !profileData?.subscription_end_date
+    )
+      return 0;
+
     const startDate = new Date(profileData.subscription_start_date);
     const endDate = new Date(profileData.subscription_end_date);
     const now = new Date();
-    
+
     const totalDuration = endDate.getTime() - startDate.getTime();
     const elapsed = now.getTime() - startDate.getTime();
-    
-    const progress = Math.max(0, Math.min(100, (elapsed / totalDuration) * 100));
+
+    const progress = Math.max(
+      0,
+      Math.min(100, (elapsed / totalDuration) * 100)
+    );
     return Math.round(progress);
   };
 
   const getRemainingDays = () => {
     if (!profileData?.subscription_end_date) return 0;
-    
+
     const endDate = new Date(profileData.subscription_end_date);
     const now = new Date();
-    const diffInDays = Math.ceil((endDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-    
+    const diffInDays = Math.ceil(
+      (endDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
+    );
+
     return Math.max(0, diffInDays);
   };
 
   const getSubscriptionStatus = () => {
     if (!profileData?.subscription_plan) return "بدون اشتراک";
     if (!profileData?.subscription_end_date) return "نامشخص";
-    
+
     const endDate = new Date(profileData.subscription_end_date);
     const now = new Date();
-    
+
     if (endDate < now) return "منقضی شده";
     return "فعال";
   };
 
-  const getSubscriptionBadgeVariant = (): "default" | "secondary" | "destructive" | "outline" => {
+  const getSubscriptionBadgeVariant = ():
+    | "default"
+    | "secondary"
+    | "destructive"
+    | "outline" => {
     const status = getSubscriptionStatus();
     if (status === "فعال") return "default"; // Changed from "success" to "default"
     if (status === "منقضی شده") return "destructive";
@@ -300,10 +361,12 @@ const Profile = () => {
       <div className="container mx-auto px-4 py-16 max-w-6xl">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-16">
-          <h1 className="text-4xl lg:text-5xl font-light text-white">پروفایل کاربری</h1>
+          <h1 className="text-4xl lg:text-5xl font-light text-white">
+            پروفایل کاربری
+          </h1>
           <div className="flex items-center space-x-4 mt-4 md:mt-0 rtl:space-x-reverse">
-            <Badge 
-              variant={getSubscriptionBadgeVariant()} 
+            <Badge
+              variant={getSubscriptionBadgeVariant()}
               className="px-4 py-2 text-sm backdrop-blur-sm border-0"
             >
               {getSubscriptionStatus()}
@@ -329,7 +392,7 @@ const Profile = () => {
                     <CheckCircle className="w-4 h-4 text-white" />
                   </div>
                 </div>
-                
+
                 <div className="space-y-2">
                   <h2 className="text-2xl font-light text-white">
                     {profileData?.name || "کاربر"}
@@ -346,13 +409,13 @@ const Profile = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="text-center p-4 bg-gray-800/30 rounded-2xl">
                     <div className="text-2xl font-light text-gold-400">
-                      {profileData?.currentWeight || '--'}
+                      {profileData?.currentWeight || "--"}
                     </div>
                     <div className="text-sm text-gray-400">وزن فعلی</div>
                   </div>
                   <div className="text-center p-4 bg-gray-800/30 rounded-2xl">
                     <div className="text-2xl font-light text-gold-400">
-                      {profileData?.targetWeight || '--'}
+                      {profileData?.targetWeight || "--"}
                     </div>
                     <div className="text-sm text-gray-400">وزن هدف</div>
                   </div>
@@ -364,26 +427,32 @@ const Profile = () => {
                       <Calendar className="w-4 h-4 text-gray-400" />
                       <span className="text-gray-400">عضویت از</span>
                     </div>
-                    <span className="text-white font-light">{formatDate(user.created_at)}</span>
+                    <span className="text-white font-light">
+                      {formatDate(user.created_at)}
+                    </span>
                   </div>
-                  
+
                   {profileData?.is_coach && (
                     <div className="flex items-center justify-between py-3 border-b border-gray-800/50">
                       <div className="flex items-center space-x-3 rtl:space-x-reverse">
                         <Crown className="w-4 h-4 text-gold-400" />
                         <span className="text-gray-400">وضعیت</span>
                       </div>
-                      <Badge className="bg-gold-500/10 text-gold-400 border-gold-500/20">مربی</Badge>
+                      <Badge className="bg-gold-500/10 text-gold-400 border-gold-500/20">
+                        مربی
+                      </Badge>
                     </div>
                   )}
-                  
+
                   {profileData?.is_admin && (
                     <div className="flex items-center justify-between py-3 border-b border-gray-800/50">
                       <div className="flex items-center space-x-3 rtl:space-x-reverse">
                         <CheckCircle className="w-4 h-4 text-blue-400" />
                         <span className="text-gray-400">دسترسی</span>
                       </div>
-                      <Badge className="bg-blue-500/10 text-blue-400 border-blue-500/20">ادمین</Badge>
+                      <Badge className="bg-blue-500/10 text-blue-400 border-blue-500/20">
+                        ادمین
+                      </Badge>
                     </div>
                   )}
                 </div>
@@ -398,7 +467,9 @@ const Profile = () => {
                           اشتراک {profileData.subscription_plan}
                         </h3>
                         <p className="text-sm text-gray-400">
-                          {getSubscriptionStatus() === "فعال" ? "فعال و در حال استفاده" : getSubscriptionStatus()}
+                          {getSubscriptionStatus() === "فعال"
+                            ? "فعال و در حال استفاده"
+                            : getSubscriptionStatus()}
                         </p>
                       </div>
                     </div>
@@ -407,10 +478,12 @@ const Profile = () => {
                       <div className="space-y-4">
                         <div className="flex items-center justify-between text-sm">
                           <span className="text-gray-400">پیشرفت اشتراک</span>
-                          <span className="text-gold-400 font-light">{getSubscriptionProgress()}%</span>
+                          <span className="text-gold-400 font-light">
+                            {getSubscriptionProgress()}%
+                          </span>
                         </div>
-                        <Progress 
-                          value={getSubscriptionProgress()} 
+                        <Progress
+                          value={getSubscriptionProgress()}
                           className="h-2 bg-gray-800/50"
                         />
                         <div className="flex items-center justify-center text-sm text-gold-400">
@@ -432,16 +505,17 @@ const Profile = () => {
                       </div>
                     )}
 
-                    {getSubscriptionStatus() === "فعال" && getRemainingDays() <= 7 && (
-                      <div className="mt-4 p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl">
-                        <div className="flex items-center space-x-2 rtl:space-x-reverse">
-                          <AlertCircle className="w-4 h-4 text-amber-400" />
-                          <span className="text-sm text-amber-400">
-                            اشتراک به زودی منقضی می‌شود
-                          </span>
+                    {getSubscriptionStatus() === "فعال" &&
+                      getRemainingDays() <= 7 && (
+                        <div className="mt-4 p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl">
+                          <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                            <AlertCircle className="w-4 h-4 text-amber-400" />
+                            <span className="text-sm text-amber-400">
+                              اشتراک به زودی منقضی می‌شود
+                            </span>
+                          </div>
                         </div>
-                      </div>
-                    )}
+                      )}
                   </div>
                 )}
               </div>
@@ -452,32 +526,39 @@ const Profile = () => {
           <div className="lg:col-span-2">
             <div className="bg-gray-900/30 backdrop-blur-sm rounded-3xl border border-gray-800/50 p-8 space-y-8">
               <div className="space-y-2">
-                <h2 className="text-3xl font-light text-white">ویرایش پروفایل</h2>
-                <p className="text-gray-400">اطلاعات پروفایل خود را به‌روزرسانی کنید</p>
+                <h2 className="text-3xl font-light text-white">
+                  ویرایش پروفایل
+                </h2>
+                <p className="text-gray-400">
+                  اطلاعات پروفایل خود را به‌روزرسانی کنید
+                </p>
               </div>
 
               <Tabs defaultValue="personal" className="w-full">
                 <TabsList className="grid w-full grid-cols-2 bg-gray-800/30 p-2 rounded-2xl mb-8 border border-gray-700/50">
-                  <TabsTrigger 
-                    value="personal" 
+                  <TabsTrigger
+                    value="personal"
                     className="data-[state=active]:bg-gold-500 data-[state=active]:text-black data-[state=active]:shadow-lg rounded-xl transition-all duration-300 font-light"
                   >
                     <User className="w-4 h-4 ml-2" />
                     اطلاعات شخصی
                   </TabsTrigger>
-                  <TabsTrigger 
-                    value="fitness" 
+                  <TabsTrigger
+                    value="fitness"
                     className="data-[state=active]:bg-gold-500 data-[state=active]:text-black data-[state=active]:shadow-lg rounded-xl transition-all duration-300 font-light"
                   >
                     <Target className="w-4 h-4 ml-2" />
                     اطلاعات تناسب اندام
                   </TabsTrigger>
                 </TabsList>
-                
+
                 <TabsContent value="personal" className="space-y-8">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-3">
-                      <Label htmlFor="name" className="text-white font-light flex items-center space-x-2 rtl:space-x-reverse">
+                      <Label
+                        htmlFor="name"
+                        className="text-white font-light flex items-center space-x-2 rtl:space-x-reverse"
+                      >
                         <User className="w-4 h-4" />
                         <span>نام و نام خانوادگی</span>
                       </Label>
@@ -490,9 +571,12 @@ const Profile = () => {
                         placeholder="نام کامل خود را وارد کنید"
                       />
                     </div>
-                    
+
                     <div className="space-y-3">
-                      <Label htmlFor="phoneNumber" className="text-white font-light flex items-center space-x-2 rtl:space-x-reverse">
+                      <Label
+                        htmlFor="phoneNumber"
+                        className="text-white font-light flex items-center space-x-2 rtl:space-x-reverse"
+                      >
                         <Phone className="w-4 h-4" />
                         <span>شماره تلفن</span>
                       </Label>
@@ -505,9 +589,11 @@ const Profile = () => {
                         placeholder="09123456789"
                       />
                     </div>
-                    
+
                     <div className="space-y-3">
-                      <Label htmlFor="age" className="text-white font-light">سن</Label>
+                      <Label htmlFor="age" className="text-white font-light">
+                        سن
+                      </Label>
                       <Input
                         id="age"
                         name="age"
@@ -518,12 +604,16 @@ const Profile = () => {
                         placeholder="25"
                       />
                     </div>
-                    
+
                     <div className="space-y-3">
-                      <Label htmlFor="gender" className="text-white font-light">جنسیت</Label>
+                      <Label htmlFor="gender" className="text-white font-light">
+                        جنسیت
+                      </Label>
                       <Select
                         value={formData.gender}
-                        onValueChange={(value) => handleSelectChange("gender", value)}
+                        onValueChange={(value) =>
+                          handleSelectChange("gender", value)
+                        }
                       >
                         <SelectTrigger className="bg-gray-800/50 border-gray-700/50 text-white rounded-xl h-12 focus:border-gold-500">
                           <SelectValue placeholder="انتخاب جنسیت" />
@@ -537,11 +627,14 @@ const Profile = () => {
                     </div>
                   </div>
                 </TabsContent>
-                
+
                 <TabsContent value="fitness" className="space-y-8">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-3">
-                      <Label htmlFor="height" className="text-white font-light flex items-center space-x-2 rtl:space-x-reverse">
+                      <Label
+                        htmlFor="height"
+                        className="text-white font-light flex items-center space-x-2 rtl:space-x-reverse"
+                      >
                         <Ruler className="w-4 h-4" />
                         <span>قد (سانتی‌متر)</span>
                       </Label>
@@ -555,9 +648,12 @@ const Profile = () => {
                         placeholder="175"
                       />
                     </div>
-                    
+
                     <div className="space-y-3">
-                      <Label htmlFor="currentWeight" className="text-white font-light flex items-center space-x-2 rtl:space-x-reverse">
+                      <Label
+                        htmlFor="currentWeight"
+                        className="text-white font-light flex items-center space-x-2 rtl:space-x-reverse"
+                      >
                         <Weight className="w-4 h-4" />
                         <span>وزن فعلی (کیلوگرم)</span>
                       </Label>
@@ -571,9 +667,12 @@ const Profile = () => {
                         placeholder="70"
                       />
                     </div>
-                    
+
                     <div className="space-y-3 md:col-span-2">
-                      <Label htmlFor="targetWeight" className="text-white font-light flex items-center space-x-2 rtl:space-x-reverse">
+                      <Label
+                        htmlFor="targetWeight"
+                        className="text-white font-light flex items-center space-x-2 rtl:space-x-reverse"
+                      >
                         <Target className="w-4 h-4" />
                         <span>وزن هدف (کیلوگرم)</span>
                       </Label>
@@ -588,32 +687,44 @@ const Profile = () => {
                       />
                     </div>
                   </div>
-                  
+
                   <div className="space-y-6">
-                    <Label className="text-white font-light text-lg">هدف تناسب اندام</Label>
+                    <Label className="text-white font-light text-lg">
+                      هدف تناسب اندام
+                    </Label>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                       {/* کاهش وزن */}
-                      <div 
+                      <div
                         className={`relative rounded-2xl p-6 cursor-pointer transition-all duration-500 border-2 group hover:scale-105 ${
-                          formData.goal === "lose" 
-                            ? "border-gold-500 bg-gold-500/10 shadow-lg shadow-gold-500/20" 
+                          formData.goal === "lose"
+                            ? "border-gold-500 bg-gold-500/10 shadow-lg shadow-gold-500/20"
                             : "border-gray-700/50 bg-gray-800/30 hover:border-gray-600 hover:bg-gray-800/50"
                         }`}
                         onClick={() => handleSelectChange("goal", "lose")}
                       >
                         <div className="flex flex-col items-center text-center space-y-4">
-                          <div className={`w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 ${
-                            formData.goal === "lose" 
-                              ? "bg-gold-500 text-black" 
-                              : "bg-gray-700 text-gray-300 group-hover:bg-gray-600"
-                          }`}>
+                          <div
+                            className={`w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 ${
+                              formData.goal === "lose"
+                                ? "bg-gold-500 text-black"
+                                : "bg-gray-700 text-gray-300 group-hover:bg-gray-600"
+                            }`}
+                          >
                             <TrendingUp className="w-8 h-8 rotate-180" />
                           </div>
                           <div>
-                            <h3 className={`font-light text-lg ${
-                              formData.goal === "lose" ? "text-gold-400" : "text-white"
-                            }`}>کاهش وزن</h3>
-                            <p className="text-sm text-gray-400 mt-1">Weight Loss</p>
+                            <h3
+                              className={`font-light text-lg ${
+                                formData.goal === "lose"
+                                  ? "text-gold-400"
+                                  : "text-white"
+                              }`}
+                            >
+                              کاهش وزن
+                            </h3>
+                            <p className="text-sm text-gray-400 mt-1">
+                              Weight Loss
+                            </p>
                           </div>
                         </div>
                         {formData.goal === "lose" && (
@@ -622,29 +733,39 @@ const Profile = () => {
                           </div>
                         )}
                       </div>
-                      
+
                       {/* افزایش عضله */}
-                      <div 
+                      <div
                         className={`relative rounded-2xl p-6 cursor-pointer transition-all duration-500 border-2 group hover:scale-105 ${
-                          formData.goal === "gain" 
-                            ? "border-gold-500 bg-gold-500/10 shadow-lg shadow-gold-500/20" 
+                          formData.goal === "gain"
+                            ? "border-gold-500 bg-gold-500/10 shadow-lg shadow-gold-500/20"
                             : "border-gray-700/50 bg-gray-800/30 hover:border-gray-600 hover:bg-gray-800/50"
                         }`}
                         onClick={() => handleSelectChange("goal", "gain")}
                       >
                         <div className="flex flex-col items-center text-center space-y-4">
-                          <div className={`w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 ${
-                            formData.goal === "gain" 
-                              ? "bg-gold-500 text-black" 
-                              : "bg-gray-700 text-gray-300 group-hover:bg-gray-600"
-                          }`}>
+                          <div
+                            className={`w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 ${
+                              formData.goal === "gain"
+                                ? "bg-gold-500 text-black"
+                                : "bg-gray-700 text-gray-300 group-hover:bg-gray-600"
+                            }`}
+                          >
                             <TrendingUp className="w-8 h-8" />
                           </div>
                           <div>
-                            <h3 className={`font-light text-lg ${
-                              formData.goal === "gain" ? "text-gold-400" : "text-white"
-                            }`}>افزایش عضله</h3>
-                            <p className="text-sm text-gray-400 mt-1">Muscle Gain</p>
+                            <h3
+                              className={`font-light text-lg ${
+                                formData.goal === "gain"
+                                  ? "text-gold-400"
+                                  : "text-white"
+                              }`}
+                            >
+                              افزایش عضله
+                            </h3>
+                            <p className="text-sm text-gray-400 mt-1">
+                              Muscle Gain
+                            </p>
                           </div>
                         </div>
                         {formData.goal === "gain" && (
@@ -653,29 +774,41 @@ const Profile = () => {
                           </div>
                         )}
                       </div>
-                      
+
                       {/* حفظ وضعیت */}
-                      <div 
+                      <div
                         className={`relative rounded-2xl p-6 cursor-pointer transition-all duration-500 border-2 group hover:scale-105 ${
-                          formData.goal === "maintenance" 
-                            ? "border-gold-500 bg-gold-500/10 shadow-lg shadow-gold-500/20" 
+                          formData.goal === "maintenance"
+                            ? "border-gold-500 bg-gold-500/10 shadow-lg shadow-gold-500/20"
                             : "border-gray-700/50 bg-gray-800/30 hover:border-gray-600 hover:bg-gray-800/50"
                         }`}
-                        onClick={() => handleSelectChange("goal", "maintenance")}
+                        onClick={() =>
+                          handleSelectChange("goal", "maintenance")
+                        }
                       >
                         <div className="flex flex-col items-center text-center space-y-4">
-                          <div className={`w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 ${
-                            formData.goal === "maintenance" 
-                              ? "bg-gold-500 text-black" 
-                              : "bg-gray-700 text-gray-300 group-hover:bg-gray-600"
-                          }`}>
+                          <div
+                            className={`w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 ${
+                              formData.goal === "maintenance"
+                                ? "bg-gold-500 text-black"
+                                : "bg-gray-700 text-gray-300 group-hover:bg-gray-600"
+                            }`}
+                          >
                             <Target className="w-8 h-8" />
                           </div>
                           <div>
-                            <h3 className={`font-light text-lg ${
-                              formData.goal === "maintenance" ? "text-gold-400" : "text-white"
-                            }`}>حفظ وضعیت</h3>
-                            <p className="text-sm text-gray-400 mt-1">Maintenance</p>
+                            <h3
+                              className={`font-light text-lg ${
+                                formData.goal === "maintenance"
+                                  ? "text-gold-400"
+                                  : "text-white"
+                              }`}
+                            >
+                              حفظ وضعیت
+                            </h3>
+                            <p className="text-sm text-gray-400 mt-1">
+                              Maintenance
+                            </p>
                           </div>
                         </div>
                         {formData.goal === "maintenance" && (
@@ -691,7 +824,7 @@ const Profile = () => {
 
               {/* Save Button */}
               <div className="flex justify-end pt-8">
-                <Button 
+                <Button
                   onClick={handleUpdateProfile}
                   disabled={updating}
                   className="bg-gold-500 hover:bg-gold-400 text-black px-8 py-3 rounded-2xl font-light text-lg transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"

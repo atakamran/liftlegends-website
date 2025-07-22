@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { setRedirectUrl } from "@/utils/redirectUtils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
@@ -112,7 +113,7 @@ const Payment = () => {
       const { data: sessionData } = await supabase.auth.getSession();
       if (!sessionData.session) {
         // Save current URL for redirect after login
-        localStorage.setItem('redirectAfterLogin', window.location.pathname + window.location.search);
+        setRedirectUrl();
         navigate('/login');
         return;
       }

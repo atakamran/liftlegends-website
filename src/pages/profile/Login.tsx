@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
 import { Separator } from "@/components/ui/separator";
+import { getAndClearRedirectUrl } from "@/utils/redirectUtils";
 
 import {
   Tabs,
@@ -124,8 +125,9 @@ const Login = () => {
           detail: { user: user }
         }));
         
-        // Redirect to dashboard
-        navigate('/');
+        // Redirect to intended destination or home
+        const redirectUrl = getAndClearRedirectUrl();
+        navigate(redirectUrl || '/');
       } else if (isLoggedIn) {
         // Session expired but localStorage still shows logged in
         localStorage.removeItem('isLoggedIn');
@@ -189,8 +191,9 @@ const Login = () => {
         description: "با موفقیت وارد شدید.",
       });
       
-      // Redirect to dashboard
-      navigate('/');
+      // Redirect to intended destination or home
+      const redirectUrl = getAndClearRedirectUrl();
+      navigate(redirectUrl || '/');
     } catch (error: unknown) {
       toast({
         variant: "destructive",
@@ -258,8 +261,9 @@ const Login = () => {
           detail: { user: data.user }
         }));
         
-        // Redirect to dashboard if auto-confirmed
-        navigate('/');
+        // Redirect to intended destination or home if auto-confirmed
+        const redirectUrl = getAndClearRedirectUrl();
+        navigate(redirectUrl || '/');
       }
 
       toast({
