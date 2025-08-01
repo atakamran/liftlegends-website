@@ -562,19 +562,19 @@ const AuthHeader = () => {
   };
 
   return (
-    <header className="bg-gray-900/90 backdrop-blur-lg border-b border-white/5 sticky top-0 z-50 dir-ltr shadow-md w-full">
+    <header className="bg-background/90 backdrop-blur-lg border-b border-border/50 sticky top-0 z-50 dir-ltr shadow-md w-full">
       <div className="container mx-auto px-3 sm:px-4 py-2 mobile-safe-area">
         <div className="flex items-center justify-between flex-row-reverse h-12 sm:h-14">
           {/* Logo */}
-          <Link 
-            to="/" 
+          <Link
+            to="/"
             className="flex items-center"
             aria-label="صفحه اصلی Lift Legends"
             title="بازگشت به صفحه اصلی"
           >
-            <img 
-              src="https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends//white%20logo.webp" 
-              alt="Lift Legends Logo" 
+            <img
+              src="https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends//white%20logo.webp"
+              alt="Lift Legends Logo"
               className="h-10 w-auto"
               loading="eager"
               width="80"
@@ -584,24 +584,22 @@ const AuthHeader = () => {
 
           {/* Desktop Navigation - New Modern Design */}
           <nav className="hidden md:flex items-center space-x-reverse space-x-8 mr-6">
-            <Link to="/" className="text-white/90 hover:text-gold-500 font-medium text-sm transition-colors duration-200 relative after:content-[''] after:absolute after:right-0 after:left-0 after:bottom-0 after:h-0.5 after:bg-gold-500 after:scale-x-0 after:origin-right hover:after:scale-x-100 after:transition-transform after:duration-300">
+            <Link to="/" className="text-foreground/90 hover:text-primary font-medium text-sm transition-colors duration-200 relative after:content-[''] after:absolute after:right-0 after:left-0 after:bottom-0 after:h-0.5 after:bg-primary after:scale-x-0 after:origin-right hover:after:scale-x-100 after:transition-transform after:duration-300">
               خانه
             </Link>
-            <Link to="/download" className="text-white/90 hover:text-gold-500 font-medium text-sm transition-colors duration-200 relative after:content-[''] after:absolute after:right-0 after:left-0 after:bottom-0 after:h-0.5 after:bg-gold-500 after:scale-x-0 after:origin-right hover:after:scale-x-100 after:transition-transform after:duration-300">
+            <Link to="/download" className="text-foreground/90 hover:text-primary font-medium text-sm transition-colors duration-200 relative after:content-[''] after:absolute after:right-0 after:left-0 after:bottom-0 after:h-0.5 after:bg-primary after:scale-x-0 after:origin-right hover:after:scale-x-100 after:transition-transform after:duration-300">
               دانلود اپلیکیشن
             </Link>
-            <Link to="/programs" className="text-white/90 hover:text-gold-500 font-medium text-sm transition-colors duration-200 relative after:content-[''] after:absolute after:right-0 after:left-0 after:bottom-0 after:h-0.5 after:bg-gold-500 after:scale-x-0 after:origin-right hover:after:scale-x-100 after:transition-transform after:duration-300">
+            <Link to="/programs" className="text-foreground/90 hover:text-primary font-medium text-sm transition-colors duration-200 relative after:content-[''] after:absolute after:right-0 after:left-0 after:bottom-0 after:h-0.5 after:bg-primary after:scale-x-0 after:origin-right hover:after:scale-x-100 after:transition-transform after:duration-300">
               برنامه‌ها
             </Link>
-
-            <Link to="/blog" className="text-white/90 hover:text-gold-500 font-medium text-sm transition-colors duration-200 relative after:content-[''] after:absolute after:right-0 after:left-0 after:bottom-0 after:h-0.5 after:bg-gold-500 after:scale-x-0 after:origin-right hover:after:scale-x-100 after:transition-transform after:duration-300">
+            <Link to="/blog" className="text-foreground/90 hover:text-primary font-medium text-sm transition-colors duration-200 relative after:content-[''] after:absolute after:right-0 after:left-0 after:bottom-0 after:h-0.5 after:bg-primary after:scale-x-0 after:origin-right hover:after:scale-x-100 after:transition-transform after:duration-300">
               بلاگ
             </Link>
-            
-            <Link to="/legends" className="text-white/90 hover:text-gold-500 font-medium text-sm transition-colors duration-200 relative after:content-[''] after:absolute after:right-0 after:left-0 after:bottom-0 after:h-0.5 after:bg-gold-500 after:scale-x-0 after:origin-right hover:after:scale-x-100 after:transition-transform after:duration-300">
+            <Link to="/legends" className="text-foreground/90 hover:text-primary font-medium text-sm transition-colors duration-200 relative after:content-[''] after:absolute after:right-0 after:left-0 after:bottom-0 after:h-0.5 after:bg-primary after:scale-x-0 after:origin-right hover:after:scale-x-100 after:transition-transform after:duration-300">
               افسانه‌ها
             </Link>
-            <Link to="/about-us" className="text-white/90 hover:text-gold-500 font-medium text-sm transition-colors duration-200 relative after:content-[''] after:absolute after:right-0 after:left-0 after:bottom-0 after:h-0.5 after:bg-gold-500 after:scale-x-0 after:origin-right hover:after:scale-x-100 after:transition-transform after:duration-300">
+            <Link to="/about-us" className="text-foreground/90 hover:text-primary font-medium text-sm transition-colors duration-200 relative after:content-[''] after:absolute after:right-0 after:left-0 after:bottom-0 after:h-0.5 after:bg-primary after:scale-x-0 after:origin-right hover:after:scale-x-100 after:transition-transform after:duration-300">
               درباره ما
             </Link>
           </nav>
@@ -611,63 +609,62 @@ const AuthHeader = () => {
             {user ? (
               <div className="flex items-center">
                 <div className="relative group">
-                  <Button 
-                    variant="ghost" 
-                    className="flex items-center text-white/90 hover:text-gold-500 rounded-lg px-3 py-1.5 bg-gray-800/40 hover:bg-gray-800/60 transition-all duration-200 border border-white/5 hover:border-gold-500/30 relative after:content-[''] after:absolute after:right-0 after:left-0 after:bottom-0 after:h-0.5 after:bg-gold-500 after:scale-x-0 after:origin-left hover:after:scale-x-100 after:transition-transform after:duration-300"
+                  <Button
+                    variant="ghost"
+                    className="flex items-center text-foreground/90 hover:text-primary rounded-lg px-3 py-1.5 bg-secondary/40 hover:bg-secondary/60 transition-all duration-200 border border-border/50 hover:border-primary/30 relative after:content-[''] after:absolute after:right-0 after:left-0 after:bottom-0 after:h-0.5 after:bg-primary after:scale-x-0 after:origin-left hover:after:scale-x-100 after:transition-transform after:duration-300"
                   >
-                    <User className="h-4 w-4 ml-2 text-gold-500" />
+                    <User className="h-4 w-4 ml-2 text-primary" />
                     <span className="text-sm font-medium truncate max-w-[100px]">{user.profile?.name || user.email}</span>
                   </Button>
-                  <div className="absolute right-0 mt-2 w-52 bg-gray-800/95 backdrop-blur-md rounded-xl shadow-2xl py-2 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 border border-gray-700/50 scale-95 group-hover:scale-100 origin-top-right max-h-[calc(100vh-100px)] overflow-y-auto">
-                    <div className="px-4 py-2 border-b border-gray-700/30 mb-1">
+                  <div className="absolute right-0 mt-2 w-52 bg-secondary/95 backdrop-blur-md rounded-xl shadow-2xl py-2 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 border border-border/50 scale-95 group-hover:scale-100 origin-top-right max-h-[calc(100vh-100px)] overflow-y-auto">
+                    <div className="px-4 py-2 border-b border-border/30 mb-1">
                       <div className="flex items-center space-x-2 space-x-reverse">
-                        <div className="w-8 h-8 rounded-full bg-gold-500/10 flex items-center justify-center text-gold-500 border border-gold-500/20">
+                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary border border-primary/20">
                           {getInitials(user.profile?.name || user.email || "")}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-white truncate">{user.profile?.name || "کاربر"}</p>
-                          <p className="text-xs text-gray-400 truncate">{user.email}</p>
+                          <p className="text-sm font-medium text-foreground truncate">{user.profile?.name || "کاربر"}</p>
+                          <p className="text-xs text-muted-foreground truncate">{user.email}</p>
                         </div>
                       </div>
                     </div>
                     
                     <div className="py-1">
-                      <Link 
-                        to="/profile" 
-                        className="flex items-center px-4 py-2 text-sm text-white/90 hover:text-gold-500 hover:bg-gray-700/30 text-right transition-all duration-150 mx-1 rounded-md group"
+                      <Link
+                        to="/profile"
+                        className="flex items-center px-4 py-2 text-sm text-foreground/90 hover:text-primary hover:bg-accent/10 text-right transition-all duration-150 mx-1 rounded-md group"
                         title="مشاهده و ویرایش پروفایل"
                         aria-label="پروفایل کاربری"
                       >
                         <div className="flex items-center">
-                          <User className="h-4 w-4 ml-2 text-gold-500/70 group-hover:text-gold-500 transition-colors" />
+                          <User className="h-4 w-4 ml-2 text-primary/70 group-hover:text-primary transition-colors" />
                           <span className="group-hover:translate-x-0.5 transition-transform duration-150">پروفایل</span>
                         </div>
                       </Link>
                       
-                      <Link 
-                        to="/subscription" 
-                        className="flex items-center px-4 py-2 text-sm text-white/90 hover:text-gold-500 hover:bg-gray-700/30 text-right transition-all duration-150 mx-1 rounded-md group"
+                      <Link
+                        to="/subscription"
+                        className="flex items-center px-4 py-2 text-sm text-foreground/90 hover:text-primary hover:bg-accent/10 text-right transition-all duration-150 mx-1 rounded-md group"
                         title="مشاهده و خرید اشتراک‌ها"
                         aria-label="اشتراک‌ها"
                       >
                         <div className="flex items-center">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-2 text-gold-500/70 group-hover:text-gold-500 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-2 text-primary/70 group-hover:text-primary transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                             <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                           </svg>
                           <span className="group-hover:translate-x-0.5 transition-transform duration-150">اشتراک‌ها</span>
                         </div>
                       </Link>
-                     
                       
-                      <Link 
-                        to="/dashboard" 
-                        className="flex items-center px-4 py-2 text-sm text-white/90 hover:text-gold-500 hover:bg-gray-700/30 text-right transition-all duration-150 mx-1 rounded-md group"
+                      <Link
+                        to="/dashboard"
+                        className="flex items-center px-4 py-2 text-sm text-foreground/90 hover:text-primary hover:bg-accent/10 text-right transition-all duration-150 mx-1 rounded-md group"
                         title="مشاهده داشبورد کاربری"
                         aria-label="داشبورد کاربری"
                       >
                         <div className="flex items-center">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-2 text-gold-500/70 group-hover:text-gold-500 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-2 text-primary/70 group-hover:text-primary transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
                             <line x1="3" y1="9" x2="21" y2="9"></line>
                             <line x1="9" y1="21" x2="9" y2="9"></line>
@@ -675,14 +672,12 @@ const AuthHeader = () => {
                           <span className="group-hover:translate-x-0.5 transition-transform duration-150">داشبورد</span>
                         </div>
                       </Link>
-                      
-
                     </div>
                     
-                    <div className="px-3 pt-1 pb-2 border-t border-gray-700/30 mt-1">
-                      <button 
+                    <div className="px-3 pt-1 pb-2 border-t border-border/30 mt-1">
+                      <button
                         onClick={handleLogout}
-                        className="flex items-center w-full text-right px-4 py-2 text-sm text-red-400 hover:text-red-300 hover:bg-red-900/10 mx-1 rounded-md transition-all duration-150 group"
+                        className="flex items-center w-full text-right px-4 py-2 text-sm text-destructive hover:text-destructive/90 hover:bg-destructive/10 mx-1 rounded-md transition-all duration-150 group"
                       >
                         <div className="flex items-center">
                           <LogOut className="h-4 w-4 ml-2 opacity-70 group-hover:opacity-100 transition-opacity" />
@@ -695,8 +690,8 @@ const AuthHeader = () => {
               </div>
             ) : (
               <Link to="/login">
-                <Button 
-                  className="bg-gradient-to-r from-gold-500 to-amber-400 hover:from-gold-600 hover:to-amber-500 text-black font-medium text-sm px-4 py-1.5 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 border border-gold-400/30"
+                <Button
+                  className="bg-gradient-to-r from-primary to-yellow-400 hover:from-primary/90 hover:to-yellow-400/90 text-primary-foreground font-medium text-sm px-4 py-1.5 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 border border-primary/30"
                 >
                   ورود / ثبت‌نام
                 </Button>
@@ -706,7 +701,7 @@ const AuthHeader = () => {
 
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden text-white/90 hover:text-gold-500 bg-gray-800/40 hover:bg-gray-800/60 p-1.5 rounded-md transition-all duration-200 border border-white/5 hover:border-gold-500/30 flex items-center gap-1"
+            className="md:hidden text-foreground/90 hover:text-primary bg-secondary/40 hover:bg-secondary/60 p-1.5 rounded-md transition-all duration-200 border border-border/50 hover:border-primary/30 flex items-center gap-1"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
             {isMenuOpen ? <X size={18} /> : <Menu size={18} />}
@@ -716,29 +711,29 @@ const AuthHeader = () => {
 
         {/* Mobile Menu - Modern Slide Down */}
         <div className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${isMenuOpen ? 'max-h-[800px] opacity-100 mt-3' : 'max-h-0 opacity-0'}`}>
-          <div className="py-3 border-t border-white/5 text-right bg-gray-800/80 backdrop-blur-md rounded-xl px-3 sm:px-4 shadow-xl mobile-safe-area">
+          <div className="py-3 border-t border-border/50 text-right bg-secondary/80 backdrop-blur-md rounded-xl px-3 sm:px-4 shadow-xl mobile-safe-area">
             {user && (
-              <div className="mb-3 pb-3 border-b border-gray-700/30">
+              <div className="mb-3 pb-3 border-b border-border/30">
                 <div className="flex items-center space-x-3 space-x-reverse">
-                  <div className="w-10 h-10 rounded-full bg-gold-500/10 flex items-center justify-center text-gold-500 border border-gold-500/20 text-sm font-bold">
+                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary border border-primary/20 text-sm font-bold">
                     {getInitials(user.profile?.name || user.email || "")}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-white truncate">{user.profile?.name || user.email || "کاربر"}</p>
-                    <p className="text-xs text-gray-400 truncate">{user.email}</p>
+                    <p className="text-sm font-medium text-foreground truncate">{user.profile?.name || user.email || "کاربر"}</p>
+                    <p className="text-xs text-muted-foreground truncate">{user.email}</p>
                   </div>
                 </div>
               </div>
             )}
             
             <nav className="flex flex-col space-y-1.5">
-              <Link 
-                to="/" 
-                className="text-white/90 hover:text-gold-500 transition-all duration-200 py-2 px-3 rounded-lg hover:bg-gray-700/30 flex items-center group"
+              <Link
+                to="/"
+                className="text-foreground/90 hover:text-primary transition-all duration-200 py-2 px-3 rounded-lg hover:bg-accent/10 flex items-center group"
                 onClick={() => setIsMenuOpen(false)}
               >
-                <div className="w-8 h-8 rounded-lg bg-gray-700/50 flex items-center justify-center ml-3 group-hover:bg-gray-700 transition-colors">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gold-500/80 group-hover:text-gold-500 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <div className="w-8 h-8 rounded-lg bg-secondary/50 flex items-center justify-center ml-3 group-hover:bg-accent/20 transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-primary/80 group-hover:text-primary transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                     <polyline points="9 22 9 12 15 12 15 22"></polyline>
                   </svg>
@@ -746,13 +741,13 @@ const AuthHeader = () => {
                 <span className="group-hover:translate-x-0.5 transition-transform duration-150">خانه</span>
               </Link>
               
-              <Link 
-                to="/download" 
-                className="text-white/90 hover:text-gold-500 transition-all duration-200 py-2 px-3 rounded-lg hover:bg-gray-700/30 flex items-center group"
+              <Link
+                to="/download"
+                className="text-foreground/90 hover:text-primary transition-all duration-200 py-2 px-3 rounded-lg hover:bg-accent/10 flex items-center group"
                 onClick={() => setIsMenuOpen(false)}
               >
-                <div className="w-8 h-8 rounded-lg bg-gray-700/50 flex items-center justify-center ml-3 group-hover:bg-gray-700 transition-colors">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gold-500/80 group-hover:text-gold-500 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <div className="w-8 h-8 rounded-lg bg-secondary/50 flex items-center justify-center ml-3 group-hover:bg-accent/20 transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-primary/80 group-hover:text-primary transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                     <polyline points="7 10 12 15 17 10"></polyline>
                     <line x1="12" y1="15" x2="12" y2="3"></line>
@@ -761,13 +756,13 @@ const AuthHeader = () => {
                 <span className="group-hover:translate-x-0.5 transition-transform duration-150">دانلود اپلیکیشن</span>
               </Link>
               
-              <Link 
-                to="/programs" 
-                className="text-white/90 hover:text-gold-500 transition-all duration-200 py-2 px-3 rounded-lg hover:bg-gray-700/30 flex items-center group"
+              <Link
+                to="/programs"
+                className="text-foreground/90 hover:text-primary transition-all duration-200 py-2 px-3 rounded-lg hover:bg-accent/10 flex items-center group"
                 onClick={() => setIsMenuOpen(false)}
               >
-                <div className="w-8 h-8 rounded-lg bg-gray-700/50 flex items-center justify-center ml-3 group-hover:bg-gray-700 transition-colors">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gold-500/80 group-hover:text-gold-500 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <div className="w-8 h-8 rounded-lg bg-secondary/50 flex items-center justify-center ml-3 group-hover:bg-accent/20 transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-primary/80 group-hover:text-primary transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
                     <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
                   </svg>
@@ -775,15 +770,13 @@ const AuthHeader = () => {
                 <span className="group-hover:translate-x-0.5 transition-transform duration-150">برنامه‌ها</span>
               </Link>
               
-
-              
-              <Link 
-                to="/blog" 
-                className="text-white/90 hover:text-gold-500 transition-all duration-200 py-2 px-3 rounded-lg hover:bg-gray-700/30 flex items-center group"
+              <Link
+                to="/blog"
+                className="text-foreground/90 hover:text-primary transition-all duration-200 py-2 px-3 rounded-lg hover:bg-accent/10 flex items-center group"
                 onClick={() => setIsMenuOpen(false)}
               >
-                <div className="w-8 h-8 rounded-lg bg-gray-700/50 flex items-center justify-center ml-3 group-hover:bg-gray-700 transition-colors">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gold-500/80 group-hover:text-gold-500 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <div className="w-8 h-8 rounded-lg bg-secondary/50 flex items-center justify-center ml-3 group-hover:bg-accent/20 transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-primary/80 group-hover:text-primary transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
                     <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
                   </svg>
@@ -791,13 +784,13 @@ const AuthHeader = () => {
                 <span className="group-hover:translate-x-0.5 transition-transform duration-150">بلاگ</span>
               </Link>
               
-              <Link 
-                to="/legends" 
-                className="text-white/90 hover:text-gold-500 transition-all duration-200 py-2 px-3 rounded-lg hover:bg-gray-700/30 flex items-center group"
+              <Link
+                to="/legends"
+                className="text-foreground/90 hover:text-primary transition-all duration-200 py-2 px-3 rounded-lg hover:bg-accent/10 flex items-center group"
                 onClick={() => setIsMenuOpen(false)}
               >
-                <div className="w-8 h-8 rounded-lg bg-gray-700/50 flex items-center justify-center ml-3 group-hover:bg-gray-700 transition-colors">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gold-500/80 group-hover:text-gold-500 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <div className="w-8 h-8 rounded-lg bg-secondary/50 flex items-center justify-center ml-3 group-hover:bg-accent/20 transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-primary/80 group-hover:text-primary transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
                     <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
                     <path d="M4 22h16"></path>
@@ -809,13 +802,13 @@ const AuthHeader = () => {
                 <span className="group-hover:translate-x-0.5 transition-transform duration-150">افسانه‌ها</span>
               </Link>
               
-              <Link 
-                to="/about-us" 
-                className="text-white/90 hover:text-gold-500 transition-all duration-200 py-2 px-3 rounded-lg hover:bg-gray-700/30 flex items-center group"
+              <Link
+                to="/about-us"
+                className="text-foreground/90 hover:text-primary transition-all duration-200 py-2 px-3 rounded-lg hover:bg-accent/10 flex items-center group"
                 onClick={() => setIsMenuOpen(false)}
               >
-                <div className="w-8 h-8 rounded-lg bg-gray-700/50 flex items-center justify-center ml-3 group-hover:bg-gray-700 transition-colors">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gold-500/80 group-hover:text-gold-500 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <div className="w-8 h-8 rounded-lg bg-secondary/50 flex items-center justify-center ml-3 group-hover:bg-accent/20 transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-primary/80 group-hover:text-primary transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <circle cx="12" cy="12" r="10"></circle>
                     <line x1="12" y1="16" x2="12" y2="12"></line>
                     <line x1="12" y1="8" x2="12.01" y2="8"></line>
@@ -825,16 +818,14 @@ const AuthHeader = () => {
               </Link>
               
               {user ? (
-                <div className="mt-2 pt-2 border-t border-gray-700/30">
-                  
-                  
-                  <Link 
-                    to="/profile" 
-                    className="text-white/90 hover:text-gold-500 transition-all duration-200 py-2 px-3 rounded-lg hover:bg-gray-700/30 flex items-center group"
+                <div className="mt-2 pt-2 border-t border-border/30">
+                  <Link
+                    to="/profile"
+                    className="text-foreground/90 hover:text-primary transition-all duration-200 py-2 px-3 rounded-lg hover:bg-accent/10 flex items-center group"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    <div className="w-8 h-8 rounded-lg bg-gray-700/50 flex items-center justify-center ml-3 group-hover:bg-gray-700 transition-colors">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gold-500/80 group-hover:text-gold-500 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <div className="w-8 h-8 rounded-lg bg-secondary/50 flex items-center justify-center ml-3 group-hover:bg-accent/20 transition-colors">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-primary/80 group-hover:text-primary transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                         <circle cx="12" cy="7" r="4"></circle>
                       </svg>
@@ -842,13 +833,13 @@ const AuthHeader = () => {
                     <span className="text-sm font-medium group-hover:translate-x-0.5 transition-transform duration-200">پروفایل</span>
                   </Link>
                   
-                  <Link 
-                    to="/subscription" 
-                    className="text-white/90 hover:text-gold-500 transition-all duration-200 py-2 px-3 rounded-lg hover:bg-gray-700/30 flex items-center group"
+                  <Link
+                    to="/subscription"
+                    className="text-foreground/90 hover:text-primary transition-all duration-200 py-2 px-3 rounded-lg hover:bg-accent/10 flex items-center group"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    <div className="w-8 h-8 rounded-lg bg-gray-700/50 flex items-center justify-center ml-3 group-hover:bg-gray-700 transition-colors">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gold-500/80 group-hover:text-gold-500 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <div className="w-8 h-8 rounded-lg bg-secondary/50 flex items-center justify-center ml-3 group-hover:bg-accent/20 transition-colors">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-primary/80 group-hover:text-primary transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                         <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                       </svg>
@@ -856,13 +847,13 @@ const AuthHeader = () => {
                     <span className="text-sm font-medium group-hover:translate-x-0.5 transition-transform duration-200">اشتراک‌ها</span>
                   </Link>
                   
-                  <Link 
-                    to="/dashboard" 
-                    className="text-white/90 hover:text-gold-500 transition-all duration-200 py-2 px-3 rounded-lg hover:bg-gray-700/30 flex items-center group"
+                  <Link
+                    to="/dashboard"
+                    className="text-foreground/90 hover:text-primary transition-all duration-200 py-2 px-3 rounded-lg hover:bg-accent/10 flex items-center group"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    <div className="w-8 h-8 rounded-lg bg-gray-700/50 flex items-center justify-center ml-3 group-hover:bg-gray-700 transition-colors">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gold-500/80 group-hover:text-gold-500 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <div className="w-8 h-8 rounded-lg bg-secondary/50 flex items-center justify-center ml-3 group-hover:bg-accent/20 transition-colors">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-primary/80 group-hover:text-primary transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
                         <line x1="3" y1="9" x2="21" y2="9"></line>
                         <line x1="9" y1="21" x2="9" y2="9"></line>
@@ -871,25 +862,23 @@ const AuthHeader = () => {
                     <span className="text-sm font-medium group-hover:translate-x-0.5 transition-transform duration-200">داشبورد</span>
                   </Link>
                   
-
-                  
-                  <button 
+                  <button
                     onClick={() => {
                       setIsMenuOpen(false);
                       handleLogout();
                     }}
-                    className="w-full text-right text-red-400 hover:text-red-300 transition-all duration-200 py-2 px-3 rounded-lg hover:bg-red-900/10 flex items-center mt-1 group"
+                    className="w-full text-right text-destructive hover:text-destructive/90 transition-all duration-200 py-2 px-3 rounded-lg hover:bg-destructive/10 flex items-center mt-1 group"
                   >
-                    <div className="w-8 h-8 rounded-lg bg-red-900/20 flex items-center justify-center ml-3 group-hover:bg-red-900/30 transition-colors">
-                      <LogOut className="h-4 w-4 text-red-400/80 group-hover:text-red-400 transition-colors" />
+                    <div className="w-8 h-8 rounded-lg bg-destructive/10 flex items-center justify-center ml-3 group-hover:bg-destructive/20 transition-colors">
+                      <LogOut className="h-4 w-4 text-destructive/80 group-hover:text-destructive transition-colors" />
                     </div>
                     <span className="text-sm font-medium group-hover:translate-x-0.5 transition-transform duration-200">خروج</span>
                   </button>
                 </div>
               ) : (
                 <Link to="/login" onClick={() => setIsMenuOpen(false)}>
-                  <Button 
-                    className="mt-3 w-full bg-gradient-to-r from-gold-500 to-amber-400 hover:from-gold-600 hover:to-amber-500 text-black font-medium text-sm rounded-lg shadow-md"
+                  <Button
+                    className="mt-3 w-full bg-gradient-to-r from-primary to-yellow-400 hover:from-primary/90 hover:to-yellow-400/90 text-primary-foreground font-medium text-sm rounded-lg shadow-md"
                   >
                     ورود / ثبت‌نام
                   </Button>
