@@ -7,6 +7,11 @@ export type Json =
   | Json[]
 
 export type Database = {
+  // Allows to automatically instanciate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "12.2.3 (519615d)"
+  }
   public: {
     Tables: {
       admin_roles: {
@@ -29,6 +34,77 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      aggregate_ratings: {
+        Row: {
+          average_rating: number
+          average_verified_rating: number | null
+          helpful_votes_total: number | null
+          id: string
+          last_review_date: string | null
+          last_updated: string | null
+          product_id: string
+          rating_1_count: number | null
+          rating_2_count: number | null
+          rating_3_count: number | null
+          rating_4_count: number | null
+          rating_5_count: number | null
+          recommendation_percentage: number | null
+          total_reviews: number
+          total_votes_total: number | null
+          verified_reviews_count: number | null
+          would_not_recommend_count: number | null
+          would_recommend_count: number | null
+        }
+        Insert: {
+          average_rating?: number
+          average_verified_rating?: number | null
+          helpful_votes_total?: number | null
+          id?: string
+          last_review_date?: string | null
+          last_updated?: string | null
+          product_id: string
+          rating_1_count?: number | null
+          rating_2_count?: number | null
+          rating_3_count?: number | null
+          rating_4_count?: number | null
+          rating_5_count?: number | null
+          recommendation_percentage?: number | null
+          total_reviews?: number
+          total_votes_total?: number | null
+          verified_reviews_count?: number | null
+          would_not_recommend_count?: number | null
+          would_recommend_count?: number | null
+        }
+        Update: {
+          average_rating?: number
+          average_verified_rating?: number | null
+          helpful_votes_total?: number | null
+          id?: string
+          last_review_date?: string | null
+          last_updated?: string | null
+          product_id?: string
+          rating_1_count?: number | null
+          rating_2_count?: number | null
+          rating_3_count?: number | null
+          rating_4_count?: number | null
+          rating_5_count?: number | null
+          recommendation_percentage?: number | null
+          total_reviews?: number
+          total_votes_total?: number | null
+          verified_reviews_count?: number | null
+          would_not_recommend_count?: number | null
+          would_recommend_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "aggregate_ratings_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: true
+            referencedRelation: "programs_sale"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       blog_categories: {
         Row: {
@@ -55,6 +131,7 @@ export type Database = {
         Row: {
           author_id: string
           category: string | null
+          category_id: string | null
           coach_id: string | null
           content: string
           cover_image: string | null
@@ -69,6 +146,7 @@ export type Database = {
         Insert: {
           author_id: string
           category?: string | null
+          category_id?: string | null
           coach_id?: string | null
           content: string
           cover_image?: string | null
@@ -83,6 +161,7 @@ export type Database = {
         Update: {
           author_id?: string
           category?: string | null
+          category_id?: string | null
           coach_id?: string | null
           content?: string
           cover_image?: string | null
@@ -96,10 +175,60 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "blog_posts_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "blog_categories"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "blog_posts_coach_id_fkey"
             columns: ["coach_id"]
             isOneToOne: false
             referencedRelation: "coaches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bundle_items: {
+        Row: {
+          bundle_id: string
+          created_at: string | null
+          id: string
+          program_id: string
+        }
+        Insert: {
+          bundle_id: string
+          created_at?: string | null
+          id?: string
+          program_id: string
+        }
+        Update: {
+          bundle_id?: string
+          created_at?: string | null
+          id?: string
+          program_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bundle_items_bundle_id_fkey"
+            columns: ["bundle_id"]
+            isOneToOne: false
+            referencedRelation: "bundle_details"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bundle_items_bundle_id_fkey"
+            columns: ["bundle_id"]
+            isOneToOne: false
+            referencedRelation: "product_bundles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bundle_items_program_id_fkey"
+            columns: ["program_id"]
+            isOneToOne: false
+            referencedRelation: "programs_sale"
             referencedColumns: ["id"]
           },
         ]
@@ -190,56 +319,433 @@ export type Database = {
           },
         ]
       }
-      fitness_plans: {
+      discount_codes: {
         Row: {
-          coach_id: string
+          bundle_id: string | null
+          code: string
           created_at: string | null
-          description: string
-          duration_weeks: number
+          discount_type: string
+          discount_value: number
+          expires_at: string | null
           id: string
-          image_url: string | null
-          price: number
-          title: string
-          type: string
-          updated_at: string | null
+          is_active: boolean
+          program_id: string | null
         }
         Insert: {
-          coach_id: string
+          bundle_id?: string | null
+          code: string
           created_at?: string | null
-          description: string
-          duration_weeks: number
+          discount_type: string
+          discount_value: number
+          expires_at?: string | null
           id?: string
-          image_url?: string | null
-          price: number
-          title: string
-          type: string
-          updated_at?: string | null
+          is_active?: boolean
+          program_id?: string | null
         }
         Update: {
-          coach_id?: string
+          bundle_id?: string | null
+          code?: string
           created_at?: string | null
-          description?: string
-          duration_weeks?: number
+          discount_type?: string
+          discount_value?: number
+          expires_at?: string | null
           id?: string
-          image_url?: string | null
-          price?: number
-          title?: string
-          type?: string
-          updated_at?: string | null
+          is_active?: boolean
+          program_id?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "fitness_plans_coach_id_fkey"
-            columns: ["coach_id"]
+            foreignKeyName: "discount_codes_bundle_id_fkey"
+            columns: ["bundle_id"]
             isOneToOne: false
-            referencedRelation: "coaches"
+            referencedRelation: "bundle_details"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "discount_codes_bundle_id_fkey"
+            columns: ["bundle_id"]
+            isOneToOne: false
+            referencedRelation: "product_bundles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "discount_codes_program_id_fkey"
+            columns: ["program_id"]
+            isOneToOne: false
+            referencedRelation: "programs_sale"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      offers: {
+        Row: {
+          availability: string | null
+          availability_ends: string | null
+          availability_starts: string | null
+          condition: string | null
+          created_at: string | null
+          created_by: string | null
+          currency: string | null
+          description: string | null
+          id: string
+          inventory_level: number | null
+          is_active: boolean | null
+          low_stock_threshold: number | null
+          name: string
+          offer_type: string | null
+          original_price: number | null
+          price: number
+          product_id: string
+          return_policy: string | null
+          seller_name: string | null
+          seller_url: string | null
+          shipping_details: string | null
+          updated_at: string | null
+          valid_from: string | null
+          valid_until: string | null
+          warranty: string | null
+        }
+        Insert: {
+          availability?: string | null
+          availability_ends?: string | null
+          availability_starts?: string | null
+          condition?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          currency?: string | null
+          description?: string | null
+          id?: string
+          inventory_level?: number | null
+          is_active?: boolean | null
+          low_stock_threshold?: number | null
+          name: string
+          offer_type?: string | null
+          original_price?: number | null
+          price: number
+          product_id: string
+          return_policy?: string | null
+          seller_name?: string | null
+          seller_url?: string | null
+          shipping_details?: string | null
+          updated_at?: string | null
+          valid_from?: string | null
+          valid_until?: string | null
+          warranty?: string | null
+        }
+        Update: {
+          availability?: string | null
+          availability_ends?: string | null
+          availability_starts?: string | null
+          condition?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          currency?: string | null
+          description?: string | null
+          id?: string
+          inventory_level?: number | null
+          is_active?: boolean | null
+          low_stock_threshold?: number | null
+          name?: string
+          offer_type?: string | null
+          original_price?: number | null
+          price?: number
+          product_id?: string
+          return_policy?: string | null
+          seller_name?: string | null
+          seller_url?: string | null
+          shipping_details?: string | null
+          updated_at?: string | null
+          valid_from?: string | null
+          valid_until?: string | null
+          warranty?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "offers_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "programs_sale"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          amount: number
+          bundle_id: string | null
+          created_at: string | null
+          discount_amount: number
+          discount_code: string | null
+          id: string
+          phone_number: string
+          program_id: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          bundle_id?: string | null
+          created_at?: string | null
+          discount_amount?: number
+          discount_code?: string | null
+          id?: string
+          phone_number: string
+          program_id: string
+          status: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          bundle_id?: string | null
+          created_at?: string | null
+          discount_amount?: number
+          discount_code?: string | null
+          id?: string
+          phone_number?: string
+          program_id?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_bundle_id_fkey"
+            columns: ["bundle_id"]
+            isOneToOne: false
+            referencedRelation: "bundle_details"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_bundle_id_fkey"
+            columns: ["bundle_id"]
+            isOneToOne: false
+            referencedRelation: "product_bundles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_program_id_fkey"
+            columns: ["program_id"]
+            isOneToOne: false
+            referencedRelation: "programs_sale"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      product_bundles: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          discount_percentage: number | null
+          id: string
+          image_url: string | null
+          is_active: boolean | null
+          is_legend: boolean | null
+          price: number
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          discount_percentage?: number | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          is_legend?: boolean | null
+          price?: number
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          discount_percentage?: number | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          is_legend?: boolean | null
+          price?: number
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      program_details: {
+        Row: {
+          created_at: string | null
+          description: string
+          details: Json | null
+          id: string
+          program_id: string
+          title: string
+          updated_at: string | null
+          weeks: Json | null
+        }
+        Insert: {
+          created_at?: string | null
+          description: string
+          details?: Json | null
+          id?: string
+          program_id: string
+          title: string
+          updated_at?: string | null
+          weeks?: Json | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string
+          details?: Json | null
+          id?: string
+          program_id?: string
+          title?: string
+          updated_at?: string | null
+          weeks?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "program_details_program_id_fkey"
+            columns: ["program_id"]
+            isOneToOne: false
+            referencedRelation: "programs_sale"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      programs_sale: {
+        Row: {
+          category: string
+          created_at: string | null
+          description: string
+          id: string
+          image_url: string | null
+          price: number
+          program_url: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string | null
+          description: string
+          id?: string
+          image_url?: string | null
+          price: number
+          program_url?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string | null
+          description?: string
+          id?: string
+          image_url?: string | null
+          price?: number
+          program_url?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      reviews: {
+        Row: {
+          cons: string | null
+          created_at: string | null
+          helpful_votes: number | null
+          id: string
+          is_featured: boolean | null
+          moderated_at: string | null
+          moderated_by: string | null
+          moderation_notes: string | null
+          product_id: string
+          pros: string | null
+          rating: number
+          review_body: string
+          review_date: string | null
+          reviewer_email: string | null
+          reviewer_id: string | null
+          reviewer_name: string
+          seller_response: string | null
+          seller_response_by: string | null
+          seller_response_date: string | null
+          status: string | null
+          title: string | null
+          total_votes: number | null
+          updated_at: string | null
+          usage_duration: string | null
+          verified_purchase: boolean | null
+          would_recommend: boolean | null
+        }
+        Insert: {
+          cons?: string | null
+          created_at?: string | null
+          helpful_votes?: number | null
+          id?: string
+          is_featured?: boolean | null
+          moderated_at?: string | null
+          moderated_by?: string | null
+          moderation_notes?: string | null
+          product_id: string
+          pros?: string | null
+          rating: number
+          review_body: string
+          review_date?: string | null
+          reviewer_email?: string | null
+          reviewer_id?: string | null
+          reviewer_name: string
+          seller_response?: string | null
+          seller_response_by?: string | null
+          seller_response_date?: string | null
+          status?: string | null
+          title?: string | null
+          total_votes?: number | null
+          updated_at?: string | null
+          usage_duration?: string | null
+          verified_purchase?: boolean | null
+          would_recommend?: boolean | null
+        }
+        Update: {
+          cons?: string | null
+          created_at?: string | null
+          helpful_votes?: number | null
+          id?: string
+          is_featured?: boolean | null
+          moderated_at?: string | null
+          moderated_by?: string | null
+          moderation_notes?: string | null
+          product_id?: string
+          pros?: string | null
+          rating?: number
+          review_body?: string
+          review_date?: string | null
+          reviewer_email?: string | null
+          reviewer_id?: string | null
+          reviewer_name?: string
+          seller_response?: string | null
+          seller_response_by?: string | null
+          seller_response_date?: string | null
+          status?: string | null
+          title?: string | null
+          total_votes?: number | null
+          updated_at?: string | null
+          usage_duration?: string | null
+          verified_purchase?: boolean | null
+          would_recommend?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "programs_sale"
             referencedColumns: ["id"]
           },
         ]
       }
       user_profiles: {
         Row: {
+          admin: boolean | null
           age: number | null
+          coach: boolean | null
           created_at: string | null
           currentWeight: number | null
           email: string | null
@@ -260,7 +766,9 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          admin?: boolean | null
           age?: number | null
+          coach?: boolean | null
           created_at?: string | null
           currentWeight?: number | null
           email?: string | null
@@ -281,7 +789,9 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          admin?: boolean | null
           age?: number | null
+          coach?: boolean | null
           created_at?: string | null
           currentWeight?: number | null
           email?: string | null
@@ -344,304 +854,76 @@ export type Database = {
           },
         ]
       }
-      subscription_logs: {
+      web_auth_tokens: {
         Row: {
+          created_at: string | null
+          expires_at: string
           id: string
+          token: string
+          updated_at: string | null
+          used: boolean | null
           user_id: string
-          plan_id: string
-          period: 'monthly' | 'yearly'
-          amount: number
-          start_date: string
-          end_date: string
-          created_at: string
         }
         Insert: {
+          created_at?: string | null
+          expires_at: string
           id?: string
+          token: string
+          updated_at?: string | null
+          used?: boolean | null
           user_id: string
-          plan_id: string
-          period: 'monthly' | 'yearly'
-          amount: number
-          start_date: string
-          end_date: string
-          created_at?: string
         }
         Update: {
+          created_at?: string | null
+          expires_at?: string
           id?: string
+          token?: string
+          updated_at?: string | null
+          used?: boolean | null
           user_id?: string
-          plan_id?: string
-          period?: 'monthly' | 'yearly'
-          amount?: number
-          start_date?: string
-          end_date?: string
-          created_at?: string
         }
         Relationships: []
-      }
-      programs_sale: {
-        Row: {
-          id: string
-          title: string
-          description: string
-          price: number
-          category: 'training' | 'diet' | 'supplement'
-          image_url: string | null
-          program_url: string | null
-          created_at: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          id?: string
-          title: string
-          description: string
-          price: number
-          category: 'training' | 'diet' | 'supplement'
-          image_url?: string | null
-          program_url?: string | null
-          created_at?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          id?: string
-          title?: string
-          description?: string
-          price?: number
-          category?: 'training' | 'diet' | 'supplement'
-          image_url?: string | null
-          program_url?: string | null
-          created_at?: string | null
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
-      orders: {
-        Row: {
-          id: string
-          user_id: string
-          program_id: string
-          amount: number
-          discount_amount: number
-          status: string
-          phone_number: string
-          discount_code: string | null
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          user_id: string
-          program_id: string
-          amount: number
-          discount_amount: number
-          status: string
-          phone_number: string
-          discount_code?: string | null
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          user_id?: string
-          program_id?: string
-          amount?: number
-          discount_amount?: number
-          status?: string
-          phone_number?: string
-          discount_code?: string | null
-          created_at?: string
-        }
-        Relationships: []
-      }
-      discount_codes: {
-        Row: {
-          id: string
-          code: string
-          discount_type: 'percentage' | 'fixed'
-          discount_value: number
-          is_active: boolean
-          program_id: string | null
-          bundle_id: string | null
-          created_at: string
-          expires_at: string | null
-        }
-        Insert: {
-          id?: string
-          code: string
-          discount_type: 'percentage' | 'fixed'
-          discount_value: number
-          is_active: boolean
-          program_id?: string | null
-          bundle_id?: string | null
-          created_at?: string
-          expires_at?: string | null
-        }
-        Update: {
-          id?: string
-          code?: string
-          discount_type?: 'percentage' | 'fixed'
-          discount_value?: number
-          is_active?: boolean
-          program_id?: string | null
-          bundle_id?: string | null
-          created_at?: string
-          expires_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "discount_codes_program_id_fkey"
-            columns: ["program_id"]
-            isOneToOne: false
-            referencedRelation: "programs_sale"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "discount_codes_bundle_id_fkey"
-            columns: ["bundle_id"]
-            isOneToOne: false
-            referencedRelation: "product_bundles"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      program_details: {
-        Row: {
-          id: string
-          program_id: string
-          title: string
-          description: string
-          details: Json
-          workouts: Json
-          weeks: Json
-          created_at: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          id?: string
-          program_id: string
-          title: string
-          description: string
-          details: Json
-          workouts?: Json
-          weeks?: Json
-          created_at?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          id?: string
-          program_id?: string
-          title?: string
-          description?: string
-          details?: Json
-          workouts?: Json
-          weeks?: Json
-          created_at?: string | null
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
-      product_bundles: {
-        Row: {
-          id: string
-          title: string
-          description: string
-          price: number
-          discount_percentage: number | null
-          image_url: string | null
-          is_active: boolean
-          is_legend: boolean
-          created_at: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          id?: string
-          title: string
-          description: string
-          price: number
-          discount_percentage?: number | null
-          image_url?: string | null
-          is_active?: boolean
-          is_legend?: boolean
-          created_at?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          id?: string
-          title?: string
-          description?: string
-          price?: number
-          discount_percentage?: number | null
-          image_url?: string | null
-          is_active?: boolean
-          is_legend?: boolean
-          created_at?: string | null
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
-      bundle_items: {
-        Row: {
-          id: string
-          bundle_id: string
-          program_id: string
-          created_at: string | null
-        }
-        Insert: {
-          id?: string
-          bundle_id: string
-          program_id: string
-          created_at?: string | null
-        }
-        Update: {
-          id?: string
-          bundle_id?: string
-          program_id?: string
-          created_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "bundle_items_bundle_id_fkey"
-            columns: ["bundle_id"]
-            isOneToOne: false
-            referencedRelation: "product_bundles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "bundle_items_program_id_fkey"
-            columns: ["program_id"]
-            isOneToOne: false
-            referencedRelation: "programs_sale"
-            referencedColumns: ["id"]
-          }
-        ]
       }
     }
     Views: {
       bundle_details: {
         Row: {
-          id: string
-          title: string
-          description: string
-          price: number
-          discount_percentage: number | null
-          image_url: string | null
-          is_active: boolean
-          is_legend: boolean
+          bundle_items: Json | null
           created_at: string | null
+          description: string | null
+          discount_percentage: number | null
+          id: string | null
+          image_url: string | null
+          is_active: boolean | null
+          is_legend: boolean | null
+          price: number | null
+          title: string | null
           updated_at: string | null
-          bundle_items: {
-            program_id: string
-            program_title: string
-            program_category: 'training' | 'diet' | 'supplement'
-            program_price: number
-          }[]
-        }
-        Insert: {
-          [_ in never]: never
-        }
-        Update: {
-          [_ in never]: never
         }
         Relationships: []
       }
     }
     Functions: {
+      calculate_bundle_total_price: {
+        Args: { bundle_uuid: string }
+        Returns: number
+      }
+      cleanup_expired_web_auth_tokens: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      get_bundle_discount_amount: {
+        Args: { bundle_uuid: string }
+        Returns: number
+      }
+      get_bundle_final_price: {
+        Args: { bundle_uuid: string }
+        Returns: number
+      }
+      get_product_with_schema_data: {
+        Args: { p_product_id: string }
+        Returns: Json
+      }
       is_admin: {
         Args: { _user_id: string }
         Returns: boolean
@@ -654,6 +936,10 @@ export type Database = {
         Args: { _user_id: string }
         Returns: boolean
       }
+      update_aggregate_ratings: {
+        Args: { p_product_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
@@ -664,110 +950,122 @@ export type Database = {
   }
 }
 
-type DefaultSchema = Database[Extract<keyof Database, "public">]
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
-  | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
-  | { schema: keyof Database },
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-  ? keyof (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-    Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-  : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-    Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
       Row: infer R
     }
-  ? R
-  : never
+    ? R
+    : never
   : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
-    DefaultSchema["Views"])
-  ? (DefaultSchema["Tables"] &
-    DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
-      Row: infer R
-    }
-  ? R
-  : never
-  : never
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R
+      }
+      ? R
+      : never
+    : never
 
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
-  | keyof DefaultSchema["Tables"]
-  | { schema: keyof Database },
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-  ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-  : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-    Insert: infer I
-  }
-  ? I
-  : never
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Insert: infer I
+    }
+    ? I
+    : never
   : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-  ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-    Insert: infer I
-  }
-  ? I
-  : never
-  : never
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I
+      }
+      ? I
+      : never
+    : never
 
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
-  | keyof DefaultSchema["Tables"]
-  | { schema: keyof Database },
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-  ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-  : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-    Update: infer U
-  }
-  ? U
-  : never
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Update: infer U
+    }
+    ? U
+    : never
   : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-  ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-    Update: infer U
-  }
-  ? U
-  : never
-  : never
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U
+      }
+      ? U
+      : never
+    : never
 
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
-  | keyof DefaultSchema["Enums"]
-  | { schema: keyof Database },
+    | keyof DefaultSchema["Enums"]
+    | { schema: keyof DatabaseWithoutInternals },
   EnumName extends DefaultSchemaEnumNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-  ? keyof Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-  : never = never,
-> = DefaultSchemaEnumNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    : never = never,
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
-  ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
-  : never
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+    : never
 
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
-  | keyof DefaultSchema["CompositeTypes"]
-  | { schema: keyof Database },
+    | keyof DefaultSchema["CompositeTypes"]
+    | { schema: keyof DatabaseWithoutInternals },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-  ? keyof Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-  : never = never,
-> = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never = never,
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
   : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
-  ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
-  : never
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never
 
 export const Constants = {
   public: {
