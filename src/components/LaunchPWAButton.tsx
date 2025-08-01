@@ -113,7 +113,7 @@ const LaunchPWAButton: React.FC<LaunchPWAButtonProps> = ({
         ) : (
           <Globe className="w-5 h-5 ml-2" />
         )}
-        {isInstalled ? 'باز کردن اپلیکیشن' : 'ورود به وب اپ'}
+        {isInstalled ? 'ورود به برنامه' : 'ورود به برنامه'}
       </>
     );
   };
