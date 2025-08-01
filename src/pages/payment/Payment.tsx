@@ -649,7 +649,7 @@ const Payment = () => {
           localStorage.setItem('payment_info', JSON.stringify(updatedPaymentInfo));
           
           // Redirect to Zarinpal payment page
-          window.location.href = `https://staging.zarinpal.com/pg/StartPay/${response.data.data.authority}`;
+          window.location.href = `https://www.zarinpal.com/pg/StartPay/${response.data.data.authority}`;
         } else {
           throw new Error(response.data.errors?.message || 'خطا در اتصال به درگاه پرداخت');
         }
