@@ -79,7 +79,7 @@ app.post("/api/zarinpal/payment-request", async (req, res) => {
     console.log("Sending request to Zarinpal API...");
 
     const response = await axios.post(
-      "https://staging.zarinpal.com/pg/v4/payment/request.json",
+      "https://api.zarinpal.com/pg/v4/payment/request.json",
       req.body,
       { headers }
     );
@@ -140,7 +140,7 @@ app.post("/api/zarinpal/verify", async (req, res) => {
     console.log("Sending verification request to Zarinpal API...");
 
     const response = await axios.post(
-      "https://staging.zarinpal.com/pg/v4/payment/verify.json",
+      "https://api.zarinpal.com/pg/v4/payment/verify.json",
       req.body,
       { headers }
     );

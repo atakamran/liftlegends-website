@@ -39,7 +39,7 @@ const ZarinpalTest = () => {
       // If the request was successful and contains a payment URL, redirect to it
       if (response.data.data && response.data.data.authority) {
         const authority = response.data.data.authority;
-        window.location.href = `https://staging.zarinpal.com/pg/StartPay/${authority}`;
+        window.location.href = `https://www.zarinpal.com/pg/StartPay/${authority}`;
       }
     } catch (error) {
       console.error(error);
