@@ -54,7 +54,7 @@ const BlogPostCard = memo(({
           
           <img 
             src={imageSrc}
-            alt={post.title} 
+            alt={`تصویر مقاله ${post.title} - لیفت لجندز`}
             className={`w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
             loading="lazy"
             decoding="async"
