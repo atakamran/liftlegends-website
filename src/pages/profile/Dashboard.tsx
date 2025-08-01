@@ -715,8 +715,8 @@ const Dashboard = () => {
         created_at: item.created_at,
         updated_at: item.updated_at,
         programs_sale: item.programs_sale && typeof item.programs_sale === 'object' ? {
-          title: item.programs_sale?.title ?? '',
-          category: (item.programs_sale?.category as 'training' | 'diet' | 'supplement') ?? 'training'
+          title: (item.programs_sale as any)?.title ?? '',
+          category: ((item.programs_sale as any)?.category as 'training' | 'diet' | 'supplement') ?? 'training'
         } : undefined
       })) : [];
       
