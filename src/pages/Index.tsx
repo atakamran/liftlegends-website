@@ -1,6 +1,7 @@
 
 import HeroSection from "@/components/HeroSection";
 import FeaturesSection from "@/components/FeaturesSection";
+import WhyLiftLegends from "@/components/WhyLiftLegends";
 import ProgramsSection from "@/components/ProgramsSection";
 import CTASection from "@/components/CTASection";
 import FaqSection from "@/components/FaqSection";
@@ -346,6 +347,7 @@ const Index = () => {
       </Helmet>
       <HeroSection />
       <FeaturesSection />
+      <WhyLiftLegends />
       <ProgramsSection />
       <CTASection />
       <FaqSection />
