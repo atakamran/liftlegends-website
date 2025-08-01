@@ -297,7 +297,7 @@ const ProgramsSection = () => {
                     {program.image_url ? (
                       <img 
                         src={program.image_url} 
-                        alt={program.title} 
+                        alt={`تصویر برنامه ${program.title} - لیفت لجندز`}
                         className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
                       />
                     ) : (

@@ -29,8 +29,28 @@ const HeroSection = () => {
 
   return (
     <section className="min-h-screen flex flex-col items-center justify-center px-4 py-12 sm:py-20 relative overflow-hidden">
+      {/* Video Background */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-20">
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="w-full h-full object-cover"
+          poster="https://images.pexels.com/photos/2294361/pexels-photo-2294361.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260"
+        >
+          <source
+            src="https://videos.pexels.com/video-files/3838631/3838631-hd_1920_1080_25fps.mp4"
+            type="video/mp4"
+          />
+          Your browser does not support the video tag.
+        </video>
+        {/* Video overlay */}
+        <div className="absolute top-0 left-0 w-full h-full bg-black opacity-50"></div>
+      </div>
+
       {/* Background effects - enhanced with more modern gradients */}
-      <div className="absolute -z-10 top-0 left-0 w-full h-full bg-gradient-to-b from-black via-gray-900 to-black"></div>
+      <div className="absolute -z-10 top-0 left-0 w-full h-full bg-gradient-to-b from-black via-gray-900 to-black opacity-50"></div>
       <div className="absolute -z-10 top-20 left-1/2 transform -translate-x-1/2 w-72 sm:w-96 h-72 sm:h-96 bg-gradient-to-r from-gold-500 to-amber-500 rounded-full blur-[120px] opacity-10"></div>
       <div className="absolute -z-10 bottom-40 right-10 w-48 sm:w-64 h-48 sm:h-64 bg-gradient-to-r from-gold-400 to-amber-300 rounded-full blur-[100px] opacity-5 animate-pulse"></div>
       <div className="absolute -z-10 top-1/3 left-1/4 w-36 sm:w-48 h-36 sm:h-48 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full blur-[120px] opacity-5"></div>
@@ -86,21 +106,16 @@ const HeroSection = () => {
 
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold">
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-gold-400 via-amber-300 to-gold-500 animate-gradient-x">
-              Lift Legends
+              افسانه خودت را بساز
             </span>
           </h1>
 
           <h2 className="text-lg sm:text-xl md:text-2xl text-white/90 font-light">
-            برنامه تمرینی رایگان بدنسازی با هوش مصنوعی
+            با Lift Legends به اوج قدرت و تناسب اندام برسید
           </h2>
 
           <p className="text-white/70 text-base sm:text-lg max-w-md mx-auto md:mx-0 leading-relaxed px-2 sm:px-0">
-            بهترین{" "}
-            <span className="text-gold-400 font-medium">
-              برنامه تمرینی رایگان
-            </span>{" "}
-            برای <span className="text-gold-400 font-medium">بدنسازی</span> و
-            تناسب اندام. برنامه‌های شخصی‌سازی شده با هوش مصنوعی
+            برنامه تمرینی و رژیم غذایی شما توسط <span className="text-gold-400 font-medium">هوش مصنوعی</span> پیشرفته طراحی می‌شود تا بهترین نتایج را در کمترین زمان ممکن کسب کنید.
           </p>
 
           {/* Enhanced feature badges with better visual design */}

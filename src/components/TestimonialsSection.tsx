@@ -188,7 +188,7 @@ const TestimonialsSection = () => {
                 <div className="absolute inset-0 bg-gradient-to-br from-gold-500/30 to-transparent rounded-full opacity-70 transform scale-[1.15] animate-pulse"></div>
                 <img 
                   src="https://source.unsplash.com/random/300x300/?fitness,trainer" 
-                  alt="Featured testimonial" 
+                  alt="امیر حسینی، قهرمان پرورش اندام کشوری و کاربر Lift Legends"
                   className="w-48 h-48 object-cover rounded-full border-4 border-gold-500/30 group-hover:border-gold-500/50 transition-colors"
                   loading="lazy"
                 />

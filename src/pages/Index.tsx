@@ -286,9 +286,9 @@ const Index = () => {
     <>
       <Helmet>
         {/* Primary Meta Tags */}
-        <title>برنامه تمرینی رایگان بدنسازی | Lift Legends - برنامه بدنسازی هوشمند</title>
-        <meta name="title" content="برنامه تمرینی رایگان بدنسازی | Lift Legends - برنامه بدنسازی هوشمند" />
-        <meta name="description" content="دانلود رایگان بهترین برنامه تمرینی بدنسازی با هوش مصنوعی. برنامه تمرینی رایگان شخصی‌سازی شده، رژیم غذایی بدنسازی و مشاوره مکمل. Lift Legends - اپلیکیشن بدنسازی هوشمند." />
+        <title>Lift Legends | افسانه خودت را بساز با برنامه تمرینی هوشمند</title>
+        <meta name="title" content="Lift Legends | افسانه خودت را بساز با برنامه تمرینی هوشمند" />
+        <meta name="description" content="با Lift Legends افسانه خود را بسازید. برنامه تمرینی و رژیم غذایی شخصی‌سازی شده با هوش مصنوعی برای رسیدن به اوج قدرت و تناسب اندام. همین امروز رایگان شروع کنید." />
         <meta name="keywords" content="برنامه تمرینی رایگان، بدنسازی، برنامه بدنسازی، برنامه تمرینی، تناسب اندام، مربی بدنسازی، برنامه تمرینی بدنسازی، رژیم غذایی بدنسازی، مکمل بدنسازی، استرویید، فیتنس، اپلیکیشن بدنسازی، هوش مصنوعی، برنامه ورزشی رایگان، تمرینات بدنسازی، AI fitness، personal trainer" />
         <meta name="author" content="Lift Legends" />
         <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
