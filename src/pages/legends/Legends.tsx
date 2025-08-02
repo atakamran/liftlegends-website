@@ -68,7 +68,16 @@ const Legends = () => {
         
       if (error) throw error;
       
-      setLegendBundles(data || []);
+        setLegendBundles(data.map(bundle => ({
+          ...bundle,
+          bundle_items: bundle.bundle_items.map(item => ({
+            ...item,
+            programs_sale: {
+              ...item.programs_sale,
+              category: item.programs_sale.category as 'training' | 'diet' | 'supplement'
+            }
+          }))
+        })) || []);
     } catch (error) {
       console.error("Error fetching legend bundles:", error);
       toast({

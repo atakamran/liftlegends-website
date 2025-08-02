@@ -78,7 +78,7 @@ const PaymentCallback = () => {
 
         // Verify payment with Zarinpal
         const verifyData = {
-          merchant_id: "57fda6d5-c1e1-4325-8d2a-4bd5e18a1f6b",
+          merchant_id: process.env.ZARINPAL_MERCHANT_ID || "MERCHANT_ID_NOT_SET",
           authority: authority,
           amount: paymentInfo.amount.toString(),
         };

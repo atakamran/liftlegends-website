@@ -108,7 +108,7 @@ const ProductPage = () => {
         title: data.title,
         description: data.description,
         price: data.price,
-        category: data.category,
+        category: data.category as "training" | "diet" | "supplement",
         image_url: data.image_url,
         program_url: data.program_url || null,
         created_at: data.created_at || new Date().toISOString(),
@@ -162,7 +162,10 @@ const ProductPage = () => {
       }
 
       console.log("Related programs fetched:", data);
-      setRelatedPrograms(data || []);
+        setRelatedPrograms(data.map(program => ({
+          ...program,
+          category: program.category as "training" | "diet" | "supplement"
+        })) || []);
     } catch (error) {
       console.error("Error fetching related programs:", error);
     }

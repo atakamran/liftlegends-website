@@ -14,13 +14,13 @@ const ZarinpalTest = () => {
     
     try {
       const data = JSON.stringify({
-        "merchant_id": "89999bca-a25d-4ada-9846-62ec13a250b1",
+        "merchant_id": process.env.ZARINPAL_MERCHANT_ID || "MERCHANT_ID_NOT_SET",
         "amount": "15000",
         "description": "test",
         "metadata": {
-          "mobile": "09148866040"
+          "mobile": "PHONE_PLACEHOLDER"
         },
-        "callback_url": "https://zarinpal.com"
+        "callback_url": `${window.location.origin}/payment/callback`
       });
       
       const config = {

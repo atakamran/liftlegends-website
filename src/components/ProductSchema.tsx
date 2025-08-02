@@ -37,7 +37,7 @@ const ProductSchema = () => {
           title: program.title,
           description: program.description,
           price: program.price,
-          category: program.category,
+          category: program.category as 'training' | 'diet' | 'supplement',
           image_url: program.image_url,
           program_url: program.program_url || null,
           created_at: program.created_at || new Date().toISOString(),

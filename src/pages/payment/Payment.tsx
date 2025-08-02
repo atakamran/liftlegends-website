@@ -189,7 +189,7 @@ const Payment = () => {
         title: data.title,
         description: data.description,
         price: data.price,
-        category: data.category,
+        category: data.category as 'training' | 'diet' | 'supplement',
         image_url: data.image_url,
       };
       
@@ -251,7 +251,7 @@ const Payment = () => {
         is_legend: data.is_legend,
         created_at: data.created_at,
         updated_at: data.updated_at,
-        bundle_items: data.bundle_items || [],
+        bundle_items: Array.isArray(data.bundle_items) ? data.bundle_items as any[] : [],
       };
       
       console.log('Bundle data mapped:', bundleData);
