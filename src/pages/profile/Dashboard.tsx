@@ -980,7 +980,6 @@ const Dashboard = () => {
                 ...typedPurchase,
                 plan: planData || { name: "اشتراک", description: "خرید اشتراک" }
               };
-              };
             }
           } catch (err) {
             console.error("Error processing purchase data:", err);
