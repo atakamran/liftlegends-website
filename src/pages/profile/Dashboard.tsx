@@ -4342,4 +4342,26 @@ const Dashboard = () => {
                 {/* Account Actions Card */}
                 <Card className="bg-gray-800/50 border-gray-700 md:col-span-2">
                   <CardHeader>
-                    <CardTitle className="text-xl text-gold-500">عملیات ح
+                    <CardTitle className="text-xl text-gold-500">عملیات حساب</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <Button
+                        variant="destructive"
+                        className="w-full"
+                        onClick={() => {
+                          // Handle account deletion
+                          alert('این قابلیت به زودی اضافه خواهد شد');
+                        }}
+                      >
+                        حذف حساب کاربری
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+          </Tabs>
+        </div>
+      </div>
+    </div>
