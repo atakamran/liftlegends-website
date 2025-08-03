@@ -30,13 +30,6 @@ import ProductPage from "./pages/programs/ProductPage";
 import ProgramDetails from "./pages/programs/ProgramDetails";
 import Legends from "./pages/legends/Legends";
 import Search from "./pages/Search";
-import GymManagement from "./pages/gym/GymManagement";
-import TrainerPanel from "./pages/trainers/TrainerPanel";
-import AthletePanel from "./pages/athletes/AthletePanel";
-import Shop from "./pages/shop/Shop";
-import AICoach from "./pages/ai/AICoach";
-import Partnerships from "./pages/partnerships/Partnerships";
-import GymDetail from "./pages/gym/GymDetail";
 
 const queryClient = new QueryClient();
 
@@ -71,13 +64,6 @@ const App = () => (
             <Route path="/programs/:programId/details" element={<ProgramDetails />} />
             <Route path="/legends" element={<Legends />} />
             <Route path="/search" element={<Search />} />
-            <Route path="/gym" element={<GymManagement />} />
-            <Route path="/trainers" element={<TrainerPanel />} />
-            <Route path="/athletes" element={<AthletePanel />} />
-            <Route path="/shop" element={<Shop />} />
-            <Route path="/ai-coach" element={<AICoach />} />
-            <Route path="/partnerships" element={<Partnerships />} />
-            <Route path="/gym/:id" element={<GymDetail />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
