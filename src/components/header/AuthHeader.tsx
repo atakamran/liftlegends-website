@@ -14,7 +14,7 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Menu, X, User, LogOut } from "lucide-react";
+import { Menu, X, User, LogOut, ShoppingCart, Trophy, Handshake, Dumbbell, Building, UserCheck, Brain } from "lucide-react";
 
 // Define interfaces outside the component
 interface UserProfile {
@@ -67,6 +67,16 @@ const AuthHeader = () => {
     password: "",
   });
   const navigate = useNavigate();
+
+  // Navigation items for new pages
+  const navItems = [
+    { name: "باشگاه‌ها", href: "/gym", icon: Building },
+    { name: "مربیان", href: "/trainers", icon: UserCheck },
+    { name: "ورزشکاران", href: "/athletes", icon: Trophy },
+    { name: "مشارکت‌ها", href: "/partnerships", icon: Handshake },
+    { name: "فروشگاه", href: "/shop", icon: ShoppingCart },
+    { name: "مربی هوشمند", href: "/ai-coach", icon: Brain },
+  ];
 
   // Function to fetch user profile data directly from Supabase
   const fetchUserProfile = async (userId: string) => {
@@ -659,10 +669,31 @@ const AuthHeader = () => {
             >
               درباره ما
             </Link>
+            
+            {/* New Pages Links */}
+            {navItems.map((item) => (
+              <Link
+                key={item.name}
+                to={item.href}
+                className="text-white/90 hover:text-gold-500 font-medium text-sm transition-colors duration-200 relative after:content-[''] after:absolute after:right-0 after:left-0 after:bottom-0 after:h-0.5 after:bg-gold-500 after:scale-x-0 after:origin-right hover:after:scale-x-100 after:transition-transform after:duration-300 flex items-center gap-2"
+              >
+                <item.icon className="h-4 w-4" />
+                {item.name}
+              </Link>
+            ))}
           </nav>
 
-          {/* Auth Buttons */}
+          {/* Shopping Cart & Auth Buttons */}
           <div className="hidden md:flex items-center space-x-reverse space-x-3">
+            {/* Shopping Cart */}
+            <Button variant="ghost" size="sm" asChild className="relative">
+              <Link to="/shop">
+                <ShoppingCart className="h-5 w-5 text-white/80 hover:text-primary" />
+                <span className="absolute -top-2 -right-2 bg-primary text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  0
+                </span>
+              </Link>
+            </Button>
             {user ? (
               <div className="flex items-center">
                 <div className="relative group">
@@ -992,6 +1023,42 @@ const AuthHeader = () => {
                 <span className="group-hover:translate-x-0.5 transition-transform duration-150">
                   درباره ما
                 </span>
+              </Link>
+
+              {/* New Pages Links - Mobile */}
+              {navItems.map((item) => (
+                <Link
+                  key={item.name}
+                  to={item.href}
+                  className="text-white/90 hover:text-gold-500 transition-all duration-200 py-2 px-3 rounded-lg hover:bg-gray-700/30 flex items-center group"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <div className="w-8 h-8 rounded-lg bg-gray-700/50 flex items-center justify-center ml-3 group-hover:bg-gray-700 transition-colors">
+                    <item.icon className="h-4 w-4 text-gold-500/80 group-hover:text-gold-500 transition-colors" />
+                  </div>
+                  <span className="group-hover:translate-x-0.5 transition-transform duration-150">
+                    {item.name}
+                  </span>
+                </Link>
+              ))}
+              
+              {/* Mobile Shopping Cart */}
+              <Link
+                to="/shop"
+                className="text-white/90 hover:text-gold-500 transition-all duration-200 py-2 px-3 rounded-lg hover:bg-gray-700/30 flex items-center group"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <div className="w-8 h-8 rounded-lg bg-gray-700/50 flex items-center justify-center ml-3 group-hover:bg-gray-700 transition-colors">
+                  <ShoppingCart className="h-4 w-4 text-gold-500/80 group-hover:text-gold-500 transition-colors" />
+                </div>
+                <div className="flex items-center justify-between flex-1">
+                  <span className="group-hover:translate-x-0.5 transition-transform duration-150">
+                    سبد خرید
+                  </span>
+                  <span className="bg-primary text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                    0
+                  </span>
+                </div>
               </Link>
 
               {user ? (
