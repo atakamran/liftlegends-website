@@ -343,12 +343,12 @@ const TestimonialsSection = () => {
             با دانلود اپلیکیشن LiftLegends، به <span className="text-gold-400">برنامه تمرینی هوشمند</span>، <span className="text-gold-400">برنامه غذایی</span> و <span className="text-gold-400">برنامه مکمل و استرویید</span> دسترسی پیدا کنید
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <button type="button" className="inline-block transition-transform hover:scale-105 hover:shadow-[0_0_20px_rgba(255,215,0,0.2)] border-0 bg-transparent p-0">
-              <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Get it on Google Play" className="h-16" />
-            </button>
-            <button type="button" className="inline-block transition-transform hover:scale-105 hover:shadow-[0_0_20px_rgba(255,215,0,0.2)] border-0 bg-transparent p-0">
-              <img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" alt="Download on the App Store" className="h-16" />
-            </button>
+            <Link to="/download">
+              <Button className="bg-gradient-to-r from-gold-500 to-gold-400 hover:from-gold-600 hover:to-gold-500 text-black font-medium px-8 py-4 text-lg rounded-xl transition-all hover:scale-105 shadow-[0_0_20px_rgba(255,215,0,0.2)] hover:shadow-[0_0_30px_rgba(255,215,0,0.4)]">
+                <Download size={20} className="ml-2" />
+                دانلود اپلیکیشن
+              </Button>
+            </Link>
           </div>
         </div>
       </div>

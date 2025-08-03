@@ -22,6 +22,17 @@ import {
   ShoppingCart,
   Dumbbell,
   Users,
+  Search,
+  Bell,
+  Settings,
+  Crown,
+  Zap,
+  ChevronDown,
+  Home,
+  BookOpen,
+  Download,
+  Info,
+  Trophy,
 } from "lucide-react";
 
 // Define interfaces outside the component
@@ -67,6 +78,8 @@ const AuthHeader = () => {
   // Create a ref for the dialog close button
   const dialogCloseRef = React.useRef<HTMLButtonElement>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
   const [authMode, setAuthMode] = useState<"login" | "register">("login");
@@ -75,7 +88,19 @@ const AuthHeader = () => {
     password: "",
   });
   const [cartItemsCount, setCartItemsCount] = useState(0);
+  const [notifications, setNotifications] = useState(0);
+  const [isScrolled, setIsScrolled] = useState(false);
   const navigate = useNavigate();
+
+  // Handle scroll effect for header
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Function to fetch user profile data directly from Supabase
   const fetchUserProfile = async (userId: string) => {
@@ -327,6 +352,16 @@ const AuthHeader = () => {
     await fetchAllUserData();
 
     return true;
+  };
+
+  // Handle search
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+      setIsSearchOpen(false);
+      setSearchQuery("");
+    }
   };
 
   useEffect(() => {
@@ -633,113 +668,221 @@ const AuthHeader = () => {
     }
   };
 
+  // Get subscription badge
+  const getSubscriptionBadge = () => {
+    if (!user?.profile?.subscription_plan) return null;
+    
+    const plan = user.profile.subscription_plan;
+    const colors = {
+      basic: "bg-blue-500/20 text-blue-400 border-blue-500/30",
+      pro: "bg-gold-500/20 text-gold-400 border-gold-500/30",
+      ultimate: "bg-purple-500/20 text-purple-400 border-purple-500/30"
+    };
+    
+    return (
+      <div className={`px-2 py-1 rounded-full text-xs font-medium border ${colors[plan as keyof typeof colors] || colors.basic}`}>
+        {plan === 'pro' ? 'PRO' : plan === 'ultimate' ? 'ULTIMATE' : 'BASIC'}
+      </div>
+    );
+  };
+
   return (
-    <header className="bg-gray-900/90 backdrop-blur-lg border-b border-white/5 sticky top-0 z-50 dir-ltr shadow-md w-full">
-      <div className="container mx-auto px-3 sm:px-4 py-2 mobile-safe-area">
-        <div className="flex items-center justify-between flex-row-reverse h-12 sm:h-14">
-          {/* Logo */}
+    <header className={`bg-gray-900/95 backdrop-blur-xl border-b border-white/10 sticky top-0 z-50 transition-all duration-300 ${isScrolled ? 'shadow-2xl shadow-black/50 bg-gray-900/98' : ''}`}>
+      <div className="container mx-auto px-4 py-3">
+        <div className="flex items-center justify-between">
+          {/* Logo Section - Enhanced */}
           <Link
             to="/"
-            className="flex items-center"
+            className="flex items-center group"
             aria-label="صفحه اصلی Lift Legends"
             title="بازگشت به صفحه اصلی"
           >
-            <img
-              src="https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends//white%20logo.webp"
-              alt="Lift Legends Logo"
-              className="h-10 w-auto"
-              loading="eager"
-              width="80"
-              height="40"
-            />
+            <div className="relative">
+              <img
+                src="https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends//white%20logo.png"
+                alt="Lift Legends Logo"
+                className="h-12 w-auto transition-transform duration-300 group-hover:scale-105"
+                loading="eager"
+                width="120"
+                height="48"
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-gold-500/20 to-transparent rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl"></div>
+            </div>
+            <div className="mr-3 hidden sm:block">
+              <h1 className="text-xl font-bold bg-gradient-to-r from-gold-400 to-gold-600 bg-clip-text text-transparent">
+                Lift Legends
+              </h1>
+              <p className="text-xs text-gray-400 -mt-1">مربی هوشمند بدنسازی</p>
+            </div>
           </Link>
 
-          {/* Desktop Navigation - New Modern Design */}
-          <nav className="hidden md:flex items-center space-x-reverse space-x-8 mr-6">
-            <Link
-              to="/"
-              className="text-white/90 hover:text-gold-500 font-medium text-sm transition-colors duration-200 relative after:content-[''] after:absolute after:right-0 after:left-0 after:bottom-0 after:h-0.5 after:bg-gold-500 after:scale-x-0 after:origin-right hover:after:scale-x-100 after:transition-transform after:duration-300"
-            >
-              خانه
-            </Link>
-            <Link
-              to="/download"
-              className="text-white/90 hover:text-gold-500 font-medium text-sm transition-colors duration-200 relative after:content-[''] after:absolute after:right-0 after:left-0 after:bottom-0 after:h-0.5 after:bg-gold-500 after:scale-x-0 after:origin-right hover:after:scale-x-100 after:transition-transform after:duration-300"
-            >
-              دریافت اپلیکیشن
-            </Link>
-            <Link
-              to="/programs"
-              className="text-white/90 hover:text-gold-500 font-medium text-sm transition-colors duration-200 relative after:content-[''] after:absolute after:right-0 after:left-0 after:bottom-0 after:h-0.5 after:bg-gold-500 after:scale-x-0 after:origin-right hover:after:scale-x-100 after:transition-transform after:duration-300"
-            >
-              برنامه‌ها
-            </Link>
+          {/* Desktop Navigation - Modern Mega Menu Style */}
+          <nav className="hidden lg:flex items-center space-x-8 space-x-reverse">
+            <div className="relative group">
+              <Link
+                to="/"
+                className="flex items-center text-white/90 hover:text-gold-400 font-medium text-sm transition-all duration-300 px-3 py-2 rounded-lg hover:bg-white/5 group"
+              >
+                <Home className="h-4 w-4 ml-2 opacity-70 group-hover:opacity-100 transition-opacity" />
+                خانه
+              </Link>
+            </div>
+
+            <div className="relative group">
+              <button className="flex items-center text-white/90 hover:text-gold-400 font-medium text-sm transition-all duration-300 px-3 py-2 rounded-lg hover:bg-white/5 group">
+                <Dumbbell className="h-4 w-4 ml-2 opacity-70 group-hover:opacity-100 transition-opacity" />
+                خدمات
+                <ChevronDown className="h-3 w-3 mr-1 opacity-70 group-hover:opacity-100 transition-all duration-300 group-hover:rotate-180" />
+              </button>
+              
+              {/* Mega Menu */}
+              <div className="absolute top-full right-0 mt-2 w-80 bg-gray-900/98 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform scale-95 group-hover:scale-100 origin-top-right">
+                <div className="p-6">
+                  <div className="grid grid-cols-2 gap-4">
+                    <Link
+                      to="/programs"
+                      className="group/item p-4 rounded-xl hover:bg-white/5 transition-all duration-200"
+                    >
+                      <div className="flex items-center mb-2">
+                        <div className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center mr-3">
+                          <BookOpen className="h-4 w-4 text-blue-400" />
+                        </div>
+                        <h3 className="font-medium text-white group-hover/item:text-blue-400 transition-colors">برنامه‌ها</h3>
+                      </div>
+                      <p className="text-xs text-gray-400 group-hover/item:text-gray-300 transition-colors">برنامه‌های تمرینی و غذایی</p>
+                    </Link>
+
+                    <Link
+                      to="/gyms"
+                      className="group/item p-4 rounded-xl hover:bg-white/5 transition-all duration-200"
+                    >
+                      <div className="flex items-center mb-2">
+                        <div className="w-8 h-8 rounded-lg bg-green-500/20 flex items-center justify-center mr-3">
+                          <Dumbbell className="h-4 w-4 text-green-400" />
+                        </div>
+                        <h3 className="font-medium text-white group-hover/item:text-green-400 transition-colors">باشگاه‌ها</h3>
+                      </div>
+                      <p className="text-xs text-gray-400 group-hover/item:text-gray-300 transition-colors">بهترین باشگاه‌های شهر</p>
+                    </Link>
+
+                    <Link
+                      to="/coaches"
+                      className="group/item p-4 rounded-xl hover:bg-white/5 transition-all duration-200"
+                    >
+                      <div className="flex items-center mb-2">
+                        <div className="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center mr-3">
+                          <Users className="h-4 w-4 text-purple-400" />
+                        </div>
+                        <h3 className="font-medium text-white group-hover/item:text-purple-400 transition-colors">مربی‌ها</h3>
+                      </div>
+                      <p className="text-xs text-gray-400 group-hover/item:text-gray-300 transition-colors">مربی‌های حرفه‌ای</p>
+                    </Link>
+
+                    <Link
+                      to="/legends"
+                      className="group/item p-4 rounded-xl hover:bg-white/5 transition-all duration-200"
+                    >
+                      <div className="flex items-center mb-2">
+                        <div className="w-8 h-8 rounded-lg bg-gold-500/20 flex items-center justify-center mr-3">
+                          <Trophy className="h-4 w-4 text-gold-400" />
+                        </div>
+                        <h3 className="font-medium text-white group-hover/item:text-gold-400 transition-colors">افسانه‌ها</h3>
+                      </div>
+                      <p className="text-xs text-gray-400 group-hover/item:text-gray-300 transition-colors">برنامه‌های قهرمانان</p>
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
 
             <Link
               to="/blog"
-              className="text-white/90 hover:text-gold-500 font-medium text-sm transition-colors duration-200 relative after:content-[''] after:absolute after:right-0 after:left-0 after:bottom-0 after:h-0.5 after:bg-gold-500 after:scale-x-0 after:origin-right hover:after:scale-x-100 after:transition-transform after:duration-300"
+              className="flex items-center text-white/90 hover:text-gold-400 font-medium text-sm transition-all duration-300 px-3 py-2 rounded-lg hover:bg-white/5 group"
             >
+              <BookOpen className="h-4 w-4 ml-2 opacity-70 group-hover:opacity-100 transition-opacity" />
               بلاگ
             </Link>
 
             <Link
-              to="/gyms"
-              className="text-white/90 hover:text-gold-500 font-medium text-sm transition-colors duration-200 relative after:content-[''] after:absolute after:right-0 after:left-0 after:bottom-0 after:h-0.5 after:bg-gold-500 after:scale-x-0 after:origin-right hover:after:scale-x-100 after:transition-transform after:duration-300"
+              to="/download"
+              className="flex items-center text-white/90 hover:text-gold-400 font-medium text-sm transition-all duration-300 px-3 py-2 rounded-lg hover:bg-white/5 group"
             >
-              باشگاه‌ها
+              <Download className="h-4 w-4 ml-2 opacity-70 group-hover:opacity-100 transition-opacity" />
+              دانلود اپ
             </Link>
-            <Link
-              to="/coaches"
-              className="text-white/90 hover:text-gold-500 font-medium text-sm transition-colors duration-200 relative after:content-[''] after:absolute after:right-0 after:left-0 after:bottom-0 after:h-0.5 after:bg-gold-500 after:scale-x-0 after:origin-right hover:after:scale-x-100 after:transition-transform after:duration-300"
-            >
-              مربی‌ها
-            </Link>
-            <Link
-              to="/legends"
-              className="text-white/90 hover:text-gold-500 font-medium text-sm transition-colors duration-200 relative after:content-[''] after:absolute after:right-0 after:left-0 after:bottom-0 after:h-0.5 after:bg-gold-500 after:scale-x-0 after:origin-right hover:after:scale-x-100 after:transition-transform after:duration-300"
-            >
-              افسانه‌ها
-            </Link>
+
             <Link
               to="/about-us"
-              className="text-white/90 hover:text-gold-500 font-medium text-sm transition-colors duration-200 relative after:content-[''] after:absolute after:right-0 after:left-0 after:bottom-0 after:h-0.5 after:bg-gold-500 after:scale-x-0 after:origin-right hover:after:scale-x-100 after:transition-transform after:duration-300"
+              className="flex items-center text-white/90 hover:text-gold-400 font-medium text-sm transition-all duration-300 px-3 py-2 rounded-lg hover:bg-white/5 group"
             >
+              <Info className="h-4 w-4 ml-2 opacity-70 group-hover:opacity-100 transition-opacity" />
               درباره ما
             </Link>
           </nav>
 
-          {/* Auth Buttons */}
-          <div className="hidden md:flex items-center space-x-reverse space-x-3">
+          {/* Right Section - Search, Cart, User */}
+          <div className="flex items-center space-x-4 space-x-reverse">
+            {/* Search Button */}
+            <button
+              onClick={() => setIsSearchOpen(!isSearchOpen)}
+              className="hidden md:flex items-center justify-center w-10 h-10 text-white/70 hover:text-gold-400 hover:bg-white/5 rounded-lg transition-all duration-200 group"
+              title="جستجو"
+            >
+              <Search className="h-5 w-5 group-hover:scale-110 transition-transform" />
+            </button>
+
             {user ? (
-              <div className="flex items-center space-x-reverse space-x-3">
+              <>
                 {/* Shopping Cart */}
                 <Link
                   to="/cart"
-                  className="relative p-2 text-white/90 hover:text-gold-500 transition-colors duration-200 rounded-lg hover:bg-gray-800/40"
+                  className="relative flex items-center justify-center w-10 h-10 text-white/70 hover:text-gold-400 hover:bg-white/5 rounded-lg transition-all duration-200 group"
                   title="سبد خرید"
                 >
-                  <ShoppingCart className="h-5 w-5" />
+                  <ShoppingCart className="h-5 w-5 group-hover:scale-110 transition-transform" />
                   {cartItemsCount > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-gold-500 text-black text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
+                    <span className="absolute -top-1 -right-1 bg-gradient-to-r from-gold-500 to-gold-400 text-black text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold animate-pulse">
                       {cartItemsCount > 99 ? "99+" : cartItemsCount}
                     </span>
                   )}
                 </Link>
 
-                <div className="relative group">
-                  <Button
-                    variant="ghost"
-                    className="flex items-center text-white/90 hover:text-gold-500 rounded-lg px-3 py-1.5 bg-gray-800/40 hover:bg-gray-800/60 transition-all duration-200 border border-white/5 hover:border-gold-500/30 relative after:content-[''] after:absolute after:right-0 after:left-0 after:bottom-0 after:h-0.5 after:bg-gold-500 after:scale-x-0 after:origin-left hover:after:scale-x-100 after:transition-transform after:duration-300"
-                  >
-                    <User className="h-4 w-4 ml-2 text-gold-500" />
-                    <span className="text-sm font-medium truncate max-w-[100px]">
-                      {user.profile?.name || user.email}
+                {/* Notifications */}
+                <button
+                  className="relative flex items-center justify-center w-10 h-10 text-white/70 hover:text-gold-400 hover:bg-white/5 rounded-lg transition-all duration-200 group"
+                  title="اعلان‌ها"
+                >
+                  <Bell className="h-5 w-5 group-hover:scale-110 transition-transform" />
+                  {notifications > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
+                      {notifications > 99 ? "99+" : notifications}
                     </span>
-                  </Button>
-                  <div className="absolute right-0 mt-2 w-52 bg-gray-800/95 backdrop-blur-md rounded-xl shadow-2xl py-2 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 border border-gray-700/50 scale-95 group-hover:scale-100 origin-top-right max-h-[calc(100vh-100px)] overflow-y-auto">
-                    <div className="px-4 py-2 border-b border-gray-700/30 mb-1">
-                      <div className="flex items-center space-x-2 space-x-reverse">
-                        <div className="w-8 h-8 rounded-full bg-gold-500/10 flex items-center justify-center text-gold-500 border border-gold-500/20">
+                  )}
+                </button>
+
+                {/* User Menu */}
+                <div className="relative group">
+                  <button className="flex items-center space-x-3 space-x-reverse text-white/90 hover:text-gold-400 rounded-xl px-3 py-2 bg-white/5 hover:bg-white/10 transition-all duration-300 border border-white/10 hover:border-gold-500/30 group">
+                    <div className="flex items-center space-x-2 space-x-reverse">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-r from-gold-500/20 to-gold-400/20 flex items-center justify-center text-gold-400 border border-gold-500/30 text-sm font-bold">
+                        {getInitials(user.profile?.name || user.email || "")}
+                      </div>
+                      <div className="hidden md:block text-right">
+                        <p className="text-sm font-medium truncate max-w-[120px]">
+                          {user.profile?.name || "کاربر"}
+                        </p>
+                        {getSubscriptionBadge()}
+                      </div>
+                    </div>
+                    <ChevronDown className="h-3 w-3 opacity-70 group-hover:opacity-100 transition-all duration-300 group-hover:rotate-180" />
+                  </button>
+                  
+                  {/* User Dropdown */}
+                  <div className="absolute left-0 mt-2 w-72 bg-gray-900/98 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform scale-95 group-hover:scale-100 origin-top-left">
+                    <div className="p-6">
+                      {/* User Info */}
+                      <div className="flex items-center space-x-3 space-x-reverse mb-4 pb-4 border-b border-white/10">
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-r from-gold-500/20 to-gold-400/20 flex items-center justify-center text-gold-400 border border-gold-500/30 text-lg font-bold">
                           {getInitials(user.profile?.name || user.email || "")}
                         </div>
                         <div className="flex-1 min-w-0">
@@ -749,141 +892,119 @@ const AuthHeader = () => {
                           <p className="text-xs text-gray-400 truncate">
                             {user.email}
                           </p>
+                          {getSubscriptionBadge()}
                         </div>
                       </div>
-                    </div>
 
-                    <div className="py-1">
-                      <Link
-                        to="/profile"
-                        className="flex items-center px-4 py-2 text-sm text-white/90 hover:text-gold-500 hover:bg-gray-700/30 text-right transition-all duration-150 mx-1 rounded-md group"
-                        title="مشاهده و ویرایش پروفایل"
-                        aria-label="پروفایل کاربری"
-                      >
-                        <div className="flex items-center">
-                          <User className="h-4 w-4 ml-2 text-gold-500/70 group-hover:text-gold-500 transition-colors" />
-                          <span className="group-hover:translate-x-0.5 transition-transform duration-150">
-                            پروفایل
-                          </span>
-                        </div>
-                      </Link>
+                      {/* Menu Items */}
+                      <div className="space-y-1">
+                        <Link
+                          to="/profile"
+                          className="flex items-center px-3 py-2 text-sm text-white/90 hover:text-gold-400 hover:bg-white/5 rounded-lg transition-all duration-200 group"
+                        >
+                          <User className="h-4 w-4 ml-3 opacity-70 group-hover:opacity-100 transition-opacity" />
+                          <span className="group-hover:translate-x-1 transition-transform duration-200">پروفایل</span>
+                        </Link>
 
-                      <Link
-                        to="/subscription"
-                        className="flex items-center px-4 py-2 text-sm text-white/90 hover:text-gold-500 hover:bg-gray-700/30 text-right transition-all duration-150 mx-1 rounded-md group"
-                        title="مشاهده و خرید اشتراک‌ها"
-                        aria-label="اشتراک‌ها"
-                      >
-                        <div className="flex items-center">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-4 w-4 ml-2 text-gold-500/70 group-hover:text-gold-500 transition-colors"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
-                            <rect
-                              x="3"
-                              y="11"
-                              width="18"
-                              height="11"
-                              rx="2"
-                              ry="2"
-                            ></rect>
-                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                          </svg>
-                          <span className="group-hover:translate-x-0.5 transition-transform duration-150">
-                            اشتراک‌ها
-                          </span>
-                        </div>
-                      </Link>
+                        <Link
+                          to="/dashboard"
+                          className="flex items-center px-3 py-2 text-sm text-white/90 hover:text-gold-400 hover:bg-white/5 rounded-lg transition-all duration-200 group"
+                        >
+                          <Settings className="h-4 w-4 ml-3 opacity-70 group-hover:opacity-100 transition-opacity" />
+                          <span className="group-hover:translate-x-1 transition-transform duration-200">داشبورد</span>
+                        </Link>
 
-                      <Link
-                        to="/dashboard"
-                        className="flex items-center px-4 py-2 text-sm text-white/90 hover:text-gold-500 hover:bg-gray-700/30 text-right transition-all duration-150 mx-1 rounded-md group"
-                        title="مشاهده داشبورد کاربری"
-                        aria-label="داشبورد کاربری"
-                      >
-                        <div className="flex items-center">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-4 w-4 ml-2 text-gold-500/70 group-hover:text-gold-500 transition-colors"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
-                            <rect
-                              x="3"
-                              y="3"
-                              width="18"
-                              height="18"
-                              rx="2"
-                              ry="2"
-                            ></rect>
-                            <line x1="3" y1="9" x2="21" y2="9"></line>
-                            <line x1="9" y1="21" x2="9" y2="9"></line>
-                          </svg>
-                          <span className="group-hover:translate-x-0.5 transition-transform duration-150">
-                            داشبورد
-                          </span>
-                        </div>
-                      </Link>
-                    </div>
+                        <Link
+                          to="/subscription"
+                          className="flex items-center px-3 py-2 text-sm text-white/90 hover:text-gold-400 hover:bg-white/5 rounded-lg transition-all duration-200 group"
+                        >
+                          <Crown className="h-4 w-4 ml-3 opacity-70 group-hover:opacity-100 transition-opacity" />
+                          <span className="group-hover:translate-x-1 transition-transform duration-200">اشتراک‌ها</span>
+                        </Link>
 
-                    <div className="px-3 pt-1 pb-2 border-t border-gray-700/30 mt-1">
-                      <button
-                        onClick={handleLogout}
-                        className="flex items-center w-full text-right px-4 py-2 text-sm text-red-400 hover:text-red-300 hover:bg-red-900/10 mx-1 rounded-md transition-all duration-150 group"
-                      >
-                        <div className="flex items-center">
-                          <LogOut className="h-4 w-4 ml-2 opacity-70 group-hover:opacity-100 transition-opacity" />
-                          <span className="group-hover:translate-x-0.5 transition-transform duration-150">
-                            خروج
-                          </span>
-                        </div>
-                      </button>
+                        <div className="border-t border-white/10 my-2"></div>
+
+                        <button
+                          onClick={handleLogout}
+                          className="flex items-center w-full px-3 py-2 text-sm text-red-400 hover:text-red-300 hover:bg-red-900/10 rounded-lg transition-all duration-200 group"
+                        >
+                          <LogOut className="h-4 w-4 ml-3 opacity-70 group-hover:opacity-100 transition-opacity" />
+                          <span className="group-hover:translate-x-1 transition-transform duration-200">خروج</span>
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
+              </>
             ) : (
               <Link to="/login">
-                <Button className="bg-gradient-to-r from-gold-500 to-amber-400 hover:from-gold-600 hover:to-amber-500 text-black font-medium text-sm px-4 py-1.5 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 border border-gold-400/30">
+                <Button className="bg-gradient-to-r from-gold-500 to-gold-400 hover:from-gold-600 hover:to-gold-500 text-black font-medium px-6 py-2 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+                  <User className="h-4 w-4 ml-2" />
                   ورود / ثبت‌نام
                 </Button>
               </Link>
             )}
-          </div>
 
-          {/* Mobile Menu Button */}
-          <button
-            className="md:hidden text-white/90 hover:text-gold-500 bg-gray-800/40 hover:bg-gray-800/60 p-1.5 rounded-md transition-all duration-200 border border-white/5 hover:border-gold-500/30 flex items-center gap-1"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-          >
-            {isMenuOpen ? <X size={18} /> : <Menu size={18} />}
-            <span className="text-sm font-medium">
-              {isMenuOpen ? "" : "منو"}
-            </span>
-          </button>
+            {/* Mobile Menu Button */}
+            <button
+              className="lg:hidden flex items-center justify-center w-10 h-10 text-white/90 hover:text-gold-400 hover:bg-white/5 rounded-lg transition-all duration-200"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+            >
+              {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
+            </button>
+          </div>
         </div>
 
-        {/* Mobile Menu - Modern Slide Down */}
+        {/* Search Bar - Expandable */}
         <div
-          className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${
-            isMenuOpen ? "max-h-[800px] opacity-100 mt-3" : "max-h-0 opacity-0"
+          className={`overflow-hidden transition-all duration-300 ease-in-out ${
+            isSearchOpen ? "max-h-20 opacity-100 mt-4" : "max-h-0 opacity-0"
           }`}
         >
-          <div className="py-3 border-t border-white/5 text-right bg-gray-800/80 backdrop-blur-md rounded-xl px-3 sm:px-4 shadow-xl mobile-safe-area">
+          <form onSubmit={handleSearch} className="relative">
+            <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+            <Input
+              type="text"
+              placeholder="جستجو در برنامه‌ها، باشگاه‌ها، مربی‌ها..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pr-12 pl-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:border-gold-500/50 focus:bg-white/10 transition-all duration-300"
+            />
+            <Button
+              type="submit"
+              size="sm"
+              className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-gold-500 hover:bg-gold-600 text-black px-4"
+            >
+              جستجو
+            </Button>
+          </form>
+        </div>
+
+        {/* Mobile Menu */}
+        <div
+          className={`lg:hidden overflow-hidden transition-all duration-300 ease-in-out ${
+            isMenuOpen ? "max-h-[600px] opacity-100 mt-4" : "max-h-0 opacity-0"
+          }`}
+        >
+          <div className="py-4 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10">
+            {/* Mobile Search */}
+            <div className="px-4 mb-4">
+              <form onSubmit={handleSearch} className="relative">
+                <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Input
+                  type="text"
+                  placeholder="جستجو..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pr-10 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400"
+                />
+              </form>
+            </div>
+
             {user && (
-              <div className="mb-3 pb-3 border-b border-gray-700/30">
+              <div className="px-4 mb-4 pb-4 border-b border-white/10">
                 <div className="flex items-center space-x-3 space-x-reverse">
-                  <div className="w-10 h-10 rounded-full bg-gold-500/10 flex items-center justify-center text-gold-500 border border-gold-500/20 text-sm font-bold">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-r from-gold-500/20 to-gold-400/20 flex items-center justify-center text-gold-400 border border-gold-500/30 text-sm font-bold">
                     {getInitials(user.profile?.name || user.email || "")}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -898,297 +1019,122 @@ const AuthHeader = () => {
               </div>
             )}
 
-            <nav className="flex flex-col space-y-1.5">
+            <nav className="px-4 space-y-2">
               <Link
                 to="/"
-                className="text-white/90 hover:text-gold-500 transition-all duration-200 py-2 px-3 rounded-lg hover:bg-gray-700/30 flex items-center group"
+                className="flex items-center px-3 py-2 text-white/90 hover:text-gold-400 hover:bg-white/5 rounded-lg transition-all duration-200 group"
                 onClick={() => setIsMenuOpen(false)}
               >
-                <div className="w-8 h-8 rounded-lg bg-gray-700/50 flex items-center justify-center ml-3 group-hover:bg-gray-700 transition-colors">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-4 w-4 text-gold-500/80 group-hover:text-gold-500 transition-colors"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                  </svg>
-                </div>
-                <span className="group-hover:translate-x-0.5 transition-transform duration-150">
-                  خانه
-                </span>
-              </Link>
-
-              <Link
-                to="/download"
-                className="text-white/90 hover:text-gold-500 transition-all duration-200 py-2 px-3 rounded-lg hover:bg-gray-700/30 flex items-center group"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <div className="w-8 h-8 rounded-lg bg-gray-700/50 flex items-center justify-center ml-3 group-hover:bg-gray-700 transition-colors">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-4 w-4 text-gold-500/80 group-hover:text-gold-500 transition-colors"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                    <polyline points="7 10 12 15 17 10"></polyline>
-                    <line x1="12" y1="15" x2="12" y2="3"></line>
-                  </svg>
-                </div>
-                <span className="group-hover:translate-x-0.5 transition-transform duration-150">
-                  دریافت اپلیکیشن
-                </span>
+                <Home className="h-4 w-4 ml-3 opacity-70 group-hover:opacity-100 transition-opacity" />
+                خانه
               </Link>
 
               <Link
                 to="/programs"
-                className="text-white/90 hover:text-gold-500 transition-all duration-200 py-2 px-3 rounded-lg hover:bg-gray-700/30 flex items-center group"
+                className="flex items-center px-3 py-2 text-white/90 hover:text-gold-400 hover:bg-white/5 rounded-lg transition-all duration-200 group"
                 onClick={() => setIsMenuOpen(false)}
               >
-                <div className="w-8 h-8 rounded-lg bg-gray-700/50 flex items-center justify-center ml-3 group-hover:bg-gray-700 transition-colors">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-4 w-4 text-gold-500/80 group-hover:text-gold-500 transition-colors"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-                  </svg>
-                </div>
-                <span className="group-hover:translate-x-0.5 transition-transform duration-150">
-                  برنامه‌ها
-                </span>
-              </Link>
-
-              <Link
-                to="/blog"
-                className="text-white/90 hover:text-gold-500 transition-all duration-200 py-2 px-3 rounded-lg hover:bg-gray-700/30 flex items-center group"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <div className="w-8 h-8 rounded-lg bg-gray-700/50 flex items-center justify-center ml-3 group-hover:bg-gray-700 transition-colors">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-4 w-4 text-gold-500/80 group-hover:text-gold-500 transition-colors"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-                  </svg>
-                </div>
-                <span className="group-hover:translate-x-0.5 transition-transform duration-150">
-                  بلاگ
-                </span>
+                <BookOpen className="h-4 w-4 ml-3 opacity-70 group-hover:opacity-100 transition-opacity" />
+                برنامه‌ها
               </Link>
 
               <Link
                 to="/gyms"
-                className="text-white/90 hover:text-gold-500 transition-all duration-200 py-2 px-3 rounded-lg hover:bg-gray-700/30 flex items-center group"
+                className="flex items-center px-3 py-2 text-white/90 hover:text-gold-400 hover:bg-white/5 rounded-lg transition-all duration-200 group"
                 onClick={() => setIsMenuOpen(false)}
               >
-                <div className="w-8 h-8 rounded-lg bg-gray-700/50 flex items-center justify-center ml-3 group-hover:bg-gray-700 transition-colors">
-                  <Dumbbell className="h-4 w-4 text-gold-500/80 group-hover:text-gold-500 transition-colors" />
-                </div>
-                <span className="group-hover:translate-x-0.5 transition-transform duration-150">
-                  باشگاه‌ها
-                </span>
+                <Dumbbell className="h-4 w-4 ml-3 opacity-70 group-hover:opacity-100 transition-opacity" />
+                باشگاه‌ها
               </Link>
 
               <Link
                 to="/coaches"
-                className="text-white/90 hover:text-gold-500 transition-all duration-200 py-2 px-3 rounded-lg hover:bg-gray-700/30 flex items-center group"
+                className="flex items-center px-3 py-2 text-white/90 hover:text-gold-400 hover:bg-white/5 rounded-lg transition-all duration-200 group"
                 onClick={() => setIsMenuOpen(false)}
               >
-                <div className="w-8 h-8 rounded-lg bg-gray-700/50 flex items-center justify-center ml-3 group-hover:bg-gray-700 transition-colors">
-                  <Users className="h-4 w-4 text-gold-500/80 group-hover:text-gold-500 transition-colors" />
-                </div>
-                <span className="group-hover:translate-x-0.5 transition-transform duration-150">
-                  مربی‌ها
-                </span>
+                <Users className="h-4 w-4 ml-3 opacity-70 group-hover:opacity-100 transition-opacity" />
+                مربی‌ها
               </Link>
 
               <Link
                 to="/legends"
-                className="text-white/90 hover:text-gold-500 transition-all duration-200 py-2 px-3 rounded-lg hover:bg-gray-700/30 flex items-center group"
+                className="flex items-center px-3 py-2 text-white/90 hover:text-gold-400 hover:bg-white/5 rounded-lg transition-all duration-200 group"
                 onClick={() => setIsMenuOpen(false)}
               >
-                <div className="w-8 h-8 rounded-lg bg-gray-700/50 flex items-center justify-center ml-3 group-hover:bg-gray-700 transition-colors">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-4 w-4 text-gold-500/80 group-hover:text-gold-500 transition-colors"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
-                    <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
-                    <path d="M4 22h16"></path>
-                    <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path>
-                    <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path>
-                    <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path>
-                  </svg>
-                </div>
-                <span className="group-hover:translate-x-0.5 transition-transform duration-150">
-                  افسانه‌ها
-                </span>
+                <Trophy className="h-4 w-4 ml-3 opacity-70 group-hover:opacity-100 transition-opacity" />
+                افسانه‌ها
+              </Link>
+
+              <Link
+                to="/blog"
+                className="flex items-center px-3 py-2 text-white/90 hover:text-gold-400 hover:bg-white/5 rounded-lg transition-all duration-200 group"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <BookOpen className="h-4 w-4 ml-3 opacity-70 group-hover:opacity-100 transition-opacity" />
+                بلاگ
+              </Link>
+
+              <Link
+                to="/download"
+                className="flex items-center px-3 py-2 text-white/90 hover:text-gold-400 hover:bg-white/5 rounded-lg transition-all duration-200 group"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <Download className="h-4 w-4 ml-3 opacity-70 group-hover:opacity-100 transition-opacity" />
+                دانلود اپ
               </Link>
 
               <Link
                 to="/about-us"
-                className="text-white/90 hover:text-gold-500 transition-all duration-200 py-2 px-3 rounded-lg hover:bg-gray-700/30 flex items-center group"
+                className="flex items-center px-3 py-2 text-white/90 hover:text-gold-400 hover:bg-white/5 rounded-lg transition-all duration-200 group"
                 onClick={() => setIsMenuOpen(false)}
               >
-                <div className="w-8 h-8 rounded-lg bg-gray-700/50 flex items-center justify-center ml-3 group-hover:bg-gray-700 transition-colors">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-4 w-4 text-gold-500/80 group-hover:text-gold-500 transition-colors"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="12" y1="16" x2="12" y2="12"></line>
-                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                  </svg>
-                </div>
-                <span className="group-hover:translate-x-0.5 transition-transform duration-150">
-                  درباره ما
-                </span>
+                <Info className="h-4 w-4 ml-3 opacity-70 group-hover:opacity-100 transition-opacity" />
+                درباره ما
               </Link>
 
               {user ? (
-                <div className="mt-2 pt-2 border-t border-gray-700/30">
+                <div className="pt-2 mt-2 border-t border-white/10 space-y-2">
                   <Link
                     to="/cart"
-                    className="text-white/90 hover:text-gold-500 transition-all duration-200 py-2 px-3 rounded-lg hover:bg-gray-700/30 flex items-center group"
+                    className="flex items-center px-3 py-2 text-white/90 hover:text-gold-400 hover:bg-white/5 rounded-lg transition-all duration-200 group"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    <div className="w-8 h-8 rounded-lg bg-gray-700/50 flex items-center justify-center ml-3 group-hover:bg-gray-700 transition-colors relative">
-                      <ShoppingCart className="h-4 w-4 text-gold-500/80 group-hover:text-gold-500 transition-colors" />
+                    <div className="relative">
+                      <ShoppingCart className="h-4 w-4 ml-3 opacity-70 group-hover:opacity-100 transition-opacity" />
                       {cartItemsCount > 0 && (
-                        <span className="absolute -top-1 -right-1 bg-gold-500 text-black text-xs rounded-full h-4 w-4 flex items-center justify-center font-medium text-[10px]">
+                        <span className="absolute -top-1 -right-1 bg-gold-500 text-black text-xs rounded-full h-4 w-4 flex items-center justify-center font-bold text-[10px]">
                           {cartItemsCount > 9 ? "9+" : cartItemsCount}
                         </span>
                       )}
                     </div>
-                    <span className="text-sm font-medium group-hover:translate-x-0.5 transition-transform duration-200">
-                      سبد خرید
-                    </span>
+                    سبد خرید
                   </Link>
 
                   <Link
                     to="/profile"
-                    className="text-white/90 hover:text-gold-500 transition-all duration-200 py-2 px-3 rounded-lg hover:bg-gray-700/30 flex items-center group"
+                    className="flex items-center px-3 py-2 text-white/90 hover:text-gold-400 hover:bg-white/5 rounded-lg transition-all duration-200 group"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    <div className="w-8 h-8 rounded-lg bg-gray-700/50 flex items-center justify-center ml-3 group-hover:bg-gray-700 transition-colors">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-4 w-4 text-gold-500/80 group-hover:text-gold-500 transition-colors"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="12" cy="7" r="4"></circle>
-                      </svg>
-                    </div>
-                    <span className="text-sm font-medium group-hover:translate-x-0.5 transition-transform duration-200">
-                      پروفایل
-                    </span>
-                  </Link>
-
-                  <Link
-                    to="/subscription"
-                    className="text-white/90 hover:text-gold-500 transition-all duration-200 py-2 px-3 rounded-lg hover:bg-gray-700/30 flex items-center group"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    <div className="w-8 h-8 rounded-lg bg-gray-700/50 flex items-center justify-center ml-3 group-hover:bg-gray-700 transition-colors">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-4 w-4 text-gold-500/80 group-hover:text-gold-500 transition-colors"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <rect
-                          x="3"
-                          y="11"
-                          width="18"
-                          height="11"
-                          rx="2"
-                          ry="2"
-                        ></rect>
-                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                      </svg>
-                    </div>
-                    <span className="text-sm font-medium group-hover:translate-x-0.5 transition-transform duration-200">
-                      اشتراک‌ها
-                    </span>
+                    <User className="h-4 w-4 ml-3 opacity-70 group-hover:opacity-100 transition-opacity" />
+                    پروفایل
                   </Link>
 
                   <Link
                     to="/dashboard"
-                    className="text-white/90 hover:text-gold-500 transition-all duration-200 py-2 px-3 rounded-lg hover:bg-gray-700/30 flex items-center group"
+                    className="flex items-center px-3 py-2 text-white/90 hover:text-gold-400 hover:bg-white/5 rounded-lg transition-all duration-200 group"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    <div className="w-8 h-8 rounded-lg bg-gray-700/50 flex items-center justify-center ml-3 group-hover:bg-gray-700 transition-colors">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-4 w-4 text-gold-500/80 group-hover:text-gold-500 transition-colors"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <rect
-                          x="3"
-                          y="3"
-                          width="18"
-                          height="18"
-                          rx="2"
-                          ry="2"
-                        ></rect>
-                        <line x1="3" y1="9" x2="21" y2="9"></line>
-                        <line x1="9" y1="21" x2="9" y2="9"></line>
-                      </svg>
-                    </div>
-                    <span className="text-sm font-medium group-hover:translate-x-0.5 transition-transform duration-200">
-                      داشبورد
-                    </span>
+                    <Settings className="h-4 w-4 ml-3 opacity-70 group-hover:opacity-100 transition-opacity" />
+                    داشبورد
+                  </Link>
+
+                  <Link
+                    to="/subscription"
+                    className="flex items-center px-3 py-2 text-white/90 hover:text-gold-400 hover:bg-white/5 rounded-lg transition-all duration-200 group"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <Crown className="h-4 w-4 ml-3 opacity-70 group-hover:opacity-100 transition-opacity" />
+                    اشتراک‌ها
                   </Link>
 
                   <button
@@ -1196,22 +1142,21 @@ const AuthHeader = () => {
                       setIsMenuOpen(false);
                       handleLogout();
                     }}
-                    className="w-full text-right text-red-400 hover:text-red-300 transition-all duration-200 py-2 px-3 rounded-lg hover:bg-red-900/10 flex items-center mt-1 group"
+                    className="flex items-center w-full px-3 py-2 text-red-400 hover:text-red-300 hover:bg-red-900/10 rounded-lg transition-all duration-200 group"
                   >
-                    <div className="w-8 h-8 rounded-lg bg-red-900/20 flex items-center justify-center ml-3 group-hover:bg-red-900/30 transition-colors">
-                      <LogOut className="h-4 w-4 text-red-400/80 group-hover:text-red-400 transition-colors" />
-                    </div>
-                    <span className="text-sm font-medium group-hover:translate-x-0.5 transition-transform duration-200">
-                      خروج
-                    </span>
+                    <LogOut className="h-4 w-4 ml-3 opacity-70 group-hover:opacity-100 transition-opacity" />
+                    خروج
                   </button>
                 </div>
               ) : (
-                <Link to="/login" onClick={() => setIsMenuOpen(false)}>
-                  <Button className="mt-3 w-full bg-gradient-to-r from-gold-500 to-amber-400 hover:from-gold-600 hover:to-amber-500 text-black font-medium text-sm rounded-lg shadow-md">
-                    ورود / ثبت‌نام
-                  </Button>
-                </Link>
+                <div className="pt-2 mt-2 border-t border-white/10">
+                  <Link to="/login" onClick={() => setIsMenuOpen(false)}>
+                    <Button className="w-full bg-gradient-to-r from-gold-500 to-gold-400 hover:from-gold-600 hover:to-gold-500 text-black font-medium rounded-xl">
+                      <User className="h-4 w-4 ml-2" />
+                      ورود / ثبت‌نام
+                    </Button>
+                  </Link>
+                </div>
               )}
             </nav>
           </div>
