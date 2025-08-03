@@ -14,7 +14,15 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Menu, X, User, LogOut } from "lucide-react";
+import {
+  Menu,
+  X,
+  User,
+  LogOut,
+  ShoppingCart,
+  Dumbbell,
+  Users,
+} from "lucide-react";
 
 // Define interfaces outside the component
 interface UserProfile {
@@ -66,6 +74,7 @@ const AuthHeader = () => {
     email: "",
     password: "",
   });
+  const [cartItemsCount, setCartItemsCount] = useState(0);
   const navigate = useNavigate();
 
   // Function to fetch user profile data directly from Supabase
@@ -86,6 +95,29 @@ const AuthHeader = () => {
     } catch (error) {
       console.error("Exception fetching user profile:", error);
       return null;
+    }
+  };
+
+  // Function to fetch cart items count
+  const fetchCartItemsCount = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from("shopping_cart")
+        .select("quantity")
+        .eq("user_id", userId);
+
+      if (error) {
+        console.error("Error fetching cart items:", error);
+        return 0;
+      }
+
+      const totalItems =
+        data?.reduce((sum, item) => sum + item.quantity, 0) || 0;
+      setCartItemsCount(totalItems);
+      return totalItems;
+    } catch (error) {
+      console.error("Exception fetching cart items:", error);
+      return 0;
     }
   };
 
@@ -207,6 +239,9 @@ const AuthHeader = () => {
 
       // Fetch user profile data
       const profileData = await fetchUserProfile(userData.id);
+
+      // Fetch cart items count
+      await fetchCartItemsCount(userData.id);
 
       // Calculate subscription status from profile data (no extra API call)
       const subscriptionStatus = checkSubscriptionStatus(profileData);
@@ -648,6 +683,18 @@ const AuthHeader = () => {
             </Link>
 
             <Link
+              to="/gyms"
+              className="text-white/90 hover:text-gold-500 font-medium text-sm transition-colors duration-200 relative after:content-[''] after:absolute after:right-0 after:left-0 after:bottom-0 after:h-0.5 after:bg-gold-500 after:scale-x-0 after:origin-right hover:after:scale-x-100 after:transition-transform after:duration-300"
+            >
+              باشگاه‌ها
+            </Link>
+            <Link
+              to="/coaches"
+              className="text-white/90 hover:text-gold-500 font-medium text-sm transition-colors duration-200 relative after:content-[''] after:absolute after:right-0 after:left-0 after:bottom-0 after:h-0.5 after:bg-gold-500 after:scale-x-0 after:origin-right hover:after:scale-x-100 after:transition-transform after:duration-300"
+            >
+              مربی‌ها
+            </Link>
+            <Link
               to="/legends"
               className="text-white/90 hover:text-gold-500 font-medium text-sm transition-colors duration-200 relative after:content-[''] after:absolute after:right-0 after:left-0 after:bottom-0 after:h-0.5 after:bg-gold-500 after:scale-x-0 after:origin-right hover:after:scale-x-100 after:transition-transform after:duration-300"
             >
@@ -664,7 +711,21 @@ const AuthHeader = () => {
           {/* Auth Buttons */}
           <div className="hidden md:flex items-center space-x-reverse space-x-3">
             {user ? (
-              <div className="flex items-center">
+              <div className="flex items-center space-x-reverse space-x-3">
+                {/* Shopping Cart */}
+                <Link
+                  to="/cart"
+                  className="relative p-2 text-white/90 hover:text-gold-500 transition-colors duration-200 rounded-lg hover:bg-gray-800/40"
+                  title="سبد خرید"
+                >
+                  <ShoppingCart className="h-5 w-5" />
+                  {cartItemsCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-gold-500 text-black text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
+                      {cartItemsCount > 99 ? "99+" : cartItemsCount}
+                    </span>
+                  )}
+                </Link>
+
                 <div className="relative group">
                   <Button
                     variant="ghost"
@@ -940,6 +1001,32 @@ const AuthHeader = () => {
               </Link>
 
               <Link
+                to="/gyms"
+                className="text-white/90 hover:text-gold-500 transition-all duration-200 py-2 px-3 rounded-lg hover:bg-gray-700/30 flex items-center group"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <div className="w-8 h-8 rounded-lg bg-gray-700/50 flex items-center justify-center ml-3 group-hover:bg-gray-700 transition-colors">
+                  <Dumbbell className="h-4 w-4 text-gold-500/80 group-hover:text-gold-500 transition-colors" />
+                </div>
+                <span className="group-hover:translate-x-0.5 transition-transform duration-150">
+                  باشگاه‌ها
+                </span>
+              </Link>
+
+              <Link
+                to="/coaches"
+                className="text-white/90 hover:text-gold-500 transition-all duration-200 py-2 px-3 rounded-lg hover:bg-gray-700/30 flex items-center group"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <div className="w-8 h-8 rounded-lg bg-gray-700/50 flex items-center justify-center ml-3 group-hover:bg-gray-700 transition-colors">
+                  <Users className="h-4 w-4 text-gold-500/80 group-hover:text-gold-500 transition-colors" />
+                </div>
+                <span className="group-hover:translate-x-0.5 transition-transform duration-150">
+                  مربی‌ها
+                </span>
+              </Link>
+
+              <Link
                 to="/legends"
                 className="text-white/90 hover:text-gold-500 transition-all duration-200 py-2 px-3 rounded-lg hover:bg-gray-700/30 flex items-center group"
                 onClick={() => setIsMenuOpen(false)}
@@ -996,6 +1083,24 @@ const AuthHeader = () => {
 
               {user ? (
                 <div className="mt-2 pt-2 border-t border-gray-700/30">
+                  <Link
+                    to="/cart"
+                    className="text-white/90 hover:text-gold-500 transition-all duration-200 py-2 px-3 rounded-lg hover:bg-gray-700/30 flex items-center group"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-gray-700/50 flex items-center justify-center ml-3 group-hover:bg-gray-700 transition-colors relative">
+                      <ShoppingCart className="h-4 w-4 text-gold-500/80 group-hover:text-gold-500 transition-colors" />
+                      {cartItemsCount > 0 && (
+                        <span className="absolute -top-1 -right-1 bg-gold-500 text-black text-xs rounded-full h-4 w-4 flex items-center justify-center font-medium text-[10px]">
+                          {cartItemsCount > 9 ? "9+" : cartItemsCount}
+                        </span>
+                      )}
+                    </div>
+                    <span className="text-sm font-medium group-hover:translate-x-0.5 transition-transform duration-200">
+                      سبد خرید
+                    </span>
+                  </Link>
+
                   <Link
                     to="/profile"
                     className="text-white/90 hover:text-gold-500 transition-all duration-200 py-2 px-3 rounded-lg hover:bg-gray-700/30 flex items-center group"
