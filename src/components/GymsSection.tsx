@@ -98,24 +98,8 @@ const GymsSection = () => {
       try {
         setLoading(true);
         
-        const { data, error } = await supabase
-          .from("gyms")
-          .select("*")
-          .eq("is_active", true)
-          .order("created_at", { ascending: false })
-          .limit(6);
-
-        if (error) {
-          console.error("Database error:", error);
-          setGyms(sampleGyms);
-          return;
-        }
-
-        if (data && data.length > 0) {
-          setGyms(data);
-        } else {
-          setGyms(sampleGyms);
-        }
+        // Since gyms table doesn't exist yet, use sample data
+        setGyms(sampleGyms);
       } catch (error) {
         console.error("Error fetching gyms:", error);
         setGyms(sampleGyms);

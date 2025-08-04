@@ -1,32 +1,24 @@
 import React, { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { toast } from "@/hooks/use-toast";
 import {
+  Star,
   MapPin,
   Phone,
   Mail,
-  Globe,
   Instagram,
   MessageCircle,
   Clock,
-  Dumbbell,
+  Users,
   Search,
   Filter,
-  Star,
-  ShoppingCart,
-  Plus,
+  Dumbbell,
+  Car,
+  Wifi,
+  Coffee,
 } from "lucide-react";
-import { Link } from "react-router-dom";
 
 interface Gym {
   id: string;
@@ -38,406 +30,305 @@ interface Gym {
   email: string;
   website: string;
   instagram: string;
-  telegram: string;
   cover_image: string;
-  gallery: string[];
   facilities: string[];
   working_hours: Record<string, string>;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
-}
-
-interface GymMembership {
-  id: string;
-  gym_id: string;
-  title: string;
-  description: string;
-  price: number;
-  duration_months: number;
-  sessions_count: number;
-  includes_pool: boolean;
-  includes_sauna: boolean;
-  includes_personal_trainer: boolean;
-  discount_percentage: number;
-  is_active: boolean;
+  rating: number;
+  total_reviews: number;
+  price_range: string;
 }
 
 const Gyms = () => {
-  const [gyms, setGyms] = useState<Gym[]>([]);
-  const [memberships, setMemberships] = useState<
-    Record<string, GymMembership[]>
-  >({});
-  const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedLocation, setSelectedLocation] = useState("");
-  const [user, setUser] = useState<any>(null);
+  const [gyms] = useState<Gym[]>([
+    {
+      id: '1',
+      name: 'باشگاه آتلانتیک',
+      description: 'باشگاه مدرن با امکانات کامل و تجهیزات پیشرفته برای بدنسازی و تناسب اندام',
+      location: 'تهران - ولیعصر',
+      address: 'خیابان ولیعصر، نرسیده به پارک وی، پلاک ۱۲۳',
+      phone: '02122334455',
+      email: 'info@atlantic-gym.ir',
+      website: 'https://atlantic-gym.ir',
+      instagram: '@atlantic_gym',
+      cover_image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800',
+      facilities: ['وزنه', 'کاردیو', 'استخر', 'سونا', 'پارکینگ', 'وای‌فای'],
+      working_hours: { 'شنبه تا پنجشنبه': '6:00 - 23:00', 'جمعه': '8:00 - 22:00' },
+      rating: 4.7,
+      total_reviews: 234,
+      price_range: '200,000 - 500,000 تومان/ماه'
+    },
+    {
+      id: '2',
+      name: 'باشگاه پاور جیم',
+      description: 'تخصصی در پرورش اندام و تمرینات قدرتی با بهترین دستگاه‌های بدنسازی',
+      location: 'تهران - نیاوران',
+      address: 'خیابان نیاوران، کوچه بهار، پلاک ۴۵',
+      phone: '02133445566',
+      email: 'info@powergym.ir',
+      website: 'https://powergym.ir',
+      instagram: '@power_gym',
+      cover_image: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800',
+      facilities: ['وزنه', 'کراس فیت', 'بوکس', 'مربی شخصی', 'پارکینگ'],
+      working_hours: { 'همه روزه': '5:30 - 24:00' },
+      rating: 4.8,
+      total_reviews: 189,
+      price_range: '300,000 - 600,000 تومان/ماه'
+    },
+    {
+      id: '3',
+      name: 'باشگاه فیتنس پلاس',
+      description: 'باشگاه خانوادگی با فضای دوستانه و امکانات متنوع برای تمام سنین',
+      location: 'تهران - سعادت آباد',
+      address: 'سعادت آباد، خیابان اصلی، برج آسمان',
+      phone: '02144556677',
+      email: 'info@fitnessplus.ir',
+      website: 'https://fitnessplus.ir',
+      instagram: '@fitness_plus',
+      cover_image: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=800',
+      facilities: ['وزنه', 'کاردیو', 'یوگا', 'پیلاتس', 'کافه', 'وای‌فای'],
+      working_hours: { 'شنبه تا چهارشنبه': '6:00 - 23:00', 'پنجشنبه و جمعه': '8:00 - 22:00' },
+      rating: 4.5,
+      total_reviews: 156,
+      price_range: '150,000 - 400,000 تومان/ماه'
+    },
+    {
+      id: '4',
+      name: 'باشگاه المپیا',
+      description: 'باشگاه حرفه‌ای با استانداردهای بین‌المللی و مربی‌های مجرب',
+      location: 'تهران - زعفرانیه',
+      address: 'زعفرانیه، خیابان ولیعصر، مجتمع تجاری پارس',
+      phone: '02188776655',
+      email: 'info@olympia-gym.ir',
+      website: 'https://olympia-gym.ir',
+      instagram: '@olympia_gym',
+      cover_image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800',
+      facilities: ['وزنه', 'کاردیو', 'استخر', 'سونا', 'جکوزی', 'پارکینگ'],
+      working_hours: { 'همه روزه': '6:00 - 23:30' },
+      rating: 4.9,
+      total_reviews: 312,
+      price_range: '400,000 - 800,000 تومان/ماه'
+    }
+  ]);
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedFacility, setSelectedFacility] = useState("همه");
+  const [filteredGyms, setFilteredGyms] = useState<Gym[]>(gyms);
+
+  // Get all unique facilities
+  const allFacilities = Array.from(
+    new Set(gyms.flatMap(gym => gym.facilities))
+  );
 
   useEffect(() => {
-    fetchGyms();
-    checkUser();
-  }, []);
+    let filtered = gyms;
 
-  const checkUser = async () => {
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-    setUser(session?.user || null);
-  };
-
-  const fetchGyms = async () => {
-    try {
-      setLoading(true);
-
-      // Fetch gyms
-      const { data: gymsData, error: gymsError } = await supabase
-        .from("gyms")
-        .select("*")
-        .eq("is_active", true)
-        .order("created_at", { ascending: false });
-
-      if (gymsError) throw gymsError;
-
-      setGyms(gymsData || []);
-
-      // Fetch memberships for all gyms
-      if (gymsData && gymsData.length > 0) {
-        const gymIds = gymsData.map((gym) => gym.id);
-        const { data: membershipsData, error: membershipsError } =
-          await supabase
-            .from("gym_memberships")
-            .select("*")
-            .in("gym_id", gymIds)
-            .eq("is_active", true)
-            .order("price", { ascending: true });
-
-        if (membershipsError) throw membershipsError;
-
-        // Group memberships by gym_id
-        const groupedMemberships: Record<string, GymMembership[]> = {};
-        membershipsData?.forEach((membership) => {
-          if (!groupedMemberships[membership.gym_id]) {
-            groupedMemberships[membership.gym_id] = [];
-          }
-          groupedMemberships[membership.gym_id].push(membership);
-        });
-
-        setMemberships(groupedMemberships);
-      }
-    } catch (error) {
-      console.error("Error fetching gyms:", error);
-      toast({
-        variant: "destructive",
-        title: "خطا در بارگذاری باشگاه‌ها",
-        description: "مشکلی در دریافت اطلاعات باشگاه‌ها رخ داد.",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const addToCart = async (
-    membershipId: string,
-    gymName: string,
-    membershipTitle: string,
-    price: number
-  ) => {
-    if (!user) {
-      toast({
-        variant: "destructive",
-        title: "ورود الزامی",
-        description: "برای افزودن به سبد خرید ابتدا وارد شوید.",
-      });
-      return;
+    // Filter by search query
+    if (searchQuery) {
+      filtered = filtered.filter(gym =>
+        gym.name.includes(searchQuery) ||
+        gym.description.includes(searchQuery) ||
+        gym.location.includes(searchQuery) ||
+        gym.facilities.some(facility => facility.includes(searchQuery))
+      );
     }
 
-    try {
-      const { error } = await supabase.from("shopping_cart").upsert({
-        user_id: user.id,
-        item_type: "gym_membership",
-        item_id: membershipId,
-        quantity: 1,
-        price: price,
-        discount_amount: 0,
-      });
-
-      if (error) throw error;
-
-      toast({
-        title: "افزوده شد",
-        description: `${membershipTitle} باشگاه ${gymName} به سبد خرید اضافه شد.`,
-      });
-    } catch (error) {
-      console.error("Error adding to cart:", error);
-      toast({
-        variant: "destructive",
-        title: "خطا",
-        description: "مشکلی در افزودن به سبد خرید رخ داد.",
-      });
+    // Filter by facility
+    if (selectedFacility !== "همه") {
+      filtered = filtered.filter(gym =>
+        gym.facilities.includes(selectedFacility)
+      );
     }
+
+    setFilteredGyms(filtered);
+  }, [searchQuery, selectedFacility, gyms]);
+
+  const getFacilityIcon = (facility: string) => {
+    const facilityIcons: Record<string, JSX.Element> = {
+      'وزنه': <Dumbbell className="w-4 h-4" />,
+      'کاردیو': <Users className="w-4 h-4" />,
+      'استخر': <Users className="w-4 h-4" />,
+      'سونا': <Users className="w-4 h-4" />,
+      'پارکینگ': <Car className="w-4 h-4" />,
+      'وای‌فای': <Wifi className="w-4 h-4" />,
+      'کافه': <Coffee className="w-4 h-4" />,
+      'یوگا': <Users className="w-4 h-4" />,
+      'پیلاتس': <Users className="w-4 h-4" />,
+      'کراس فیت': <Dumbbell className="w-4 h-4" />,
+      'بوکس': <Dumbbell className="w-4 h-4" />,
+      'مربی شخصی': <Users className="w-4 h-4" />,
+      'جکوزی': <Users className="w-4 h-4" />,
+    };
+    return facilityIcons[facility] || <Dumbbell className="w-4 h-4" />;
   };
-
-  const formatPrice = (price: number): string => {
-    return price === 0
-      ? "رایگان"
-      : `${new Intl.NumberFormat("fa-IR").format(price)} تومان`;
-  };
-
-  const filteredGyms = gyms.filter((gym) => {
-    const matchesSearch =
-      gym.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      gym.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      gym.location?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesLocation =
-      !selectedLocation || gym.location?.includes(selectedLocation);
-    return matchesSearch && matchesLocation;
-  });
-
-  const locations = [
-    ...new Set(gyms.map((gym) => gym.location).filter(Boolean)),
-  ];
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold-500 mx-auto mb-4"></div>
-          <p className="text-gray-400">در حال بارگذاری باشگاه‌ها...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-gradient-to-b from-black to-gray-900 pt-24 pb-12">
+      <div className="max-w-7xl mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-gold-500 to-amber-400 bg-clip-text text-transparent">
-            باشگاه‌های ورزشی
+          <h1 className="text-4xl md:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-green-400 via-emerald-300 to-green-500">
+            بهترین باشگاه‌های شهر
           </h1>
-          <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-            بهترین باشگاه‌های ورزشی را پیدا کنید و عضویت خود را انتخاب کنید
+          <p className="text-white/70 text-lg max-w-3xl mx-auto">
+            باشگاه‌های مجهز و مدرن با امکانات کامل برای رسیدن به اهداف تناسب اندام شما
           </p>
         </div>
 
         {/* Search and Filter */}
-        <div className="mb-8 flex flex-col md:flex-row gap-4">
+        <div className="flex flex-col md:flex-row gap-4 mb-8 max-w-4xl mx-auto">
           <div className="relative flex-1">
-            <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+            <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <Input
-              placeholder="جستجو در باشگاه‌ها..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pr-10 bg-gray-900 border-gray-700 text-white"
+              type="text"
+              placeholder="جستجو در نام، توضیحات یا امکانات..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pr-10 bg-gray-900/50 border-white/20 text-white placeholder:text-gray-400"
             />
           </div>
-          <select
-            value={selectedLocation}
-            onChange={(e) => setSelectedLocation(e.target.value)}
-            className="px-4 py-2 bg-gray-900 border border-gray-700 rounded-md text-white"
-          >
-            <option value="">همه مناطق</option>
-            {locations.map((location) => (
-              <option key={location} value={location}>
-                {location}
-              </option>
-            ))}
-          </select>
+
+          <div className="relative">
+            <Filter className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <select
+              value={selectedFacility}
+              onChange={(e) => setSelectedFacility(e.target.value)}
+              className="pr-10 pl-4 py-2 bg-gray-900/50 border border-white/20 text-white rounded-md min-w-[200px] appearance-none"
+            >
+              <option value="همه">همه امکانات</option>
+              {allFacilities.map((facility) => (
+                <option key={facility} value={facility}>
+                  {facility}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {/* Results Count */}
+        <div className="text-center mb-8">
+          <p className="text-white/60">
+            {filteredGyms.length} باشگاه یافت شد
+          </p>
         </div>
 
         {/* Gyms Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredGyms.map((gym) => (
             <Card
               key={gym.id}
-              className="bg-gray-900 border-gray-700 overflow-hidden hover:border-gold-500/50 transition-all duration-300"
+              className="overflow-hidden bg-gradient-to-br from-gray-900 to-black border border-white/10 transition-all duration-300 hover:border-green-500/50 hover:shadow-lg hover:shadow-green-500/10 group"
             >
-              {/* Cover Image */}
-              {gym.cover_image && (
-                <div className="h-48 bg-gray-800 overflow-hidden">
-                  <img
-                    src={gym.cover_image}
-                    alt={gym.name}
-                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                  />
+              <div className="relative w-full h-56 overflow-hidden">
+                <img
+                  src={gym.cover_image}
+                  alt={gym.name}
+                  className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                />
+                
+                <div className="absolute top-3 right-3">
+                  <Badge className="bg-green-500/20 text-green-400 border-green-500/30 backdrop-blur-sm">
+                    باشگاه
+                  </Badge>
                 </div>
-              )}
 
-              <CardHeader>
-                <CardTitle className="text-gold-500 text-xl">
+                <div className="absolute bottom-3 left-3">
+                  <div className="flex items-center space-x-1 space-x-reverse bg-black/50 backdrop-blur-sm rounded-full px-2 py-1">
+                    <Star className="w-3 h-3 text-yellow-400 fill-current" />
+                    <span className="text-white text-xs font-medium">{gym.rating}</span>
+                  </div>
+                </div>
+              </div>
+
+              <CardHeader className="p-4">
+                <CardTitle className="text-lg text-green-400 group-hover:text-green-300 transition-colors">
                   {gym.name}
                 </CardTitle>
-                {gym.location && (
-                  <div className="flex items-center text-gray-400 text-sm">
-                    <MapPin className="h-4 w-4 ml-1" />
-                    {gym.location}
-                  </div>
-                )}
-                {gym.description && (
-                  <CardDescription className="text-gray-300">
-                    {gym.description}
-                  </CardDescription>
-                )}
+                <div className="flex items-center text-gray-400 text-sm">
+                  <MapPin className="w-4 h-4 ml-1" />
+                  {gym.location}
+                </div>
               </CardHeader>
 
-              <CardContent className="space-y-4">
-                {/* Contact Info */}
-                <div className="space-y-2">
-                  {gym.phone && (
-                    <div className="flex items-center text-sm text-gray-400">
-                      <Phone className="h-4 w-4 ml-2" />
-                      {gym.phone}
-                    </div>
-                  )}
-                  {gym.address && (
-                    <div className="flex items-center text-sm text-gray-400">
-                      <MapPin className="h-4 w-4 ml-2" />
-                      {gym.address}
-                    </div>
-                  )}
-                </div>
+              <CardContent className="p-4 pt-0">
+                <p className="text-white/70 text-sm mb-4 line-clamp-2">
+                  {gym.description}
+                </p>
 
                 {/* Facilities */}
-                {gym.facilities && gym.facilities.length > 0 && (
-                  <div>
-                    <h4 className="text-sm font-medium text-gold-500 mb-2">
-                      امکانات:
-                    </h4>
-                    <div className="flex flex-wrap gap-1">
-                      {gym.facilities.slice(0, 3).map((facility, index) => (
-                        <Badge
-                          key={index}
-                          variant="secondary"
-                          className="text-xs"
-                        >
-                          {facility}
-                        </Badge>
-                      ))}
-                      {gym.facilities.length > 3 && (
-                        <Badge variant="secondary" className="text-xs">
-                          +{gym.facilities.length - 3} مورد دیگر
-                        </Badge>
-                      )}
-                    </div>
+                <div className="mb-4">
+                  <div className="flex flex-wrap gap-1">
+                    {gym.facilities.slice(0, 3).map((facility, index) => (
+                      <div key={index} className="flex items-center bg-gray-800/50 rounded-full px-2 py-1">
+                        {getFacilityIcon(facility)}
+                        <span className="text-xs text-gray-300 mr-1">{facility}</span>
+                      </div>
+                    ))}
+                    {gym.facilities.length > 3 && (
+                      <div className="flex items-center bg-gray-800/50 rounded-full px-2 py-1">
+                        <span className="text-xs text-gray-300">+{gym.facilities.length - 3}</span>
+                      </div>
+                    )}
                   </div>
-                )}
-
-                {/* Memberships */}
-                {memberships[gym.id] && memberships[gym.id].length > 0 && (
-                  <div>
-                    <h4 className="text-sm font-medium text-gold-500 mb-2">
-                      شهریه‌ها:
-                    </h4>
-                    <div className="space-y-2">
-                      {memberships[gym.id].slice(0, 2).map((membership) => (
-                        <div
-                          key={membership.id}
-                          className="bg-gray-800 p-3 rounded-lg"
-                        >
-                          <div className="flex justify-between items-start mb-2">
-                            <h5 className="font-medium text-white text-sm">
-                              {membership.title}
-                            </h5>
-                            <span className="text-gold-500 font-bold text-sm">
-                              {formatPrice(membership.price)}
-                            </span>
-                          </div>
-                          <div className="flex flex-wrap gap-1 mb-2">
-                            <Badge variant="outline" className="text-xs">
-                              {membership.duration_months} ماه
-                            </Badge>
-                            {membership.sessions_count && (
-                              <Badge variant="outline" className="text-xs">
-                                {membership.sessions_count} جلسه
-                              </Badge>
-                            )}
-                            {membership.includes_pool && (
-                              <Badge variant="outline" className="text-xs">
-                                استخر
-                              </Badge>
-                            )}
-                            {membership.includes_sauna && (
-                              <Badge variant="outline" className="text-xs">
-                                سونا
-                              </Badge>
-                            )}
-                          </div>
-                          <Button
-                            size="sm"
-                            onClick={() =>
-                              addToCart(
-                                membership.id,
-                                gym.name,
-                                membership.title,
-                                membership.price
-                              )
-                            }
-                            className="w-full bg-gold-500 hover:bg-gold-600 text-black"
-                          >
-                            <ShoppingCart className="h-4 w-4 ml-1" />
-                            افزودن به سبد خرید
-                          </Button>
-                        </div>
-                      ))}
-                      {memberships[gym.id].length > 2 && (
-                        <Link
-                          to={`/gyms/${gym.id}`}
-                          className="block text-center text-gold-500 hover:text-gold-400 text-sm"
-                        >
-                          مشاهده همه شهریه‌ها ({memberships[gym.id].length})
-                        </Link>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* Social Links */}
-                <div className="flex gap-2 pt-2">
-                  {gym.website && (
-                    <a
-                      href={gym.website}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="p-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors"
-                    >
-                      <Globe className="h-4 w-4 text-gray-400" />
-                    </a>
-                  )}
-                  {gym.instagram && (
-                    <a
-                      href={gym.instagram}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="p-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors"
-                    >
-                      <Instagram className="h-4 w-4 text-gray-400" />
-                    </a>
-                  )}
-                  {gym.telegram && (
-                    <a
-                      href={gym.telegram}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="p-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors"
-                    >
-                      <MessageCircle className="h-4 w-4 text-gray-400" />
-                    </a>
-                  )}
                 </div>
+
+                {/* Working Hours */}
+                <div className="flex items-center text-gray-400 text-xs mb-4">
+                  <Clock className="w-3 h-3 ml-1" />
+                  <span>{Object.values(gym.working_hours)[0]}</span>
+                </div>
+
+                {/* Price Range */}
+                <div className="mb-4">
+                  <p className="text-sm text-green-400 font-medium">{gym.price_range}</p>
+                </div>
+
+                {/* Contact Info */}
+                <div className="flex items-center gap-2 mb-4">
+                  <a
+                    href={`tel:${gym.phone}`}
+                    className="p-2 bg-green-500/20 text-green-400 rounded-full hover:bg-green-500/30 transition-colors"
+                  >
+                    <Phone className="w-4 h-4" />
+                  </a>
+                  <a
+                    href={`https://instagram.com/${gym.instagram.replace('@', '')}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-2 bg-pink-500/20 text-pink-400 rounded-full hover:bg-pink-500/30 transition-colors"
+                  >
+                    <Instagram className="w-4 h-4" />
+                  </a>
+                  <a
+                    href={gym.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-2 bg-blue-500/20 text-blue-400 rounded-full hover:bg-blue-500/30 transition-colors"
+                  >
+                    <Users className="w-4 h-4" />
+                  </a>
+                </div>
+
+                <Button
+                  className="w-full bg-gradient-to-r from-green-500 to-emerald-400 hover:from-green-600 hover:to-emerald-500 text-black"
+                >
+                  مشاهده جزئیات
+                </Button>
               </CardContent>
             </Card>
           ))}
         </div>
 
+        {/* Empty State */}
         {filteredGyms.length === 0 && (
           <div className="text-center py-12">
-            <Dumbbell className="h-16 w-16 text-gray-600 mx-auto mb-4" />
-            <h3 className="text-xl font-medium text-gray-400 mb-2">
+            <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center">
+              <Dumbbell className="w-12 h-12 text-gray-500" />
+            </div>
+            <h3 className="text-xl font-semibold text-white mb-2">
               باشگاهی یافت نشد
             </h3>
-            <p className="text-gray-500">
-              با تغییر فیلترها یا جستجوی جدید دوباره تلاش کنید
+            <p className="text-white/60">
+              لطفاً فیلترها را تغییر دهید یا عبارت جستجوی دیگری امتحان کنید.
             </p>
           </div>
         )}

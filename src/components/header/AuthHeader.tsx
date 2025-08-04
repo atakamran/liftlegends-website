@@ -126,20 +126,9 @@ const AuthHeader = () => {
   // Function to fetch cart items count
   const fetchCartItemsCount = async (userId: string) => {
     try {
-      const { data, error } = await supabase
-        .from("shopping_cart")
-        .select("quantity")
-        .eq("user_id", userId);
-
-      if (error) {
-        console.error("Error fetching cart items:", error);
-        return 0;
-      }
-
-      const totalItems =
-        data?.reduce((sum, item) => sum + item.quantity, 0) || 0;
-      setCartItemsCount(totalItems);
-      return totalItems;
+      // Shopping cart table doesn't exist yet, return 0
+      setCartItemsCount(0);
+      return 0;
     } catch (error) {
       console.error("Exception fetching cart items:", error);
       return 0;

@@ -12,6 +12,8 @@ import {
   Users as UsersIcon,
   ArrowDown
 } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 const testimonials = [
   {

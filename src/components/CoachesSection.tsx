@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ChevronRight, Star, Award, Clock, User, CheckCircle, Users, Target, TrendingUp } from "lucide-react";
+import { ChevronRight, Star, Award, Clock, User, CheckCircle, Users, Target, TrendingUp, Dumbbell } from "lucide-react";
 
 interface Coach {
   id: string;
@@ -106,24 +106,8 @@ const CoachesSection = () => {
       try {
         setLoading(true);
         
-        const { data, error } = await supabase
-          .from("coaches")
-          .select("*")
-          .eq("is_active", true)
-          .order("rating", { ascending: false })
-          .limit(6);
-
-        if (error) {
-          console.error("Database error:", error);
-          setCoaches(sampleCoaches);
-          return;
-        }
-
-        if (data && data.length > 0) {
-          setCoaches(data);
-        } else {
-          setCoaches(sampleCoaches);
-        }
+        // Since coaches table doesn't exist yet, use sample data
+        setCoaches(sampleCoaches);
       } catch (error) {
         console.error("Error fetching coaches:", error);
         setCoaches(sampleCoaches);
