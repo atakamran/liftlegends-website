@@ -4311,32 +4311,12 @@ const Dashboard = () => {
                         </div>
                       </div>
                     </div>
-                    
-                    <div className="mt-6">
-                      <Button 
-                        variant="destructive" 
-                        className="w-full"
-                        onClick={async () => {
-                          await supabase.auth.signOut();
-                          navigate('/');
-                        }}
-                      >
-                        <LogOut className="w-4 h-4 ml-2" />
-                        خروج از حساب
-                      </Button>
-                    </div>
                   </div>
                 </div>
-              </TabsContent>
-            </Tabs>
-          </SidebarContent>
-        </Sidebar>
-        
-        {/* Main Content Area */}
-        <div className="flex-1 p-6">
-          {/* Content will be rendered here based on active tab */}
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
       </SidebarProvider>
     </div>
   );
