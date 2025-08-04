@@ -50,6 +50,17 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
+import { 
+  Sidebar,
+  SidebarContent,
+  SidebarHeader,
+  SidebarProvider,
+  SidebarSeparator,
+  SidebarGroup,
+  SidebarGroupLabel,
+  SidebarMenuButton,
+  SidebarTrigger
+} from "@/components/ui/sidebar";
 import { Loader2, Plus, Edit, Trash2, Check, X, Calendar, CreditCard, Shield, Zap, LogOut, Menu, Award, Search, Filter, SortAsc, SortDesc, Grid, List, ChevronLeft, ChevronRight, Eye, EyeOff } from "lucide-react";
 import SubscriptionPlans from "@/components/SubscriptionPlans";
 
@@ -2091,84 +2102,78 @@ const Dashboard = () => {
       {/* Mobile Header Removed */}
       
       {/* Main Dashboard Layout */}
-      <div className="flex flex-col lg:flex-row h-full">
-        {/* Sidebar - Hidden on Mobile */}
-        <div className="hidden lg:flex lg:w-64 bg-gray-800/50 backdrop-blur-md border-l border-gray-700/30 h-screen sticky top-0 flex-col">
-          <div className="p-6">
-            <div className="relative">
-              <h1 className="text-2xl font-bold text-gold-500 mb-24"></h1>
-              <p className="text-sm text-gray-400 mb-6"></p>
-            </div>
-            
-            {/* Removed User Profile Summary */}
-          </div>
-          
-          {/* Navigation Menu */}
-          <nav className="flex-1 px-3 py-6">
-            <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="flex flex-col w-full space-y-2 bg-transparent">
-                {/* User Profile Section */}
-                <div className="mb-6 px-2">
-                  <div className="flex items-center space-x-3 space-x-reverse mb-4">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-gold-500 to-amber-600 flex items-center justify-center text-black font-bold text-lg shadow-lg shadow-gold-500/20">
-                      {user?.email?.charAt(0).toUpperCase() || "U"}
-                    </div>
-                    <div>
-                      <h3 className="font-medium text-white">{user?.profile?.name || user?.email?.split('@')[0] || "کاربر"}</h3>
-                      <p className="text-xs text-gray-400">{user?.email || ""}</p>
-                    </div>
+      <SidebarProvider>
+        <div className="flex flex-col lg:flex-row h-full">
+          {/* Modern Sidebar using SidebarComponent */}
+          <Sidebar side="right" variant="floating" collapsible="icon" className="border-l border-gray-700/30">
+            <SidebarHeader>
+              <div className="flex items-center justify-between px-2">
+                <h2 className="text-xl font-bold text-gold-500">داشبورد</h2>
+                <SidebarTrigger />
+              </div>
+              
+              {/* User Profile Section */}
+              <div className="mt-6 mb-4 px-2">
+                <div className="flex items-center space-x-3 space-x-reverse mb-4">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-gold-500 to-amber-600 flex items-center justify-center text-black font-bold text-lg shadow-lg shadow-gold-500/20">
+                    {user?.email?.charAt(0).toUpperCase() || "U"}
+                  </div>
+                  <div>
+                    <h3 className="font-medium text-white">{user?.profile?.name || user?.email?.split('@')[0] || "کاربر"}</h3>
+                    <p className="text-xs text-gray-400">{user?.email || ""}</p>
+                  </div>
+                </div>
+                
+                <div className="bg-gray-800/50 rounded-lg p-3 border border-gray-700/50 mb-2">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs text-gray-400">اشتراک فعال</span>
+                    <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-gold-500/20 text-gold-400">
+                      {user?.profile?.subscription_plan === "basic" && "پایه"}
+                      {user?.profile?.subscription_plan === "pro" && "پرو"}
+                      {user?.profile?.subscription_plan === "ultimate" && "آلتیمیت"}
+                    </span>
                   </div>
                   
-                  <div className="bg-gray-800/50 rounded-lg p-3 border border-gray-700/50 mb-6">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs text-gray-400">اشتراک فعال</span>
-                      <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-gold-500/20 text-gold-400">
-                        {user?.profile?.subscription_plan === "basic" && "پایه"}
-                        {user?.profile?.subscription_plan === "pro" && "پرو"}
-                        {user?.profile?.subscription_plan === "ultimate" && "آلتیمیت"}
+                  {user?.profile?.subscription_plan !== "basic" && user?.profile?.subscription_end_date && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-gray-400">زمان باقیمانده</span>
+                      <span className="text-xs font-medium">
+                        {calculateRemainingDays(user?.profile?.subscription_end_date)} روز
                       </span>
                     </div>
-                    
-                    {user?.profile?.subscription_plan !== "basic" && user?.profile?.subscription_end_date && (
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs text-gray-400">زمان باقیمانده</span>
-                        <span className="text-xs font-medium">
-                          {calculateRemainingDays(user?.profile?.subscription_end_date)} روز
-                        </span>
-                      </div>
-                    )}
-                  </div>
+                  )}
                 </div>
-                
-                <div className="px-2 mb-2">
-                  <h4 className="text-xs uppercase tracking-wider text-gray-500 mb-2">منوی اصلی</h4>
-                </div>
+              </div>
+            </SidebarHeader>
+            
+            <SidebarSeparator />
+            
+            {/* Navigation Menu */}
+            <SidebarContent className="flex-1 overflow-auto py-2">
+              <SidebarGroup>
+                <SidebarGroupLabel>منوی اصلی</SidebarGroupLabel>
                 
                 {/* Main Navigation Items */}
-                <TabsTrigger 
-                  value="training" 
-                  className="group w-full justify-start px-4 py-3 text-right rounded-lg transition-all duration-300
-                    data-[state=active]:bg-gradient-to-r data-[state=active]:from-gold-500/20 data-[state=active]:to-transparent 
-                    data-[state=active]:border-r-4 data-[state=active]:border-gold-500 data-[state=active]:text-white
-                    hover:bg-gray-700/30"
+                <SidebarMenuButton 
+                  isActive={activeTab === "training"} 
+                  onClick={() => setActiveTab("training")}
+                  className="w-full justify-start"
                 >
-                  <div className="flex items-center">
-                    <div className="w-8 h-8 rounded-md bg-gradient-to-br from-gold-500/10 to-amber-600/10 flex items-center justify-center mr-3 ml-3 group-data-[state=active]:bg-gradient-to-br group-data-[state=active]:from-gold-500/20 group-data-[state=active]:to-amber-600/20">
+                  <div className="flex items-center justify-start w-full">
+                    <div className="w-8 h-8 rounded-md bg-gradient-to-br from-gold-500/10 to-amber-600/10 flex items-center justify-center ml-3 group-data-[active=true]:bg-gradient-to-br group-data-[active=true]:from-gold-500/20 group-data-[active=true]:to-amber-600/20">
                       <Zap size={18} className="text-gold-500" />
                     </div>
                     <span>برنامه‌های تمرینی</span>
                   </div>
-                </TabsTrigger>
+                </SidebarMenuButton>
                 
-                <TabsTrigger 
-                  value="meals" 
-                  className="group w-full justify-start px-4 py-3 text-right rounded-lg transition-all duration-300
-                    data-[state=active]:bg-gradient-to-r data-[state=active]:from-gold-500/20 data-[state=active]:to-transparent 
-                    data-[state=active]:border-r-4 data-[state=active]:border-gold-500 data-[state=active]:text-white
-                    hover:bg-gray-700/30"
+                <SidebarMenuButton 
+                  isActive={activeTab === "meals"} 
+                  onClick={() => setActiveTab("meals")}
+                  className="w-full justify-start"
                 >
-                  <div className="flex items-center">
-                    <div className="w-8 h-8 rounded-md bg-gradient-to-br from-gold-500/10 to-amber-600/10 flex items-center justify-center mr-3 ml-3 group-data-[state=active]:bg-gradient-to-br group-data-[state=active]:from-gold-500/20 group-data-[state=active]:to-amber-600/20">
+                  <div className="flex items-center justify-start w-full">
+                    <div className="w-8 h-8 rounded-md bg-gradient-to-br from-gold-500/10 to-amber-600/10 flex items-center justify-center ml-3 group-data-[active=true]:bg-gradient-to-br group-data-[active=true]:from-gold-500/20 group-data-[active=true]:to-amber-600/20">
                       <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gold-500">
                         <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path>
                         <path d="M7 2v20"></path>
@@ -2179,17 +2184,15 @@ const Dashboard = () => {
                     </div>
                     <span>برنامه‌های غذایی</span>
                   </div>
-                </TabsTrigger>
+                </SidebarMenuButton>
                 
-                <TabsTrigger 
-                  value="supplements" 
-                  className="group w-full justify-start px-4 py-3 text-right rounded-lg transition-all duration-300
-                    data-[state=active]:bg-gradient-to-r data-[state=active]:from-gold-500/20 data-[state=active]:to-transparent 
-                    data-[state=active]:border-r-4 data-[state=active]:border-gold-500 data-[state=active]:text-white
-                    hover:bg-gray-700/30"
+                <SidebarMenuButton 
+                  isActive={activeTab === "supplements"} 
+                  onClick={() => setActiveTab("supplements")}
+                  className="w-full justify-start"
                 >
-                  <div className="flex items-center">
-                    <div className="w-8 h-8 rounded-md bg-gradient-to-br from-gold-500/10 to-amber-600/10 flex items-center justify-center mr-3 ml-3 group-data-[state=active]:bg-gradient-to-br group-data-[state=active]:from-gold-500/20 group-data-[state=active]:to-amber-600/20">
+                  <div className="flex items-center justify-start w-full">
+                    <div className="w-8 h-8 rounded-md bg-gradient-to-br from-gold-500/10 to-amber-600/10 flex items-center justify-center ml-3 group-data-[active=true]:bg-gradient-to-br group-data-[active=true]:from-gold-500/20 group-data-[active=true]:to-amber-600/20">
                       <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gold-500">
                         <path d="m8 21 8-9"></path>
                         <path d="M12 21a9 9 0 0 0 0-18C7.5 3 4 7.5 4 11c0 2 1 4 2 6"></path>
@@ -2199,17 +2202,15 @@ const Dashboard = () => {
                     </div>
                     <span>برنامه‌های مکمل</span>
                   </div>
-                </TabsTrigger>
+                </SidebarMenuButton>
                 
-                <TabsTrigger 
-                  value="orders" 
-                  className="group w-full justify-start px-4 py-3 text-right rounded-lg transition-all duration-300
-                    data-[state=active]:bg-gradient-to-r data-[state=active]:from-gold-500/20 data-[state=active]:to-transparent 
-                    data-[state=active]:border-r-4 data-[state=active]:border-gold-500 data-[state=active]:text-white
-                    hover:bg-gray-700/30"
+                <SidebarMenuButton 
+                  isActive={activeTab === "orders"} 
+                  onClick={() => setActiveTab("orders")}
+                  className="w-full justify-start"
                 >
-                  <div className="flex items-center">
-                    <div className="w-8 h-8 rounded-md bg-gradient-to-br from-gold-500/10 to-amber-600/10 flex items-center justify-center mr-3 ml-3 group-data-[state=active]:bg-gradient-to-br group-data-[state=active]:from-gold-500/20 group-data-[state=active]:to-amber-600/20">
+                  <div className="flex items-center justify-start w-full">
+                    <div className="w-8 h-8 rounded-md bg-gradient-to-br from-gold-500/10 to-amber-600/10 flex items-center justify-center ml-3 group-data-[active=true]:bg-gradient-to-br group-data-[active=true]:from-gold-500/20 group-data-[active=true]:to-amber-600/20">
                       <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gold-500">
                         <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
                         <path d="M3 6h18"></path>
@@ -2218,32 +2219,28 @@ const Dashboard = () => {
                     </div>
                     <span>سفارش‌ها</span>
                   </div>
-                </TabsTrigger>
+                </SidebarMenuButton>
                 
-                <TabsTrigger 
-                  value="payments" 
-                  className="group w-full justify-start px-4 py-3 text-right rounded-lg transition-all duration-300
-                    data-[state=active]:bg-gradient-to-r data-[state=active]:from-gold-500/20 data-[state=active]:to-transparent 
-                    data-[state=active]:border-r-4 data-[state=active]:border-gold-500 data-[state=active]:text-white
-                    hover:bg-gray-700/30"
+                <SidebarMenuButton 
+                  isActive={activeTab === "payments"} 
+                  onClick={() => setActiveTab("payments")}
+                  className="w-full justify-start"
                 >
-                  <div className="flex items-center">
-                    <div className="w-8 h-8 rounded-md bg-gradient-to-br from-gold-500/10 to-amber-600/10 flex items-center justify-center mr-3 ml-3 group-data-[state=active]:bg-gradient-to-br group-data-[state=active]:from-gold-500/20 group-data-[state=active]:to-amber-600/20">
+                  <div className="flex items-center justify-start w-full">
+                    <div className="w-8 h-8 rounded-md bg-gradient-to-br from-gold-500/10 to-amber-600/10 flex items-center justify-center ml-3 group-data-[active=true]:bg-gradient-to-br group-data-[active=true]:from-gold-500/20 group-data-[active=true]:to-amber-600/20">
                       <CreditCard size={18} className="text-gold-500" />
                     </div>
                     <span>پرداخت‌ها</span>
                   </div>
-                </TabsTrigger>
+                </SidebarMenuButton>
                 
-                <TabsTrigger 
-                  value="profile" 
-                  className="group w-full justify-start px-4 py-3 text-right rounded-lg transition-all duration-300
-                    data-[state=active]:bg-gradient-to-r data-[state=active]:from-gold-500/20 data-[state=active]:to-transparent 
-                    data-[state=active]:border-r-4 data-[state=active]:border-gold-500 data-[state=active]:text-white
-                    hover:bg-gray-700/30"
+                <SidebarMenuButton 
+                  isActive={activeTab === "profile"} 
+                  onClick={() => setActiveTab("profile")}
+                  className="w-full justify-start"
                 >
-                  <div className="flex items-center">
-                    <div className="w-8 h-8 rounded-md bg-gradient-to-br from-gold-500/10 to-amber-600/10 flex items-center justify-center mr-3 ml-3 group-data-[state=active]:bg-gradient-to-br group-data-[state=active]:from-gold-500/20 group-data-[state=active]:to-amber-600/20">
+                  <div className="flex items-center justify-start w-full">
+                    <div className="w-8 h-8 rounded-md bg-gradient-to-br from-gold-500/10 to-amber-600/10 flex items-center justify-center ml-3 group-data-[active=true]:bg-gradient-to-br group-data-[active=true]:from-gold-500/20 group-data-[active=true]:to-amber-600/20">
                       <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gold-500">
                         <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
                         <circle cx="12" cy="7" r="4"></circle>
@@ -2251,23 +2248,24 @@ const Dashboard = () => {
                     </div>
                     <span>پروفایل</span>
                   </div>
-                </TabsTrigger>
+                </SidebarMenuButton>
+              </SidebarGroup>
                 
                 {user?.profile?.is_admin && (
-                  <>
-                    <div className="px-2 mt-6 mb-2">
-                      <h4 className="text-xs uppercase tracking-wider text-gray-500 mb-2">مدیریت</h4>
-                    </div>
+                  <SidebarGroup>
+                    <SidebarSeparator />
+                    <SidebarGroupLabel>
+                      <Shield className="w-4 h-4" />
+                      بخش مدیریتی
+                    </SidebarGroupLabel>
                     
-                    <TabsTrigger 
-                      value="products" 
-                      className="group w-full justify-start px-4 py-3 text-right rounded-lg transition-all duration-300
-                        data-[state=active]:bg-gradient-to-r data-[state=active]:from-gold-500/20 data-[state=active]:to-transparent 
-                        data-[state=active]:border-r-4 data-[state=active]:border-gold-500 data-[state=active]:text-white
-                        hover:bg-gray-700/30"
+                    <SidebarMenuButton 
+                      isActive={activeTab === "products"} 
+                      onClick={() => setActiveTab("products")}
+                      className="w-full justify-start"
                     >
-                      <div className="flex items-center">
-                        <div className="w-8 h-8 rounded-md bg-gradient-to-br from-gold-500/10 to-amber-600/10 flex items-center justify-center mr-3 ml-3 group-data-[state=active]:bg-gradient-to-br group-data-[state=active]:from-gold-500/20 group-data-[state=active]:to-amber-600/20">
+                      <div className="flex items-center justify-start w-full">
+                        <div className="w-8 h-8 rounded-md bg-gradient-to-br from-gold-500/10 to-amber-600/10 flex items-center justify-center ml-3 group-data-[active=true]:bg-gradient-to-br group-data-[active=true]:from-gold-500/20 group-data-[active=true]:to-amber-600/20">
                           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gold-500">
                             <rect width="20" height="14" x="2" y="5" rx="2"></rect>
                             <line x1="2" x2="22" y1="10" y2="10"></line>
@@ -2275,32 +2273,28 @@ const Dashboard = () => {
                         </div>
                         <span>مدیریت محصولات</span>
                       </div>
-                    </TabsTrigger>
+                    </SidebarMenuButton>
                     
-                    <TabsTrigger 
-                      value="blog" 
-                      className="group w-full justify-start px-4 py-3 text-right rounded-lg transition-all duration-300
-                        data-[state=active]:bg-gradient-to-r data-[state=active]:from-gold-500/20 data-[state=active]:to-transparent 
-                        data-[state=active]:border-r-4 data-[state=active]:border-gold-500 data-[state=active]:text-white
-                        hover:bg-gray-700/30"
+                    <SidebarMenuButton 
+                      isActive={activeTab === "blog"} 
+                      onClick={() => setActiveTab("blog")}
+                      className="w-full justify-start"
                     >
-                      <div className="flex items-center">
-                        <div className="w-8 h-8 rounded-md bg-gradient-to-br from-gold-500/10 to-amber-600/10 flex items-center justify-center mr-3 ml-3 group-data-[state=active]:bg-gradient-to-br group-data-[state=active]:from-gold-500/20 group-data-[state=active]:to-amber-600/20">
+                      <div className="flex items-center justify-start w-full">
+                        <div className="w-8 h-8 rounded-md bg-gradient-to-br from-gold-500/10 to-amber-600/10 flex items-center justify-center ml-3 group-data-[active=true]:bg-gradient-to-br group-data-[active=true]:from-gold-500/20 group-data-[active=true]:to-amber-600/20">
                           <Edit size={18} className="text-gold-500" />
                         </div>
                         <span>مدیریت بلاگ</span>
                       </div>
-                    </TabsTrigger>
+                    </SidebarMenuButton>
                     
-                    <TabsTrigger 
-                      value="gyms" 
-                      className="group w-full justify-start px-4 py-3 text-right rounded-lg transition-all duration-300
-                        data-[state=active]:bg-gradient-to-r data-[state=active]:from-gold-500/20 data-[state=active]:to-transparent 
-                        data-[state=active]:border-r-4 data-[state=active]:border-gold-500 data-[state=active]:text-white
-                        hover:bg-gray-700/30"
+                    <SidebarMenuButton 
+                      isActive={activeTab === "gyms"} 
+                      onClick={() => setActiveTab("gyms")}
+                      className="w-full justify-start"
                     >
-                      <div className="flex items-center">
-                        <div className="w-8 h-8 rounded-md bg-gradient-to-br from-gold-500/10 to-amber-600/10 flex items-center justify-center mr-3 ml-3 group-data-[state=active]:bg-gradient-to-br group-data-[state=active]:from-gold-500/20 group-data-[state=active]:to-amber-600/20">
+                      <div className="flex items-center justify-start w-full">
+                        <div className="w-8 h-8 rounded-md bg-gradient-to-br from-gold-500/10 to-amber-600/10 flex items-center justify-center ml-3 group-data-[active=true]:bg-gradient-to-br group-data-[active=true]:from-gold-500/20 group-data-[active=true]:to-amber-600/20">
                           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gold-500">
                             <path d="M7.5 8a5.5 5.5 0 1 0 0 8h9a5.5 5.5 0 0 0 0-8h-9Z"></path>
                             <path d="M12 8v8"></path>
@@ -2309,17 +2303,15 @@ const Dashboard = () => {
                         </div>
                         <span>مدیریت باشگاه‌ها</span>
                       </div>
-                    </TabsTrigger>
+                    </SidebarMenuButton>
                     
-                    <TabsTrigger 
-                      value="coaches" 
-                      className="group w-full justify-start px-4 py-3 text-right rounded-lg transition-all duration-300
-                        data-[state=active]:bg-gradient-to-r data-[state=active]:from-gold-500/20 data-[state=active]:to-transparent 
-                        data-[state=active]:border-r-4 data-[state=active]:border-gold-500 data-[state=active]:text-white
-                        hover:bg-gray-700/30"
+                    <SidebarMenuButton 
+                      isActive={activeTab === "coaches"} 
+                      onClick={() => setActiveTab("coaches")}
+                      className="w-full justify-start"
                     >
-                      <div className="flex items-center">
-                        <div className="w-8 h-8 rounded-md bg-gradient-to-br from-gold-500/10 to-amber-600/10 flex items-center justify-center mr-3 ml-3 group-data-[state=active]:bg-gradient-to-br group-data-[state=active]:from-gold-500/20 group-data-[state=active]:to-amber-600/20">
+                      <div className="flex items-center justify-start w-full">
+                        <div className="w-8 h-8 rounded-md bg-gradient-to-br from-gold-500/10 to-amber-600/10 flex items-center justify-center ml-3 group-data-[active=true]:bg-gradient-to-br group-data-[active=true]:from-gold-500/20 group-data-[active=true]:to-amber-600/20">
                           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gold-500">
                             <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
                             <circle cx="9" cy="7" r="4"></circle>
@@ -2330,17 +2322,15 @@ const Dashboard = () => {
                         </div>
                         <span>مدیریت مربی‌ها</span>
                       </div>
-                    </TabsTrigger>
+                    </SidebarMenuButton>
                     
-                    <TabsTrigger 
-                      value="athlete-management" 
-                      className="group w-full justify-start px-4 py-3 text-right rounded-lg transition-all duration-300
-                        data-[state=active]:bg-gradient-to-r data-[state=active]:from-gold-500/20 data-[state=active]:to-transparent 
-                        data-[state=active]:border-r-4 data-[state=active]:border-gold-500 data-[state=active]:text-white
-                        hover:bg-gray-700/30"
+                    <SidebarMenuButton 
+                      isActive={activeTab === "athlete-management"} 
+                      onClick={() => setActiveTab("athlete-management")}
+                      className="w-full justify-start"
                     >
-                      <div className="flex items-center">
-                        <div className="w-8 h-8 rounded-md bg-gradient-to-br from-gold-500/10 to-amber-600/10 flex items-center justify-center mr-3 ml-3 group-data-[state=active]:bg-gradient-to-br group-data-[state=active]:from-gold-500/20 group-data-[state=active]:to-amber-600/20">
+                      <div className="flex items-center justify-start w-full">
+                        <div className="w-8 h-8 rounded-md bg-gradient-to-br from-gold-500/10 to-amber-600/10 flex items-center justify-center ml-3 group-data-[active=true]:bg-gradient-to-br group-data-[active=true]:from-gold-500/20 group-data-[active=true]:to-amber-600/20">
                           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gold-500">
                             <path d="M12 2v20"></path>
                             <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
@@ -2348,17 +2338,15 @@ const Dashboard = () => {
                         </div>
                         <span>مدیریت ورزشکاران</span>
                       </div>
-                    </TabsTrigger>
+                    </SidebarMenuButton>
 
-                    <TabsTrigger 
-                      value="program-management" 
-                      className="group w-full justify-start px-4 py-3 text-right rounded-lg transition-all duration-300
-                        data-[state=active]:bg-gradient-to-r data-[state=active]:from-gold-500/20 data-[state=active]:to-transparent 
-                        data-[state=active]:border-r-4 data-[state=active]:border-gold-500 data-[state=active]:text-white
-                        hover:bg-gray-700/30"
+                    <SidebarMenuButton 
+                      isActive={activeTab === "program-management"} 
+                      onClick={() => setActiveTab("program-management")}
+                      className="w-full justify-start"
                     >
-                      <div className="flex items-center">
-                        <div className="w-8 h-8 rounded-md bg-gradient-to-br from-gold-500/10 to-amber-600/10 flex items-center justify-center mr-3 ml-3 group-data-[state=active]:bg-gradient-to-br group-data-[state=active]:from-gold-500/20 group-data-[state=active]:to-amber-600/20">
+                      <div className="flex items-center justify-start w-full">
+                        <div className="w-8 h-8 rounded-md bg-gradient-to-br from-gold-500/10 to-amber-600/10 flex items-center justify-center ml-3 group-data-[active=true]:bg-gradient-to-br group-data-[active=true]:from-gold-500/20 group-data-[active=true]:to-amber-600/20">
                           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gold-500">
                             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                             <polyline points="14,2 14,8 20,8"></polyline>
@@ -2369,42 +2357,40 @@ const Dashboard = () => {
                         </div>
                         <span>مدیریت برنامه‌ها</span>
                       </div>
-                    </TabsTrigger>
+                    </SidebarMenuButton>
                     
-                    <TabsTrigger 
-                      value="bundles" 
-                      className="group w-full justify-start px-4 py-3 text-right rounded-lg transition-all duration-300
-                        data-[state=active]:bg-gradient-to-r data-[state=active]:from-gold-500/20 data-[state=active]:to-transparent 
-                        data-[state=active]:border-r-4 data-[state=active]:border-gold-500 data-[state=active]:text-white
-                        hover:bg-gray-700/30"
+                    <SidebarMenuButton 
+                      isActive={activeTab === "bundles"} 
+                      onClick={() => setActiveTab("bundles")}
+                      className="w-full justify-start"
                     >
-                      <div className="flex items-center">
-                        <div className="w-8 h-8 rounded-md bg-gradient-to-br from-gold-500/10 to-amber-600/10 flex items-center justify-center mr-3 ml-3 group-data-[state=active]:bg-gradient-to-br group-data-[state=active]:from-gold-500/20 group-data-[state=active]:to-amber-600/20">
+                      <div className="flex items-center justify-start w-full">
+                        <div className="w-8 h-8 rounded-md bg-gradient-to-br from-gold-500/10 to-amber-600/10 flex items-center justify-center ml-3 group-data-[active=true]:bg-gradient-to-br group-data-[active=true]:from-gold-500/20 group-data-[active=true]:to-amber-600/20">
                           <Award size={18} className="text-gold-500" />
                         </div>
                         <span>مدیریت پک‌ها</span>
                       </div>
-                    </TabsTrigger>
-                  </>
+                    </SidebarMenuButton>
+                  </SidebarGroup>
                 )}
                 
-                {/* Logout Button */}
-                <div className="mt-auto pt-6 px-2">
-                  <Button 
-                    variant="outline" 
-                    className="w-full border-gray-700 hover:border-red-500 hover:bg-red-500/10 text-gray-400 hover:text-red-400 flex items-center justify-center"
-                    onClick={async () => {
-                      await supabase.auth.signOut();
-                      navigate('/');
-                    }}
-                  >
-                    <LogOut size={16} className="ml-2" />
-                    خروج از حساب
-                  </Button>
-                </div>
-              </TabsList>
-            </Tabs>
-          </nav>
+            </SidebarContent>
+            
+            {/* Logout Button */}
+            <div className="mt-auto pt-6 px-2">
+              <Button 
+                variant="outline" 
+                className="w-full border-gray-700 hover:border-red-500 hover:bg-red-500/10 text-gray-400 hover:text-red-400 flex items-center justify-center"
+                onClick={async () => {
+                  await supabase.auth.signOut();
+                  navigate('/');
+                }}
+              >
+                <LogOut size={16} className="ml-2" />
+                خروج از حساب
+              </Button>
+            </div>
+          </Sidebar>
           
 
         </div>
@@ -4324,46 +4310,34 @@ const Dashboard = () => {
                           </span>
                         </div>
                       </div>
-                      
-                      {user?.profile?.subscription_plan !== "ultimate" && (
-                        <Button
-                          variant="outline"
-                          className="w-full mt-4 border-gold-500/30 text-gold-400 hover:bg-gold-500/10"
-                          onClick={() => navigate('/subscription')}
-                        >
-                          <Award className="h-4 w-4 mr-2" />
-                          ارتقا به اشتراک بالاتر
-                        </Button>
-                      )}
                     </div>
-                  </CardContent>
-                </Card>
-                
-                {/* Account Actions Card */}
-                <Card className="bg-gray-800/50 border-gray-700 md:col-span-2">
-                  <CardHeader>
-                    <CardTitle className="text-xl text-gold-500">عملیات حساب</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <Button
-                        variant="destructive"
+                    
+                    <div className="mt-6">
+                      <Button 
+                        variant="destructive" 
                         className="w-full"
-                        onClick={() => {
-                          // Handle account deletion
-                          alert('این قابلیت به زودی اضافه خواهد شد');
+                        onClick={async () => {
+                          await supabase.auth.signOut();
+                          navigate('/');
                         }}
                       >
-                        حذف حساب کاربری
+                        <LogOut className="w-4 h-4 ml-2" />
+                        خروج از حساب
                       </Button>
                     </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </TabsContent>
-          </Tabs>
+                  </div>
+                </div>
+              </TabsContent>
+            </Tabs>
+          </SidebarContent>
+        </Sidebar>
+        
+        {/* Main Content Area */}
+        <div className="flex-1 p-6">
+          {/* Content will be rendered here based on active tab */}
         </div>
       </div>
+      </SidebarProvider>
     </div>
   );
 };

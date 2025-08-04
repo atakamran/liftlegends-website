@@ -98,8 +98,8 @@ const AuthHeader = () => {
       setIsScrolled(window.scrollY > 20);
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   // Function to fetch user profile data directly from Supabase
@@ -659,25 +659,36 @@ const AuthHeader = () => {
 
   // Get subscription badge
   const getSubscriptionBadge = () => {
-    if (!user?.profile?.subscription_plan) return null;
-    
+    if (
+      !user?.profile?.subscription_plan ||
+      user.profile.subscription_plan === "basic"
+    )
+      return null;
+
     const plan = user.profile.subscription_plan;
     const colors = {
-      basic: "bg-blue-500/20 text-blue-400 border-blue-500/30",
       pro: "bg-gold-500/20 text-gold-400 border-gold-500/30",
-      ultimate: "bg-purple-500/20 text-purple-400 border-purple-500/30"
+      ultimate: "bg-purple-500/20 text-purple-400 border-purple-500/30",
     };
-    
+
     return (
-      <div className={`px-2 py-1 rounded-full text-xs font-medium border ${colors[plan as keyof typeof colors] || colors.basic}`}>
-        {plan === 'pro' ? 'PRO' : plan === 'ultimate' ? 'ULTIMATE' : 'BASIC'}
+      <div
+        className={`px-2 py-1 rounded-full text-xs font-medium border ${
+          colors[plan as keyof typeof colors]
+        }`}
+      >
+        {plan === "pro" ? "PRO" : plan === "ultimate" ? "ULTIMATE" : ""}
       </div>
     );
   };
 
   return (
-    <header className={`bg-gray-900/95 backdrop-blur-xl border-b border-white/10 sticky top-0 z-50 transition-all duration-300 ${isScrolled ? 'shadow-2xl shadow-black/50 bg-gray-900/98' : ''}`}>
-      <div className="container mx-auto px-4 py-3">
+    <header
+      className={`bg-black/95 backdrop-blur-xl border-b border-gold-500/20 fixed top-0 left-0 right-0 z-[9999] transition-all duration-300 ${
+        isScrolled ? "shadow-2xl shadow-gold-500/10 bg-black/98" : ""
+      }`}
+    >
+      <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           {/* Logo Section - Enhanced */}
           <Link
@@ -690,94 +701,112 @@ const AuthHeader = () => {
               <img
                 src="https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends//white%20logo.png"
                 alt="Lift Legends Logo"
-                className="h-12 w-auto transition-transform duration-300 group-hover:scale-105"
+                className="h-14 w-auto transition-transform duration-300 group-hover:scale-105 drop-shadow-lg"
                 loading="eager"
                 width="120"
-                height="48"
+                height="56"
               />
-              <div className="absolute inset-0 bg-gradient-to-r from-gold-500/20 to-transparent rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-gold-500/30 to-transparent rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl"></div>
             </div>
-            <div className="mr-3 hidden sm:block">
-              <h1 className="text-xl font-bold bg-gradient-to-r from-gold-400 to-gold-600 bg-clip-text text-transparent">
+            <div className="mr-4 hidden sm:block">
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-gold-400 via-gold-300 to-gold-500 bg-clip-text text-transparent drop-shadow-sm">
                 Lift Legends
               </h1>
-              <p className="text-xs text-gray-400 -mt-1">مربی هوشمند بدنسازی</p>
+              <p className="text-sm text-gray-300 -mt-1 font-medium">
+                مربی هوشمند بدنسازی
+              </p>
             </div>
           </Link>
 
-          {/* Desktop Navigation - Modern Mega Menu Style */}
-          <nav className="hidden lg:flex items-center space-x-8 space-x-reverse">
+          {/* Desktop Navigation - Modern Style */}
+          <nav className="hidden lg:flex items-center space-x-6 space-x-reverse">
             <div className="relative group">
               <Link
                 to="/"
-                className="flex items-center text-white/90 hover:text-gold-400 font-medium text-sm transition-all duration-300 px-3 py-2 rounded-lg hover:bg-white/5 group"
+                className="flex items-center text-white hover:text-gold-400 font-semibold text-sm transition-all duration-300 px-4 py-2.5 rounded-xl hover:bg-gradient-to-r hover:from-gold-500/10 hover:to-gold-400/10 border border-transparent hover:border-gold-500/30 group"
               >
-                <Home className="h-4 w-4 ml-2 opacity-70 group-hover:opacity-100 transition-opacity" />
+                <Home className="h-4 w-4 ml-2 opacity-80 group-hover:opacity-100 transition-opacity" />
                 خانه
               </Link>
             </div>
 
             <div className="relative group">
-              <button className="flex items-center text-white/90 hover:text-gold-400 font-medium text-sm transition-all duration-300 px-3 py-2 rounded-lg hover:bg-white/5 group">
-                <Dumbbell className="h-4 w-4 ml-2 opacity-70 group-hover:opacity-100 transition-opacity" />
+              <button className="flex items-center text-white hover:text-gold-400 font-semibold text-sm transition-all duration-300 px-4 py-2.5 rounded-xl hover:bg-gradient-to-r hover:from-gold-500/10 hover:to-gold-400/10 border border-transparent hover:border-gold-500/30 group">
+                <Dumbbell className="h-4 w-4 ml-2 opacity-80 group-hover:opacity-100 transition-opacity" />
                 خدمات
-                <ChevronDown className="h-3 w-3 mr-1 opacity-70 group-hover:opacity-100 transition-all duration-300 group-hover:rotate-180" />
+                <ChevronDown className="h-3 w-3 mr-1 opacity-80 group-hover:opacity-100 transition-all duration-300 group-hover:rotate-180" />
               </button>
-              
-              {/* Mega Menu */}
-              <div className="absolute top-full right-0 mt-2 w-80 bg-gray-900/98 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform scale-95 group-hover:scale-100 origin-top-right">
+
+              {/* Modern Dropdown Menu */}
+              <div className="absolute top-full right-0 mt-3 w-96 bg-black/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gold-500/20 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform scale-95 group-hover:scale-100 origin-top-right overflow-hidden">
                 <div className="p-6">
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gap-3">
                     <Link
                       to="/programs"
-                      className="group/item p-4 rounded-xl hover:bg-white/5 transition-all duration-200"
+                      className="group/item p-4 rounded-xl bg-gradient-to-br from-gold-500/10 to-gold-600/5 hover:from-gold-500/20 hover:to-gold-600/10 border border-gold-500/20 hover:border-gold-400/40 transition-all duration-300 hover:scale-105"
                     >
-                      <div className="flex items-center mb-2">
-                        <div className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center mr-3">
-                          <BookOpen className="h-4 w-4 text-blue-400" />
+                      <div className="flex items-center mb-4">
+                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-gold-500 to-gold-600 flex items-center justify-center ml-4 shadow-xl group-hover/item:shadow-gold-500/25 transition-all duration-300">
+                          <BookOpen className="h-6 w-6 text-black" />
                         </div>
-                        <h3 className="font-medium text-white group-hover/item:text-blue-400 transition-colors">برنامه‌ها</h3>
+                        <h3 className="font-bold text-lg text-white group-hover/item:text-gold-300 transition-colors">
+                          برنامه‌ها
+                        </h3>
                       </div>
-                      <p className="text-xs text-gray-400 group-hover/item:text-gray-300 transition-colors">برنامه‌های تمرینی و غذایی</p>
+                      <p className="text-sm text-gray-300 group-hover/item:text-gray-200 transition-colors leading-relaxed mr-2">
+                        برنامه‌های تمرینی و غذایی
+                      </p>
                     </Link>
 
                     <Link
                       to="/gyms"
-                      className="group/item p-4 rounded-xl hover:bg-white/5 transition-all duration-200"
+                      className="group/item p-4 rounded-xl bg-gradient-to-br from-gold-500/10 to-gold-600/5 hover:from-gold-500/20 hover:to-gold-600/10 border border-gold-500/20 hover:border-gold-400/40 transition-all duration-300 hover:scale-105"
                     >
-                      <div className="flex items-center mb-2">
-                        <div className="w-8 h-8 rounded-lg bg-green-500/20 flex items-center justify-center mr-3">
-                          <Dumbbell className="h-4 w-4 text-green-400" />
+                      <div className="flex items-center mb-4">
+                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-gold-500 to-gold-600 flex items-center justify-center ml-4 shadow-xl group-hover/item:shadow-gold-500/25 transition-all duration-300">
+                          <Dumbbell className="h-6 w-6 text-black" />
                         </div>
-                        <h3 className="font-medium text-white group-hover/item:text-green-400 transition-colors">باشگاه‌ها</h3>
+                        <h3 className="font-bold text-lg text-white group-hover/item:text-gold-300 transition-colors">
+                          باشگاه‌ها
+                        </h3>
                       </div>
-                      <p className="text-xs text-gray-400 group-hover/item:text-gray-300 transition-colors">بهترین باشگاه‌های شهر</p>
+                      <p className="text-sm text-gray-300 group-hover/item:text-gray-200 transition-colors leading-relaxed mr-2">
+                        بهترین باشگاه‌های شهر
+                      </p>
                     </Link>
 
                     <Link
                       to="/coaches"
-                      className="group/item p-4 rounded-xl hover:bg-white/5 transition-all duration-200"
+                      className="group/item p-4 rounded-xl bg-gradient-to-br from-gold-500/10 to-gold-600/5 hover:from-gold-500/20 hover:to-gold-600/10 border border-gold-500/20 hover:border-gold-400/40 transition-all duration-300 hover:scale-105"
                     >
-                      <div className="flex items-center mb-2">
-                        <div className="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center mr-3">
-                          <Users className="h-4 w-4 text-purple-400" />
+                      <div className="flex items-center mb-4">
+                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-gold-500 to-gold-600 flex items-center justify-center ml-4 shadow-xl group-hover/item:shadow-gold-500/25 transition-all duration-300">
+                          <Users className="h-6 w-6 text-black" />
                         </div>
-                        <h3 className="font-medium text-white group-hover/item:text-purple-400 transition-colors">مربی‌ها</h3>
+                        <h3 className="font-bold text-lg text-white group-hover/item:text-gold-300 transition-colors">
+                          مربی‌ها
+                        </h3>
                       </div>
-                      <p className="text-xs text-gray-400 group-hover/item:text-gray-300 transition-colors">مربی‌های حرفه‌ای</p>
+                      <p className="text-sm text-gray-300 group-hover/item:text-gray-200 transition-colors leading-relaxed mr-2">
+                        مربی‌های حرفه‌ای
+                      </p>
                     </Link>
 
                     <Link
                       to="/legends"
-                      className="group/item p-4 rounded-xl hover:bg-white/5 transition-all duration-200"
+                      className="group/item p-4 rounded-xl bg-gradient-to-br from-gold-500/10 to-gold-600/5 hover:from-gold-500/20 hover:to-gold-600/10 border border-gold-500/20 hover:border-gold-400/40 transition-all duration-300 hover:scale-105"
                     >
-                      <div className="flex items-center mb-2">
-                        <div className="w-8 h-8 rounded-lg bg-gold-500/20 flex items-center justify-center mr-3">
-                          <Trophy className="h-4 w-4 text-gold-400" />
+                      <div className="flex items-center mb-4">
+                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-gold-500 to-gold-600 flex items-center justify-center ml-4 shadow-xl group-hover/item:shadow-gold-500/25 transition-all duration-300">
+                          <Trophy className="h-6 w-6 text-black" />
                         </div>
-                        <h3 className="font-medium text-white group-hover/item:text-gold-400 transition-colors">افسانه‌ها</h3>
+                        <h3 className="font-bold text-lg text-white group-hover/item:text-gold-300 transition-colors">
+                          افسانه‌ها
+                        </h3>
                       </div>
-                      <p className="text-xs text-gray-400 group-hover/item:text-gray-300 transition-colors">برنامه‌های قهرمانان</p>
+                      <p className="text-sm text-gray-300 group-hover/item:text-gray-200 transition-colors leading-relaxed mr-2">
+                        برنامه‌های قهرمانان
+                      </p>
                     </Link>
                   </div>
                 </div>
@@ -786,25 +815,25 @@ const AuthHeader = () => {
 
             <Link
               to="/blog"
-              className="flex items-center text-white/90 hover:text-gold-400 font-medium text-sm transition-all duration-300 px-3 py-2 rounded-lg hover:bg-white/5 group"
+              className="flex items-center text-white hover:text-gold-400 font-semibold text-sm transition-all duration-300 px-4 py-2.5 rounded-xl hover:bg-gradient-to-r hover:from-gold-500/10 hover:to-gold-400/10 border border-transparent hover:border-gold-500/30 group"
             >
-              <BookOpen className="h-4 w-4 ml-2 opacity-70 group-hover:opacity-100 transition-opacity" />
+              <BookOpen className="h-4 w-4 ml-2 opacity-80 group-hover:opacity-100 transition-opacity" />
               بلاگ
             </Link>
 
             <Link
               to="/download"
-              className="flex items-center text-white/90 hover:text-gold-400 font-medium text-sm transition-all duration-300 px-3 py-2 rounded-lg hover:bg-white/5 group"
+              className="flex items-center text-white hover:text-gold-400 font-semibold text-sm transition-all duration-300 px-4 py-2.5 rounded-xl hover:bg-gradient-to-r hover:from-gold-500/10 hover:to-gold-400/10 border border-transparent hover:border-gold-500/30 group"
             >
-              <Download className="h-4 w-4 ml-2 opacity-70 group-hover:opacity-100 transition-opacity" />
+              <Download className="h-4 w-4 ml-2 opacity-80 group-hover:opacity-100 transition-opacity" />
               دانلود اپ
             </Link>
 
             <Link
               to="/about-us"
-              className="flex items-center text-white/90 hover:text-gold-400 font-medium text-sm transition-all duration-300 px-3 py-2 rounded-lg hover:bg-white/5 group"
+              className="flex items-center text-white hover:text-gold-400 font-semibold text-sm transition-all duration-300 px-4 py-2.5 rounded-xl hover:bg-gradient-to-r hover:from-gold-500/10 hover:to-gold-400/10 border border-transparent hover:border-gold-500/30 group"
             >
-              <Info className="h-4 w-4 ml-2 opacity-70 group-hover:opacity-100 transition-opacity" />
+              <Info className="h-4 w-4 ml-2 opacity-80 group-hover:opacity-100 transition-opacity" />
               درباره ما
             </Link>
           </nav>
@@ -865,20 +894,20 @@ const AuthHeader = () => {
                     </div>
                     <ChevronDown className="h-3 w-3 opacity-70 group-hover:opacity-100 transition-all duration-300 group-hover:rotate-180" />
                   </button>
-                  
+
                   {/* User Dropdown */}
-                  <div className="absolute left-0 mt-2 w-72 bg-gray-900/98 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform scale-95 group-hover:scale-100 origin-top-left">
+                  <div className="absolute left-0 mt-3 w-80 bg-black/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gold-500/20 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform scale-95 group-hover:scale-100 origin-top-left overflow-hidden">
                     <div className="p-6">
                       {/* User Info */}
-                      <div className="flex items-center space-x-3 space-x-reverse mb-4 pb-4 border-b border-white/10">
-                        <div className="w-12 h-12 rounded-full bg-gradient-to-r from-gold-500/20 to-gold-400/20 flex items-center justify-center text-gold-400 border border-gold-500/30 text-lg font-bold">
+                      <div className="flex items-center space-x-3 space-x-reverse mb-6 pb-4 border-b border-gold-500/20">
+                        <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-gold-500 to-gold-600 flex items-center justify-center text-white text-lg font-bold shadow-lg">
                           {getInitials(user.profile?.name || user.email || "")}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-white truncate">
+                          <p className="text-base font-bold text-white truncate">
                             {user.profile?.name || "کاربر"}
                           </p>
-                          <p className="text-xs text-gray-400 truncate">
+                          <p className="text-sm text-gray-300 truncate mb-2">
                             {user.email}
                           </p>
                           {getSubscriptionBadge()}
@@ -886,39 +915,43 @@ const AuthHeader = () => {
                       </div>
 
                       {/* Menu Items */}
-                      <div className="space-y-1">
+                      <div className="space-y-3">
                         <Link
                           to="/profile"
-                          className="flex items-center px-3 py-2 text-sm text-white/90 hover:text-gold-400 hover:bg-white/5 rounded-lg transition-all duration-200 group"
+                          className="flex items-center px-5 py-4 text-sm text-white hover:text-gold-300 bg-gradient-to-r from-gold-500/10 to-gold-600/5 hover:from-gold-500/20 hover:to-gold-600/10 border border-gold-500/20 hover:border-gold-400/40 rounded-xl transition-all duration-300 hover:scale-105 group"
                         >
-                          <User className="h-4 w-4 ml-3 opacity-70 group-hover:opacity-100 transition-opacity" />
-                          <span className="group-hover:translate-x-1 transition-transform duration-200">پروفایل</span>
+                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-gold-500 to-gold-600 flex items-center justify-center ml-4 shadow-lg group-hover:shadow-gold-500/25 transition-all duration-300">
+                            <User className="h-5 w-5 text-black" />
+                          </div>
+                          <span className="font-semibold text-base group-hover:translate-x-1 transition-transform duration-200">
+                            پروفایل
+                          </span>
                         </Link>
 
                         <Link
                           to="/dashboard"
-                          className="flex items-center px-3 py-2 text-sm text-white/90 hover:text-gold-400 hover:bg-white/5 rounded-lg transition-all duration-200 group"
+                          className="flex items-center px-5 py-4 text-sm text-white hover:text-gold-300 bg-gradient-to-r from-gold-500/10 to-gold-600/5 hover:from-gold-500/20 hover:to-gold-600/10 border border-gold-500/20 hover:border-gold-400/40 rounded-xl transition-all duration-300 hover:scale-105 group"
                         >
-                          <Settings className="h-4 w-4 ml-3 opacity-70 group-hover:opacity-100 transition-opacity" />
-                          <span className="group-hover:translate-x-1 transition-transform duration-200">داشبورد</span>
+                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-gold-500 to-gold-600 flex items-center justify-center ml-4 shadow-lg group-hover:shadow-gold-500/25 transition-all duration-300">
+                            <Settings className="h-5 w-5 text-black" />
+                          </div>
+                          <span className="font-semibold text-base group-hover:translate-x-1 transition-transform duration-200">
+                            داشبورد
+                          </span>
                         </Link>
 
-                        <Link
-                          to="/subscription"
-                          className="flex items-center px-3 py-2 text-sm text-white/90 hover:text-gold-400 hover:bg-white/5 rounded-lg transition-all duration-200 group"
-                        >
-                          <Crown className="h-4 w-4 ml-3 opacity-70 group-hover:opacity-100 transition-opacity" />
-                          <span className="group-hover:translate-x-1 transition-transform duration-200">اشتراک‌ها</span>
-                        </Link>
-
-                        <div className="border-t border-white/10 my-2"></div>
+                        <div className="border-t border-gold-500/20 my-3"></div>
 
                         <button
                           onClick={handleLogout}
-                          className="flex items-center w-full px-3 py-2 text-sm text-red-400 hover:text-red-300 hover:bg-red-900/10 rounded-lg transition-all duration-200 group"
+                          className="flex items-center w-full px-5 py-4 text-sm text-white hover:text-gold-300 bg-gradient-to-r from-gold-500/10 to-gold-600/5 hover:from-gold-500/20 hover:to-gold-600/10 border border-gold-500/20 hover:border-gold-400/40 rounded-xl transition-all duration-300 hover:scale-105 group"
                         >
-                          <LogOut className="h-4 w-4 ml-3 opacity-70 group-hover:opacity-100 transition-opacity" />
-                          <span className="group-hover:translate-x-1 transition-transform duration-200">خروج</span>
+                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-gold-500 to-gold-600 flex items-center justify-center ml-4 shadow-lg group-hover:shadow-gold-500/25 transition-all duration-300">
+                            <LogOut className="h-5 w-5 text-black" />
+                          </div>
+                          <span className="font-semibold text-base group-hover:translate-x-1 transition-transform duration-200">
+                            خروج
+                          </span>
                         </button>
                       </div>
                     </div>
@@ -969,161 +1002,208 @@ const AuthHeader = () => {
           </form>
         </div>
 
-        {/* Mobile Menu */}
+        {/* Mobile Menu - Enhanced Responsive Design */}
         <div
           className={`lg:hidden overflow-hidden transition-all duration-300 ease-in-out ${
-            isMenuOpen ? "max-h-[600px] opacity-100 mt-4" : "max-h-0 opacity-0"
+            isMenuOpen ? "max-h-[800px] opacity-100 mt-4" : "max-h-0 opacity-0"
           }`}
         >
-          <div className="py-4 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10">
+          <div className="py-6 bg-black/95 backdrop-blur-xl rounded-2xl border border-gold-500/20 shadow-2xl">
             {/* Mobile Search */}
-            <div className="px-4 mb-4">
+            <div className="px-6 mb-6">
               <form onSubmit={handleSearch} className="relative">
-                <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                 <Input
                   type="text"
-                  placeholder="جستجو..."
+                  placeholder="جستجو در برنامه‌ها، باشگاه‌ها..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pr-10 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400"
+                  className="w-full pr-12 pl-4 py-3 bg-black/50 border border-gold-500/20 rounded-xl text-white placeholder-gray-400 focus:border-gold-400/50 focus:ring-2 focus:ring-gold-500/20"
                 />
+                <Button
+                  type="submit"
+                  size="sm"
+                  className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-gradient-to-r from-gold-500 to-gold-600 hover:from-gold-600 hover:to-gold-700 text-black px-3 py-1 rounded-lg"
+                >
+                  جستجو
+                </Button>
               </form>
             </div>
 
             {user && (
-              <div className="px-4 mb-4 pb-4 border-b border-white/10">
-                <div className="flex items-center space-x-3 space-x-reverse">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-r from-gold-500/20 to-gold-400/20 flex items-center justify-center text-gold-400 border border-gold-500/30 text-sm font-bold">
+              <div className="px-6 mb-6 pb-6 border-b border-gold-500/20">
+                <div className="flex items-center space-x-4 space-x-reverse">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-gold-500 to-gold-600 flex items-center justify-center text-white text-base font-bold shadow-lg">
                     {getInitials(user.profile?.name || user.email || "")}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-white truncate">
+                    <p className="text-base font-bold text-white truncate">
                       {user.profile?.name || user.email || "کاربر"}
                     </p>
-                    <p className="text-xs text-gray-400 truncate">
+                    <p className="text-sm text-gray-300 truncate mb-2">
                       {user.email}
                     </p>
+                    {getSubscriptionBadge()}
                   </div>
                 </div>
               </div>
             )}
 
-            <nav className="px-4 space-y-2">
-              <Link
-                to="/"
-                className="flex items-center px-3 py-2 text-white/90 hover:text-gold-400 hover:bg-white/5 rounded-lg transition-all duration-200 group"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <Home className="h-4 w-4 ml-3 opacity-70 group-hover:opacity-100 transition-opacity" />
-                خانه
-              </Link>
+            <nav className="px-6 space-y-3">
+              {/* Main Navigation */}
+              <div className="grid grid-cols-2 gap-3 mb-6">
+                <Link
+                  to="/"
+                  className="flex flex-col items-center p-4 bg-gradient-to-br from-blue-500/10 to-blue-600/5 hover:from-blue-500/20 hover:to-blue-600/10 border border-blue-500/20 hover:border-blue-400/40 rounded-xl transition-all duration-300 hover:scale-105 group"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center mb-2 shadow-lg">
+                    <Home className="h-5 w-5 text-white" />
+                  </div>
+                  <span className="text-sm font-semibold text-white group-hover:text-blue-300 transition-colors">
+                    خانه
+                  </span>
+                </Link>
 
-              <Link
-                to="/programs"
-                className="flex items-center px-3 py-2 text-white/90 hover:text-gold-400 hover:bg-white/5 rounded-lg transition-all duration-200 group"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <BookOpen className="h-4 w-4 ml-3 opacity-70 group-hover:opacity-100 transition-opacity" />
-                برنامه‌ها
-              </Link>
+                <Link
+                  to="/programs"
+                  className="flex flex-col items-center p-4 bg-gradient-to-br from-gold-500/10 to-gold-600/5 hover:from-gold-500/20 hover:to-gold-600/10 border border-gold-500/20 hover:border-gold-400/40 rounded-xl transition-all duration-300 hover:scale-105 group"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-gold-500 to-gold-600 flex items-center justify-center mb-2 shadow-lg">
+                    <BookOpen className="h-5 w-5 text-black" />
+                  </div>
+                  <span className="text-sm font-semibold text-white group-hover:text-gold-300 transition-colors">
+                    برنامه‌ها
+                  </span>
+                </Link>
 
-              <Link
-                to="/gyms"
-                className="flex items-center px-3 py-2 text-white/90 hover:text-gold-400 hover:bg-white/5 rounded-lg transition-all duration-200 group"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <Dumbbell className="h-4 w-4 ml-3 opacity-70 group-hover:opacity-100 transition-opacity" />
-                باشگاه‌ها
-              </Link>
+                <Link
+                  to="/gyms"
+                  className="flex flex-col items-center p-4 bg-gradient-to-br from-gold-500/10 to-gold-600/5 hover:from-gold-500/20 hover:to-gold-600/10 border border-gold-500/20 hover:border-gold-400/40 rounded-xl transition-all duration-300 hover:scale-105 group"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-gold-500 to-gold-600 flex items-center justify-center mb-2 shadow-lg">
+                    <Dumbbell className="h-5 w-5 text-black" />
+                  </div>
+                  <span className="text-sm font-semibold text-white group-hover:text-gold-300 transition-colors">
+                    باشگاه‌ها
+                  </span>
+                </Link>
 
-              <Link
-                to="/coaches"
-                className="flex items-center px-3 py-2 text-white/90 hover:text-gold-400 hover:bg-white/5 rounded-lg transition-all duration-200 group"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <Users className="h-4 w-4 ml-3 opacity-70 group-hover:opacity-100 transition-opacity" />
-                مربی‌ها
-              </Link>
+                <Link
+                  to="/coaches"
+                  className="flex flex-col items-center p-4 bg-gradient-to-br from-gold-500/10 to-gold-600/5 hover:from-gold-500/20 hover:to-gold-600/10 border border-gold-500/20 hover:border-gold-400/40 rounded-xl transition-all duration-300 hover:scale-105 group"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-gold-500 to-gold-600 flex items-center justify-center mb-2 shadow-lg">
+                    <Users className="h-5 w-5 text-black" />
+                  </div>
+                  <span className="text-sm font-semibold text-white group-hover:text-gold-300 transition-colors">
+                    مربی‌ها
+                  </span>
+                </Link>
+              </div>
 
-              <Link
-                to="/legends"
-                className="flex items-center px-3 py-2 text-white/90 hover:text-gold-400 hover:bg-white/5 rounded-lg transition-all duration-200 group"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <Trophy className="h-4 w-4 ml-3 opacity-70 group-hover:opacity-100 transition-opacity" />
-                افسانه‌ها
-              </Link>
+              {/* Secondary Navigation */}
+              <div className="space-y-3">
+                <Link
+                  to="/legends"
+                  className="flex items-center px-5 py-4 bg-gradient-to-r from-gold-500/10 to-gold-600/5 hover:from-gold-500/20 hover:to-gold-600/10 border border-gold-500/20 hover:border-gold-400/40 rounded-xl transition-all duration-300 hover:scale-105 group"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-gold-500 to-gold-600 flex items-center justify-center ml-4 shadow-lg group-hover:shadow-gold-500/25 transition-all duration-300">
+                    <Trophy className="h-5 w-5 text-black" />
+                  </div>
+                  <span className="font-semibold text-base text-white group-hover:text-gold-300 transition-colors">
+                    افسانه‌ها
+                  </span>
+                </Link>
 
-              <Link
-                to="/blog"
-                className="flex items-center px-3 py-2 text-white/90 hover:text-gold-400 hover:bg-white/5 rounded-lg transition-all duration-200 group"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <BookOpen className="h-4 w-4 ml-3 opacity-70 group-hover:opacity-100 transition-opacity" />
-                بلاگ
-              </Link>
+                <Link
+                  to="/blog"
+                  className="flex items-center px-5 py-4 bg-gradient-to-r from-gold-500/10 to-gold-600/5 hover:from-gold-500/20 hover:to-gold-600/10 border border-gold-500/20 hover:border-gold-400/40 rounded-xl transition-all duration-300 hover:scale-105 group"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-gold-500 to-gold-600 flex items-center justify-center ml-4 shadow-lg group-hover:shadow-gold-500/25 transition-all duration-300">
+                    <BookOpen className="h-5 w-5 text-black" />
+                  </div>
+                  <span className="font-semibold text-base text-white group-hover:text-gold-300 transition-colors">
+                    بلاگ
+                  </span>
+                </Link>
 
-              <Link
-                to="/download"
-                className="flex items-center px-3 py-2 text-white/90 hover:text-gold-400 hover:bg-white/5 rounded-lg transition-all duration-200 group"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <Download className="h-4 w-4 ml-3 opacity-70 group-hover:opacity-100 transition-opacity" />
-                دانلود اپ
-              </Link>
+                <Link
+                  to="/download"
+                  className="flex items-center px-5 py-4 bg-gradient-to-r from-gold-500/10 to-gold-600/5 hover:from-gold-500/20 hover:to-gold-600/10 border border-gold-500/20 hover:border-gold-400/40 rounded-xl transition-all duration-300 hover:scale-105 group"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-gold-500 to-gold-600 flex items-center justify-center ml-4 shadow-lg group-hover:shadow-gold-500/25 transition-all duration-300">
+                    <Download className="h-5 w-5 text-black" />
+                  </div>
+                  <span className="font-semibold text-base text-white group-hover:text-gold-300 transition-colors">
+                    دانلود اپ
+                  </span>
+                </Link>
 
-              <Link
-                to="/about-us"
-                className="flex items-center px-3 py-2 text-white/90 hover:text-gold-400 hover:bg-white/5 rounded-lg transition-all duration-200 group"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <Info className="h-4 w-4 ml-3 opacity-70 group-hover:opacity-100 transition-opacity" />
-                درباره ما
-              </Link>
+                <Link
+                  to="/about-us"
+                  className="flex items-center px-5 py-4 bg-gradient-to-r from-gold-500/10 to-gold-600/5 hover:from-gold-500/20 hover:to-gold-600/10 border border-gold-500/20 hover:border-gold-400/40 rounded-xl transition-all duration-300 hover:scale-105 group"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-gold-500 to-gold-600 flex items-center justify-center ml-4 shadow-lg group-hover:shadow-gold-500/25 transition-all duration-300">
+                    <Info className="h-5 w-5 text-black" />
+                  </div>
+                  <span className="font-semibold text-base text-white group-hover:text-gold-300 transition-colors">
+                    درباره ما
+                  </span>
+                </Link>
+              </div>
 
               {user ? (
-                <div className="pt-2 mt-2 border-t border-white/10 space-y-2">
+                <div className="pt-4 mt-4 border-t border-gold-500/20 space-y-3">
                   <Link
                     to="/cart"
-                    className="flex items-center px-3 py-2 text-white/90 hover:text-gold-400 hover:bg-white/5 rounded-lg transition-all duration-200 group"
+                    className="flex items-center px-5 py-4 bg-gradient-to-r from-gold-500/10 to-gold-600/5 hover:from-gold-500/20 hover:to-gold-600/10 border border-gold-500/20 hover:border-gold-400/40 rounded-xl transition-all duration-300 hover:scale-105 group"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    <div className="relative">
-                      <ShoppingCart className="h-4 w-4 ml-3 opacity-70 group-hover:opacity-100 transition-opacity" />
+                    <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-gold-500 to-gold-600 flex items-center justify-center ml-4 shadow-lg group-hover:shadow-gold-500/25 transition-all duration-300">
+                      <ShoppingCart className="h-5 w-5 text-black" />
                       {cartItemsCount > 0 && (
                         <span className="absolute -top-1 -right-1 bg-gold-500 text-black text-xs rounded-full h-4 w-4 flex items-center justify-center font-bold text-[10px]">
                           {cartItemsCount > 9 ? "9+" : cartItemsCount}
                         </span>
                       )}
                     </div>
-                    سبد خرید
+                    <span className="font-semibold text-base text-white group-hover:text-gold-300 transition-colors">
+                      سبد خرید
+                    </span>
                   </Link>
 
                   <Link
                     to="/profile"
-                    className="flex items-center px-3 py-2 text-white/90 hover:text-gold-400 hover:bg-white/5 rounded-lg transition-all duration-200 group"
+                    className="flex items-center px-5 py-4 bg-gradient-to-r from-gold-500/10 to-gold-600/5 hover:from-gold-500/20 hover:to-gold-600/10 border border-gold-500/20 hover:border-gold-400/40 rounded-xl transition-all duration-300 hover:scale-105 group"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    <User className="h-4 w-4 ml-3 opacity-70 group-hover:opacity-100 transition-opacity" />
-                    پروفایل
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-gold-500 to-gold-600 flex items-center justify-center ml-4 shadow-lg group-hover:shadow-gold-500/25 transition-all duration-300">
+                      <User className="h-5 w-5 text-black" />
+                    </div>
+                    <span className="font-semibold text-base text-white group-hover:text-gold-300 transition-colors">
+                      پروفایل
+                    </span>
                   </Link>
 
                   <Link
                     to="/dashboard"
-                    className="flex items-center px-3 py-2 text-white/90 hover:text-gold-400 hover:bg-white/5 rounded-lg transition-all duration-200 group"
+                    className="flex items-center px-4 py-3 bg-gradient-to-r from-gold-500/10 to-gold-600/5 hover:from-gold-500/20 hover:to-gold-600/10 border border-gold-500/20 hover:border-gold-400/40 rounded-xl transition-all duration-300 hover:scale-105 group"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    <Settings className="h-4 w-4 ml-3 opacity-70 group-hover:opacity-100 transition-opacity" />
-                    داشبورد
-                  </Link>
-
-                  <Link
-                    to="/subscription"
-                    className="flex items-center px-3 py-2 text-white/90 hover:text-gold-400 hover:bg-white/5 rounded-lg transition-all duration-200 group"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    <Crown className="h-4 w-4 ml-3 opacity-70 group-hover:opacity-100 transition-opacity" />
-                    اشتراک‌ها
+                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-gold-500 to-gold-600 flex items-center justify-center mr-3 shadow-md">
+                      <Settings className="h-4 w-4 text-black" />
+                    </div>
+                    <span className="font-semibold text-white group-hover:text-gold-300 transition-colors">
+                      داشبورد
+                    </span>
                   </Link>
 
                   <button
@@ -1131,17 +1211,21 @@ const AuthHeader = () => {
                       setIsMenuOpen(false);
                       handleLogout();
                     }}
-                    className="flex items-center w-full px-3 py-2 text-red-400 hover:text-red-300 hover:bg-red-900/10 rounded-lg transition-all duration-200 group"
+                    className="flex items-center w-full px-4 py-3 bg-gradient-to-r from-gold-500/10 to-gold-600/5 hover:from-gold-500/20 hover:to-gold-600/10 border border-gold-500/20 hover:border-gold-400/40 rounded-xl transition-all duration-300 hover:scale-105 group"
                   >
-                    <LogOut className="h-4 w-4 ml-3 opacity-70 group-hover:opacity-100 transition-opacity" />
-                    خروج
+                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-gold-500 to-gold-600 flex items-center justify-center mr-3 shadow-md">
+                      <LogOut className="h-4 w-4 text-black" />
+                    </div>
+                    <span className="font-semibold text-white group-hover:text-gold-300 transition-colors">
+                      خروج
+                    </span>
                   </button>
                 </div>
               ) : (
-                <div className="pt-2 mt-2 border-t border-white/10">
+                <div className="pt-4 mt-4 border-t border-gold-500/20">
                   <Link to="/login" onClick={() => setIsMenuOpen(false)}>
-                    <Button className="w-full bg-gradient-to-r from-gold-500 to-gold-400 hover:from-gold-600 hover:to-gold-500 text-black font-medium rounded-xl">
-                      <User className="h-4 w-4 ml-2" />
+                    <Button className="w-full bg-gradient-to-r from-gold-500 to-gold-400 hover:from-gold-600 hover:to-gold-500 text-black font-bold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+                      <User className="h-5 w-5 ml-2" />
                       ورود / ثبت‌نام
                     </Button>
                   </Link>
