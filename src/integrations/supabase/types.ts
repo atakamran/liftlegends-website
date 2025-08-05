@@ -377,6 +377,63 @@ export type Database = {
           },
         ]
       }
+      gyms: {
+        Row: {
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string | null
+          description: string | null
+          facilities: string[] | null
+          id: string
+          image_url: string | null
+          is_active: boolean | null
+          location: string | null
+          membership_types: Json | null
+          name: string
+          operating_hours: Json | null
+          price_range: string | null
+          rating: number | null
+          total_reviews: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string | null
+          description?: string | null
+          facilities?: string[] | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          location?: string | null
+          membership_types?: Json | null
+          name: string
+          operating_hours?: Json | null
+          price_range?: string | null
+          rating?: number | null
+          total_reviews?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string | null
+          description?: string | null
+          facilities?: string[] | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          location?: string | null
+          membership_types?: Json | null
+          name?: string
+          operating_hours?: Json | null
+          price_range?: string | null
+          rating?: number | null
+          total_reviews?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       offers: {
         Row: {
           availability: string | null

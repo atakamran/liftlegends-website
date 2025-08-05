@@ -31,6 +31,8 @@ import Legends from "./pages/legends/Legends";
 import Search from "./pages/Search";
 import Gyms from "./pages/gyms/Gyms";
 import Coaches from "./pages/coaches/Coaches";
+import CoachDetail from "./pages/coaches/CoachDetail";
+import GymDetail from "./pages/gyms/GymDetail";
 import Cart from "./pages/cart/Cart";
 
 const queryClient = new QueryClient();
@@ -70,7 +72,9 @@ const App = () => (
             <Route path="/legends" element={<Legends />} />
             <Route path="/search" element={<Search />} />
             <Route path="/gyms" element={<Gyms />} />
+            <Route path="/gyms/:id" element={<GymDetail />} />
             <Route path="/coaches" element={<Coaches />} />
+            <Route path="/coaches/:id" element={<CoachDetail />} />
             <Route path="/cart" element={<Cart />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

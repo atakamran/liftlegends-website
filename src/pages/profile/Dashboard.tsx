@@ -177,6 +177,36 @@ interface Program {
   program_url: string | null;
 }
 
+interface Gym {
+  id: string;
+  name: string;
+  description: string | null;
+  location: string | null;
+  contact_phone: string | null;
+  contact_email: string | null;
+  image_url: string | null;
+  facilities: string[] | null;
+  operating_hours: any;
+  membership_types: any;
+  price_range: string | null;
+  rating: number;
+  total_reviews: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+interface Coach {
+  id: string;
+  full_name: string;
+  bio: string | null;
+  profile_image: string | null;
+  expertise: string;
+  experience_years: number | null;
+  created_at: string;
+  updated_at: string;
+}
+
 interface ProgramDetail {
   id: string;
   program_id: string;
@@ -411,6 +441,48 @@ const Dashboard = () => {
   const [bundleSearchTerm, setBundleSearchTerm] = useState("");
   const [bundleStatusFilter, setBundleStatusFilter] = useState<string>("all");
   const [showBundleForm, setShowBundleForm] = useState(false);
+
+  // Gym management state
+  const [gyms, setGyms] = useState<Gym[]>([]);
+  const [gymLoading, setGymLoading] = useState(false);
+  const [gymFormData, setGymFormData] = useState({
+    name: "",
+    description: "",
+    location: "",
+    contact_phone: "",
+    contact_email: "",
+    image_url: "",
+    facilities: [] as string[],
+    operating_hours: {},
+    membership_types: {},
+    price_range: "",
+    is_active: true,
+  });
+  const [isEditingGym, setIsEditingGym] = useState(false);
+  const [currentGymId, setCurrentGymId] = useState<string | null>(null);
+
+  // Enhanced gym management states
+  const [gymSearchTerm, setGymSearchTerm] = useState("");
+  const [gymStatusFilter, setGymStatusFilter] = useState<string>("all");
+  const [showGymForm, setShowGymForm] = useState(false);
+
+  // Coach management state
+  const [coaches, setCoaches] = useState<Coach[]>([]);
+  const [coachLoading, setCoachLoading] = useState(false);
+  const [coachFormData, setCoachFormData] = useState({
+    full_name: "",
+    bio: "",
+    profile_image: "",
+    expertise: "",
+    experience_years: 0,
+  });
+  const [isEditingCoach, setIsEditingCoach] = useState(false);
+  const [currentCoachId, setCurrentCoachId] = useState<string | null>(null);
+
+  // Enhanced coach management states
+  const [coachSearchTerm, setCoachSearchTerm] = useState("");
+  const [coachExpertiseFilter, setCoachExpertiseFilter] = useState<string>("all");
+  const [showCoachForm, setShowCoachForm] = useState(false);
 
   // Function to fetch products
   const fetchProducts = async () => {
@@ -1632,6 +1704,271 @@ const Dashboard = () => {
     setIsEditingBundle(false);
     setCurrentBundleId(null);
     setShowBundleForm(false);
+  };
+
+  // Gym management functions
+  const fetchGyms = async () => {
+    try {
+      setGymLoading(true);
+
+      const { data, error } = await supabase
+        .from("gyms")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+
+      setGyms(data || []);
+    } catch (error) {
+      console.error("Error fetching gyms:", error);
+      toast({
+        variant: "destructive",
+        title: "خطا در بارگذاری باشگاه‌ها",
+        description: "مشکلی در دریافت لیست باشگاه‌ها رخ داد. لطفاً دوباره تلاش کنید.",
+      });
+    } finally {
+      setGymLoading(false);
+    }
+  };
+
+  const createGym = async () => {
+    try {
+      if (!gymFormData.name || !gymFormData.description) {
+        toast({
+          variant: "destructive",
+          title: "خطا در ثبت باشگاه",
+          description: "لطفاً نام و توضیحات باشگاه را وارد کنید.",
+        });
+        return;
+      }
+
+      setGymLoading(true);
+
+      const { data, error } = await supabase
+        .from("gyms")
+        .insert({
+          name: gymFormData.name,
+          description: gymFormData.description,
+          location: gymFormData.location || null,
+          contact_phone: gymFormData.contact_phone || null,
+          contact_email: gymFormData.contact_email || null,
+          image_url: gymFormData.image_url || null,
+          facilities: gymFormData.facilities.length > 0 ? gymFormData.facilities : null,
+          operating_hours: Object.keys(gymFormData.operating_hours).length > 0 ? gymFormData.operating_hours : null,
+          membership_types: Object.keys(gymFormData.membership_types).length > 0 ? gymFormData.membership_types : null,
+          price_range: gymFormData.price_range || null,
+          is_active: gymFormData.is_active,
+        })
+        .select();
+
+      if (error) throw error;
+
+      fetchGyms();
+
+      setGymFormData({
+        name: "",
+        description: "",
+        location: "",
+        contact_phone: "",
+        contact_email: "",
+        image_url: "",
+        facilities: [],
+        operating_hours: {},
+        membership_types: {},
+        price_range: "",
+        is_active: true,
+      });
+      setShowGymForm(false);
+
+      toast({
+        title: "باشگاه ثبت شد",
+        description: "باشگاه با موفقیت ثبت شد.",
+      });
+    } catch (error) {
+      console.error("Error creating gym:", error);
+      toast({
+        variant: "destructive",
+        title: "خطا در ثبت باشگاه",
+        description: "مشکلی در ثبت باشگاه رخ داد. لطفاً دوباره تلاش کنید.",
+      });
+    } finally {
+      setGymLoading(false);
+    }
+  };
+
+  const updateGym = async () => {
+    try {
+      if (!gymFormData.name || !gymFormData.description) {
+        toast({
+          variant: "destructive",
+          title: "خطا در بروزرسانی باشگاه",
+          description: "لطفاً نام و توضیحات باشگاه را وارد کنید.",
+        });
+        return;
+      }
+
+      setGymLoading(true);
+
+      const { error } = await supabase
+        .from("gyms")
+        .update({
+          name: gymFormData.name,
+          description: gymFormData.description,
+          location: gymFormData.location || null,
+          contact_phone: gymFormData.contact_phone || null,
+          contact_email: gymFormData.contact_email || null,
+          image_url: gymFormData.image_url || null,
+          facilities: gymFormData.facilities.length > 0 ? gymFormData.facilities : null,
+          operating_hours: Object.keys(gymFormData.operating_hours).length > 0 ? gymFormData.operating_hours : null,
+          membership_types: Object.keys(gymFormData.membership_types).length > 0 ? gymFormData.membership_types : null,
+          price_range: gymFormData.price_range || null,
+          is_active: gymFormData.is_active,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", currentGymId);
+
+      if (error) throw error;
+
+      fetchGyms();
+
+      setGymFormData({
+        name: "",
+        description: "",
+        location: "",
+        contact_phone: "",
+        contact_email: "",
+        image_url: "",
+        facilities: [],
+        operating_hours: {},
+        membership_types: {},
+        price_range: "",
+        is_active: true,
+      });
+      setIsEditingGym(false);
+      setCurrentGymId(null);
+      setShowGymForm(false);
+
+      toast({
+        title: "باشگاه بروزرسانی شد",
+        description: "باشگاه با موفقیت بروزرسانی شد.",
+      });
+    } catch (error) {
+      console.error("Error updating gym:", error);
+      toast({
+        variant: "destructive",
+        title: "خطا در بروزرسانی باشگاه",
+        description: "مشکلی در بروزرسانی باشگاه رخ داد. لطفاً دوباره تلاش کنید.",
+      });
+    } finally {
+      setGymLoading(false);
+    }
+  };
+
+  const deleteGym = async (id: string) => {
+    try {
+      setGymLoading(true);
+
+      const { error } = await supabase
+        .from("gyms")
+        .delete()
+        .eq("id", id);
+
+      if (error) throw error;
+
+      fetchGyms();
+
+      toast({
+        title: "باشگاه حذف شد",
+        description: "باشگاه با موفقیت حذف شد.",
+      });
+    } catch (error) {
+      console.error("Error deleting gym:", error);
+      toast({
+        variant: "destructive",
+        title: "خطا در حذف باشگاه",
+        description: "مشکلی در حذف باشگاه رخ داد. لطفاً دوباره تلاش کنید.",
+      });
+    } finally {
+      setGymLoading(false);
+    }
+  };
+
+  // Coach management functions
+  const fetchCoaches = async () => {
+    try {
+      setCoachLoading(true);
+
+      const { data, error } = await supabase
+        .from("coaches")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+
+      setCoaches(data || []);
+    } catch (error) {
+      console.error("Error fetching coaches:", error);
+      toast({
+        variant: "destructive",
+        title: "خطا در بارگذاری مربی‌ها",
+        description: "مشکلی در دریافت لیست مربی‌ها رخ داد. لطفاً دوباره تلاش کنید.",
+      });
+    } finally {
+      setCoachLoading(false);
+    }
+  };
+
+  const createCoach = async () => {
+    try {
+      if (!coachFormData.full_name || !coachFormData.expertise) {
+        toast({
+          variant: "destructive",
+          title: "خطا در ثبت مربی",
+          description: "لطفاً نام و تخصص مربی را وارد کنید.",
+        });
+        return;
+      }
+
+      setCoachLoading(true);
+
+      const { data, error } = await supabase
+        .from("coaches")
+        .insert({
+          full_name: coachFormData.full_name,
+          bio: coachFormData.bio || null,
+          profile_image: coachFormData.profile_image || null,
+          expertise: coachFormData.expertise,
+          experience_years: coachFormData.experience_years || null,
+        })
+        .select();
+
+      if (error) throw error;
+
+      fetchCoaches();
+
+      setCoachFormData({
+        full_name: "",
+        bio: "",
+        profile_image: "",
+        expertise: "",
+        experience_years: 0,
+      });
+      setShowCoachForm(false);
+
+      toast({
+        title: "مربی ثبت شد",
+        description: "مربی با موفقیت ثبت شد.",
+      });
+    } catch (error) {
+      console.error("Error creating coach:", error);
+      toast({
+        variant: "destructive",
+        title: "خطا در ثبت مربی",
+        description: "مشکلی در ثبت مربی رخ داد. لطفاً دوباره تلاش کنید.",
+      });
+    } finally {
+      setCoachLoading(false);
+    }
   };
 
   // Enhanced bundle filtering functions
