@@ -2279,45 +2279,42 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white pb-20 lg:pb-0">
-      {/* Mobile Header Removed */}
-
-      {/* Main Dashboard Layout */}
+    <div className="bg-background text-foreground">
       <SidebarProvider>
-        <div className="flex flex-col lg:flex-row h-full">
-          {/* Modern Sidebar using SidebarComponent */}
+        <div className="flex h-screen overflow-hidden">
+          {/* Modern Sidebar */}
           <Sidebar
             side="right"
-            variant="floating"
+            variant="sidebar"
             collapsible="icon"
-            className="border-l border-gray-700/30"
+            className="border-l border-border/80"
           >
             <SidebarHeader>
               <div className="flex items-center justify-between px-2">
-                <h2 className="text-xl font-bold text-gold-500">داشبورد</h2>
+                <h2 className="text-xl font-bold text-primary">داشبورد</h2>
                 <SidebarTrigger />
               </div>
 
               {/* User Profile Section */}
               <div className="mt-6 mb-4 px-2">
                 <div className="flex items-center space-x-3 space-x-reverse mb-4">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-gold-500 to-amber-600 flex items-center justify-center text-black font-bold text-lg shadow-lg shadow-gold-500/20">
+                  <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-lg">
                     {user?.email?.charAt(0).toUpperCase() || "U"}
                   </div>
                   <div>
-                    <h3 className="font-medium text-white">
+                    <h3 className="font-medium text-foreground">
                       {user?.profile?.name ||
                         user?.email?.split("@")[0] ||
                         "کاربر"}
                     </h3>
-                    <p className="text-xs text-gray-400">{user?.email || ""}</p>
+                    <p className="text-xs text-muted-foreground">{user?.email || ""}</p>
                   </div>
                 </div>
 
-                <div className="bg-gray-800/50 rounded-lg p-3 border border-gray-700/50 mb-2">
+                <div className="bg-muted/50 rounded-lg p-3 border border-border/50 mb-2">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs text-gray-400">اشتراک فعال</span>
-                    <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-gold-500/20 text-gold-400">
+                    <span className="text-xs text-muted-foreground">اشتراک فعال</span>
+                    <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-primary/20 text-primary">
                       {user?.profile?.subscription_plan === "basic" && "پایه"}
                       {user?.profile?.subscription_plan === "pro" && "پرو"}
                       {user?.profile?.subscription_plan === "ultimate" &&
@@ -2328,10 +2325,10 @@ const Dashboard = () => {
                   {user?.profile?.subscription_plan !== "basic" &&
                     user?.profile?.subscription_end_date && (
                       <div className="flex items-center justify-between">
-                        <span className="text-xs text-gray-400">
+                        <span className="text-xs text-muted-foreground">
                           زمان باقیمانده
                         </span>
-                        <span className="text-xs font-medium">
+                        <span className="text-xs font-medium text-foreground">
                           {calculateRemainingDays(
                             user?.profile?.subscription_end_date
                           )}{" "}
@@ -2354,141 +2351,111 @@ const Dashboard = () => {
                 <SidebarMenuButton
                   isActive={activeTab === "training"}
                   onClick={() => setActiveTab("training")}
-                  className="w-full justify-start"
                 >
-                  <div className="flex items-center justify-start w-full">
-                    <div className="w-8 h-8 rounded-md bg-gradient-to-br from-gold-500/10 to-amber-600/10 flex items-center justify-center ml-3 group-data-[active=true]:bg-gradient-to-br group-data-[active=true]:from-gold-500/20 group-data-[active=true]:to-amber-600/20">
-                      <Zap size={18} className="text-gold-500" />
-                    </div>
-                    <span>برنامه‌های تمرینی</span>
-                  </div>
+                  <Zap size={18} className="text-muted-foreground group-data-[active=true]:text-primary" />
+                  <span>برنامه‌های تمرینی</span>
                 </SidebarMenuButton>
 
                 <SidebarMenuButton
                   isActive={activeTab === "meals"}
                   onClick={() => setActiveTab("meals")}
-                  className="w-full justify-start"
                 >
-                  <div className="flex items-center justify-start w-full">
-                    <div className="w-8 h-8 rounded-md bg-gradient-to-br from-gold-500/10 to-amber-600/10 flex items-center justify-center ml-3 group-data-[active=true]:bg-gradient-to-br group-data-[active=true]:from-gold-500/20 group-data-[active=true]:to-amber-600/20">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="18"
-                        height="18"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="text-gold-500"
-                      >
-                        <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path>
-                        <path d="M7 2v20"></path>
-                        <path d="M21 15V2"></path>
-                        <path d="M18 15V2"></path>
-                        <path d="M21 15a3 3 0 1 1-6 0"></path>
-                      </svg>
-                    </div>
-                    <span>برنامه‌های غذایی</span>
-                  </div>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="text-muted-foreground group-data-[active=true]:text-primary"
+                  >
+                    <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path>
+                    <path d="M7 2v20"></path>
+                    <path d="M21 15V2"></path>
+                    <path d="M18 15V2"></path>
+                    <path d="M21 15a3 3 0 1 1-6 0"></path>
+                  </svg>
+                  <span>برنامه‌های غذایی</span>
                 </SidebarMenuButton>
 
                 <SidebarMenuButton
                   isActive={activeTab === "supplements"}
                   onClick={() => setActiveTab("supplements")}
-                  className="w-full justify-start"
                 >
-                  <div className="flex items-center justify-start w-full">
-                    <div className="w-8 h-8 rounded-md bg-gradient-to-br from-gold-500/10 to-amber-600/10 flex items-center justify-center ml-3 group-data-[active=true]:bg-gradient-to-br group-data-[active=true]:from-gold-500/20 group-data-[active=true]:to-amber-600/20">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="18"
-                        height="18"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="text-gold-500"
-                      >
-                        <path d="m8 21 8-9"></path>
-                        <path d="M12 21a9 9 0 0 0 0-18C7.5 3 4 7.5 4 11c0 2 1 4 2 6"></path>
-                        <path d="M19.8 17.8a9 9 0 0 0 .2-2c0-2.8-1-5.5-2.8-7.4"></path>
-                        <path d="M13.5 8.5A5 5 0 0 0 12 8a5 5 0 0 0-5 5c0 1.1.4 2.2 1 3"></path>
-                      </svg>
-                    </div>
-                    <span>برنامه‌های مکمل</span>
-                  </div>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="text-muted-foreground group-data-[active=true]:text-primary"
+                  >
+                    <path d="m8 21 8-9"></path>
+                    <path d="M12 21a9 9 0 0 0 0-18C7.5 3 4 7.5 4 11c0 2 1 4 2 6"></path>
+                    <path d="M19.8 17.8a9 9 0 0 0 .2-2c0-2.8-1-5.5-2.8-7.4"></path>
+                    <path d="M13.5 8.5A5 5 0 0 0 12 8a5 5 0 0 0-5 5c0 1.1.4 2.2 1 3"></path>
+                  </svg>
+                  <span>برنامه‌های مکمل</span>
                 </SidebarMenuButton>
 
                 <SidebarMenuButton
                   isActive={activeTab === "orders"}
                   onClick={() => setActiveTab("orders")}
-                  className="w-full justify-start"
                 >
-                  <div className="flex items-center justify-start w-full">
-                    <div className="w-8 h-8 rounded-md bg-gradient-to-br from-gold-500/10 to-amber-600/10 flex items-center justify-center ml-3 group-data-[active=true]:bg-gradient-to-br group-data-[active=true]:from-gold-500/20 group-data-[active=true]:to-amber-600/20">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="18"
-                        height="18"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="text-gold-500"
-                      >
-                        <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
-                        <path d="M3 6h18"></path>
-                        <path d="M16 10a4 4 0 0 1-8 0"></path>
-                      </svg>
-                    </div>
-                    <span>سفارش‌ها</span>
-                  </div>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="text-muted-foreground group-data-[active=true]:text-primary"
+                  >
+                    <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+                    <path d="M3 6h18"></path>
+                    <path d="M16 10a4 4 0 0 1-8 0"></path>
+                  </svg>
+                  <span>سفارش‌ها</span>
                 </SidebarMenuButton>
 
                 <SidebarMenuButton
                   isActive={activeTab === "payments"}
                   onClick={() => setActiveTab("payments")}
-                  className="w-full justify-start"
                 >
-                  <div className="flex items-center justify-start w-full">
-                    <div className="w-8 h-8 rounded-md bg-gradient-to-br from-gold-500/10 to-amber-600/10 flex items-center justify-center ml-3 group-data-[active=true]:bg-gradient-to-br group-data-[active=true]:from-gold-500/20 group-data-[active=true]:to-amber-600/20">
-                      <CreditCard size={18} className="text-gold-500" />
-                    </div>
-                    <span>پرداخت‌ها</span>
-                  </div>
+                  <CreditCard size={18} className="text-muted-foreground group-data-[active=true]:text-primary" />
+                  <span>پرداخت‌ها</span>
                 </SidebarMenuButton>
 
                 <SidebarMenuButton
                   isActive={activeTab === "profile"}
                   onClick={() => setActiveTab("profile")}
-                  className="w-full justify-start"
                 >
-                  <div className="flex items-center justify-start w-full">
-                    <div className="w-8 h-8 rounded-md bg-gradient-to-br from-gold-500/10 to-amber-600/10 flex items-center justify-center ml-3 group-data-[active=true]:bg-gradient-to-br group-data-[active=true]:from-gold-500/20 group-data-[active=true]:to-amber-600/20">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="18"
-                        height="18"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="text-gold-500"
-                      >
-                        <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="12" cy="7" r="4"></circle>
-                      </svg>
-                    </div>
-                    <span>پروفایل</span>
-                  </div>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="text-muted-foreground group-data-[active=true]:text-primary"
+                  >
+                    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                  </svg>
+                  <span>پروفایل</span>
                 </SidebarMenuButton>
               </SidebarGroup>
 
@@ -2503,185 +2470,150 @@ const Dashboard = () => {
                   <SidebarMenuButton
                     isActive={activeTab === "products"}
                     onClick={() => setActiveTab("products")}
-                    className="w-full justify-start"
                   >
-                    <div className="flex items-center justify-start w-full">
-                      <div className="w-8 h-8 rounded-md bg-gradient-to-br from-gold-500/10 to-amber-600/10 flex items-center justify-center ml-3 group-data-[active=true]:bg-gradient-to-br group-data-[active=true]:from-gold-500/20 group-data-[active=true]:to-amber-600/20">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="18"
-                          height="18"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="text-gold-500"
-                        >
-                          <rect
-                            width="20"
-                            height="14"
-                            x="2"
-                            y="5"
-                            rx="2"
-                          ></rect>
-                          <line x1="2" x2="22" y1="10" y2="10"></line>
-                        </svg>
-                      </div>
-                      <span>مدیریت محصولات</span>
-                    </div>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="text-muted-foreground group-data-[active=true]:text-primary"
+                    >
+                      <rect
+                        width="20"
+                        height="14"
+                        x="2"
+                        y="5"
+                        rx="2"
+                      ></rect>
+                      <line x1="2" x2="22" y1="10" y2="10"></line>
+                    </svg>
+                    <span>مدیریت محصولات</span>
                   </SidebarMenuButton>
 
                   <SidebarMenuButton
                     isActive={activeTab === "blog"}
                     onClick={() => setActiveTab("blog")}
-                    className="w-full justify-start"
                   >
-                    <div className="flex items-center justify-start w-full">
-                      <div className="w-8 h-8 rounded-md bg-gradient-to-br from-gold-500/10 to-amber-600/10 flex items-center justify-center ml-3 group-data-[active=true]:bg-gradient-to-br group-data-[active=true]:from-gold-500/20 group-data-[active=true]:to-amber-600/20">
-                        <Edit size={18} className="text-gold-500" />
-                      </div>
-                      <span>مدیریت بلاگ</span>
-                    </div>
+                    <Edit size={18} className="text-muted-foreground group-data-[active=true]:text-primary" />
+                    <span>مدیریت بلاگ</span>
                   </SidebarMenuButton>
 
                   <SidebarMenuButton
                     isActive={activeTab === "gyms"}
                     onClick={() => setActiveTab("gyms")}
-                    className="w-full justify-start"
                   >
-                    <div className="flex items-center justify-start w-full">
-                      <div className="w-8 h-8 rounded-md bg-gradient-to-br from-gold-500/10 to-amber-600/10 flex items-center justify-center ml-3 group-data-[active=true]:bg-gradient-to-br group-data-[active=true]:from-gold-500/20 group-data-[active=true]:to-amber-600/20">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="18"
-                          height="18"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="text-gold-500"
-                        >
-                          <path d="M7.5 8a5.5 5.5 0 1 0 0 8h9a5.5 5.5 0 0 0 0-8h-9Z"></path>
-                          <path d="M12 8v8"></path>
-                          <path d="M8.5 12h7"></path>
-                        </svg>
-                      </div>
-                      <span>مدیریت باشگاه‌ها</span>
-                    </div>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="text-muted-foreground group-data-[active=true]:text-primary"
+                    >
+                      <path d="M7.5 8a5.5 5.5 0 1 0 0 8h9a5.5 5.5 0 0 0 0-8h-9Z"></path>
+                      <path d="M12 8v8"></path>
+                      <path d="M8.5 12h7"></path>
+                    </svg>
+                    <span>مدیریت باشگاه‌ها</span>
                   </SidebarMenuButton>
 
                   <SidebarMenuButton
                     isActive={activeTab === "coaches"}
                     onClick={() => setActiveTab("coaches")}
-                    className="w-full justify-start"
                   >
-                    <div className="flex items-center justify-start w-full">
-                      <div className="w-8 h-8 rounded-md bg-gradient-to-br from-gold-500/10 to-amber-600/10 flex items-center justify-center ml-3 group-data-[active=true]:bg-gradient-to-br group-data-[active=true]:from-gold-500/20 group-data-[active=true]:to-amber-600/20">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="18"
-                          height="18"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="text-gold-500"
-                        >
-                          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
-                          <circle cx="9" cy="7" r="4"></circle>
-                          <path d="m22 21-3-3"></path>
-                          <path d="m22 21-3-3"></path>
-                          <circle cx="19" cy="11" r="2"></circle>
-                        </svg>
-                      </div>
-                      <span>مدیریت مربی‌ها</span>
-                    </div>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="text-muted-foreground group-data-[active=true]:text-primary"
+                    >
+                      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                      <circle cx="9" cy="7" r="4"></circle>
+                      <path d="m22 21-3-3"></path>
+                      <path d="m22 21-3-3"></path>
+                      <circle cx="19" cy="11" r="2"></circle>
+                    </svg>
+                    <span>مدیریت مربی‌ها</span>
                   </SidebarMenuButton>
 
                   <SidebarMenuButton
                     isActive={activeTab === "athlete-management"}
                     onClick={() => setActiveTab("athlete-management")}
-                    className="w-full justify-start"
                   >
-                    <div className="flex items-center justify-start w-full">
-                      <div className="w-8 h-8 rounded-md bg-gradient-to-br from-gold-500/10 to-amber-600/10 flex items-center justify-center ml-3 group-data-[active=true]:bg-gradient-to-br group-data-[active=true]:from-gold-500/20 group-data-[active=true]:to-amber-600/20">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="18"
-                          height="18"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="text-gold-500"
-                        >
-                          <path d="M12 2v20"></path>
-                          <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-                        </svg>
-                      </div>
-                      <span>مدیریت ورزشکاران</span>
-                    </div>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="text-muted-foreground group-data-[active=true]:text-primary"
+                    >
+                      <path d="M12 2v20"></path>
+                      <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                    </svg>
+                    <span>مدیریت ورزشکاران</span>
                   </SidebarMenuButton>
 
                   <SidebarMenuButton
                     isActive={activeTab === "program-management"}
                     onClick={() => setActiveTab("program-management")}
-                    className="w-full justify-start"
                   >
-                    <div className="flex items-center justify-start w-full">
-                      <div className="w-8 h-8 rounded-md bg-gradient-to-br from-gold-500/10 to-amber-600/10 flex items-center justify-center ml-3 group-data-[active=true]:bg-gradient-to-br group-data-[active=true]:from-gold-500/20 group-data-[active=true]:to-amber-600/20">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="18"
-                          height="18"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="text-gold-500"
-                        >
-                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                          <polyline points="14,2 14,8 20,8"></polyline>
-                          <line x1="16" y1="13" x2="8" y2="13"></line>
-                          <line x1="16" y1="17" x2="8" y2="17"></line>
-                          <polyline points="10,9 9,9 8,9"></polyline>
-                        </svg>
-                      </div>
-                      <span>مدیریت برنامه‌ها</span>
-                    </div>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="text-muted-foreground group-data-[active=true]:text-primary"
+                    >
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                      <polyline points="14,2 14,8 20,8"></polyline>
+                      <line x1="16" y1="13" x2="8" y2="13"></line>
+                      <line x1="16" y1="17" x2="8" y2="17"></line>
+                      <polyline points="10,9 9,9 8,9"></polyline>
+                    </svg>
+                    <span>مدیریت برنامه‌ها</span>
                   </SidebarMenuButton>
 
                   <SidebarMenuButton
                     isActive={activeTab === "bundles"}
                     onClick={() => setActiveTab("bundles")}
-                    className="w-full justify-start"
                   >
-                    <div className="flex items-center justify-start w-full">
-                      <div className="w-8 h-8 rounded-md bg-gradient-to-br from-gold-500/10 to-amber-600/10 flex items-center justify-center ml-3 group-data-[active=true]:bg-gradient-to-br group-data-[active=true]:from-gold-500/20 group-data-[active=true]:to-amber-600/20">
-                        <Award size={18} className="text-gold-500" />
-                      </div>
-                      <span>مدیریت پک‌ها</span>
-                    </div>
+                    <Award size={18} className="text-muted-foreground group-data-[active=true]:text-primary" />
+                    <span>مدیریت پک‌ها</span>
                   </SidebarMenuButton>
                 </SidebarGroup>
               )}
             </SidebarContent>
 
             {/* Logout Button */}
-            <div className="mt-auto pt-6 px-2">
+            <div className="mt-auto p-2">
               <Button
-                variant="outline"
-                className="w-full border-gray-700 hover:border-red-500 hover:bg-red-500/10 text-gray-400 hover:text-red-400 flex items-center justify-center"
+                variant="ghost"
+                className="w-full justify-start text-muted-foreground hover:bg-destructive/20 hover:text-destructive"
                 onClick={async () => {
                   await supabase.auth.signOut();
                   navigate("/");
@@ -2692,208 +2624,35 @@ const Dashboard = () => {
               </Button>
             </div>
           </Sidebar>
-        </div>
 
-        {/* Modern Mobile Footer Navigation */}
-        <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50">
-          <div className="bg-gray-900/95 backdrop-blur-xl border-t border-gray-700/30 rounded-t-xl shadow-lg">
-            <div className="px-2 pt-2 pb-1">
-              <Tabs value={activeTab} onValueChange={setActiveTab}>
-                <TabsList className="flex w-full bg-transparent justify-between p-1">
-                  <TabsTrigger
-                    value="training"
-                    className="flex-1 flex flex-col items-center py-2 text-xs rounded-lg data-[state=active]:bg-gray-800 data-[state=active]:text-gold-500 transition-all duration-200"
-                  >
-                    <div className="w-10 h-10 rounded-full bg-gray-800/70 flex items-center justify-center mb-1 data-[state=active]:bg-gold-500/20">
-                      <Zap
-                        size={18}
-                        className="data-[state=active]:text-gold-500"
-                      />
-                    </div>
-                    <span>تمرین</span>
-                  </TabsTrigger>
-
-                  <TabsTrigger
-                    value="meals"
-                    className="flex-1 flex flex-col items-center py-2 text-xs rounded-lg data-[state=active]:bg-gray-800 data-[state=active]:text-gold-500 transition-all duration-200"
-                  >
-                    <div className="w-10 h-10 rounded-full bg-gray-800/70 flex items-center justify-center mb-1 data-[state=active]:bg-gold-500/20">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="18"
-                        height="18"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path>
-                        <path d="M7 2v20"></path>
-                        <path d="M21 15V2"></path>
-                        <path d="M18 15V2"></path>
-                        <path d="M21 15a3 3 0 1 1-6 0"></path>
-                      </svg>
-                    </div>
-                    <span>غذا</span>
-                  </TabsTrigger>
-
-                  <TabsTrigger
-                    value="supplements"
-                    className="flex-1 flex flex-col items-center py-2 text-xs rounded-lg data-[state=active]:bg-gray-800 data-[state=active]:text-gold-500 transition-all duration-200"
-                  >
-                    <div className="w-10 h-10 rounded-full bg-gray-800/70 flex items-center justify-center mb-1 data-[state=active]:bg-gold-500/20">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="18"
-                        height="18"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="m8 21 8-9"></path>
-                        <path d="M12 21a9 9 0 0 0 0-18C7.5 3 4 7.5 4 11c0 2 1 4 2 6"></path>
-                        <path d="M19.8 17.8a9 9 0 0 0 .2-2c0-2.8-1-5.5-2.8-7.4"></path>
-                        <path d="M13.5 8.5A5 5 0 0 0 12 8a5 5 0 0 0-5 5c0 1.1.4 2.2 1 3"></path>
-                      </svg>
-                    </div>
-                    <span>مکمل</span>
-                  </TabsTrigger>
-
-                  <TabsTrigger
-                    value="orders"
-                    className="flex-1 flex flex-col items-center py-2 text-xs rounded-lg data-[state=active]:bg-gray-800 data-[state=active]:text-gold-500 transition-all duration-200"
-                  >
-                    <div className="w-10 h-10 rounded-full bg-gray-800/70 flex items-center justify-center mb-1 data-[state=active]:bg-gold-500/20">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="18"
-                        height="18"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
-                        <path d="M3 6h18"></path>
-                        <path d="M16 10a4 4 0 0 1-8 0"></path>
-                      </svg>
-                    </div>
-                    <span>سفارش</span>
-                  </TabsTrigger>
-
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <button className="flex-1 flex flex-col items-center py-2 text-xs rounded-lg hover:bg-gray-800 transition-all duration-200">
-                        <div className="w-10 h-10 rounded-full bg-gray-800/70 flex items-center justify-center mb-1">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="18"
-                            height="18"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
-                            <circle cx="12" cy="12" r="1"></circle>
-                            <circle cx="19" cy="12" r="1"></circle>
-                            <circle cx="5" cy="12" r="1"></circle>
-                          </svg>
-                        </div>
-                        <span>بیشتر</span>
-                      </button>
-                    </DialogTrigger>
-                    <DialogContent className="bg-gray-800 border-gray-700 text-white">
-                      <DialogHeader>
-                        <DialogTitle className="text-gold-500">
-                          گزینه‌های بیشتر
-                        </DialogTitle>
-                      </DialogHeader>
-                      <div className="flex flex-col space-y-2 py-4">
-                        <Button
-                          variant="ghost"
-                          className="justify-start text-white hover:bg-gray-700/50"
-                          onClick={() => setActiveTab("payments")}
-                        >
-                          <CreditCard
-                            size={18}
-                            className="ml-3 text-gold-500"
-                          />
-                          پرداخت‌ها
-                        </Button>
-                        {user?.profile?.is_admin && (
-                          <Button
-                            variant="ghost"
-                            className="justify-start text-white hover:bg-gray-700/50"
-                            onClick={() => setActiveTab("blog")}
-                          >
-                            <Edit size={18} className="ml-3 text-gold-500" />
-                            مدیریت بلاگ
-                          </Button>
-                        )}
-                        <div className="border-t border-gray-700 my-2 pt-2">
-                          <Button
-                            variant="ghost"
-                            className="justify-start text-gray-400 hover:text-white hover:bg-gray-700/50 w-full"
-                            onClick={async () => {
-                              await supabase.auth.signOut();
-                              localStorage.setItem("isLoggedIn", "false");
-                              localStorage.removeItem("headauth"); // Clear cached auth data
-                              navigate("/");
-                            }}
-                          >
-                            <LogOut size={18} className="ml-2" />
-                            خروج از حساب
-                          </Button>
-                        </div>
-                      </div>
-                    </DialogContent>
-                  </Dialog>
-                </TabsList>
-              </Tabs>
-            </div>
-          </div>
-        </div>
-
-        {/* Main Content Area */}
-        <div className="flex-1 p-4 lg:p-8 lg:mt-0 mb-28 lg:mb-0">
-          <Tabs
-            value={activeTab}
-            onValueChange={setActiveTab}
-            className="w-full"
-          >
-            {/* Training Programs Tab */}
-            <TabsContent
-              value="training"
-              className="space-y-6 animate-in fade-in-50 duration-300"
+          {/* Main Content Area */}
+          <main className="flex-1 overflow-y-auto p-4 lg:p-8 pb-24 lg:pb-8">
+            <Tabs
+              value={activeTab}
+              onValueChange={setActiveTab}
+              className="w-full"
             >
+              {/* Training Programs Tab */}
+              <TabsContent
+                value="training"
+                className="space-y-6 animate-in fade-in-50 duration-300"
+              >
               <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-white">
+                <h2 className="text-2xl font-bold text-foreground">
                   برنامه‌های تمرینی خریداری شده
                 </h2>
-                <Button
-                  className="bg-gold-500 hover:bg-gold-600 text-black"
-                  onClick={() => navigate("/programs")}
-                >
+                <Button onClick={() => navigate("/programs")}>
                   <Plus size={16} className="ml-2" />
                   خرید برنامه جدید
                 </Button>
               </div>
 
               {/* Training Programs Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {productLoading ? (
-                  <div className="col-span-3 flex justify-center items-center py-12">
-                    <Loader2 className="h-8 w-8 animate-spin text-gold-500" />
-                    <span className="mr-2 text-gray-400">
+                  <div className="col-span-full flex justify-center items-center py-12">
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                    <span className="mr-2 text-muted-foreground">
                       در حال بارگذاری برنامه‌ها...
                     </span>
                   </div>
@@ -2910,79 +2669,60 @@ const Dashboard = () => {
                     .map((program) => (
                       <Card
                         key={program.id}
-                        className="bg-gray-800/50 border-gray-700 hover:border-gold-500/50 transition-all duration-300 overflow-hidden"
+                        className="bg-card border-border hover:border-primary/20 transition-all duration-300 overflow-hidden flex flex-col"
                       >
-                        <div className="h-40 bg-gradient-to-br from-gold-500/20 to-amber-500/20 relative">
-                          <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="relative">
+                          <div className="aspect-video bg-muted flex items-center justify-center">
                             {program.image_url ? (
                               <img
                                 src={program.image_url}
                                 alt={program.title}
-                                className="object-cover w-full h-full opacity-60"
+                                className="object-cover w-full h-full"
                               />
                             ) : (
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="48"
-                                height="48"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                className="text-gold-400 opacity-50"
-                              >
-                                <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
-                                <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
-                                <line x1="6" y1="1" x2="6" y2="4"></line>
-                                <line x1="10" y1="1" x2="10" y2="4"></line>
-                                <line x1="14" y1="1" x2="14" y2="4"></line>
-                              </svg>
+                              <Zap
+                                className="w-12 h-12 text-muted-foreground/50"
+                              />
                             )}
                           </div>
                           <div className="absolute top-2 right-2 flex gap-1">
-                            <span className="bg-gold-500/20 text-gold-300 text-xs font-medium px-2.5 py-1 rounded-full">
+                            <span className="bg-primary/10 text-primary text-xs font-medium px-2.5 py-1 rounded-full">
                               تمرینی
                             </span>
                             {hasPurchasedProgram(program.id) && (
-                              <span className="bg-gold-500/20 text-gold-300 text-xs font-medium px-2.5 py-1 rounded-full flex items-center">
+                              <span className="bg-green-500/10 text-green-400 text-xs font-medium px-2.5 py-1 rounded-full flex items-center">
                                 <Check size={12} className="ml-1" />
                                 خریداری شده
                               </span>
                             )}
                             {user?.profile?.is_admin &&
                               !hasPurchasedProgram(program.id) && (
-                                <span className="bg-blue-500/20 text-blue-300 text-xs font-medium px-2.5 py-1 rounded-full flex items-center">
+                                <span className="bg-blue-500/10 text-blue-400 text-xs font-medium px-2.5 py-1 rounded-full flex items-center">
                                   <Shield size={12} className="ml-1" />
                                   دسترسی ادمین
                                 </span>
                               )}
                           </div>
                         </div>
-                        <CardHeader>
-                          <CardTitle className="text-lg">
+                        <CardHeader className="flex-grow">
+                          <CardTitle className="text-lg text-foreground">
                             {program.title}
                           </CardTitle>
+                          <CardDescription className="text-sm">
+                             {formatPrice(program.price)}
+                          </CardDescription>
                         </CardHeader>
-                        <CardContent>
-                          <p className="text-sm text-gray-400">
-                            قیمت: {formatPrice(program.price)}
-                          </p>
-                        </CardContent>
                         <CardFooter>
                           <Button
                             variant="outline"
-                            className="w-full border-gray-700 hover:border-gold-500 hover:bg-gold-500/10"
+                            className="w-full"
                             onClick={() => {
                               if (
                                 hasPurchasedProgram(program.id) ||
                                 user?.profile?.is_admin
                               ) {
-                                // Navigate to program details page
                                 navigate(`/programs/${program.id}/details`);
                               } else {
-                                // Navigate to purchase page
                                 navigate(`/product/${program.id}`);
                               }
                             }}
@@ -2996,8 +2736,12 @@ const Dashboard = () => {
                       </Card>
                     ))
                 ) : (
-                  <div className="col-span-3 text-center py-12">
-                    <p className="text-gray-400">
+                  <div className="col-span-full text-center py-12 bg-card rounded-lg border border-dashed border-border">
+                    <Zap className="mx-auto h-12 w-12 text-muted-foreground" />
+                    <h3 className="mt-4 text-sm font-semibold text-foreground">
+                      برنامه تمرینی یافت نشد
+                    </h3>
+                    <p className="mt-1 text-sm text-muted-foreground">
                       شما هنوز هیچ برنامه تمرینی خریداری نکرده‌اید.
                     </p>
                   </div>
@@ -3011,24 +2755,21 @@ const Dashboard = () => {
               className="space-y-6 animate-in fade-in-50 duration-300"
             >
               <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-white">
+                <h2 className="text-2xl font-bold text-foreground">
                   برنامه‌های غذایی خریداری شده
                 </h2>
-                <Button
-                  className="bg-green-500 hover:bg-green-600 text-white"
-                  onClick={() => navigate("/programs")}
-                >
+                <Button onClick={() => navigate("/programs")}>
                   <Plus size={16} className="ml-2" />
                   خرید برنامه جدید
                 </Button>
               </div>
 
               {/* Meal Plans Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {productLoading ? (
-                  <div className="col-span-3 flex justify-center items-center py-12">
-                    <Loader2 className="h-8 w-8 animate-spin text-green-500" />
-                    <span className="mr-2 text-gray-400">
+                  <div className="col-span-full flex justify-center items-center py-12">
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                    <span className="mr-2 text-muted-foreground">
                       در حال بارگذاری برنامه‌ها...
                     </span>
                   </div>
@@ -3045,79 +2786,64 @@ const Dashboard = () => {
                     .map((program) => (
                       <Card
                         key={program.id}
-                        className="bg-gray-800/50 border-gray-700 hover:border-green-500/50 transition-all duration-300 overflow-hidden"
+                        className="bg-card border-border hover:border-primary/20 transition-all duration-300 overflow-hidden flex flex-col"
                       >
-                        <div className="h-40 bg-gradient-to-br from-green-500/20 to-teal-500/20 relative">
-                          <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="relative">
+                          <div className="aspect-video bg-muted flex items-center justify-center">
                             {program.image_url ? (
                               <img
                                 src={program.image_url}
                                 alt={program.title}
-                                className="object-cover w-full h-full opacity-60"
+                                className="object-cover w-full h-full"
                               />
                             ) : (
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="48"
-                                height="48"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                className="text-green-400 opacity-50"
-                              >
-                                <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path>
-                                <path d="M7 2v20"></path>
-                                <path d="M21 15V2"></path>
-                                <path d="M18 15V2"></path>
-                                <path d="M21 15a3 3 0 1 1-6 0"></path>
+                              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-12 h-12 text-muted-foreground/50">
+                                <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2" />
+                                <path d="M7 2v20" />
+                                <path d="M21 15V2" />
+                                <path d="M18 15V2" />
+                                <path d="M21 15a3 3 0 1 1-6 0" />
                               </svg>
                             )}
                           </div>
                           <div className="absolute top-2 right-2 flex gap-1">
-                            <span className="bg-green-500/20 text-green-300 text-xs font-medium px-2.5 py-1 rounded-full">
+                            <span className="bg-green-500/10 text-green-400 text-xs font-medium px-2.5 py-1 rounded-full">
                               غذایی
                             </span>
                             {hasPurchasedProgram(program.id) && (
-                              <span className="bg-gold-500/20 text-gold-300 text-xs font-medium px-2.5 py-1 rounded-full flex items-center">
+                              <span className="bg-green-500/10 text-green-400 text-xs font-medium px-2.5 py-1 rounded-full flex items-center">
                                 <Check size={12} className="ml-1" />
                                 خریداری شده
                               </span>
                             )}
                             {user?.profile?.is_admin &&
                               !hasPurchasedProgram(program.id) && (
-                                <span className="bg-blue-500/20 text-blue-300 text-xs font-medium px-2.5 py-1 rounded-full flex items-center">
+                                <span className="bg-blue-500/10 text-blue-400 text-xs font-medium px-2.5 py-1 rounded-full flex items-center">
                                   <Shield size={12} className="ml-1" />
                                   دسترسی ادمین
                                 </span>
                               )}
                           </div>
                         </div>
-                        <CardHeader>
-                          <CardTitle className="text-lg">
+                        <CardHeader className="flex-grow">
+                          <CardTitle className="text-lg text-foreground">
                             {program.title}
                           </CardTitle>
+                          <CardDescription className="text-sm">
+                            {formatPrice(program.price)}
+                          </CardDescription>
                         </CardHeader>
-                        <CardContent>
-                          <p className="text-sm text-gray-400">
-                            قیمت: {formatPrice(program.price)}
-                          </p>
-                        </CardContent>
                         <CardFooter>
                           <Button
                             variant="outline"
-                            className="w-full border-gray-700 hover:border-green-500 hover:bg-green-500/10"
+                            className="w-full"
                             onClick={() => {
                               if (
                                 hasPurchasedProgram(program.id) ||
                                 user?.profile?.is_admin
                               ) {
-                                // Navigate to program details page
                                 navigate(`/programs/${program.id}/details`);
                               } else {
-                                // Navigate to purchase page
                                 navigate(`/product/${program.id}`);
                               }
                             }}
@@ -3131,8 +2857,18 @@ const Dashboard = () => {
                       </Card>
                     ))
                 ) : (
-                  <div className="col-span-3 text-center py-12">
-                    <p className="text-gray-400">
+                  <div className="col-span-full text-center py-12 bg-card rounded-lg border border-dashed border-border">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mx-auto h-12 w-12 text-muted-foreground">
+                      <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2" />
+                      <path d="M7 2v20" />
+                      <path d="M21 15V2" />
+                      <path d="M18 15V2" />
+                      <path d="M21 15a3 3 0 1 1-6 0" />
+                    </svg>
+                    <h3 className="mt-4 text-sm font-semibold text-foreground">
+                      برنامه غذایی یافت نشد
+                    </h3>
+                    <p className="mt-1 text-sm text-muted-foreground">
                       شما هنوز هیچ برنامه غذایی خریداری نکرده‌اید.
                     </p>
                   </div>
@@ -3146,24 +2882,21 @@ const Dashboard = () => {
               className="space-y-6 animate-in fade-in-50 duration-300"
             >
               <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-white">
+                <h2 className="text-2xl font-bold text-foreground">
                   برنامه‌های مکمل خریداری شده
                 </h2>
-                <Button
-                  className="bg-purple-500 hover:bg-purple-600 text-white"
-                  onClick={() => navigate("/programs")}
-                >
+                <Button onClick={() => navigate("/programs")}>
                   <Plus size={16} className="ml-2" />
                   برنامه جدید
                 </Button>
               </div>
 
               {/* Supplement Plans Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {productLoading ? (
-                  <div className="col-span-3 flex justify-center items-center py-12">
-                    <Loader2 className="h-8 w-8 animate-spin text-purple-500" />
-                    <span className="mr-2 text-gray-400">
+                  <div className="col-span-full flex justify-center items-center py-12">
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                    <span className="mr-2 text-muted-foreground">
                       در حال بارگذاری برنامه‌ها...
                     </span>
                   </div>
@@ -3180,83 +2913,62 @@ const Dashboard = () => {
                     .map((program) => (
                       <Card
                         key={program.id}
-                        className="bg-gray-800/50 border-gray-700 hover:border-purple-500/50 transition-all duration-300 overflow-hidden"
+                        className="bg-card border-border hover:border-primary/20 transition-all duration-300 overflow-hidden flex flex-col"
                       >
-                        <div className="h-40 bg-gradient-to-br from-purple-500/20 to-blue-500/20 relative">
-                          <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="relative">
+                          <div className="aspect-video bg-muted flex items-center justify-center">
                             {program.image_url ? (
                               <img
                                 src={program.image_url}
                                 alt={program.title}
-                                className="object-cover w-full h-full opacity-60"
+                                className="object-cover w-full h-full"
                               />
                             ) : (
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="48"
-                                height="48"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                className="text-purple-400 opacity-50"
-                              >
-                                <path d="M8.3 10a.7.7 0 0 1-.626-1.079L11.4 3a.7.7 0 0 1 1.198-.043L16.3 8.9a.7.7 0 0 1-.572 1.1Z"></path>
-                                <rect
-                                  x="3"
-                                  y="14"
-                                  width="7"
-                                  height="7"
-                                  rx="1"
-                                ></rect>
-                                <circle cx="17.5" cy="17.5" r="3.5"></circle>
+                              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-12 h-12 text-muted-foreground/50">
+                                <path d="M8.3 10a.7.7 0 0 1-.626-1.079L11.4 3a.7.7 0 0 1 1.198-.043L16.3 8.9a.7.7 0 0 1-.572 1.1Z" />
+                                <rect x="3" y="14" width="7" height="7" rx="1" />
+                                <circle cx="17.5" cy="17.5" r="3.5" />
                               </svg>
                             )}
                           </div>
                           <div className="absolute top-2 right-2 flex gap-1">
-                            <span className="bg-purple-500/20 text-purple-300 text-xs font-medium px-2.5 py-1 rounded-full">
+                            <span className="bg-purple-500/10 text-purple-400 text-xs font-medium px-2.5 py-1 rounded-full">
                               مکمل
                             </span>
                             {hasPurchasedProgram(program.id) && (
-                              <span className="bg-gold-500/20 text-gold-300 text-xs font-medium px-2.5 py-1 rounded-full flex items-center">
+                              <span className="bg-green-500/10 text-green-400 text-xs font-medium px-2.5 py-1 rounded-full flex items-center">
                                 <Check size={12} className="ml-1" />
                                 خریداری شده
                               </span>
                             )}
                             {user?.profile?.is_admin &&
                               !hasPurchasedProgram(program.id) && (
-                                <span className="bg-blue-500/20 text-blue-300 text-xs font-medium px-2.5 py-1 rounded-full flex items-center">
+                                <span className="bg-blue-500/10 text-blue-400 text-xs font-medium px-2.5 py-1 rounded-full flex items-center">
                                   <Shield size={12} className="ml-1" />
                                   دسترسی ادمین
                                 </span>
                               )}
                           </div>
                         </div>
-                        <CardHeader>
-                          <CardTitle className="text-lg">
+                        <CardHeader className="flex-grow">
+                          <CardTitle className="text-lg text-foreground">
                             {program.title}
                           </CardTitle>
+                          <CardDescription className="text-sm">
+                            {formatPrice(program.price)}
+                          </CardDescription>
                         </CardHeader>
-                        <CardContent>
-                          <p className="text-sm text-gray-400">
-                            قیمت: {formatPrice(program.price)}
-                          </p>
-                        </CardContent>
                         <CardFooter>
                           <Button
                             variant="outline"
-                            className="w-full border-gray-700 hover:border-purple-500 hover:bg-purple-500/10"
+                            className="w-full"
                             onClick={() => {
                               if (
                                 hasPurchasedProgram(program.id) ||
                                 user?.profile?.is_admin
                               ) {
-                                // Navigate to program details page
                                 navigate(`/programs/${program.id}/details`);
                               } else {
-                                // Navigate to purchase page
                                 navigate(`/product/${program.id}`);
                               }
                             }}
@@ -3270,8 +2982,16 @@ const Dashboard = () => {
                       </Card>
                     ))
                 ) : (
-                  <div className="col-span-3 text-center py-12">
-                    <p className="text-gray-400">
+                  <div className="col-span-full text-center py-12 bg-card rounded-lg border border-dashed border-border">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mx-auto h-12 w-12 text-muted-foreground">
+                      <path d="M8.3 10a.7.7 0 0 1-.626-1.079L11.4 3a.7.7 0 0 1 1.198-.043L16.3 8.9a.7.7 0 0 1-.572 1.1Z" />
+                      <rect x="3" y="14" width="7" height="7" rx="1" />
+                      <circle cx="17.5" cy="17.5" r="3.5" />
+                    </svg>
+                    <h3 className="mt-4 text-sm font-semibold text-foreground">
+                      برنامه مکملی یافت نشد
+                    </h3>
+                    <p className="mt-1 text-sm text-muted-foreground">
                       شما هنوز هیچ برنامه مکملی خریداری نکرده‌اید.
                     </p>
                   </div>
@@ -3285,17 +3005,23 @@ const Dashboard = () => {
               className="space-y-6 animate-in fade-in-50 duration-300"
             >
               <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-white">سفارش‌ها</h2>
+                <h2 className="text-2xl font-bold text-foreground">سفارش‌ها</h2>
               </div>
 
               {/* Empty Orders Tab */}
-              <Card className="bg-gray-800/50 border-gray-700">
-                <CardContent className="p-6 text-center">
-                  <p className="text-gray-400 py-8">
-                    این بخش در حال حاضر خالی است.
-                  </p>
-                </CardContent>
-              </Card>
+              <div className="text-center py-12 bg-card rounded-lg border border-dashed border-border">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mx-auto h-12 w-12 text-muted-foreground">
+                  <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
+                  <path d="M3 6h18" />
+                  <path d="M16 10a4 4 0 0 1-8 0" />
+                </svg>
+                <h3 className="mt-4 text-sm font-semibold text-foreground">
+                  سفارشی یافت نشد
+                </h3>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  این بخش در حال حاضر خالی است.
+                </p>
+              </div>
             </TabsContent>
 
             {/* Payments Tab */}
@@ -3304,39 +3030,27 @@ const Dashboard = () => {
               className="space-y-6 animate-in fade-in-50 duration-300"
             >
               <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-white">پرداخت‌ها</h2>
+                <h2 className="text-2xl font-bold text-foreground">پرداخت‌ها</h2>
                 <Button
                   variant="outline"
-                  className="border-gray-700 hover:border-blue-500 hover:bg-blue-500/10"
                   onClick={fetchUserPurchases}
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="ml-2"
-                  >
-                    <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
-                    <circle cx="12" cy="12" r="3"></circle>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-2">
+                    <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+                    <circle cx="12" cy="12" r="3" />
                   </svg>
                   بروزرسانی
                 </Button>
               </div>
 
               {/* Payment Summary Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Card className="bg-gray-800/50 border-gray-700">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <Card className="bg-card border-border">
                   <CardHeader className="pb-2">
-                    <CardDescription className="text-gray-400">
+                    <CardDescription>
                       مجموع پرداخت‌ها
                     </CardDescription>
-                    <CardTitle className="text-2xl text-white">
+                    <CardTitle className="text-2xl text-foreground">
                       {userPurchases
                         .reduce(
                           (total, purchase) => total + (purchase.amount || 0),
@@ -3347,55 +3061,33 @@ const Dashboard = () => {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-sm text-gray-400 flex items-center">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="ml-1"
-                      >
-                        <path d="M12 20v-6"></path>
-                        <path d="M18 20V10"></path>
-                        <path d="M6 20v-3"></path>
+                    <div className="text-sm text-muted-foreground flex items-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-1">
+                        <path d="M12 20v-6" />
+                        <path d="M18 20V10" />
+                        <path d="M6 20v-3" />
                       </svg>
                       تعداد کل پرداخت‌ها: {userPurchases.length}
                     </div>
                   </CardContent>
                 </Card>
 
-                <Card className="bg-gray-800/50 border-gray-700">
+                <Card className="bg-card border-border">
                   <CardHeader className="pb-2">
-                    <CardDescription className="text-gray-400">
+                    <CardDescription>
                       آخرین پرداخت
                     </CardDescription>
-                    <CardTitle className="text-2xl text-white">
+                    <CardTitle className="text-2xl text-foreground">
                       {userPurchases.length > 0
                         ? formatPrice(userPurchases[0]?.amount || 0)
                         : "بدون پرداخت"}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-sm text-gray-400 flex items-center">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="ml-1"
-                      >
-                        <path d="M12 2v20"></path>
-                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                    <div className="text-sm text-muted-foreground flex items-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-1">
+                        <path d="M12 2v20" />
+                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
                       </svg>
                       {userPurchases.length > 0 &&
                       userPurchases[0]?.purchase_date
@@ -3405,12 +3097,12 @@ const Dashboard = () => {
                   </CardContent>
                 </Card>
 
-                <Card className="bg-gray-800/50 border-gray-700">
+                <Card className="bg-card border-border">
                   <CardHeader className="pb-2">
-                    <CardDescription className="text-gray-400">
+                    <CardDescription>
                       وضعیت اشتراک
                     </CardDescription>
-                    <CardTitle className="text-2xl text-white">
+                    <CardTitle className="text-2xl text-foreground">
                       {user?.profile?.subscription_plan === "basic"
                         ? "پایه"
                         : user?.profile?.subscription_plan === "pro"
@@ -3421,21 +3113,10 @@ const Dashboard = () => {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-sm text-amber-400 flex items-center">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="ml-1"
-                      >
-                        <path d="M12 2v20"></path>
-                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                    <div className="text-sm text-primary flex items-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-1">
+                        <path d="M12 2v20" />
+                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
                       </svg>
                       {user?.profile?.subscription_end_date
                         ? `تا تاریخ ${formatDate(
@@ -3449,7 +3130,7 @@ const Dashboard = () => {
 
               {/* Purchased Programs */}
               {userPurchases.some((purchase) => purchase.program_id) && (
-                <Card className="bg-gray-800/50 border-gray-700 mb-6">
+                <Card className="bg-card border-border mb-6">
                   <CardHeader>
                     <CardTitle className="text-xl">
                       برنامه‌های خریداری شده
@@ -3466,7 +3147,7 @@ const Dashboard = () => {
                       .map((purchase) => (
                         <Card
                           key={purchase.id}
-                          className="bg-gray-900 border-gray-700 overflow-hidden"
+                          className="bg-muted border-border overflow-hidden"
                         >
                           <CardHeader className="pb-2">
                             <CardTitle className="text-lg">
@@ -3477,7 +3158,7 @@ const Dashboard = () => {
                             </CardDescription>
                           </CardHeader>
                           <CardContent className="pt-0">
-                            <div className="text-xs text-gray-400 mb-3">
+                            <div className="text-xs text-muted-foreground mb-3">
                               تاریخ خرید:{" "}
                               {purchase.purchase_date
                                 ? formatDate(purchase.purchase_date)
@@ -3520,19 +3201,19 @@ const Dashboard = () => {
               )}
 
               {/* Payments Table */}
-              <Card className="bg-gray-800/50 border-gray-700">
+              <Card className="bg-card border-border">
                 <CardContent className="p-0">
                   <Table>
                     <TableHeader>
-                      <TableRow className="border-gray-700 hover:bg-gray-800/50">
-                        <TableHead className="text-gray-400">
+                      <TableRow className="border-border hover:bg-muted/50">
+                        <TableHead className="text-muted-foreground">
                           شناسه پرداخت
                         </TableHead>
-                        <TableHead className="text-gray-400">تاریخ</TableHead>
-                        <TableHead className="text-gray-400">برنامه</TableHead>
-                        <TableHead className="text-gray-400">مبلغ</TableHead>
-                        <TableHead className="text-gray-400">وضعیت</TableHead>
-                        <TableHead className="text-gray-400">
+                        <TableHead className="text-muted-foreground">تاریخ</TableHead>
+                        <TableHead className="text-muted-foreground">برنامه</TableHead>
+                        <TableHead className="text-muted-foreground">مبلغ</TableHead>
+                        <TableHead className="text-muted-foreground">وضعیت</TableHead>
+                        <TableHead className="text-muted-foreground">
                           تاریخ انقضا
                         </TableHead>
                       </TableRow>
@@ -3542,7 +3223,7 @@ const Dashboard = () => {
                         userPurchases.map((purchase) => (
                           <TableRow
                             key={purchase.id}
-                            className="border-gray-700 hover:bg-gray-800/50"
+                            className="border-border hover:bg-muted/50"
                           >
                             <TableCell className="font-medium">
                               {purchase.payment_id
@@ -3558,7 +3239,7 @@ const Dashboard = () => {
                               {purchase.program_id ? (
                                 <a
                                   href={`/product/${purchase.program_id}`}
-                                  className="text-gold-400 hover:text-gold-300 hover:underline"
+                                  className="text-primary hover:underline"
                                 >
                                   {purchase.plan?.name || "برنامه نامشخص"}
                                 </a>
@@ -3571,13 +3252,13 @@ const Dashboard = () => {
                             </TableCell>
                             <TableCell>
                               <span
-                                className={`${
+                                className={`text-xs font-medium px-2.5 py-1 rounded-full ${
                                   purchase.payment_status === "completed"
-                                    ? "bg-green-500/20 text-green-400"
+                                    ? "bg-green-500/10 text-green-400"
                                     : purchase.payment_status === "pending"
-                                    ? "bg-yellow-500/20 text-yellow-400"
-                                    : "bg-red-500/20 text-red-400"
-                                } text-xs font-medium px-2.5 py-1 rounded-full`}
+                                    ? "bg-yellow-500/10 text-yellow-400"
+                                    : "bg-red-500/10 text-red-400"
+                                }`}
                               >
                                 {purchase.payment_status === "completed"
                                   ? "موفق"
@@ -3597,7 +3278,7 @@ const Dashboard = () => {
                         <TableRow>
                           <TableCell
                             colSpan={6}
-                            className="text-center py-6 text-gray-400"
+                            className="text-center py-12 text-muted-foreground"
                           >
                             هیچ پرداختی یافت نشد
                           </TableCell>
@@ -3618,10 +3299,10 @@ const Dashboard = () => {
                 {/* Header Section */}
                 <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
                   <div>
-                    <h2 className="text-3xl font-bold text-white mb-2">
+                    <h2 className="text-3xl font-bold text-foreground mb-2">
                       مدیریت محصولات
                     </h2>
-                    <p className="text-gray-400">
+                    <p className="text-muted-foreground">
                       مدیریت کامل محصولات، دسته‌بندی و قیمت‌گذاری
                     </p>
                   </div>
@@ -3630,7 +3311,6 @@ const Dashboard = () => {
                       variant="outline"
                       size="sm"
                       onClick={() => setShowProductForm(!showProductForm)}
-                      className="border-gray-600 hover:border-gold-500"
                     >
                       {showProductForm ? (
                         <EyeOff size={16} className="ml-2" />
@@ -3652,7 +3332,6 @@ const Dashboard = () => {
                           program_url: "",
                         });
                       }}
-                      className="bg-gradient-to-r from-gold-500 to-amber-600 hover:from-gold-600 hover:to-amber-700 text-black font-medium"
                     >
                       <Plus size={16} className="ml-2" />
                       محصول جدید
@@ -3662,11 +3341,11 @@ const Dashboard = () => {
 
                 {/* Product Form */}
                 {showProductForm && (
-                  <Card className="bg-gradient-to-br from-gray-800/80 to-gray-900/80 border-gray-700/50 backdrop-blur-sm">
+                  <Card className="bg-card border-border">
                     <CardHeader className="pb-4">
                       <div className="flex items-center justify-between">
                         <div>
-                          <CardTitle className="text-xl text-gold-500 flex items-center">
+                          <CardTitle className="text-xl text-primary flex items-center">
                             {isEditingProduct ? (
                               <Edit size={20} className="ml-2" />
                             ) : (
@@ -3686,7 +3365,7 @@ const Dashboard = () => {
                           variant="ghost"
                           size="sm"
                           onClick={() => setShowProductForm(false)}
-                          className="text-gray-400 hover:text-white"
+                          className="text-muted-foreground hover:text-foreground"
                         >
                           <X size={16} />
                         </Button>
@@ -3697,10 +3376,7 @@ const Dashboard = () => {
                         {/* Left Column */}
                         <div className="space-y-4">
                           <div className="space-y-2">
-                            <Label
-                              htmlFor="product-title"
-                              className="text-sm font-medium text-gray-300"
-                            >
+                            <Label htmlFor="product-title">
                               عنوان محصول
                             </Label>
                             <Input
@@ -3713,16 +3389,12 @@ const Dashboard = () => {
                                 })
                               }
                               placeholder="عنوان محصول را وارد کنید"
-                              className="bg-gray-900/50 border-gray-600 focus:border-gold-500 text-white"
                             />
                           </div>
 
                           <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
-                              <Label
-                                htmlFor="product-price"
-                                className="text-sm font-medium text-gray-300"
-                              >
+                              <Label htmlFor="product-price">
                                 قیمت (تومان)
                               </Label>
                               <Input
@@ -3736,14 +3408,10 @@ const Dashboard = () => {
                                   })
                                 }
                                 placeholder="0"
-                                className="bg-gray-900/50 border-gray-600 focus:border-gold-500 text-white"
                               />
                             </div>
                             <div className="space-y-2">
-                              <Label
-                                htmlFor="product-category"
-                                className="text-sm font-medium text-gray-300"
-                              >
+                              <Label htmlFor="product-category">
                                 دسته‌بندی
                               </Label>
                               <Select
@@ -3758,13 +3426,10 @@ const Dashboard = () => {
                                   })
                                 }
                               >
-                                <SelectTrigger
-                                  id="product-category"
-                                  className="bg-gray-900/50 border-gray-600 focus:border-gold-500 text-white"
-                                >
+                                <SelectTrigger id="product-category">
                                   <SelectValue placeholder="انتخاب کنید" />
                                 </SelectTrigger>
-                                <SelectContent className="bg-gray-800 border-gray-600">
+                                <SelectContent>
                                   <SelectItem value="training">
                                     🏋️ برنامه تمرینی
                                   </SelectItem>
@@ -3780,10 +3445,7 @@ const Dashboard = () => {
                           </div>
 
                           <div className="space-y-2">
-                            <Label
-                              htmlFor="product-image"
-                              className="text-sm font-medium text-gray-300"
-                            >
+                            <Label htmlFor="product-image">
                               آدرس تصویر
                             </Label>
                             <Input
@@ -3796,15 +3458,11 @@ const Dashboard = () => {
                                 })
                               }
                               placeholder="https://example.com/image.jpg"
-                              className="bg-gray-900/50 border-gray-600 focus:border-gold-500 text-white"
                             />
                           </div>
 
                           <div className="space-y-2">
-                            <Label
-                              htmlFor="product-url"
-                              className="text-sm font-medium text-gray-300"
-                            >
+                            <Label htmlFor="product-url">
                               آدرس برنامه
                             </Label>
                             <Input
@@ -3817,7 +3475,6 @@ const Dashboard = () => {
                                 })
                               }
                               placeholder="https://example.com/program"
-                              className="bg-gray-900/50 border-gray-600 focus:border-gold-500 text-white"
                             />
                           </div>
                         </div>
@@ -3825,10 +3482,7 @@ const Dashboard = () => {
                         {/* Right Column */}
                         <div className="space-y-4">
                           <div className="space-y-2">
-                            <Label
-                              htmlFor="product-description"
-                              className="text-sm font-medium text-gray-300"
-                            >
+                            <Label htmlFor="product-description">
                               توضیحات محصول
                             </Label>
                             <Textarea
@@ -3842,17 +3496,17 @@ const Dashboard = () => {
                               }
                               placeholder="توضیحات کامل محصول را وارد کنید..."
                               rows={8}
-                              className="bg-gray-900/50 border-gray-600 focus:border-gold-500 text-white resize-none"
+                              className="resize-none"
                             />
                           </div>
 
                           {/* Preview */}
                           {productFormData.image_url && (
                             <div className="space-y-2">
-                              <Label className="text-sm font-medium text-gray-300">
+                              <Label>
                                 پیش‌نمایش تصویر
                               </Label>
-                              <div className="w-full h-32 bg-gray-900/50 rounded-lg border border-gray-600 overflow-hidden">
+                              <div className="w-full h-32 bg-muted rounded-lg border border-border overflow-hidden">
                                 <img
                                   src={productFormData.image_url}
                                   alt="Preview"
@@ -3868,12 +3522,11 @@ const Dashboard = () => {
                       </div>
 
                       {/* Form Actions */}
-                      <div className="flex justify-end space-x-3 space-x-reverse mt-6 pt-4 border-t border-gray-700">
+                      <div className="flex justify-end space-x-3 space-x-reverse mt-6 pt-4 border-t border-border">
                         <Button
                           variant="outline"
                           onClick={cancelEditProduct}
                           disabled={productLoading}
-                          className="border-gray-600 hover:border-gray-500"
                         >
                           انصراف
                         </Button>
@@ -3881,7 +3534,6 @@ const Dashboard = () => {
                           <Button
                             onClick={updateProduct}
                             disabled={productLoading}
-                            className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700"
                           >
                             {productLoading ? (
                               <>
@@ -3899,7 +3551,6 @@ const Dashboard = () => {
                           <Button
                             onClick={createProduct}
                             disabled={productLoading}
-                            className="bg-gradient-to-r from-gold-500 to-amber-600 hover:from-gold-600 hover:to-amber-700 text-black"
                           >
                             {productLoading ? (
                               <>
@@ -3920,12 +3571,12 @@ const Dashboard = () => {
                 )}
 
                 {/* Products List */}
-                <Card className="bg-gradient-to-br from-gray-800/80 to-gray-900/80 border-gray-700/50 backdrop-blur-sm">
+                <Card className="bg-card border-border">
                   <CardHeader className="pb-4">
                     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                       <div>
-                        <CardTitle className="text-xl text-white flex items-center">
-                          <List size={20} className="ml-2 text-gold-500" />
+                        <CardTitle className="text-xl text-foreground flex items-center">
+                          <List size={20} className="ml-2 text-primary" />
                           لیست محصولات
                         </CardTitle>
                         <CardDescription className="mt-1">
@@ -3938,7 +3589,7 @@ const Dashboard = () => {
                         {/* Search */}
                         <div className="relative">
                           <Search
-                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground"
                             size={16}
                           />
                           <Input
@@ -3948,7 +3599,7 @@ const Dashboard = () => {
                               setProductSearchTerm(e.target.value);
                               resetPagination();
                             }}
-                            className="pr-10 bg-gray-900/50 border-gray-600 focus:border-gold-500 text-white w-full sm:w-64"
+                            className="pr-10 w-full sm:w-64"
                           />
                         </div>
 
@@ -3960,11 +3611,11 @@ const Dashboard = () => {
                             resetPagination();
                           }}
                         >
-                          <SelectTrigger className="bg-gray-900/50 border-gray-600 focus:border-gold-500 text-white w-full sm:w-40">
+                          <SelectTrigger className="w-full sm:w-40">
                             <Filter size={16} className="ml-2" />
                             <SelectValue />
                           </SelectTrigger>
-                          <SelectContent className="bg-gray-800 border-gray-600">
+                          <SelectContent>
                             <SelectItem value="all">همه دسته‌ها</SelectItem>
                             <SelectItem value="training">🏋️ تمرینی</SelectItem>
                             <SelectItem value="diet">🥗 غذایی</SelectItem>
@@ -3981,7 +3632,7 @@ const Dashboard = () => {
                             setProductSortOrder(sortOrder as "asc" | "desc");
                           }}
                         >
-                          <SelectTrigger className="bg-gray-900/50 border-gray-600 focus:border-gold-500 text-white w-full sm:w-44">
+                          <SelectTrigger className="w-full sm:w-44">
                             {productSortOrder === "asc" ? (
                               <SortAsc size={16} className="ml-2" />
                             ) : (
@@ -3989,7 +3640,7 @@ const Dashboard = () => {
                             )}
                             <SelectValue />
                           </SelectTrigger>
-                          <SelectContent className="bg-gray-800 border-gray-600">
+                          <SelectContent>
                             <SelectItem value="created_at-desc">
                               جدیدترین
                             </SelectItem>
@@ -4017,31 +3668,31 @@ const Dashboard = () => {
                   <CardContent>
                     {productLoading && products.length === 0 ? (
                       <div className="flex justify-center items-center py-12">
-                        <Loader2 className="h-8 w-8 animate-spin text-gold-500" />
-                        <span className="mr-3 text-gray-400">
+                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                        <span className="mr-3 text-muted-foreground">
                           در حال بارگذاری محصولات...
                         </span>
                       </div>
                     ) : (
                       <>
                         {/* Products Table */}
-                        <div className="overflow-x-auto rounded-lg border border-gray-700">
+                        <div className="overflow-x-auto rounded-lg border border-border">
                           <Table>
                             <TableHeader>
-                              <TableRow className="bg-gray-900/50 border-gray-700 hover:bg-gray-900/70">
-                                <TableHead className="text-gray-300 font-medium">
+                              <TableRow className="bg-muted/50 border-border hover:bg-muted/70">
+                                <TableHead className="font-medium">
                                   محصول
                                 </TableHead>
-                                <TableHead className="text-gray-300 font-medium">
+                                <TableHead className="font-medium">
                                   دسته‌بندی
                                 </TableHead>
-                                <TableHead className="text-gray-300 font-medium">
+                                <TableHead className="font-medium">
                                   قیمت
                                 </TableHead>
-                                <TableHead className="text-gray-300 font-medium">
+                                <TableHead className="font-medium">
                                   تاریخ ایجاد
                                 </TableHead>
-                                <TableHead className="text-gray-300 font-medium text-center">
+                                <TableHead className="font-medium text-center">
                                   عملیات
                                 </TableHead>
                               </TableRow>
@@ -4060,12 +3711,12 @@ const Dashboard = () => {
                                         colSpan={5}
                                         className="text-center py-12"
                                       >
-                                        <div className="flex flex-col items-center justify-center text-gray-400">
+                                        <div className="flex flex-col items-center justify-center text-muted-foreground">
                                           <Search
                                             size={48}
                                             className="mb-4 opacity-50"
                                           />
-                                          <p className="text-lg font-medium mb-2">
+                                          <p className="text-lg font-medium mb-2 text-foreground">
                                             محصولی یافت نشد
                                           </p>
                                           <p className="text-sm">
@@ -4081,11 +3732,11 @@ const Dashboard = () => {
                                 return paginatedProducts.map((product) => (
                                   <TableRow
                                     key={product.id}
-                                    className="border-gray-700 hover:bg-gray-800/30 transition-colors"
+                                    className="border-border hover:bg-muted/50 transition-colors"
                                   >
                                     <TableCell>
                                       <div className="flex items-center space-x-3 space-x-reverse">
-                                        <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center overflow-hidden">
+                                        <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center overflow-hidden">
                                           {product.image_url ? (
                                             <img
                                               src={product.image_url}
@@ -4093,7 +3744,7 @@ const Dashboard = () => {
                                               className="w-full h-full object-cover"
                                             />
                                           ) : (
-                                            <div className="text-gray-400">
+                                            <div className="text-muted-foreground">
                                               {product.category ===
                                                 "training" && "🏋️"}
                                               {product.category === "diet" &&
@@ -4104,10 +3755,10 @@ const Dashboard = () => {
                                           )}
                                         </div>
                                         <div>
-                                          <p className="font-medium text-white">
+                                          <p className="font-medium text-foreground">
                                             {product.title}
                                           </p>
-                                          <p className="text-sm text-gray-400 truncate max-w-xs">
+                                          <p className="text-sm text-muted-foreground truncate max-w-xs">
                                             {product.description.length > 50
                                               ? product.description.substring(
                                                   0,
@@ -4122,10 +3773,10 @@ const Dashboard = () => {
                                       <span
                                         className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
                                           product.category === "training"
-                                            ? "bg-gold-500/20 text-gold-300"
+                                            ? "bg-primary/10 text-primary"
                                             : product.category === "diet"
-                                            ? "bg-green-500/20 text-green-300"
-                                            : "bg-purple-500/20 text-purple-300"
+                                            ? "bg-green-500/10 text-green-400"
+                                            : "bg-purple-500/10 text-purple-400"
                                         }`}
                                       >
                                         {product.category === "training" &&
@@ -4137,11 +3788,11 @@ const Dashboard = () => {
                                       </span>
                                     </TableCell>
                                     <TableCell>
-                                      <span className="font-medium text-white">
+                                      <span className="font-medium text-foreground">
                                         {formatPrice(product.price)}
                                       </span>
                                     </TableCell>
-                                    <TableCell className="text-gray-400">
+                                    <TableCell className="text-muted-foreground">
                                       {new Date(
                                         product.created_at
                                       ).toLocaleDateString("fa-IR")}
@@ -4155,43 +3806,38 @@ const Dashboard = () => {
                                             editProduct(product);
                                             setShowProductForm(true);
                                           }}
-                                          className="border-gray-600 hover:border-blue-500 hover:bg-blue-500/10"
                                         >
                                           <Edit className="h-4 w-4" />
                                         </Button>
                                         <Dialog>
                                           <DialogTrigger asChild>
                                             <Button
-                                              variant="outline"
+                                              variant="destructive"
                                               size="sm"
-                                              className="border-gray-600 hover:border-red-500 hover:bg-red-500/10 text-red-400"
                                             >
                                               <Trash2 className="h-4 w-4" />
                                             </Button>
                                           </DialogTrigger>
-                                          <DialogContent className="bg-gray-800 border-gray-700 text-white">
+                                          <DialogContent className="bg-card border-border">
                                             <DialogHeader>
-                                              <DialogTitle className="text-red-400">
+                                              <DialogTitle className="text-destructive">
                                                 حذف محصول
                                               </DialogTitle>
-                                              <DialogDescription className="text-gray-300">
+                                              <DialogDescription>
                                                 آیا از حذف محصول "
-                                                <span className="font-medium text-white">
+                                                <span className="font-medium text-foreground">
                                                   {product.title}
                                                 </span>
                                                 " اطمینان دارید؟
                                                 <br />
-                                                <span className="text-red-400 text-sm">
+                                                <span className="text-destructive text-sm">
                                                   این عمل غیرقابل بازگشت است.
                                                 </span>
                                               </DialogDescription>
                                             </DialogHeader>
                                             <DialogFooter>
                                               <DialogClose asChild>
-                                                <Button
-                                                  variant="outline"
-                                                  className="border-gray-600"
-                                                >
+                                                <Button variant="outline">
                                                   انصراف
                                                 </Button>
                                               </DialogClose>
@@ -4200,7 +3846,6 @@ const Dashboard = () => {
                                                 onClick={() =>
                                                   deleteProduct(product.id)
                                                 }
-                                                className="bg-red-600 hover:bg-red-700"
                                               >
                                                 <Trash2 className="h-4 w-4 ml-2" />
                                                 حذف محصول
@@ -4224,8 +3869,8 @@ const Dashboard = () => {
 
                           if (totalPages > 1) {
                             return (
-                              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6 pt-4 border-t border-gray-700">
-                                <div className="flex items-center gap-2 text-sm text-gray-400">
+                              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6 pt-4 border-t border-border">
+                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                   <span>نمایش</span>
                                   <Select
                                     value={productsPerPage.toString()}
@@ -4234,10 +3879,10 @@ const Dashboard = () => {
                                       resetPagination();
                                     }}
                                   >
-                                    <SelectTrigger className="w-20 h-8 bg-gray-900/50 border-gray-600 text-white">
+                                    <SelectTrigger className="w-20 h-8">
                                       <SelectValue />
                                     </SelectTrigger>
-                                    <SelectContent className="bg-gray-800 border-gray-600">
+                                    <SelectContent>
                                       <SelectItem value="5">5</SelectItem>
                                       <SelectItem value="10">10</SelectItem>
                                       <SelectItem value="20">20</SelectItem>
@@ -4257,7 +3902,6 @@ const Dashboard = () => {
                                       )
                                     }
                                     disabled={currentPage === 1}
-                                    className="border-gray-600 hover:border-gold-500"
                                   >
                                     <ChevronRight size={16} />
                                   </Button>
@@ -4292,11 +3936,6 @@ const Dashboard = () => {
                                             onClick={() =>
                                               setCurrentPage(pageNum)
                                             }
-                                            className={
-                                              currentPage === pageNum
-                                                ? "bg-gold-500 text-black hover:bg-gold-600"
-                                                : "border-gray-600 hover:border-gold-500"
-                                            }
                                           >
                                             {pageNum}
                                           </Button>
@@ -4314,7 +3953,6 @@ const Dashboard = () => {
                                       )
                                     }
                                     disabled={currentPage === totalPages}
-                                    className="border-gray-600 hover:border-gold-500"
                                   >
                                     <ChevronLeft size={16} />
                                   </Button>
@@ -4340,10 +3978,10 @@ const Dashboard = () => {
                 {/* Header Section */}
                 <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
                   <div>
-                    <h2 className="text-3xl font-bold text-white mb-2">
+                    <h2 className="text-3xl font-bold text-foreground mb-2">
                       مدیریت جزئیات برنامه‌ها
                     </h2>
-                    <p className="text-gray-400">
+                    <p className="text-muted-foreground">
                       مدیریت محتوا و جزئیات برنامه‌های آموزشی
                     </p>
                   </div>
@@ -4354,7 +3992,6 @@ const Dashboard = () => {
                       onClick={() =>
                         setShowProgramDetailForm(!showProgramDetailForm)
                       }
-                      className="border-gray-600 hover:border-gold-500"
                     >
                       {showProgramDetailForm ? (
                         <EyeOff size={16} className="ml-2" />
@@ -4368,11 +4005,11 @@ const Dashboard = () => {
 
                 {/* Program Detail Form */}
                 {(showProgramDetailForm || isEditingProgramDetail) && (
-                  <Card className="bg-gradient-to-br from-gray-800/80 to-gray-900/80 border-gray-700/50 backdrop-blur-sm">
+                  <Card className="bg-card border-border">
                     <CardHeader className="pb-4">
                       <div className="flex items-center justify-between">
                         <div>
-                          <CardTitle className="text-xl text-gold-500 flex items-center">
+                          <CardTitle className="text-xl text-primary flex items-center">
                             <Edit size={20} className="ml-2" />
                             {isEditingProgramDetail
                               ? "ویرایش جزئیات برنامه"
@@ -4393,7 +4030,7 @@ const Dashboard = () => {
                               cancelEditProgramDetail();
                             }
                           }}
-                          className="text-gray-400 hover:text-white"
+                          className="text-muted-foreground hover:text-foreground"
                         >
                           <X size={16} />
                         </Button>
@@ -4406,10 +4043,7 @@ const Dashboard = () => {
                           {/* Left Column */}
                           <div className="space-y-4">
                             <div className="space-y-2">
-                              <Label
-                                htmlFor="program-detail-title"
-                                className="text-sm font-medium text-gray-300"
-                              >
+                              <Label htmlFor="program-detail-title">
                                 عنوان برنامه
                               </Label>
                               <Input
@@ -4422,15 +4056,11 @@ const Dashboard = () => {
                                   })
                                 }
                                 placeholder="عنوان برنامه را وارد کنید"
-                                className="bg-gray-900/50 border-gray-600 focus:border-gold-500 text-white"
                               />
                             </div>
 
                             <div className="space-y-2">
-                              <Label
-                                htmlFor="program-detail-description"
-                                className="text-sm font-medium text-gray-300"
-                              >
+                              <Label htmlFor="program-detail-description">
                                 توضیحات برنامه
                               </Label>
                               <Textarea
@@ -4444,7 +4074,7 @@ const Dashboard = () => {
                                 }
                                 placeholder="توضیحات کامل برنامه را وارد کنید..."
                                 rows={6}
-                                className="bg-gray-900/50 border-gray-600 focus:border-gold-500 text-white resize-none"
+                                className="resize-none"
                               />
                             </div>
                           </div>
@@ -4452,10 +4082,7 @@ const Dashboard = () => {
                           {/* Right Column */}
                           <div className="space-y-4">
                             <div className="space-y-2">
-                              <Label
-                                htmlFor="program-detail-details"
-                                className="text-sm font-medium text-gray-300"
-                              >
+                              <Label htmlFor="program-detail-details">
                                 جزئیات برنامه (JSON)
                               </Label>
                               <Textarea
@@ -4479,7 +4106,6 @@ const Dashboard = () => {
                                       details: parsed,
                                     });
                                   } catch (error) {
-                                    // Invalid JSON, keep the string value for editing
                                     setProgramDetailFormData({
                                       ...programDetailFormData,
                                       details: e.target.value,
@@ -4488,15 +4114,12 @@ const Dashboard = () => {
                                 }}
                                 placeholder='{"exercises": [], "instructions": "", "duration": "8 weeks"}'
                                 rows={6}
-                                className="bg-gray-900/50 border-gray-600 focus:border-gold-500 text-white resize-none font-mono text-sm"
+                                className="resize-none font-mono text-sm"
                               />
                             </div>
 
                             <div className="space-y-2">
-                              <Label
-                                htmlFor="program-detail-weeks"
-                                className="text-sm font-medium text-gray-300"
-                              >
+                              <Label htmlFor="program-detail-weeks">
                                 هفته‌های برنامه (JSON)
                               </Label>
                               <Textarea
@@ -4520,7 +4143,6 @@ const Dashboard = () => {
                                       weeks: parsed,
                                     });
                                   } catch (error) {
-                                    // Invalid JSON, keep the string value for editing
                                     setProgramDetailFormData({
                                       ...programDetailFormData,
                                       weeks: e.target.value,
@@ -4529,26 +4151,24 @@ const Dashboard = () => {
                                 }}
                                 placeholder='{"week1": {"day1": {}, "day2": {}}, "week2": {}}'
                                 rows={6}
-                                className="bg-gray-900/50 border-gray-600 focus:border-gold-500 text-white resize-none font-mono text-sm"
+                                className="resize-none font-mono text-sm"
                               />
                             </div>
                           </div>
                         </div>
 
                         {/* Form Actions */}
-                        <div className="flex justify-end space-x-3 space-x-reverse mt-6 pt-4 border-t border-gray-700">
+                        <div className="flex justify-end space-x-3 space-x-reverse mt-6 pt-4 border-t border-border">
                           <Button
                             variant="outline"
                             onClick={cancelEditProgramDetail}
                             disabled={programDetailsLoading}
-                            className="border-gray-600 hover:border-gray-500"
                           >
                             انصراف
                           </Button>
                           <Button
                             onClick={updateProgramDetail}
                             disabled={programDetailsLoading}
-                            className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700"
                           >
                             {programDetailsLoading ? (
                               <>
@@ -4569,12 +4189,12 @@ const Dashboard = () => {
                 )}
 
                 {/* Program Details List */}
-                <Card className="bg-gradient-to-br from-gray-800/80 to-gray-900/80 border-gray-700/50 backdrop-blur-sm">
+                <Card className="bg-card border-border">
                   <CardHeader className="pb-4">
                     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                       <div>
-                        <CardTitle className="text-xl text-white flex items-center">
-                          <List size={20} className="ml-2 text-gold-500" />
+                        <CardTitle className="text-xl text-foreground flex items-center">
+                          <List size={20} className="ml-2 text-primary" />
                           لیست جزئیات برنامه‌ها
                         </CardTitle>
                         <CardDescription className="mt-1">
@@ -4587,7 +4207,7 @@ const Dashboard = () => {
                         {/* Search */}
                         <div className="relative">
                           <Search
-                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground"
                             size={16}
                           />
                           <Input
@@ -4596,7 +4216,7 @@ const Dashboard = () => {
                             onChange={(e) =>
                               setProgramDetailSearchTerm(e.target.value)
                             }
-                            className="pr-10 bg-gray-900/50 border-gray-600 focus:border-gold-500 text-white w-full sm:w-64"
+                            className="pr-10 w-full sm:w-64"
                           />
                         </div>
 
@@ -4605,11 +4225,11 @@ const Dashboard = () => {
                           value={programDetailCategoryFilter}
                           onValueChange={setProgramDetailCategoryFilter}
                         >
-                          <SelectTrigger className="bg-gray-900/50 border-gray-600 focus:border-gold-500 text-white w-full sm:w-40">
+                          <SelectTrigger className="w-full sm:w-40">
                             <Filter size={16} className="ml-2" />
                             <SelectValue />
                           </SelectTrigger>
-                          <SelectContent className="bg-gray-800 border-gray-600">
+                          <SelectContent>
                             <SelectItem value="all">همه دسته‌ها</SelectItem>
                             <SelectItem value="training">🏋️ تمرینی</SelectItem>
                             <SelectItem value="diet">🥗 غذایی</SelectItem>
@@ -4623,31 +4243,31 @@ const Dashboard = () => {
                   <CardContent>
                     {programDetailsLoading && programDetails.length === 0 ? (
                       <div className="flex justify-center items-center py-12">
-                        <Loader2 className="h-8 w-8 animate-spin text-gold-500" />
-                        <span className="mr-3 text-gray-400">
+                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                        <span className="mr-3 text-muted-foreground">
                           در حال بارگذاری برنامه‌ها...
                         </span>
                       </div>
                     ) : (
                       <>
                         {/* Program Details Table */}
-                        <div className="overflow-x-auto rounded-lg border border-gray-700">
+                        <div className="overflow-x-auto rounded-lg border border-border">
                           <Table>
                             <TableHeader>
-                              <TableRow className="bg-gray-900/50 border-gray-700 hover:bg-gray-900/70">
-                                <TableHead className="text-gray-300 font-medium">
+                              <TableRow className="bg-muted/50 border-border hover:bg-muted/70">
+                                <TableHead className="font-medium">
                                   برنامه
                                 </TableHead>
-                                <TableHead className="text-gray-300 font-medium">
+                                <TableHead className="font-medium">
                                   محصول مرتبط
                                 </TableHead>
-                                <TableHead className="text-gray-300 font-medium">
+                                <TableHead className="font-medium">
                                   دسته‌بندی
                                 </TableHead>
-                                <TableHead className="text-gray-300 font-medium">
+                                <TableHead className="font-medium">
                                   تاریخ ایجاد
                                 </TableHead>
-                                <TableHead className="text-gray-300 font-medium text-center">
+                                <TableHead className="font-medium text-center">
                                   عملیات
                                 </TableHead>
                               </TableRow>
@@ -4664,12 +4284,12 @@ const Dashboard = () => {
                                         colSpan={5}
                                         className="text-center py-12"
                                       >
-                                        <div className="flex flex-col items-center justify-center text-gray-400">
+                                        <div className="flex flex-col items-center justify-center text-muted-foreground">
                                           <Search
                                             size={48}
                                             className="mb-4 opacity-50"
                                           />
-                                          <p className="text-lg font-medium mb-2">
+                                          <p className="text-lg font-medium mb-2 text-foreground">
                                             برنامه‌ای یافت نشد
                                           </p>
                                           <p className="text-sm">
@@ -4685,12 +4305,12 @@ const Dashboard = () => {
                                   (programDetail: ProgramDetail) => (
                                     <TableRow
                                       key={programDetail.id}
-                                      className="border-gray-700 hover:bg-gray-800/30 transition-colors"
+                                      className="border-border hover:bg-muted/50 transition-colors"
                                     >
                                       <TableCell>
                                         <div className="flex items-center space-x-3 space-x-reverse">
-                                          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center">
-                                            <div className="text-gray-400">
+                                          <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center">
+                                            <div className="text-muted-foreground">
                                               {programDetail.programs_sale
                                                 ?.category === "training" &&
                                                 "🏋️"}
@@ -4702,10 +4322,10 @@ const Dashboard = () => {
                                             </div>
                                           </div>
                                           <div>
-                                            <p className="font-medium text-white">
+                                            <p className="font-medium text-foreground">
                                               {programDetail.title}
                                             </p>
-                                            <p className="text-sm text-gray-400 truncate max-w-xs">
+                                            <p className="text-sm text-muted-foreground truncate max-w-xs">
                                               {programDetail.description
                                                 .length > 50
                                                 ? programDetail.description.substring(
@@ -4718,7 +4338,7 @@ const Dashboard = () => {
                                         </div>
                                       </TableCell>
                                       <TableCell>
-                                        <span className="text-white font-medium">
+                                        <span className="font-medium text-foreground">
                                           {programDetail.programs_sale?.title ||
                                             "نامشخص"}
                                         </span>
@@ -4728,11 +4348,11 @@ const Dashboard = () => {
                                           className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
                                             programDetail.programs_sale
                                               ?.category === "training"
-                                              ? "bg-gold-500/20 text-gold-300"
+                                              ? "bg-primary/10 text-primary"
                                               : programDetail.programs_sale
                                                   ?.category === "diet"
-                                              ? "bg-green-500/20 text-green-300"
-                                              : "bg-purple-500/20 text-purple-300"
+                                              ? "bg-green-500/10 text-green-400"
+                                              : "bg-purple-500/10 text-purple-400"
                                           }`}
                                         >
                                           {programDetail.programs_sale
@@ -4745,7 +4365,7 @@ const Dashboard = () => {
                                             "💊 مکمل"}
                                         </span>
                                       </TableCell>
-                                      <TableCell className="text-gray-400">
+                                      <TableCell className="text-muted-foreground">
                                         {new Date(
                                           programDetail.created_at
                                         ).toLocaleDateString("fa-IR")}
@@ -4759,7 +4379,6 @@ const Dashboard = () => {
                                               editProgramDetail(programDetail);
                                               setShowProgramDetailForm(true);
                                             }}
-                                            className="border-gray-600 hover:border-blue-500 hover:bg-blue-500/10"
                                           >
                                             <Edit className="h-4 w-4" />
                                           </Button>
@@ -4785,19 +4404,19 @@ const Dashboard = () => {
                 value="blog"
                 className="space-y-6 animate-in fade-in-50 duration-300"
               >
-                <Card className="bg-gray-800/50 border-gray-700">
+                <Card className="bg-card border-border">
                   <CardHeader>
-                    <CardTitle className="text-xl text-gold-500">
+                    <CardTitle className="text-xl text-primary">
                       مدیریت بلاگ
                     </CardTitle>
-                    <CardDescription className="text-gray-400">
+                    <CardDescription>
                       مقالات بلاگ را مدیریت کنید
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-6">
                     {/* Blog Post Form */}
-                    <div className="bg-gray-700/30 rounded-lg p-4 border border-gray-700">
-                      <h3 className="text-lg font-medium mb-4">
+                    <div className="bg-muted/50 rounded-lg p-4 border border-border">
+                      <h3 className="text-lg font-medium mb-4 text-foreground">
                         {isEditing ? "ویرایش مقاله" : "ایجاد مقاله جدید"}
                       </h3>
                       <div className="space-y-4">
@@ -4810,7 +4429,6 @@ const Dashboard = () => {
                               placeholder="عنوان مقاله را وارد کنید"
                               value={blogFormData.title}
                               onChange={handleTitleChange}
-                              className="bg-gray-800 border-gray-700 text-white"
                             />
                           </div>
 
@@ -4822,7 +4440,6 @@ const Dashboard = () => {
                               placeholder="نامک مقاله را وارد کنید"
                               value={blogFormData.slug}
                               onChange={handleBlogInputChange}
-                              className="bg-gray-800 border-gray-700 text-white"
                             />
                           </div>
                         </div>
@@ -4835,7 +4452,7 @@ const Dashboard = () => {
                             placeholder="خلاصه مقاله را وارد کنید"
                             value={blogFormData.excerpt || ""}
                             onChange={handleBlogInputChange}
-                            className="bg-gray-800 border-gray-700 text-white h-20"
+                            className="h-20"
                           />
                         </div>
 
@@ -4847,7 +4464,7 @@ const Dashboard = () => {
                             placeholder="محتوای مقاله را وارد کنید"
                             value={blogFormData.content}
                             onChange={handleBlogInputChange}
-                            className="bg-gray-800 border-gray-700 text-white h-40"
+                            className="h-40"
                           />
                         </div>
 
@@ -4860,7 +4477,6 @@ const Dashboard = () => {
                               placeholder="آدرس تصویر کاور را وارد کنید"
                               value={blogFormData.cover_image || ""}
                               onChange={handleBlogInputChange}
-                              className="bg-gray-800 border-gray-700 text-white"
                             />
                           </div>
 
@@ -4870,10 +4486,10 @@ const Dashboard = () => {
                               value={blogFormData.category || "none"}
                               onValueChange={handleCategoryChange}
                             >
-                              <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
+                              <SelectTrigger>
                                 <SelectValue placeholder="دسته‌بندی را انتخاب کنید" />
                               </SelectTrigger>
-                              <SelectContent className="bg-gray-800 border-gray-700 text-white">
+                              <SelectContent>
                                 <SelectItem value="none">
                                   بدون دسته‌بندی
                                 </SelectItem>
@@ -4916,7 +4532,6 @@ const Dashboard = () => {
                                   category: "none",
                                 });
                               }}
-                              className="border-gray-600"
                             >
                               انصراف
                             </Button>
@@ -4927,7 +4542,6 @@ const Dashboard = () => {
                               isEditing ? updateBlogPost : createBlogPost
                             }
                             disabled={pageLoading}
-                            className="bg-gold-500 hover:bg-gold-600 text-black"
                           >
                             {pageLoading ? (
                               <>
@@ -4951,8 +4565,8 @@ const Dashboard = () => {
                     </div>
 
                     {/* Blog Categories */}
-                    <div className="bg-gray-700/30 rounded-lg p-4 border border-gray-700">
-                      <h3 className="text-lg font-medium mb-4">
+                    <div className="bg-muted/50 rounded-lg p-4 border border-border">
+                      <h3 className="text-lg font-medium mb-4 text-foreground">
                         مدیریت دسته‌بندی‌ها
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -4964,7 +4578,6 @@ const Dashboard = () => {
                             placeholder="نام دسته‌بندی را وارد کنید"
                             value={categoryFormData.name}
                             onChange={handleCategoryNameChange}
-                            className="bg-gray-800 border-gray-700 text-white"
                           />
                         </div>
 
@@ -4976,7 +4589,6 @@ const Dashboard = () => {
                             placeholder="نامک دسته‌بندی را وارد کنید"
                             value={categoryFormData.slug}
                             onChange={handleCategoryInputChange}
-                            className="bg-gray-800 border-gray-700 text-white"
                           />
                         </div>
                       </div>
@@ -4984,7 +4596,6 @@ const Dashboard = () => {
                       <Button
                         onClick={createCategory}
                         disabled={!!loading}
-                        className="bg-gradient-to-r from-gold-500 to-amber-400 hover:from-gold-600 hover:to-amber-500 text-black"
                       >
                         {loading ? (
                           <>
@@ -4998,10 +4609,10 @@ const Dashboard = () => {
 
                       <div className="mt-6">
                         <div className="flex items-center justify-between mb-3">
-                          <h4 className="text-sm font-medium">
+                          <h4 className="text-sm font-medium text-foreground">
                             دسته‌بندی‌های موجود:
                           </h4>
-                          <span className="text-xs text-gray-400">
+                          <span className="text-xs text-muted-foreground">
                             {blogCategories.length} دسته‌بندی
                           </span>
                         </div>
@@ -5011,9 +4622,9 @@ const Dashboard = () => {
                             placeholder="جستجوی دسته‌بندی..."
                             value={categorySearch}
                             onChange={handleCategorySearch}
-                            className="bg-gray-800 border-gray-700 text-white pr-9"
+                            className="pr-9"
                           />
-                          <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                          <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
                               width="16"
@@ -5040,17 +4651,17 @@ const Dashboard = () => {
                           {filteredCategories.map((category) => (
                             <div
                               key={category.id}
-                              className="group relative flex items-center bg-gradient-to-r from-gray-800 to-gray-700 hover:from-gray-700 hover:to-gray-600 rounded-full px-3 py-1.5 text-sm transition-all duration-200 hover:shadow-md"
+                              className="group relative flex items-center bg-muted hover:bg-muted/80 rounded-full px-3 py-1.5 text-sm transition-all duration-200"
                             >
-                              <span className="font-medium text-white">
+                              <span className="font-medium text-foreground">
                                 {category.name}
                               </span>
-                              <span className="mr-2 text-xs text-gray-400 opacity-70">
+                              <span className="mr-2 text-xs text-muted-foreground">
                                 ({category.slug})
                               </span>
 
                               <button
-                                className="mr-2 ml-1 p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-500/20 text-red-400"
+                                className="mr-2 ml-1 p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-destructive/20 text-destructive"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   if (
@@ -5074,12 +4685,10 @@ const Dashboard = () => {
                                   <Trash2 className="h-3 w-3" />
                                 )}
                               </button>
-
-                              <div className="absolute inset-0 rounded-full ring-1 ring-white/10 transition-opacity group-hover:ring-white/20"></div>
                             </div>
                           ))}
                           {filteredCategories.length === 0 && (
-                            <div className="w-full text-center py-6 text-gray-500 text-sm bg-gray-800/30 rounded-lg border border-dashed border-gray-700">
+                            <div className="w-full text-center py-6 text-muted-foreground text-sm bg-muted/50 rounded-lg border border-dashed border-border">
                               {categorySearch.trim() !== ""
                                 ? "هیچ دسته‌بندی‌ای با این عبارت یافت نشد"
                                 : "هنوز دسته‌بندی‌ای ایجاد نشده است"}
@@ -5090,26 +4699,26 @@ const Dashboard = () => {
                     </div>
 
                     {/* Blog Posts List */}
-                    <div className="bg-gray-700/30 rounded-lg p-4 border border-gray-700">
-                      <h3 className="text-lg font-medium mb-4">لیست مقالات</h3>
+                    <div className="bg-muted/50 rounded-lg p-4 border border-border">
+                      <h3 className="text-lg font-medium mb-4 text-foreground">لیست مقالات</h3>
                       <div className="overflow-x-auto">
                         <Table>
                           <TableCaption>لیست مقالات بلاگ</TableCaption>
                           <TableHeader>
-                            <TableRow className="border-gray-700 hover:bg-gray-800/50">
-                              <TableHead className="text-gray-400">
+                            <TableRow className="border-border hover:bg-muted/80">
+                              <TableHead>
                                 عنوان
                               </TableHead>
-                              <TableHead className="text-gray-400">
+                              <TableHead>
                                 نامک
                               </TableHead>
-                              <TableHead className="text-gray-400">
+                              <TableHead>
                                 وضعیت
                               </TableHead>
-                              <TableHead className="text-gray-400">
+                              <TableHead>
                                 تاریخ ایجاد
                               </TableHead>
-                              <TableHead className="text-gray-400 text-left">
+                              <TableHead className="text-left">
                                 عملیات
                               </TableHead>
                             </TableRow>
@@ -5119,7 +4728,7 @@ const Dashboard = () => {
                               <TableRow>
                                 <TableCell
                                   colSpan={5}
-                                  className="text-center py-8 text-gray-500"
+                                  className="text-center py-8 text-muted-foreground"
                                 >
                                   هنوز مقاله‌ای ایجاد نشده است
                                 </TableCell>
@@ -5128,7 +4737,7 @@ const Dashboard = () => {
                               blogPosts.map((post) => (
                                 <TableRow
                                   key={post.id}
-                                  className="border-gray-700 hover:bg-gray-800/50"
+                                  className="border-border hover:bg-muted/80"
                                 >
                                   <TableCell className="font-medium">
                                     {post.title}
@@ -5136,11 +4745,11 @@ const Dashboard = () => {
                                   <TableCell>{post.slug}</TableCell>
                                   <TableCell>
                                     {post.published ? (
-                                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-900/30 text-green-400">
+                                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-500/10 text-green-400">
                                         منتشر شده
                                       </span>
                                     ) : (
-                                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-500/20 text-gray-400">
+                                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-muted text-muted-foreground">
                                         پیش‌نویس
                                       </span>
                                     )}
@@ -5168,7 +4777,7 @@ const Dashboard = () => {
                                             category: post.category || "none",
                                           });
                                         }}
-                                        className="h-8 px-2 text-blue-400 hover:text-blue-300 hover:bg-blue-900/20"
+                                        className="h-8 px-2 text-primary hover:text-primary hover:bg-primary/10"
                                       >
                                         <Edit className="h-4 w-4" />
                                       </Button>
@@ -5177,15 +4786,15 @@ const Dashboard = () => {
                                           <Button
                                             variant="ghost"
                                             size="sm"
-                                            className="h-8 px-2 text-red-400 hover:text-red-300 hover:bg-red-900/20"
+                                            className="h-8 px-2 text-destructive hover:text-destructive hover:bg-destructive/10"
                                           >
                                             <Trash2 className="h-4 w-4" />
                                           </Button>
                                         </DialogTrigger>
-                                        <DialogContent className="bg-gray-800 border-gray-700">
+                                        <DialogContent className="bg-card border-border">
                                           <DialogHeader>
                                             <DialogTitle>حذف مقاله</DialogTitle>
-                                            <DialogDescription className="text-gray-400">
+                                            <DialogDescription>
                                               آیا از حذف مقاله "{post.title}"
                                               اطمینان دارید؟
                                             </DialogDescription>
@@ -5194,7 +4803,6 @@ const Dashboard = () => {
                                             <DialogClose asChild>
                                               <Button
                                                 variant="outline"
-                                                className="border-gray-600"
                                               >
                                                 انصراف
                                               </Button>
@@ -5230,54 +4838,54 @@ const Dashboard = () => {
               className="space-y-6 animate-in fade-in-50 duration-300"
             >
               <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-white">
+                <h2 className="text-2xl font-bold text-foreground">
                   پروفایل کاربری
                 </h2>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* User Information Card */}
-                <Card className="bg-gray-800/50 border-gray-700">
+                <Card className="bg-card border-border">
                   <CardHeader>
-                    <CardTitle className="text-xl text-gold-500">
+                    <CardTitle className="text-xl text-primary">
                       اطلاعات کاربری
                     </CardTitle>
-                    <CardDescription className="text-gray-400">
+                    <CardDescription>
                       اطلاعات شخصی حساب کاربری شما
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="flex flex-col space-y-1">
-                      <span className="text-sm text-gray-400">ایمیل</span>
-                      <span className="text-white font-medium">
+                      <span className="text-sm text-muted-foreground">ایمیل</span>
+                      <span className="text-foreground font-medium">
                         {user?.email || "ثبت نشده"}
                       </span>
                     </div>
 
                     <div className="flex flex-col space-y-1">
-                      <span className="text-sm text-gray-400">نام</span>
-                      <span className="text-white font-medium">
+                      <span className="text-sm text-muted-foreground">نام</span>
+                      <span className="text-foreground font-medium">
                         {user?.profile?.name || "ثبت نشده"}
                       </span>
                     </div>
 
                     <div className="flex flex-col space-y-1">
-                      <span className="text-sm text-gray-400">شماره تماس</span>
-                      <span className="text-white font-medium">
+                      <span className="text-sm text-muted-foreground">شماره تماس</span>
+                      <span className="text-foreground font-medium">
                         {user?.profile?.phoneNumber || "ثبت نشده"}
                       </span>
                     </div>
 
                     <div className="flex flex-col space-y-1">
-                      <span className="text-sm text-gray-400">تاریخ عضویت</span>
-                      <span className="text-white font-medium">
+                      <span className="text-sm text-muted-foreground">تاریخ عضویت</span>
+                      <span className="text-foreground font-medium">
                         {formatDateToPersian(user?.created_at) || "نامشخص"}
                       </span>
                     </div>
 
                     <Button
                       variant="outline"
-                      className="w-full mt-4 border-gray-700 hover:border-gold-500 hover:bg-gold-500/10"
+                      className="w-full mt-4"
                       onClick={() => navigate("/profile")}
                     >
                       ویرایش اطلاعات
@@ -5286,21 +4894,21 @@ const Dashboard = () => {
                 </Card>
 
                 {/* Subscription Information Card */}
-                <Card className="bg-gray-800/50 border-gray-700">
+                <Card className="bg-card border-border">
                   <CardHeader>
-                    <CardTitle className="text-xl text-gold-500">
+                    <CardTitle className="text-xl text-primary">
                       اطلاعات اشتراک
                     </CardTitle>
-                    <CardDescription className="text-gray-400">
+                    <CardDescription>
                       وضعیت اشتراک فعلی شما
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="flex flex-col space-y-1">
-                      <span className="text-sm text-gray-400">نوع اشتراک</span>
+                      <span className="text-sm text-muted-foreground">نوع اشتراک</span>
                       <div className="flex items-center">
-                        <Shield className="h-5 w-5 text-gold-500 mr-2" />
-                        <span className="text-white font-medium">
+                        <Shield className="h-5 w-5 text-primary mr-2" />
+                        <span className="text-foreground font-medium">
                           {user?.profile?.subscription_plan === "basic" &&
                             "اشتراک پایه"}
                           {user?.profile?.subscription_plan === "pro" &&
@@ -5314,10 +4922,10 @@ const Dashboard = () => {
 
                     {user?.profile?.subscription_plan !== "basic" && (
                       <div className="flex flex-col space-y-1">
-                        <span className="text-sm text-gray-400">
+                        <span className="text-sm text-muted-foreground">
                           تاریخ شروع
                         </span>
-                        <span className="text-white font-medium">
+                        <span className="text-foreground font-medium">
                           {formatDateToPersian(
                             user?.profile?.subscription_start_date
                           ) || "نامشخص"}
@@ -5327,10 +4935,10 @@ const Dashboard = () => {
 
                     {user?.profile?.subscription_plan !== "basic" && (
                       <div className="flex flex-col space-y-1">
-                        <span className="text-sm text-gray-400">
+                        <span className="text-sm text-muted-foreground">
                           تاریخ پایان
                         </span>
-                        <span className="text-white font-medium">
+                        <span className="text-foreground font-medium">
                           {formatDateToPersian(
                             user?.profile?.subscription_end_date
                           ) || "نامشخص"}
@@ -5341,12 +4949,12 @@ const Dashboard = () => {
                     {user?.profile?.subscription_plan !== "basic" &&
                       user?.profile?.subscription_end_date && (
                         <div className="flex flex-col space-y-1">
-                          <span className="text-sm text-gray-400">
+                          <span className="text-sm text-muted-foreground">
                             روزهای باقیمانده
                           </span>
                           <div className="flex items-center">
-                            <Calendar className="h-5 w-5 text-gold-500 mr-2" />
-                            <span className="text-white font-medium">
+                            <Calendar className="h-5 w-5 text-primary mr-2" />
+                            <span className="text-foreground font-medium">
                               {calculateRemainingDays(
                                 user?.profile?.subscription_end_date
                               )}{" "}
@@ -5357,22 +4965,22 @@ const Dashboard = () => {
                       )}
 
                     {/* Show what programs the user has access to based on subscription */}
-                    <div className="mt-4 pt-4 border-t border-gray-700">
-                      <h4 className="text-white font-medium mb-3">
+                    <div className="mt-4 pt-4 border-t border-border">
+                      <h4 className="text-foreground font-medium mb-3">
                         دسترسی‌های اشتراک شما
                       </h4>
 
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
-                          <span className="text-sm text-gray-400">
+                          <span className="text-sm text-muted-foreground">
                             برنامه‌های تمرینی
                           </span>
                           <span
                             className={`text-xs font-medium px-2 py-1 rounded-full ${
                               user?.profile?.subscription_plan === "pro" ||
                               user?.profile?.subscription_plan === "ultimate"
-                                ? "bg-green-500/20 text-green-400"
-                                : "bg-gray-700/50 text-gray-400"
+                                ? "bg-green-500/10 text-green-400"
+                                : "bg-muted text-muted-foreground"
                             }`}
                           >
                             {user?.profile?.subscription_plan === "pro" ||
@@ -5383,14 +4991,14 @@ const Dashboard = () => {
                         </div>
 
                         <div className="flex items-center justify-between">
-                          <span className="text-sm text-gray-400">
+                          <span className="text-sm text-muted-foreground">
                             برنامه‌های غذایی
                           </span>
                           <span
                             className={`text-xs font-medium px-2 py-1 rounded-full ${
                               user?.profile?.subscription_plan === "ultimate"
-                                ? "bg-green-500/20 text-green-400"
-                                : "bg-gray-700/50 text-gray-400"
+                                ? "bg-green-500/10 text-green-400"
+                                : "bg-muted text-muted-foreground"
                             }`}
                           >
                             {user?.profile?.subscription_plan === "ultimate"
@@ -5400,14 +5008,14 @@ const Dashboard = () => {
                         </div>
 
                         <div className="flex items-center justify-between">
-                          <span className="text-sm text-gray-400">
+                          <span className="text-sm text-muted-foreground">
                             برنامه‌های مکمل
                           </span>
                           <span
                             className={`text-xs font-medium px-2 py-1 rounded-full ${
                               user?.profile?.subscription_plan === "ultimate"
-                                ? "bg-green-500/20 text-green-400"
-                                : "bg-gray-700/50 text-gray-400"
+                                ? "bg-green-500/10 text-green-400"
+                                : "bg-muted text-muted-foreground"
                             }`}
                           >
                             {user?.profile?.subscription_plan === "ultimate"
@@ -5422,6 +5030,123 @@ const Dashboard = () => {
               </div>
             </TabsContent>
           </Tabs>
+        </main>
+        </div>
+
+        {/* Modern Mobile Footer Navigation */}
+        <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50">
+          <div className="bg-background/95 backdrop-blur-xl border-t border-border/80 rounded-t-xl shadow-lg">
+            <div className="px-2 pt-2 pb-safe">
+              <Tabs value={activeTab} onValueChange={setActiveTab}>
+                <TabsList className="flex w-full bg-transparent justify-around p-0">
+                  <TabsTrigger
+                    value="training"
+                    className="flex-1 flex flex-col items-center gap-1 py-2 text-xs rounded-lg data-[state=active]:text-primary"
+                  >
+                    <Zap size={20} />
+                    <span>تمرین</span>
+                  </TabsTrigger>
+
+                  <TabsTrigger
+                    value="meals"
+                    className="flex-1 flex flex-col items-center gap-1 py-2 text-xs rounded-lg data-[state=active]:text-primary"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2" />
+                      <path d="M7 2v20" />
+                      <path d="M21 15V2" />
+                      <path d="M18 15V2" />
+                      <path d="M21 15a3 3 0 1 1-6 0" />
+                    </svg>
+                    <span>غذا</span>
+                  </TabsTrigger>
+
+                  <TabsTrigger
+                    value="supplements"
+                    className="flex-1 flex flex-col items-center gap-1 py-2 text-xs rounded-lg data-[state=active]:text-primary"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="m8 21 8-9" />
+                      <path d="M12 21a9 9 0 0 0 0-18C7.5 3 4 7.5 4 11c0 2 1 4 2 6" />
+                      <path d="M19.8 17.8a9 9 0 0 0 .2-2c0-2.8-1-5.5-2.8-7.4" />
+                      <path d="M13.5 8.5A5 5 0 0 0 12 8a5 5 0 0 0-5 5c0 1.1.4 2.2 1 3" />
+                    </svg>
+                    <span>مکمل</span>
+                  </TabsTrigger>
+
+                  <TabsTrigger
+                    value="orders"
+                    className="flex-1 flex flex-col items-center gap-1 py-2 text-xs rounded-lg data-[state=active]:text-primary"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
+                      <path d="M3 6h18" />
+                      <path d="M16 10a4 4 0 0 1-8 0" />
+                    </svg>
+                    <span>سفارش</span>
+                  </TabsTrigger>
+
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <button className="flex-1 flex flex-col items-center gap-1 py-2 text-xs rounded-lg text-muted-foreground hover:bg-muted">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <circle cx="12" cy="12" r="1" />
+                          <circle cx="19" cy="12" r="1" />
+                          <circle cx="5" cy="12" r="1" />
+                        </svg>
+                        <span>بیشتر</span>
+                      </button>
+                    </DialogTrigger>
+                    <DialogContent className="bg-card border-border text-foreground">
+                      <DialogHeader>
+                        <DialogTitle className="text-primary">
+                          گزینه‌های بیشتر
+                        </DialogTitle>
+                      </DialogHeader>
+                      <div className="flex flex-col space-y-2 py-4">
+                        <Button
+                          variant="ghost"
+                          className="justify-start text-foreground hover:bg-muted"
+                          onClick={() => setActiveTab("payments")}
+                        >
+                          <CreditCard
+                            size={18}
+                            className="ml-3 text-primary"
+                          />
+                          پرداخت‌ها
+                        </Button>
+                        {user?.profile?.is_admin && (
+                          <Button
+                            variant="ghost"
+                            className="justify-start text-foreground hover:bg-muted"
+                            onClick={() => setActiveTab("blog")}
+                          >
+                            <Edit size={18} className="ml-3 text-primary" />
+                            مدیریت بلاگ
+                          </Button>
+                        )}
+                        <div className="border-t border-border my-2 pt-2">
+                          <Button
+                            variant="ghost"
+                            className="justify-start text-muted-foreground hover:text-destructive-foreground hover:bg-destructive/80 w-full"
+                            onClick={async () => {
+                              await supabase.auth.signOut();
+                              localStorage.setItem("isLoggedIn", "false");
+                              localStorage.removeItem("headauth"); // Clear cached auth data
+                              navigate("/");
+                            }}
+                          >
+                            <LogOut size={18} className="ml-2" />
+                            خروج از حساب
+                          </Button>
+                        </div>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                </TabsList>
+              </Tabs>
+            </div>
+          </div>
         </div>
       </SidebarProvider>
     </div>
