@@ -293,7 +293,7 @@ export type Database = {
           experience_years?: number | null
           expertise: string
           full_name: string
-          id: string
+          id?: string
           profile_id?: string | null
           profile_image?: string | null
           updated_at?: string | null
