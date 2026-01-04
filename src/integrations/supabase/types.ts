@@ -7,10 +7,10 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "12.2.3 (519615d)"
+    PostgrestVersion: "13.0.5"
   }
   public: {
     Tables: {
@@ -965,34 +965,19 @@ export type Database = {
         Args: { bundle_uuid: string }
         Returns: number
       }
-      cleanup_expired_web_auth_tokens: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
+      cleanup_expired_web_auth_tokens: { Args: never; Returns: undefined }
       get_bundle_discount_amount: {
         Args: { bundle_uuid: string }
         Returns: number
       }
-      get_bundle_final_price: {
-        Args: { bundle_uuid: string }
-        Returns: number
-      }
+      get_bundle_final_price: { Args: { bundle_uuid: string }; Returns: number }
       get_product_with_schema_data: {
         Args: { p_product_id: string }
         Returns: Json
       }
-      is_admin: {
-        Args: { _user_id: string }
-        Returns: boolean
-      }
-      is_blog_admin: {
-        Args: { _user_id: string }
-        Returns: boolean
-      }
-      is_coach: {
-        Args: { _user_id: string }
-        Returns: boolean
-      }
+      is_admin: { Args: { _user_id: string }; Returns: boolean }
+      is_blog_admin: { Args: { _user_id: string }; Returns: boolean }
+      is_coach: { Args: { _user_id: string }; Returns: boolean }
       update_aggregate_ratings: {
         Args: { p_product_id: string }
         Returns: undefined

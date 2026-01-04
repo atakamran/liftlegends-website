@@ -33,22 +33,21 @@ const CoachesSection = () => {
   const [loading, setLoading] = useState(true);
   const [isVisible, setIsVisible] = useState(false);
 
-  // Sample coaches data as fallback
   const sampleCoaches: Coach[] = [
     {
       id: 'sample-1',
       user_id: 'sample-user-1',
-      name: 'احمد محمدی',
-      bio: 'مربی پرورش اندام با ۱۰ سال تجربه در زمینه بدنسازی و تناسب اندام',
-      specialties: ['پرورش اندام', 'کاهش وزن', 'تناسب اندام'],
+      name: 'Mike Reynolds',
+      bio: 'IFBB Pro bodybuilder with 10+ years of coaching experience in hypertrophy and contest prep',
+      specialties: ['Bodybuilding', 'Contest Prep', 'Hypertrophy'],
       experience_years: 10,
-      certifications: ['مربی بدنسازی درجه یک', 'متخصص تغذیه ورزشی'],
+      certifications: ['NASM CPT', 'ISSN Sports Nutritionist'],
       profile_image: 'https://images.pexels.com/photos/1431282/pexels-photo-1431282.jpeg',
       gallery: [],
-      phone: '09121234567',
-      email: 'ahmad.mohammadi@example.com',
-      instagram: '@ahmad_coach',
-      telegram: '@ahmad_coach',
+      phone: '+1 555-0123',
+      email: 'mike.reynolds@example.com',
+      instagram: '@mike_fitness',
+      telegram: '@mike_coach',
       rating: 4.8,
       total_reviews: 156,
       is_active: true,
@@ -59,17 +58,17 @@ const CoachesSection = () => {
     {
       id: 'sample-2',
       user_id: 'sample-user-2',
-      name: 'سارا احمدی',
-      bio: 'متخصص تغذیه ورزشی و فیتنس با تمرکز بر برنامه‌های کاهش وزن',
-      specialties: ['تغذیه ورزشی', 'کاردیو', 'یوگا'],
+      name: 'Sarah Mitchell',
+      bio: 'Sports nutritionist and fitness coach specializing in body transformation and weight loss',
+      specialties: ['Nutrition', 'Weight Loss', 'Yoga'],
       experience_years: 7,
-      certifications: ['متخصص تغذیه ورزشی', 'مربی یوگا'],
+      certifications: ['Precision Nutrition L2', 'RYT-200'],
       profile_image: 'https://images.pexels.com/photos/1431283/pexels-photo-1431283.jpeg',
       gallery: [],
-      phone: '09129876543',
-      email: 'sara.ahmadi@example.com',
-      instagram: '@sara_nutrition',
-      telegram: '@sara_nutrition',
+      phone: '+1 555-0124',
+      email: 'sarah.mitchell@example.com',
+      instagram: '@sarah_nutrition',
+      telegram: '@sarah_fit',
       rating: 4.9,
       total_reviews: 89,
       is_active: true,
@@ -80,17 +79,17 @@ const CoachesSection = () => {
     {
       id: 'sample-3',
       user_id: 'sample-user-3',
-      name: 'علی رضایی',
-      bio: 'مربی کراس فیت و آمادگی جسمانی با رویکرد علمی و مدرن',
-      specialties: ['کراس فیت', 'آمادگی جسمانی', 'قدرتی'],
+      name: 'Alex Turner',
+      bio: 'CrossFit L3 coach and former competitive athlete with a science-based approach to training',
+      specialties: ['CrossFit', 'Functional Fitness', 'Strength'],
       experience_years: 8,
-      certifications: ['مربی کراس فیت', 'مربی آمادگی جسمانی'],
+      certifications: ['CrossFit L3', 'CSCS'],
       profile_image: 'https://images.pexels.com/photos/1431284/pexels-photo-1431284.jpeg',
       gallery: [],
-      phone: '09123456789',
-      email: 'ali.rezaei@example.com',
-      instagram: '@ali_crossfit',
-      telegram: '@ali_crossfit',
+      phone: '+1 555-0125',
+      email: 'alex.turner@example.com',
+      instagram: '@alex_crossfit',
+      telegram: '@alex_strength',
       rating: 4.7,
       total_reviews: 124,
       is_active: true,
@@ -100,13 +99,10 @@ const CoachesSection = () => {
     }
   ];
 
-  // Fetch coaches
   useEffect(() => {
     const fetchCoaches = async () => {
       try {
         setLoading(true);
-        
-        // Since coaches table doesn't exist yet, use sample data
         setCoaches(sampleCoaches);
       } catch (error) {
         console.error("Error fetching coaches:", error);
@@ -119,7 +115,6 @@ const CoachesSection = () => {
     fetchCoaches();
   }, []);
 
-  // Intersection Observer for animations
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -144,15 +139,16 @@ const CoachesSection = () => {
 
   const getSpecialtyIcon = (specialty: string) => {
     const specialtyIcons: Record<string, JSX.Element> = {
-      'پرورش اندام': <Dumbbell className="w-4 h-4" />,
-      'کاهش وزن': <TrendingUp className="w-4 h-4" />,
-      'تناسب اندام': <Target className="w-4 h-4" />,
-      'تغذیه ورزشی': <Users className="w-4 h-4" />,
-      'کاردیو': <Users className="w-4 h-4" />,
-      'یوگا': <Users className="w-4 h-4" />,
-      'کراس فیت': <Dumbbell className="w-4 h-4" />,
-      'آمادگی جسمانی': <Target className="w-4 h-4" />,
-      'قدرتی': <Dumbbell className="w-4 h-4" />,
+      'Bodybuilding': <Dumbbell className="w-4 h-4" />,
+      'Weight Loss': <TrendingUp className="w-4 h-4" />,
+      'Hypertrophy': <Target className="w-4 h-4" />,
+      'Nutrition': <Users className="w-4 h-4" />,
+      'Cardio': <Users className="w-4 h-4" />,
+      'Yoga': <Users className="w-4 h-4" />,
+      'CrossFit': <Dumbbell className="w-4 h-4" />,
+      'Functional Fitness': <Target className="w-4 h-4" />,
+      'Strength': <Dumbbell className="w-4 h-4" />,
+      'Contest Prep': <Award className="w-4 h-4" />,
     };
     return specialtyIcons[specialty] || <Users className="w-4 h-4" />;
   };
@@ -167,13 +163,13 @@ const CoachesSection = () => {
         {/* Section header */}
         <div className={`text-center mb-16 transform transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
           <span className="inline-block bg-gradient-to-r from-purple-500/20 to-blue-500/10 text-purple-400 text-sm px-5 py-2 rounded-full border border-purple-500/20 mb-5 hover:border-purple-500/40 transition-colors">
-            مربی‌های حرفه‌ای
+            Expert Coaches
           </span>
           <h2 className="text-4xl md:text-5xl font-bold mb-8 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-blue-300 to-purple-500">
-            بهترین مربی‌های ورزشی
+            World-Class Trainers
           </h2>
           <p className="text-white/70 max-w-3xl mx-auto text-lg leading-relaxed">
-            مربی‌های مجرب و حرفه‌ای برای راهنمایی شما در مسیر تناسب اندام و سلامتی
+            Certified professionals ready to guide you on your fitness journey
           </p>
         </div>
 
@@ -196,7 +192,7 @@ const CoachesSection = () => {
                       {coach.profile_image ? (
                         <img 
                           src={coach.profile_image} 
-                          alt={`تصویر مربی ${coach.name}`}
+                          alt={`Coach ${coach.name}`}
                           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                           loading="lazy"
                         />
@@ -222,9 +218,9 @@ const CoachesSection = () => {
                   <div className="flex items-center justify-center gap-2 text-sm">
                     <div className="flex items-center">
                       <Star className="h-4 w-4 text-yellow-500 fill-current" />
-                      <span className="mr-1 font-medium">{coach.rating.toFixed(1)}</span>
+                      <span className="ml-1 font-medium">{coach.rating.toFixed(1)}</span>
                     </div>
-                    <span className="text-gray-400">({coach.total_reviews} نظر)</span>
+                    <span className="text-gray-400">({coach.total_reviews} reviews)</span>
                   </div>
                 </CardHeader>
                 
@@ -236,8 +232,8 @@ const CoachesSection = () => {
                   {/* Experience */}
                   <div className="flex items-center justify-center gap-4 text-sm mb-4">
                     <div className="flex items-center text-gray-400">
-                      <Award className="h-4 w-4 ml-1" />
-                      {coach.experience_years} سال تجربه
+                      <Award className="h-4 w-4 mr-1" />
+                      {coach.experience_years}+ years
                     </div>
                   </div>
 
@@ -248,7 +244,7 @@ const CoachesSection = () => {
                         {coach.specialties.slice(0, 2).map((specialty, specialtyIndex) => (
                           <div key={specialtyIndex} className="flex items-center bg-gray-800/50 rounded-full px-2 py-1">
                             {getSpecialtyIcon(specialty)}
-                            <span className="text-xs text-gray-300 mr-1">{specialty}</span>
+                            <span className="text-xs text-gray-300 ml-1">{specialty}</span>
                           </div>
                         ))}
                         {coach.specialties.length > 2 && (
@@ -267,8 +263,8 @@ const CoachesSection = () => {
                       variant="default" 
                       className="w-full bg-gradient-to-r from-purple-500 to-blue-400 hover:from-purple-600 hover:to-blue-500 text-white group"
                     >
-                      <span>مشاهده مربی</span>
-                      <ChevronRight size={16} className="mr-1 group-hover:translate-x-1 transition-transform" />
+                      <span>View Profile</span>
+                      <ChevronRight size={16} className="ml-1 group-hover:translate-x-1 transition-transform" />
                     </Button>
                   </Link>
                 </CardFooter>
@@ -284,8 +280,8 @@ const CoachesSection = () => {
               variant="outline" 
               className="border-purple-500/30 text-purple-500 hover:bg-purple-500/10 hover:text-purple-400 hover:border-purple-500/50 px-8 py-6 text-lg group"
             >
-              <span>مشاهده همه مربی‌ها</span>
-              <ChevronRight size={20} className="mr-2 group-hover:translate-x-1 transition-transform" />
+              <span>View All Coaches</span>
+              <ChevronRight size={20} className="ml-2 group-hover:translate-x-1 transition-transform" />
             </Button>
           </Link>
         </div>

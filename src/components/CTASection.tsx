@@ -74,20 +74,20 @@ const CTASection = () => {
           {/* Badge */}
           <div className="inline-flex items-center gap-2 bg-gradient-to-r from-gold-500/20 to-amber-500/10 text-gold-400 text-sm px-6 py-3 rounded-full border border-gold-500/30 mb-8 hover:border-gold-500/50 transition-all">
             <Gift size={16} />
-            <span>دانلود رایگان - بدون محدودیت زمانی</span>
+            <span>Free Download – No Credit Card Required</span>
           </div>
 
           {/* Main headline */}
           <h2 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6">
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-gold-400 via-amber-300 to-gold-500 animate-gradient-x">
-              آماده تحول بدنی؟
+              Ready to Transform?
             </span>
           </h2>
 
           <p className="text-xl md:text-2xl text-white/90 mb-12 max-w-4xl mx-auto leading-relaxed">
-            همین الان{" "}
-            <span className="text-gold-400 font-semibold">Lift Legends</span> را
-            دانلود کنید و تجربه بدنسازی هوشمند را آغاز کنید
+            Download{" "}
+            <span className="text-gold-400 font-semibold">Lift Legends</span>{" "}
+            now and experience AI-powered fitness like never before
           </p>
 
           {/* CTA Buttons */}
@@ -96,8 +96,8 @@ const CTASection = () => {
               className="w-full sm:w-auto bg-gradient-to-r from-gold-500 to-amber-400 hover:from-gold-600 hover:to-amber-500 text-black px-8 py-6 text-lg font-semibold rounded-xl transition-all hover:scale-105 shadow-[0_0_30px_rgba(255,215,0,0.4)] hover:shadow-[0_0_40px_rgba(255,215,0,0.6)] group min-w-[250px]"
               onClick={() => (window.location.href = "/download")}
             >
-              <Download size={20} className="ml-2 group-hover:animate-bounce" />
-              دریافت رایگان اپلیکیشن
+              <Download size={20} className="mr-2 group-hover:animate-bounce" />
+              Get It Free
             </Button>
 
             <Button
@@ -105,8 +105,8 @@ const CTASection = () => {
               className="w-full sm:w-auto border-gold-500/40 text-gold-400 hover:bg-gold-500/10 hover:border-gold-500/70 px-8 py-6 text-lg font-medium rounded-xl transition-all hover:scale-105 min-w-[200px]"
               onClick={() => (window.location.href = "/programs")}
             >
-              <ArrowRight size={20} className="ml-2" />
-              مشاهده برنامه‌ها
+              <ArrowRight size={20} className="mr-2" />
+              View Programs
             </Button>
           </div>
         </div>
@@ -146,7 +146,7 @@ const CTASection = () => {
                   <div className="w-full space-y-3">
                     <div className="bg-gold-500/20 rounded-lg p-3 border border-gold-500/40">
                       <div className="text-gold-400 text-sm font-medium text-center">
-                        مربی هوشمند بدنسازی
+                        AI Fitness Coach
                       </div>
                     </div>
 
@@ -154,18 +154,18 @@ const CTASection = () => {
                       <div className="flex items-center gap-2">
                         <div className="w-2 h-2 rounded-full bg-gold-500"></div>
                         <div className="text-white text-xs">
-                          برنامه تمرینی هوشمند
+                          Smart Training Program
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
                         <div className="w-2 h-2 rounded-full bg-gold-500/70"></div>
                         <div className="text-white text-xs">
-                          رژیم غذایی شخصی
+                          Custom Nutrition Plan
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
                         <div className="w-2 h-2 rounded-full bg-gold-500/70"></div>
-                        <div className="text-white text-xs">مشاوره مکمل</div>
+                        <div className="text-white text-xs">Supplement Guide</div>
                       </div>
                     </div>
                   </div>
@@ -188,13 +188,13 @@ const CTASection = () => {
 
             {/* Floating elements */}
             <div className="absolute -top-4 -right-4 bg-gray-900/90 backdrop-blur-sm px-3 py-2 rounded-lg border border-gold-500/40 shadow-lg animate-float">
-              <p className="text-xs text-gold-400 font-medium">رایگان!</p>
+              <p className="text-xs text-gold-400 font-medium">100% Free!</p>
             </div>
             <div
               className="absolute bottom-8 -left-8 bg-gray-900/90 backdrop-blur-sm px-3 py-2 rounded-lg border border-gold-500/40 shadow-lg animate-float"
               style={{ animationDelay: "1s" }}
             >
-              <p className="text-xs text-gold-400 font-medium">هوش مصنوعی</p>
+              <p className="text-xs text-gold-400 font-medium">AI-Powered</p>
             </div>
           </div>
         </div>
@@ -207,7 +207,7 @@ const CTASection = () => {
           style={{ transitionDelay: "500ms" }}
         >
           <p className="text-white/60 text-sm">
-            ⚡ دانلود رایگان - بدون نیاز به ثبت‌نام اولیه
+            ⚡ Free download – No signup required to start
           </p>
         </div>
       </div>
