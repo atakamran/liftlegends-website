@@ -1,3 +1,4 @@
+
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { HelpCircle, Download, MessageCircle, Dumbbell, Utensils, Shield, Brain, Calendar, User } from "lucide-react";
 import { useState } from "react";
@@ -5,74 +6,75 @@ import { useState } from "react";
 const faqs = [
   {
     category: "general",
-    question: "Is Lift Legends free to use?",
-    answer: "Yes, Lift Legends offers a free tier with core features including general workout programs. For advanced features like personalized nutrition plans and AI coaching, premium subscriptions are available."
+    question: "آیا برنامه رایگان است؟",
+    answer: "بله، LiftLegends یک نسخه رایگان با امکانات پایه دارد. می‌توانید برنامه‌های تمرینی عمومی را به صورت رایگان استفاده کنید، اما برای دسترسی به امکانات پیشرفته مانند برنامه‌های غذایی شخصی‌سازی شده و مربی هوش مصنوعی، نیاز به خرید اشتراک دارید."
   },
   {
     category: "ai",
-    question: "How do I connect with the AI coach?",
-    answer: "After subscribing to the Ultimate plan, you'll find the 'AI Coach' option in your profile. Simply tap it to ask questions and get personalized guidance. Our AI coach is available 24/7 to answer your fitness questions."
+    question: "چطور با مربی هوش مصنوعی ارتباط بگیرم؟",
+    answer: "پس از خرید اشتراک Ultimate، در بخش پروفایل، گزینه «مربی هوشمند» را مشاهده خواهید کرد. با انتخاب آن می‌توانید سؤالات خود را بپرسید و راهنمایی‌های لازم را دریافت کنید. مربی هوش مصنوعی ما ۲۴ ساعته آماده پاسخگویی به سؤالات شماست."
   },
   {
     category: "training",
-    question: "How does the AI training program work?",
-    answer: "Our AI analyzes your profile data—age, weight, height, experience level, goals, and physical limitations—to create a fully personalized training program. It includes appropriate exercises, sets, reps, and rest periods, and adapts as you progress."
+    question: "برنامه تمرینی هوشمند چگونه کار می‌کند؟",
+    answer: "برنامه تمرینی هوشمند LiftLegends با استفاده از هوش مصنوعی و بر اساس اطلاعاتی که شما وارد می‌کنید (مانند سن، وزن، قد، سطح تجربه، اهداف بدنسازی و محدودیت‌های جسمی) یک برنامه کاملاً شخصی‌سازی شده برای شما طراحی می‌کند. این برنامه شامل تمرینات مناسب، تعداد ست‌ها، تکرارها و استراحت بین ست‌ها است و به مرور زمان با پیشرفت شما تغییر می‌کند."
   },
   {
     category: "training",
-    question: "Can I customize my training programs?",
-    answer: "Absolutely. With Pro and Ultimate subscriptions, training programs are fully customized based on your goals, experience level, available equipment, and physical limitations. Our AI designs the optimal program for your specific situation."
+    question: "آیا برنامه‌های تمرینی قابل شخصی‌سازی هستند؟",
+    answer: "بله، در اشتراک‌های Pro و Ultimate، برنامه‌های تمرینی کاملاً بر اساس هدف، سطح تجربه، تجهیزات در دسترس و محدودیت‌های جسمی شما شخصی‌سازی می‌شوند. هوش مصنوعی ما با تحلیل داده‌های شما، بهترین برنامه را برای رسیدن به اهداف بدنسازی شما طراحی می‌کند."
   },
   {
     category: "diet",
-    question: "How do I get a nutrition plan?",
-    answer: "With a Pro or Ultimate subscription, complete your body profile and answer questions about your dietary preferences. You'll receive a personalized meal plan including daily meals, calories, protein, carbs, and fats—plus supplement recommendations."
+    question: "چطور می‌توانم برنامه غذایی دریافت کنم؟",
+    answer: "با خرید اشتراک Pro یا Ultimate، پس از تکمیل فرم اطلاعات بدنی و پاسخ به سؤالات مربوط به ترجیحات غذایی، برنامه غذایی شخصی خود را دریافت خواهید کرد. این برنامه شامل وعده‌های غذایی روزانه، میزان کالری، پروتئین، کربوهیدرات و چربی مورد نیاز شما و همچنین توصیه‌های مکمل خواهد بود."
   },
   {
     category: "supplement",
-    question: "What's included in the supplement and PED guide?",
-    answer: "The supplement and PED section provides expert guidance on various supplements and performance enhancers tailored to your physique goals. This includes dosage recommendations, timing protocols, cycle planning, and safety information including potential side effects."
+    question: "برنامه مکمل و استرویید چه ویژگی‌هایی دارد؟",
+    answer: "بخش برنامه مکمل و استرویید LiftLegends به شما مشاوره تخصصی در مورد انواع مکمل‌ها و استروییدهای مناسب برای اهداف بدنسازی شما ارائه می‌دهد. این برنامه شامل دوزهای پیشنهادی، زمان‌بندی مصرف، چرخه‌های استرویید و نکات ایمنی است. همچنین اطلاعات جامعی درباره عوارض جانبی احتمالی و روش‌های کاهش آن‌ها در اختیار شما قرار می‌گیرد."
   },
   {
     category: "general",
-    question: "Can I cancel my subscription anytime?",
-    answer: "Yes, you can cancel anytime from your account settings. You'll retain access to premium features until the end of your billing period. No cancellation fees apply."
+    question: "آیا می‌توانم اشتراک خود را لغو کنم؟",
+    answer: "بله، در هر زمان می‌توانید از بخش تنظیمات حساب کاربری، اشتراک خود را لغو کنید. در این صورت، تا پایان دوره پرداخت‌شده، به امکانات اشتراک دسترسی خواهید داشت. هیچ هزینه اضافی برای لغو اشتراک دریافت نمی‌شود."
   },
   {
     category: "general",
-    question: "Is Lift Legends suitable for beginners?",
-    answer: "Absolutely! The platform is designed for all fitness levels—from complete beginners to advanced athletes. Beginners get detailed video tutorials and safety tips for every exercise, plus programs with appropriate intensity and gradual progression."
+    question: "آیا LiftLegends برای افراد مبتدی مناسب است؟",
+    answer: "کاملاً! برنامه برای همه سطوح از مبتدی تا حرفه‌ای طراحی شده است. برای افراد تازه‌کار، ویدیوهای آموزشی دقیق و نکات ایمنی برای هر حرکت ارائه می‌شود. همچنین برنامه‌های تمرینی مخصوص مبتدیان با شدت مناسب و پیشرفت تدریجی طراحی شده‌اند."
   },
   {
     category: "app",
-    question: "Can I track my progress?",
-    answer: "Yes, Lift Legends includes comprehensive progress tracking. Log your weight, body measurements, personal records, and before/after photos. Interactive charts visualize your transformation over time."
+    question: "آیا می‌توانم پیشرفت خود را پیگیری کنم؟",
+    answer: "بله، LiftLegends دارای بخش پیگیری پیشرفت است که به شما امکان می‌دهد وزن، اندازه‌های بدن، رکوردهای تمرینی و تصاویر قبل و بعد خود را ثبت و مقایسه کنید. همچنین نمودارهای تعاملی برای مشاهده روند پیشرفت در طول زمان ارائه می‌شود."
   },
   {
     category: "app",
-    question: "Does the app work offline?",
-    answer: "Yes, core features like viewing your training and nutrition programs, logging workouts, and watching tutorials work offline. However, you'll need internet connectivity for new programs and AI coach features."
+    question: "آیا برنامه به صورت آفلاین هم کار می‌کند؟",
+    answer: "بله، بخش‌های اصلی برنامه مانند مشاهده برنامه‌های تمرینی و غذایی، ثبت تمرینات و مشاهده آموزش‌ها به صورت آفلاین در دسترس هستند. البته برای دریافت برنامه‌های جدید و استفاده از مربی هوش مصنوعی، نیاز به اتصال اینترنت دارید."
   },
   {
     category: "ai",
-    question: "How does AI improve my training?",
-    answer: "Our AI analyzes your workout data, progress patterns, and logged records to identify strengths and weaknesses. It then adjusts your program to focus on weak points while preventing injury, and intelligently scales intensity based on your progress."
+    question: "هوش مصنوعی چگونه به بهبود تمرینات من کمک می‌کند؟",
+    answer: "هوش مصنوعی LiftLegends با تحلیل داده‌های تمرینی شما، الگوهای پیشرفت و رکوردهای ثبت شده، نقاط قوت و ضعف شما را شناسایی می‌کند. سپس برنامه تمرینی را به گونه‌ای تنظیم می‌کند که بر نقاط ضعف تمرکز بیشتری داشته باشد و از بروز آسیب‌دیدگی جلوگیری کند. همچنین با توجه به میزان پیشرفت شما، شدت تمرینات را به طور هوشمند تنظیم می‌کند."
   },
   {
     category: "supplement",
-    question: "Is the steroid guidance legal?",
-    answer: "Lift Legends provides educational and scientific information about supplements and performance enhancers. Usage is the user's responsibility and must comply with local laws. We always recommend consulting with a healthcare professional before using any supplements or PEDs."
+    question: "آیا مشاوره استرویید در برنامه قانونی است؟",
+    answer: "LiftLegends تنها اطلاعات آموزشی و علمی درباره انواع مکمل‌ها و استروییدها ارائه می‌دهد. استفاده از این اطلاعات بر عهده کاربر است و باید مطابق با قوانین کشور محل سکونت خود عمل کند. ما همواره توصیه می‌کنیم قبل از استفاده از هرگونه مکمل یا استرویید با پزشک متخصص مشورت کنید."
   }
 ];
 
+// FAQ categories for better organization
 const faqCategories = [
-  { id: "all", name: "All", icon: <HelpCircle size={18} /> },
-  { id: "training", name: "Training", icon: <Dumbbell size={18} /> },
-  { id: "diet", name: "Nutrition", icon: <Utensils size={18} /> },
-  { id: "supplement", name: "Supplements", icon: <Shield size={18} /> },
-  { id: "ai", name: "AI Coach", icon: <Brain size={18} /> },
-  { id: "app", name: "App", icon: <Download size={18} /> },
-  { id: "general", name: "General", icon: <User size={18} /> }
+  { id: "all", name: "همه", icon: <HelpCircle size={18} /> },
+  { id: "training", name: "برنامه تمرینی", icon: <Dumbbell size={18} /> },
+  { id: "diet", name: "رژیم غذایی", icon: <Utensils size={18} /> },
+  { id: "supplement", name: "مکمل و استرویید", icon: <Shield size={18} /> },
+  { id: "ai", name: "هوش مصنوعی", icon: <Brain size={18} /> },
+  { id: "app", name: "اپلیکیشن", icon: <Download size={18} /> },
+  { id: "general", name: "عمومی", icon: <User size={18} /> }
 ];
 
 const FaqSection = () => {
@@ -90,11 +92,11 @@ const FaqSection = () => {
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-16">
           <span className="inline-block bg-gold-500/10 text-gold-400 text-sm px-4 py-1.5 rounded-full border border-gold-500/20 mb-4">
-            Got Questions?
+            پاسخ به سوالات شما
           </span>
-          <h2 className="text-3xl md:text-5xl font-bold mb-6 text-gradient">Frequently Asked Questions</h2>
+          <h2 className="text-3xl md:text-5xl font-bold mb-6 text-gradient">سوالات متداول</h2>
           <p className="text-white/70 max-w-2xl mx-auto text-lg">
-            Everything you need to know about <span className="text-gold-400">AI training programs</span>, <span className="text-gold-400">nutrition plans</span>, and <span className="text-gold-400">supplement guidance</span>
+            پاسخ سوالات رایج شما درباره <span className="text-gold-400">برنامه تمرینی هوشمند</span>، <span className="text-gold-400">برنامه غذایی</span> و <span className="text-gold-400">برنامه مکمل و استرویید</span>
           </p>
         </div>
 
@@ -124,7 +126,7 @@ const FaqSection = () => {
               value={`item-${index}`}
               className="bg-gradient-to-br from-gray-900 to-black rounded-xl border border-white/10 hover:border-gold-500/20 transition-all overflow-hidden group shadow-sm hover:shadow-[0_0_15px_rgba(255,215,0,0.1)]"
             >
-              <AccordionTrigger className="px-6 py-4 hover:text-gold-400 transition-colors font-medium text-left group-hover:bg-gray-800/30">
+              <AccordionTrigger className="px-6 py-4 hover:text-gold-400 transition-colors font-medium text-right group-hover:bg-gray-800/30">
                 <div className="flex items-center gap-2">
                   {faq.category === "training" && <Dumbbell size={16} className="text-gold-500" />}
                   {faq.category === "diet" && <Utensils size={16} className="text-gold-500" />}
@@ -146,24 +148,24 @@ const FaqSection = () => {
         <div className="mt-16 bg-gradient-to-r from-gray-900 to-black p-8 rounded-2xl border border-gold-500/20 text-center relative overflow-hidden group hover:border-gold-500/30 transition-all">
           <div className="absolute -z-10 top-0 right-0 w-48 h-48 bg-gold-500 rounded-full blur-[100px] opacity-5 group-hover:opacity-10 transition-opacity"></div>
           
-          <h3 className="text-xl font-semibold mb-4 text-white">Still have questions?</h3>
+          <h3 className="text-xl font-semibold mb-4 text-white">هنوز سوالی دارید؟</h3>
           <p className="text-white/70 mb-6">
-            Our support team is ready to help with any questions about <span className="text-gold-400">AI training</span> and <span className="text-gold-400">premium features</span>
+            تیم پشتیبانی ما آماده پاسخگویی به سوالات شما درباره <span className="text-gold-400">برنامه هوشمند تمرینی</span> و <span className="text-gold-400">هوش مصنوعی</span> هستند
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <a 
-              href="mailto:support@liftlegends.io" 
+              href="mailto:support@liftlegends.ir" 
               className="bg-gray-800 hover:bg-gold-500/20 text-white hover:text-gold-400 px-6 py-3 rounded-xl transition-all inline-flex items-center justify-center gap-2 border border-transparent hover:border-gold-500/30"
             >
               <MessageCircle size={18} />
-              Contact Support
+              تماس با پشتیبانی
             </a>
             <button 
               type="button" 
               className="bg-gray-800 hover:bg-gold-500/20 text-white hover:text-gold-400 px-6 py-3 rounded-xl transition-all inline-flex items-center justify-center gap-2 border border-transparent hover:border-gold-500/30"
             >
               <Download size={18} />
-              Download User Guide
+              دانلود راهنمای کامل
             </button>
           </div>
         </div>

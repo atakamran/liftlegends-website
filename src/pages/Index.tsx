@@ -16,43 +16,45 @@ const Index = () => {
       {
         "@type": "Organization",
         "name": "Lift Legends",
-        "alternateName": "LiftLegends",
-        "url": "https://liftlegends.io/",
+        "alternateName": "لیفت لجندز",
+        "url": "https://liftlegends.ir/",
         "logo": {
           "@type": "ImageObject",
           "url": "https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends//white%20logo.png",
           "width": 200,
           "height": 200
         },
-        "description": "AI-powered fitness platform delivering personalized training programs, nutrition plans, and supplement guidance",
+        "description": "شرکت توسعه‌دهنده اپلیکیشن بدنسازی هوشمند با هوش مصنوعی",
         "foundingDate": "2024",
         "industry": "Health & Fitness Technology",
         "knowsAbout": [
-          "Personalized Training Programs",
-          "AI Fitness Coaching",
-          "Nutrition Planning",
-          "Supplement Guidance",
-          "Strength Training",
-          "Body Transformation",
-          "Workout Programming",
-          "Performance Enhancement"
+          "برنامه تمرینی رایگان",
+          "بدنسازی",
+          "برنامه بدنسازی",
+          "برنامه تمرینی",
+          "تناسب اندام",
+          "هوش مصنوعی",
+          "رژیم غذایی بدنسازی",
+          "مکمل‌های ورزشی",
+          "تمرینات بدنسازی",
+          "برنامه ورزشی"
         ],
         "sameAs": [
-          "https://liftlegends.io/"
+          "https://liftlegends.ir/"
         ],
         "contactPoint": {
           "@type": "ContactPoint",
           "contactType": "customer service",
-          "availableLanguage": ["English"]
+          "availableLanguage": ["Persian", "English"]
         }
       },
       {
         "@type": "WebSite",
-        "name": "Lift Legends - AI-Powered Fitness Platform",
-        "alternateName": "LiftLegends",
-        "url": "https://liftlegends.io/",
-        "description": "Transform your physique with AI-driven personalized training programs, smart nutrition plans, and expert supplement guidance. Start your legend today.",
-        "inLanguage": "en-US",
+        "name": "Lift Legends - برنامه تمرینی رایگان بدنسازی",
+        "alternateName": "لیفت لجندز",
+        "url": "https://liftlegends.ir/",
+        "description": "بهترین برنامه تمرینی رایگان بدنسازی با هوش مصنوعی - برنامه تمرینی شخصی‌سازی شده، رژیم غذایی بدنسازی و مشاوره تخصصی مکمل",
+        "inLanguage": "fa-IR",
         "publisher": {
           "@type": "Organization",
           "name": "Lift Legends"
@@ -61,27 +63,27 @@ const Index = () => {
           "@type": "SearchAction",
           "target": {
             "@type": "EntryPoint",
-            "urlTemplate": "https://liftlegends.io/search?q={search_term_string}"
+            "urlTemplate": "https://liftlegends.ir/search?q={search_term_string}"
           },
           "query-input": "required name=search_term_string"
         },
         "mainEntity": {
-          "@id": "https://liftlegends.io/#mobileapp"
+          "@id": "https://liftlegends.ir/#mobileapp"
         }
       },
       {
         "@type": "MobileApplication",
-        "@id": "https://liftlegends.io/#mobileapp",
+        "@id": "https://liftlegends.ir/#mobileapp",
         "name": "Lift Legends",
-        "alternateName": "LiftLegends Fitness App",
-        "description": "The ultimate AI-powered fitness companion. Get personalized training programs, smart nutrition plans, and expert supplement guidance tailored to your goals.",
+        "alternateName": "لیفت لجندز",
+        "description": "بهترین برنامه تمرینی رایگان بدنسازی با هوش مصنوعی پیشرفته، برنامه تمرینی شخصی‌سازی شده، رژیم غذایی بدنسازی هوشمند و مشاوره مکمل و استرویید",
         "applicationCategory": "HealthApplication",
         "applicationSubCategory": "Fitness",
-        "operatingSystem": "Android, iOS",
+        "operatingSystem": "Android",
         "softwareVersion": "1.0.0",
         "datePublished": "2024-01-01",
         "dateModified": "2024-12-01",
-        "inLanguage": "en-US",
+        "inLanguage": "fa-IR",
         "contentRating": "Everyone",
         "author": {
           "@type": "Organization",
@@ -91,25 +93,27 @@ const Index = () => {
           "@type": "Organization",
           "name": "Lift Legends"
         },
-        "downloadUrl": "https://liftlegends.io/download",
-        "installUrl": "https://liftlegends.io/download",
+        "downloadUrl": "https://liftlegends.ir/download",
+        "installUrl": "https://liftlegends.ir/download",
         "screenshot": [
           "https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends//white%20logo.png"
         ],
         "featureList": [
-          "AI-Personalized Training Programs",
-          "Smart Nutrition Planning",
-          "Supplement & PED Guidance",
-          "Progress Tracking & Analytics",
-          "Virtual AI Coach",
-          "Exercise Library with Videos",
-          "Macro & Calorie Calculator",
-          "Meal Planning Tools"
+          "برنامه تمرینی رایگان شخصی‌سازی شده",
+          "برنامه بدنسازی هوشمند با هوش مصنوعی",
+          "رژیم غذایی بدنسازی شخصی‌سازی شده",
+          "مشاوره مکمل و استرویید",
+          "تمرینات بدنسازی کامل",
+          "پیگیری پیشرفت بدنسازی",
+          "مربی مجازی بدنسازی",
+          "کتابخانه تمرینات بدنسازی",
+          "محاسبه کالری و ماکروها",
+          "برنامه‌ریزی وعده‌های غذایی"
         ],
         "offers": {
           "@type": "Offer",
           "price": "0",
-          "priceCurrency": "USD",
+          "priceCurrency": "IRR",
           "availability": "https://schema.org/InStock",
           "category": "Free with Premium Options"
         },
@@ -125,56 +129,56 @@ const Index = () => {
             "@type": "Review",
             "author": {
               "@type": "Person",
-              "name": "Mike Johnson"
+              "name": "علی محمدی"
             },
             "reviewRating": {
               "@type": "Rating",
               "ratingValue": "5",
               "bestRating": "5"
             },
-            "reviewBody": "Best fitness app I've ever used. The AI-powered training programs are incredibly effective and adapt to my progress perfectly."
+            "reviewBody": "بهترین اپلیکیشن بدنسازی که تا حالا استفاده کردم. برنامه تمرینی هوشمندش واقعاً کارآمده."
           }
         ]
       },
       {
         "@type": "Service",
-        "name": "Lift Legends AI Fitness Platform",
-        "description": "Comprehensive fitness platform offering AI-personalized training programs, smart nutrition plans, and expert supplement guidance for optimal results.",
+        "name": "برنامه تمرینی رایگان بدنسازی Lift Legends",
+        "description": "ارائه برنامه تمرینی رایگان بدنسازی، برنامه بدنسازی شخصی‌سازی شده، رژیم غذایی بدنسازی هوشمند و مشاوره مکمل با استفاده از هوش مصنوعی",
         "provider": {
           "@type": "Organization",
           "name": "Lift Legends"
         },
         "serviceType": "Fitness & Health Consulting",
         "areaServed": {
-          "@type": "Place",
-          "name": "Worldwide"
+          "@type": "Country",
+          "name": "Iran"
         },
         "hasOfferCatalog": {
           "@type": "OfferCatalog",
-          "name": "Fitness Services",
+          "name": "خدمات بدنسازی",
           "itemListElement": [
             {
               "@type": "Offer",
               "itemOffered": {
                 "@type": "Service",
-                "name": "AI Training Programs",
-                "description": "Personalized workout programs powered by artificial intelligence"
+                "name": "برنامه تمرینی رایگان بدنسازی",
+                "description": "برنامه تمرینی رایگان بدنسازی شخصی‌سازی شده با هوش مصنوعی"
               }
             },
             {
               "@type": "Offer",
               "itemOffered": {
                 "@type": "Service",
-                "name": "Smart Nutrition Plans",
-                "description": "Customized meal plans based on your goals and preferences"
+                "name": "رژیم غذایی بدنسازی",
+                "description": "برنامه غذایی بدنسازی شخصی‌سازی شده بر اساس اهداف و نیازهای فردی"
               }
             },
             {
               "@type": "Offer",
               "itemOffered": {
                 "@type": "Service",
-                "name": "Supplement Guidance",
-                "description": "Expert recommendations for supplements and performance enhancers"
+                "name": "مشاوره مکمل و استرویید",
+                "description": "راهنمایی تخصصی در انتخاب و مصرف مکمل‌های ورزشی"
               }
             }
           ]
@@ -185,34 +189,34 @@ const Index = () => {
         "mainEntity": [
           {
             "@type": "Question",
-            "name": "Is Lift Legends free to use?",
+            "name": "آیا Lift Legends رایگان است؟",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "Yes, Lift Legends offers a free tier with core features. For advanced features like personalized nutrition plans and AI coaching, premium subscriptions are available."
+              "text": "بله، Lift Legends یک نسخه رایگان با امکانات پایه دارد. برای دسترسی به امکانات پیشرفته مانند برنامه‌های غذایی شخصی‌سازی شده و مربی هوش مصنوعی، نیاز به خرید اشتراک دارید."
             }
           },
           {
             "@type": "Question",
-            "name": "How does the AI training program work?",
+            "name": "چگونه برنامه تمرینی رایگان بدنسازی کار می‌کند؟",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "Our AI analyzes your profile (age, weight, height, experience level, goals, and limitations) to create a fully personalized training program that adapts as you progress."
+              "text": "برنامه تمرینی رایگان بدنسازی Lift Legends با استفاده از هوش مصنوعی و بر اساس اطلاعات شما (سن، وزن، قد، سطح تجربه، اهداف بدنسازی) یک برنامه بدنسازی کاملاً شخصی‌سازی شده طراحی می‌کند."
             }
           },
           {
             "@type": "Question",
-            "name": "Is Lift Legends suitable for beginners?",
+            "name": "آیا برنامه تمرینی رایگان برای مبتدیان بدنسازی مناسب است؟",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "Absolutely! Lift Legends is designed for all fitness levels, from complete beginners to advanced athletes. Programs automatically adjust to your experience level."
+              "text": "بله، برنامه تمرینی رایگان بدنسازی Lift Legends برای تمام سطوح از مبتدی تا حرفه‌ای طراحی شده است. برنامه‌های بدنسازی بر اساس سطح تجربه شما تنظیم می‌شود."
             }
           },
           {
             "@type": "Question",
-            "name": "What types of workouts are available?",
+            "name": "چه تمریناتی در برنامه بدنسازی رایگان موجود است؟",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "Our platform includes strength training, HIIT, cardio, functional fitness, and flexibility workouts. All exercises come with video demonstrations and detailed instructions."
+              "text": "برنامه تمرینی رایگان بدنسازی شامل تمرینات کامل بدنسازی مانند تمرینات قدرتی، کارکردی، کارتیو و کششی است. همه تمرینات بدنسازی با راهنمایی تصویری و توضیحات کامل ارائه می‌شود."
             }
           }
         ]
@@ -223,8 +227,8 @@ const Index = () => {
           {
             "@type": "ListItem",
             "position": 1,
-            "name": "Home",
-            "item": "https://liftlegends.io/"
+            "name": "خانه",
+            "item": "https://liftlegends.ir/"
           }
         ]
       }
@@ -235,21 +239,21 @@ const Index = () => {
     <>
       <Helmet>
         {/* Primary Meta Tags */}
-        <title>Lift Legends | Build Your Legend with AI-Powered Training</title>
-        <meta name="title" content="Lift Legends | Build Your Legend with AI-Powered Training" />
-        <meta name="description" content="Transform your physique with Lift Legends. AI-personalized training programs, smart nutrition plans, and expert supplement guidance. Start building your legend today – free." />
-        <meta name="keywords" content="AI fitness app, personalized training program, workout planner, nutrition plan, supplement guide, strength training, bodybuilding app, fitness coach AI, workout program, body transformation, muscle building, weight loss app" />
+        <title>Lift Legends | افسانه خودت را بساز با برنامه تمرینی هوشمند</title>
+        <meta name="title" content="Lift Legends | افسانه خودت را بساز با برنامه تمرینی هوشمند" />
+        <meta name="description" content="با Lift Legends افسانه خود را بسازید. برنامه تمرینی و رژیم غذایی شخصی‌سازی شده با هوش مصنوعی برای رسیدن به اوج قدرت و تناسب اندام. همین امروز رایگان شروع کنید." />
+        <meta name="keywords" content="برنامه تمرینی رایگان، بدنسازی، برنامه بدنسازی، برنامه تمرینی، تناسب اندام، مربی بدنسازی، برنامه تمرینی بدنسازی، رژیم غذایی بدنسازی، مکمل بدنسازی، استرویید، فیتنس، اپلیکیشن بدنسازی، هوش مصنوعی، برنامه ورزشی رایگان، تمرینات بدنسازی، AI fitness، personal trainer" />
         <meta name="author" content="Lift Legends" />
         <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
-        <meta name="language" content="English" />
+        <meta name="language" content="Persian" />
         <meta name="revisit-after" content="7 days" />
         <meta name="distribution" content="global" />
         <meta name="rating" content="general" />
         
         {/* Geo Tags */}
-        <meta name="geo.region" content="US" />
-        <meta name="geo.country" content="United States" />
-        <meta name="geo.placename" content="Global" />
+        <meta name="geo.region" content="IR" />
+        <meta name="geo.country" content="Iran" />
+        <meta name="geo.placename" content="Iran" />
         
         {/* Mobile Optimization */}
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
@@ -261,23 +265,23 @@ const Index = () => {
         {/* Open Graph / Facebook */}
         <meta property="og:type" content="website" />
         <meta property="og:site_name" content="Lift Legends" />
-        <meta property="og:title" content="Lift Legends | AI-Powered Fitness Platform" />
-        <meta property="og:description" content="Transform your physique with AI-driven personalized training, smart nutrition plans, and expert supplement guidance. Start free today." />
+        <meta property="og:title" content="برنامه تمرینی رایگان بدنسازی | Lift Legends - برنامه بدنسازی هوشمند" />
+        <meta property="og:description" content="دانلود رایگان بهترین برنامه تمرینی بدنسازی با هوش مصنوعی. برنامه تمرینی رایگان شخصی‌سازی شده، رژیم غذایی بدنسازی و مشاوره مکمل." />
         <meta property="og:image" content="https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends//white%20logo.png" />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
-        <meta property="og:image:alt" content="Lift Legends - AI-Powered Fitness Platform" />
-        <meta property="og:url" content="https://liftlegends.io/" />
-        <meta property="og:locale" content="en_US" />
+        <meta property="og:image:alt" content="Lift Legends - اپلیکیشن بدنسازی هوشمند" />
+        <meta property="og:url" content="https://liftlegends.ir/" />
+        <meta property="og:locale" content="fa_IR" />
         
         {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:site" content="@liftlegends" />
         <meta name="twitter:creator" content="@liftlegends" />
-        <meta name="twitter:title" content="Lift Legends | AI-Powered Fitness Platform" />
-        <meta name="twitter:description" content="Transform your physique with AI-driven personalized training, smart nutrition plans, and expert supplement guidance. Start free today." />
+        <meta name="twitter:title" content="برنامه تمرینی رایگان بدنسازی | Lift Legends - برنامه بدنسازی هوشمند" />
+        <meta name="twitter:description" content="دانلود رایگان بهترین برنامه تمرینی بدنسازی با هوش مصنوعی. برنامه تمرینی رایگان شخصی‌سازی شده، رژیم غذایی بدنسازی و مشاوره مکمل." />
         <meta name="twitter:image" content="https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends//white%20logo.png" />
-        <meta name="twitter:image:alt" content="Lift Legends - AI-Powered Fitness Platform" />
+        <meta name="twitter:image:alt" content="Lift Legends - اپلیکیشن بدنسازی هوشمند" />
         
         {/* Additional SEO Tags */}
         <meta name="theme-color" content="#D4AF37" />
@@ -285,9 +289,9 @@ const Index = () => {
         <meta name="application-name" content="Lift Legends" />
         
         {/* Canonical and Alternate */}
-        <link rel="canonical" href="https://liftlegends.io/" />
-        <link rel="alternate" hrefLang="en" href="https://liftlegends.io/" />
-        <link rel="alternate" hrefLang="x-default" href="https://liftlegends.io/" />
+        <link rel="canonical" href="https://liftlegends.ir/" />
+        <link rel="alternate" hrefLang="fa" href="https://liftlegends.ir/" />
+        <link rel="alternate" hrefLang="x-default" href="https://liftlegends.ir/" />
         
         {/* Preconnect for Performance */}
         <link rel="preconnect" href="https://wagixhjktcodkdkgtgdj.supabase.co" />

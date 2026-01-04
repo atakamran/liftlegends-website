@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ChevronRight } from "lucide-react";
 
+// Define Program interface
 interface Program {
   id: string;
   title: string;
@@ -23,12 +24,13 @@ const ProgramsSection = () => {
   const [activeCategory, setActiveCategory] = useState<'training' | 'diet' | 'supplement'>('training');
   const [isVisible, setIsVisible] = useState(false);
 
+  // Sample programs data as fallback
   const samplePrograms: Program[] = [
     {
       id: 'sample-1',
-      title: 'FST-7 Hypertrophy System',
-      description: 'Advanced muscle-building program using the legendary FST-7 technique for maximum hypertrophy',
-      price: 49,
+      title: 'برنامه تمرینی FST-7',
+      description: 'برنامه تمرینی پیشرفته برای افزایش حجم عضلانی با تکنیک FST-7',
+      price: 299000,
       category: 'training',
       image_url: 'https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends/fst7-program.jpg',
       program_url: 'fst7-program',
@@ -36,9 +38,9 @@ const ProgramsSection = () => {
     },
     {
       id: 'sample-2',
-      title: 'SHRED-X Fat Loss Protocol',
-      description: 'High-intensity fat loss nutrition plan for sustainable, healthy weight loss',
-      price: 39,
+      title: 'رژیم غذایی کاهش وزن',
+      description: 'برنامه غذایی کامل برای کاهش وزن سالم و پایدار',
+      price: 199000,
       category: 'diet',
       image_url: 'https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends/diet-plan.jpg',
       program_url: 'weight-loss-diet',
@@ -46,9 +48,9 @@ const ProgramsSection = () => {
     },
     {
       id: 'sample-3',
-      title: 'Beginner Foundations',
-      description: 'Complete starter program for those new to strength training and fitness',
-      price: 29,
+      title: 'برنامه تمرینی مبتدی',
+      description: 'برنامه تمرینی کامل برای شروع بدنسازی و تناسب اندام',
+      price: 149000,
       category: 'training',
       image_url: 'https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends/beginner-workout.jpg',
       program_url: 'beginner-workout',
@@ -56,9 +58,9 @@ const ProgramsSection = () => {
     },
     {
       id: 'sample-4',
-      title: 'Creatine Monohydrate Guide',
-      description: 'Science-backed creatine protocol for strength and muscle gains',
-      price: 19,
+      title: 'مکمل کراتین مونوهیدرات',
+      description: 'کراتین با کیفیت بالا برای افزایش قدرت و حجم عضلانی',
+      price: 89000,
       category: 'supplement',
       image_url: 'https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends/creatine.jpg',
       program_url: 'creatine-supplement',
@@ -66,9 +68,9 @@ const ProgramsSection = () => {
     },
     {
       id: 'sample-5',
-      title: 'Mass Gain Meal Plan',
-      description: 'Strategic nutrition plan designed for clean muscle gains and weight increase',
-      price: 44,
+      title: 'رژیم غذایی افزایش حجم',
+      description: 'برنامه غذایی تخصصی برای افزایش وزن و حجم عضلانی',
+      price: 249000,
       category: 'diet',
       image_url: 'https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends/bulk-diet.jpg',
       program_url: 'bulking-diet',
@@ -76,9 +78,9 @@ const ProgramsSection = () => {
     },
     {
       id: 'sample-6',
-      title: 'Elite Performance Training',
-      description: 'Advanced training protocol for experienced athletes seeking peak performance',
-      price: 69,
+      title: 'برنامه تمرینی پیش‌رفته',
+      description: 'برنامه تمرینی حرفه‌ای برای ورزشکاران با تجربه',
+      price: 399000,
       category: 'training',
       image_url: 'https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends/advanced-workout.jpg',
       program_url: 'advanced-workout',
@@ -86,8 +88,8 @@ const ProgramsSection = () => {
     },
     {
       id: 'sample-7',
-      title: 'Starter Training Program',
-      description: 'Free beginner-friendly workout program to kickstart your fitness journey',
+      title: 'برنامه تمرینی رایگان مبتدی',
+      description: 'برنامه تمرینی کاملاً رایگان برای شروع بدنسازی',
       price: 0,
       category: 'training',
       image_url: 'https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends/free-workout.jpg',
@@ -96,8 +98,8 @@ const ProgramsSection = () => {
     },
     {
       id: 'sample-8',
-      title: 'Nutrition Essentials Guide',
-      description: 'Free comprehensive guide to healthy eating for athletes and fitness enthusiasts',
+      title: 'راهنمای تغذیه رایگان',
+      description: 'راهنمای کامل و رایگان تغذیه سالم برای بدنسازان',
       price: 0,
       category: 'diet',
       image_url: 'https://wagixhjktcodkdkgtgdj.supabase.co/storage/v1/object/public/legends/free-nutrition.jpg',
@@ -106,6 +108,7 @@ const ProgramsSection = () => {
     }
   ];
 
+  // Fetch programs
   useEffect(() => {
     const fetchPrograms = async () => {
       try {
@@ -115,14 +118,16 @@ const ProgramsSection = () => {
           .from("programs_sale")
           .select("*")
           .order("created_at", { ascending: false })
-          .limit(12);
+          .limit(12); // Increased limit to get more programs
 
         if (error) {
           console.error("Database error:", error);
+          // Use sample data as fallback
           setPrograms(samplePrograms);
           return;
         }
 
+        // Map programs_sale data to Program interface
         const programsData = data ? data.map(program => ({
           id: program.id,
           title: program.title,
@@ -134,10 +139,14 @@ const ProgramsSection = () => {
           created_at: program.created_at || new Date().toISOString(),
         })) : [];
         
+        // If no data from database, use sample data
         if (programsData.length === 0) {
           setPrograms(samplePrograms);
         } else {
+          // Combine database data with sample data to ensure we have enough content
           const combinedPrograms = [...programsData];
+          
+          // Add sample programs for categories that might be missing
           const categories = ['training', 'diet', 'supplement'];
           categories.forEach(category => {
             const categoryCount = combinedPrograms.filter(p => p.category === category).length;
@@ -151,6 +160,7 @@ const ProgramsSection = () => {
         }
       } catch (error) {
         console.error("Error fetching programs:", error);
+        // Use sample data as fallback
         setPrograms(samplePrograms);
       } finally {
         setLoading(false);
@@ -160,6 +170,7 @@ const ProgramsSection = () => {
     fetchPrograms();
   }, []);
 
+  // Intersection Observer for animations
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -182,12 +193,15 @@ const ProgramsSection = () => {
     };
   }, []);
 
+  // Filter programs by category
   const filteredPrograms = programs.filter(program => program.category === activeCategory);
 
+  // Format price with Persian numerals and Toman
   const formatPrice = (price: number) => {
-    return '$' + price.toFixed(0);
+    return new Intl.NumberFormat('fa-IR').format(price) + ' تومان';
   };
 
+  // Get category badge color
   const getCategoryColor = (category: string) => {
     switch (category) {
       case 'training':
@@ -201,16 +215,17 @@ const ProgramsSection = () => {
     }
   };
 
+  // Get category name
   const getCategoryName = (category: string) => {
     switch (category) {
       case 'training':
-        return 'Training';
+        return 'برنامه تمرینی';
       case 'diet':
-        return 'Nutrition';
+        return 'برنامه غذایی';
       case 'supplement':
-        return 'Supplement';
+        return 'مکمل';
       default:
-        return 'Product';
+        return 'محصول';
     }
   };
 
@@ -224,26 +239,26 @@ const ProgramsSection = () => {
         {/* Section header */}
         <div className={`text-center mb-16 transform transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
           <span className="inline-block bg-gradient-to-r from-gold-500/20 to-amber-500/10 text-gold-400 text-sm px-5 py-2 rounded-full border border-gold-500/20 mb-5 hover:border-gold-500/40 transition-colors">
-            Premium Programs
+            برنامه‌های اختصاصی
           </span>
           <h2 className="text-4xl md:text-5xl font-bold mb-8 bg-clip-text text-transparent bg-gradient-to-r from-gold-400 via-amber-300 to-gold-500">
-            LiftLegends Programs
+            برنامه‌های LiftLegends
           </h2>
           <p className="text-white/70 max-w-3xl mx-auto text-lg leading-relaxed">
-            Expert-designed programs to help you achieve your fitness and health goals faster.
+            برنامه‌های تخصصی ما برای کمک به شما در رسیدن به اهداف تناسب اندام و سلامتی طراحی شده‌اند.
           </p>
         </div>
 
         {/* Category tabs */}
         <div className={`flex justify-center mb-12 transform transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`} style={{ transitionDelay: "100ms" }}>
-          <div className="flex space-x-2">
+          <div className="flex space-x-2 space-x-reverse">
             <button
               onClick={() => setActiveCategory('training')}
               className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${activeCategory === 'training' 
                 ? 'bg-gradient-to-r from-gold-500 to-amber-400 text-black shadow-lg' 
                 : 'bg-gray-800/50 text-white/70 hover:bg-gray-800 hover:text-white border border-transparent'}`}
             >
-              Training Programs
+              برنامه‌های تمرینی
             </button>
             <button
               onClick={() => setActiveCategory('diet')}
@@ -251,7 +266,7 @@ const ProgramsSection = () => {
                 ? 'bg-gradient-to-r from-gold-500 to-amber-400 text-black shadow-lg' 
                 : 'bg-gray-800/50 text-white/70 hover:bg-gray-800 hover:text-white border border-transparent'}`}
             >
-              Nutrition Plans
+              برنامه‌های غذایی
             </button>
             <button
               onClick={() => setActiveCategory('supplement')}
@@ -259,7 +274,7 @@ const ProgramsSection = () => {
                 ? 'bg-gradient-to-r from-gold-500 to-amber-400 text-black shadow-lg' 
                 : 'bg-gray-800/50 text-white/70 hover:bg-gray-800 hover:text-white border border-transparent'}`}
             >
-              Supplements
+              مکمل‌ها
             </button>
           </div>
         </div>
@@ -282,7 +297,7 @@ const ProgramsSection = () => {
                     {program.image_url ? (
                       <img 
                         src={program.image_url} 
-                        alt={`${program.title} - Lift Legends`}
+                        alt={`تصویر برنامه ${program.title} - لیفت لجندز`}
                         className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
                       />
                     ) : (
@@ -293,7 +308,7 @@ const ProgramsSection = () => {
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
                           </div>
-                          <span className="text-gray-500 text-sm">No Image</span>
+                          <span className="text-gray-500 text-sm">بدون تصویر</span>
                         </div>
                       </div>
                     )}
@@ -313,7 +328,7 @@ const ProgramsSection = () => {
                     <p className="text-white/70 line-clamp-2 text-sm mb-3 h-10 group-hover:text-white/90 transition-colors">{program.description}</p>
                     <p className="text-lg font-bold text-white">
                       {program.price === 0 ? (
-                        <span className="text-green-500">Free</span>
+                        <span className="text-green-500">رایگان</span>
                       ) : (
                         formatPrice(program.price)
                       )}
@@ -329,8 +344,8 @@ const ProgramsSection = () => {
                         variant="default" 
                         className="w-full bg-gradient-to-r from-gold-500 to-amber-400 hover:from-gold-600 hover:to-amber-500 text-black group"
                       >
-                        <span>View Program</span>
-                        <ChevronRight size={16} className="ml-1 group-hover:translate-x-1 transition-transform" />
+                        <span>مشاهده محصول</span>
+                        <ChevronRight size={16} className="mr-1 group-hover:translate-x-1 transition-transform" />
                       </Button>
                     </Link>
                   </CardFooter>
@@ -338,7 +353,7 @@ const ProgramsSection = () => {
               ))
             ) : (
               <div className="col-span-full text-center py-12">
-                <p className="text-gray-400 text-lg">No programs available in this category yet.</p>
+                <p className="text-gray-400 text-lg">در حال حاضر برنامه‌ای در این دسته وجود ندارد.</p>
               </div>
             )}
           </div>
@@ -351,8 +366,8 @@ const ProgramsSection = () => {
               variant="outline" 
               className="border-gold-500/30 text-gold-500 hover:bg-gold-500/10 hover:text-gold-400 hover:border-gold-500/50 px-8 py-6 text-lg group"
             >
-              <span>View All Programs</span>
-              <ChevronRight size={20} className="ml-2 group-hover:translate-x-1 transition-transform" />
+              <span>مشاهده همه برنامه‌ها</span>
+              <ChevronRight size={20} className="mr-2 group-hover:translate-x-1 transition-transform" />
             </Button>
           </Link>
         </div>
