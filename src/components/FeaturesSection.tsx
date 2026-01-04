@@ -1,4 +1,3 @@
-
 import { Activity, Dumbbell, Utensils, Brain, Calendar, BarChart3, Zap, Download, Shield, Pill, Award, Sparkles, Clock, ChevronRight } from "lucide-react";
 import { useEffect, useState, useRef, ReactNode } from "react";
 import { Button } from "@/components/ui/button";
@@ -12,66 +11,66 @@ interface AdditionalFeature {
 const features = [
   {
     icon: <Dumbbell size={28} />,
-    title: "برنامه تمرینی هوشمند",
-    description: "برنامه‌های تمرینی شخصی‌سازی شده بر اساس اهداف، سطح تجربه و محدودیت‌های شما با هوش مصنوعی پیشرفته",
-    tag: "هوشمند"
+    title: "AI Training Programs",
+    description: "Personalized workout plans built around your goals, experience level, and equipment—powered by advanced artificial intelligence.",
+    tag: "Smart"
   },
   {
     icon: <Utensils size={28} />,
-    title: "رژیم غذایی شخصی",
-    description: "برنامه‌های غذایی متناسب با اهداف بدنسازی و توصیه‌های تغذیه‌ای برای رسیدن سریع‌تر به نتیجه",
-    tag: "شخصی‌سازی شده"
+    title: "Custom Nutrition Plans",
+    description: "Tailored meal plans designed to fuel your performance and accelerate results. Macros calculated. Meals planned. Goals crushed.",
+    tag: "Personalized"
   },
   {
     icon: <Shield size={28} />,
-    title: "برنامه مکمل و استرویید",
-    description: "مشاوره تخصصی در زمینه مکمل‌ها و استروییدها با در نظر گرفتن شرایط بدنی و اهداف شما",
-    tag: "تخصصی"
+    title: "Supplement & PED Guide",
+    description: "Expert guidance on supplements and performance enhancers. Science-backed protocols tailored to your physique and objectives.",
+    tag: "Expert"
   },
   {
     icon: <Brain size={28} />,
-    title: "پشتیبانی با هوش مصنوعی",
-    description: "دسترسی ۲۴ ساعته به مربی هوش مصنوعی برای راهنمایی، پاسخ به سؤالات و اصلاح تکنیک‌های تمرینی",
-    tag: "هوش مصنوعی"
+    title: "24/7 AI Coach",
+    description: "Round-the-clock access to your AI fitness coach. Get instant answers, form corrections, and program adjustments anytime.",
+    tag: "AI-Powered"
   },
   {
     icon: <Calendar size={28} />,
-    title: "برنامه‌ریزی هفتگی",
-    description: "برنامه‌ریزی دقیق تمرینات هفتگی با توجه به زمان‌بندی و اهداف شما برای دستیابی به نتایج بهتر",
-    tag: "منظم"
+    title: "Weekly Programming",
+    description: "Structured weekly training schedules optimized for progressive overload and recovery. Never wonder what to do next.",
+    tag: "Organized"
   },
   {
     icon: <BarChart3 size={28} />,
-    title: "پیگیری پیشرفت",
-    description: "ابزارهای پیشرفته برای ثبت و پیگیری پیشرفت بدنی، وزنه‌ها و اندازه‌های بدن با نمودارهای تحلیلی",
-    tag: "تحلیلی"
+    title: "Progress Analytics",
+    description: "Track your lifts, measurements, and body composition with detailed analytics. Visualize your transformation over time.",
+    tag: "Data-Driven"
   },
 ];
 
 const additionalFeatures: AdditionalFeature[] = [
   {
     icon: <Activity size={20} />,
-    title: "ثبت رکوردهای شخصی",
+    title: "Personal Records",
   },
   {
     icon: <Pill size={20} />,
-    title: "مشاوره مکمل",
+    title: "Supplement Advisor",
   },
   {
     icon: <Award size={20} />,
-    title: "چالش‌های انگیزشی",
+    title: "Challenges",
   },
   {
     icon: <Clock size={20} />,
-    title: "تایمر تمرین",
+    title: "Workout Timer",
   },
   {
     icon: <Sparkles size={20} />,
-    title: "برنامه استرویید",
+    title: "Cycle Planning",
   },
   {
     icon: <Brain size={20} />,
-    title: "مشاوره تغذیه",
+    title: "Nutrition Coach",
   }
 ];
 
@@ -107,28 +106,27 @@ const FeaturesSection = () => {
 
   return (
     <section id="features" className="py-24 px-4 bg-gradient-to-b from-gray-900 via-black to-gray-900 relative">
-      {/* Enhanced background effects */}
+      {/* Background effects */}
       <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-b from-black to-transparent"></div>
       <div className="absolute -z-10 top-1/3 right-0 w-96 h-96 bg-gradient-to-r from-gold-500 to-amber-400 rounded-full blur-[150px] opacity-5"></div>
       <div className="absolute -z-10 bottom-1/4 left-1/4 w-80 h-80 bg-gradient-to-r from-gold-400 to-amber-300 rounded-full blur-[130px] opacity-5"></div>
       <div className="absolute -z-10 top-2/3 right-1/4 w-64 h-64 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full blur-[120px] opacity-3"></div>
       
       <div className="max-w-7xl mx-auto">
-        {/* Enhanced section header with better typography and animations */}
+        {/* Section header */}
         <div className="text-center mb-20">
           <span className="inline-block bg-gradient-to-r from-gold-500/20 to-amber-500/10 text-gold-400 text-sm px-5 py-2 rounded-full border border-gold-500/20 mb-5 hover:border-gold-500/40 transition-colors">
-            ویژگی‌های منحصر به فرد
+            Elite Features
           </span>
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-8 bg-clip-text text-transparent bg-gradient-to-r from-gold-400 via-amber-300 to-gold-500 animate-gradient-x">
-            ویژگی‌های برتر Lift Legends
+            Everything You Need to Dominate
           </h2>
           <p className="text-white/70 max-w-3xl mx-auto text-lg leading-relaxed">
-            با Lift Legends به قدرت خود دست یابید و اهداف بدنسازی خود را با <span className="text-gold-400 font-medium">برنامه هوشمند تمرینی</span> محقق کنید. 
-            اپلیکیشنی که با استفاده از <span className="text-gold-400 font-medium">هوش مصنوعی</span> به شما کمک می‌کند به بهترین فرم بدنی خود برسید.
+            Unlock your full potential with Lift Legends. Our <span className="text-gold-400 font-medium">AI-powered platform</span> delivers everything you need to build the physique you deserve.
           </p>
         </div>
 
-        {/* Enhanced main features grid with better card design */}
+        {/* Main features grid */}
         <div className="mb-24">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {features.map((feature, index) => (
@@ -141,13 +139,13 @@ const FeaturesSection = () => {
                   className={`relative h-full bg-gradient-to-br from-gray-900 to-black p-8 rounded-2xl glass-morphism border border-white/10 shadow-[0_0_25px_rgba(255,215,0,0.1)] overflow-hidden group hover:border-gold-500/30 hover:shadow-[0_0_35px_rgba(255,215,0,0.15)] transition-all duration-500 transform ${visibleFeatures.includes(index) ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
                   style={{ transitionDelay: `${index * 100}ms` }}
                 >
-                  {/* Enhanced hover effects */}
+                  {/* Hover effects */}
                   <div className="absolute inset-0 bg-gradient-to-br from-gold-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                   <div className="absolute top-4 right-4 bg-gradient-to-r from-gold-500/20 to-amber-500/10 text-gold-400 text-xs px-3 py-1 rounded-full border border-gold-500/20 font-medium">
                     {feature.tag}
                   </div>
                   
-                  {/* Enhanced content layout */}
+                  {/* Content */}
                   <div className="space-y-5 flex flex-col items-center text-center pt-4">
                     <div className="bg-gradient-to-br from-gold-400 to-amber-500 p-5 rounded-xl text-black inline-block group-hover:scale-110 transition-transform duration-500 shadow-lg">
                       {feature.icon}
@@ -160,7 +158,7 @@ const FeaturesSection = () => {
                       type="button"
                       className="text-gold-400 hover:text-gold-300 flex items-center gap-1 text-sm mt-2 group-hover:translate-x-1 transition-transform border-0 bg-transparent p-0"
                     >
-                      اطلاعات بیشتر
+                      Learn More
                       <ChevronRight size={16} />
                     </button>
                   </div>
@@ -170,17 +168,17 @@ const FeaturesSection = () => {
           </div>
         </div>
         
-        {/* App experience showcase - without screenshots */}
+        {/* App experience showcase */}
         <div className="my-32 relative">
           <div className="absolute -z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl h-80 bg-gradient-to-r from-gold-500/10 to-amber-500/5 rounded-full blur-[100px]"></div>
           
           <div className="text-center mb-16">
             <span className="inline-block bg-gradient-to-r from-purple-500/20 to-blue-500/10 text-purple-400 text-sm px-5 py-2 rounded-full border border-purple-500/20 mb-5">
-              ویژگی‌های کاربری
+              App Features
             </span>
-            <h2 className="text-3xl md:text-4xl font-bold mb-6 text-white">تجربه کاربری فوق‌العاده</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-6 text-white">Exceptional User Experience</h2>
             <p className="text-white/70 max-w-2xl mx-auto">
-              طراحی مدرن و کاربرپسند اپلیکیشن Lift Legends برای تجربه‌ای لذت‌بخش
+              Modern, intuitive design built for athletes who demand the best
             </p>
           </div>
           
@@ -189,9 +187,9 @@ const FeaturesSection = () => {
               <div className="w-16 h-16 mx-auto mb-4 bg-purple-500/20 rounded-full flex items-center justify-center">
                 <div className="w-8 h-8 bg-purple-500/60 rounded-full"></div>
               </div>
-              <h3 className="text-xl font-bold text-center text-white mb-3">صفحه اصلی</h3>
+              <h3 className="text-xl font-bold text-center text-white mb-3">Dashboard</h3>
               <p className="text-center text-white/70 group-hover:text-purple-400 transition-colors">
-                دسترسی سریع به تمام ویژگی‌های اپلیکیشن با رابط کاربری ساده و زیبا
+                Quick access to all features with a clean, intuitive interface
               </p>
             </div>
             
@@ -199,9 +197,9 @@ const FeaturesSection = () => {
               <div className="w-16 h-16 mx-auto mb-4 bg-gold-500/20 rounded-full flex items-center justify-center">
                 <div className="w-8 h-8 bg-gold-500/60 rounded-full"></div>
               </div>
-              <h3 className="text-xl font-bold text-center text-white mb-3">برنامه تمرینی</h3>
+              <h3 className="text-xl font-bold text-center text-white mb-3">Training Hub</h3>
               <p className="text-center text-white/70 group-hover:text-gold-400 transition-colors">
-                برنامه‌های تمرینی شخصی‌سازی شده با جزئیات کامل و ویدیوهای آموزشی
+                Personalized workouts with detailed instructions and video demos
               </p>
             </div>
             
@@ -209,19 +207,19 @@ const FeaturesSection = () => {
               <div className="w-16 h-16 mx-auto mb-4 bg-amber-500/20 rounded-full flex items-center justify-center">
                 <div className="w-8 h-8 bg-amber-500/60 rounded-full"></div>
               </div>
-              <h3 className="text-xl font-bold text-center text-white mb-3">مکمل و استرویید</h3>
+              <h3 className="text-xl font-bold text-center text-white mb-3">Supplement Stack</h3>
               <p className="text-center text-white/70 group-hover:text-amber-400 transition-colors">
-                مشاوره تخصصی در زمینه مکمل‌ها و استروئیدها با توجه به اهداف شما
+                Expert guidance on supplements and performance enhancers
               </p>
             </div>
           </div>
         </div>
         
-        {/* Enhanced additional features with better visual design */}
+        {/* Additional features */}
         <div className="mt-24">
-          <h3 className="text-3xl font-bold text-center mb-6 text-white">امکانات بیشتر</h3>
+          <h3 className="text-3xl font-bold text-center mb-6 text-white">More Power Features</h3>
           <p className="text-white/70 text-center max-w-2xl mx-auto mb-16 leading-relaxed">
-            علاوه بر ویژگی‌های اصلی، Lift Legends امکانات متنوع دیگری نیز برای کمک به شما در مسیر بدنسازی ارائه می‌دهد
+            Beyond the core features, Lift Legends packs everything you need to dominate your fitness journey
           </p>
           
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
@@ -251,10 +249,10 @@ const FeaturesSection = () => {
           <div className="flex flex-col md:flex-row items-center justify-between gap-8">
             <div>
               <h3 className="text-3xl font-bold mb-4 text-white">
-                آماده <span className="text-gradient">تغییر بدن</span> خود هستید؟
+                Ready to <span className="text-gradient">Transform</span>?
               </h3>
               <p className="text-white/70 max-w-xl leading-relaxed">
-                همین امروز اپلیکیشن Lift Legends را دانلود کنید و سفر خود را به سمت بدنی قوی‌تر و سالم‌تر آغاز کنید.
+                Download Lift Legends today and start building the physique you deserve. No excuses. Just results.
               </p>
             </div>
             
@@ -262,8 +260,8 @@ const FeaturesSection = () => {
               className="bg-gradient-to-r from-gold-500 to-amber-400 hover:from-gold-600 hover:to-amber-500 text-black px-8 py-6 text-lg font-medium rounded-xl transition-all hover:scale-105 shadow-[0_0_20px_rgba(255,215,0,0.2)] hover:shadow-[0_0_30px_rgba(255,215,0,0.4)]"
               onClick={() => window.location.href = "/download"}
             >
-              <Download size={20} className="ml-2" />
-              دانلود اپلیکیشن
+              <Download size={20} className="mr-2" />
+              Download Now
             </Button>
           </div>
         </div>
